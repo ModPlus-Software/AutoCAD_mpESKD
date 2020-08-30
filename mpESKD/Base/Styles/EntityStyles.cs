@@ -10,7 +10,7 @@
         public EntityStyles(Type entityType)
         {
             EntityType = entityType;
-            Styles = new ObservableCollection<IntellectualEntityStyle>();
+            Styles = new ObservableCollection<SmartEntityStyle>();
         }
 
         /// <summary>
@@ -26,7 +26,7 @@
         /// <summary>
         /// Коллекция стилей для указанного типа примитива
         /// </summary>
-        public ObservableCollection<IntellectualEntityStyle> Styles { get; }
+        public ObservableCollection<SmartEntityStyle> Styles { get; }
 
         /// <summary>
         /// Есть ли в списке стили с одинаковыми именами
@@ -36,9 +36,9 @@
         /// <summary>
         /// Сделать слой текущим
         /// </summary>
-        public void SetCurrent(IntellectualEntityStyle style)
+        public void SetCurrent(SmartEntityStyle style)
         {
-            foreach (IntellectualEntityStyle entityStyle in Styles)
+            foreach (SmartEntityStyle entityStyle in Styles)
             {
                 if (entityStyle != style)
                 {

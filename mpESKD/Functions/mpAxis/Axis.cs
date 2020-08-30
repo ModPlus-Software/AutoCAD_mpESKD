@@ -14,9 +14,9 @@
     /// <summary>
     /// Прямая ось
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h41")]
+    [SmartEntityDisplayNameKey("h41")]
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
-    public class Axis : IntellectualEntity
+    public class Axis : SmartEntity, ITextValueEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Axis"/> class.
@@ -256,14 +256,17 @@
 
         [EntityProperty(PropertiesCategory.Content, 4, "p20", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 5, "p22", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string FirstText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 6, "p21", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 7, "", "", propertyScope: PropertyScope.Hidden)]
@@ -273,14 +276,17 @@
 
         [EntityProperty(PropertiesCategory.Content, 8, "p23", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 9, "p25", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string SecondText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 10, "p24", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 11, "", "", propertyScope: PropertyScope.Hidden)]
@@ -290,22 +296,27 @@
 
         [EntityProperty(PropertiesCategory.Content, 12, "p26", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 13, "p28", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string ThirdText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 14, "p27", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 15, "p30", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string BottomOrientText { get; set; } = string.Empty;
 
         [EntityProperty(PropertiesCategory.Content, 16, "p31", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string TopOrientText { get; set; } = string.Empty;
 
         // last values

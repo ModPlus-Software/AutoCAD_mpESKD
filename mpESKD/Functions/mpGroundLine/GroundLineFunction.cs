@@ -15,7 +15,7 @@
     using Overrules;
 
     /// <inheritdoc />
-    public class GroundLineFunction : IIntellectualEntityFunction
+    public class GroundLineFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
@@ -34,7 +34,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
             Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -53,7 +53,7 @@
                 var groundLine = new GroundLine();
                 var blockReference = MainFunction.CreateBlock(groundLine);
 
-                groundLine.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                groundLine.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 InsertGroundLineWithJig(groundLine, blockReference);
             }

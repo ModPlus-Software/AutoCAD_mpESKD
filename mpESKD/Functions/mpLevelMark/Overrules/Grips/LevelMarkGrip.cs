@@ -15,7 +15,7 @@
     /// <summary>
     /// Обычная ручка высотной отметки
     /// </summary>
-    public class LevelMarkGrip : IntellectualEntityGripData
+    public class LevelMarkGrip : SmartEntityGripData
     {
         private readonly List<Point3d> _points;
 

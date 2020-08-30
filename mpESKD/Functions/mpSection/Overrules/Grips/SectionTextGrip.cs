@@ -13,7 +13,7 @@
     /// <summary>
     /// Ручка позиции текста
     /// </summary>
-    public class SectionTextGrip : IntellectualEntityGripData
+    public class SectionTextGrip : SmartEntityGripData
     {
         public SectionTextGrip(Section section)
         {

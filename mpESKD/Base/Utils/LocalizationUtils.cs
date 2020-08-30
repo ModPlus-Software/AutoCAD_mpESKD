@@ -97,7 +97,7 @@
                 return EntityLocalizationNames[entityType];
             }
 
-            var attribute = entityType.GetCustomAttribute<IntellectualEntityDisplayNameKeyAttribute>();
+            var attribute = entityType.GetCustomAttribute<SmartEntityDisplayNameKeyAttribute>();
             if (attribute != null)
             {
                 try

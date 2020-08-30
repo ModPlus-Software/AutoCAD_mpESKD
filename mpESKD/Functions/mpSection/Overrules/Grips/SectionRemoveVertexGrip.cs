@@ -13,7 +13,7 @@
     /// <summary>
     /// Ручка удаления вершины
     /// </summary>
-    public class SectionRemoveVertexGrip : IntellectualEntityGripData
+    public class SectionRemoveVertexGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SectionRemoveVertexGrip"/> class.

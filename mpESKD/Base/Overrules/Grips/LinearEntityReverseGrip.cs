@@ -7,41 +7,41 @@
     /// <summary>
     /// Ручка реверса линейного интеллектуального объекта
     /// </summary>
-    public class LinearEntityReverseGrip : IntellectualEntityGripData
+    public class LinearEntityReverseGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearEntityReverseGrip"/> class.
         /// </summary>
-        /// <param name="intellectualEntity">Instance of <see cref="IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
-        public LinearEntityReverseGrip(IntellectualEntity intellectualEntity)
+        /// <param name="smartEntity">Instance of <see cref="SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
+        public LinearEntityReverseGrip(SmartEntity smartEntity)
         {
-            IntellectualEntity = intellectualEntity;
+            SmartEntity = smartEntity;
             GripType = GripType.Mirror;
         }
 
         /// <summary>
         /// Экземпляр интеллектуального объекта
         /// </summary>
-        public IntellectualEntity IntellectualEntity { get; }
+        public SmartEntity SmartEntity { get; }
 
         /// <inheritdoc />
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
-            using (IntellectualEntity)
+            using (SmartEntity)
             {
-                var newInsertionPoint = IntellectualEntity.EndPoint;
-                IntellectualEntity.EndPoint = IntellectualEntity.InsertionPoint;
-                IntellectualEntity.InsertionPoint = newInsertionPoint;
-                ((ILinearEntity)IntellectualEntity).MiddlePoints.Reverse();
-                IntellectualEntity.BlockTransform = IntellectualEntity.BlockTransform.Inverse();
+                var newInsertionPoint = SmartEntity.EndPoint;
+                SmartEntity.EndPoint = SmartEntity.InsertionPoint;
+                SmartEntity.InsertionPoint = newInsertionPoint;
+                ((ILinearEntity)SmartEntity).MiddlePoints.Reverse();
+                SmartEntity.BlockTransform = SmartEntity.BlockTransform.Inverse();
 
-                IntellectualEntity.UpdateEntities();
-                IntellectualEntity.BlockRecord.UpdateAnonymousBlocks();
+                SmartEntity.UpdateEntities();
+                SmartEntity.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
+                    var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
                     ((BlockReference)blkRef).Position = newInsertionPoint;
-                    using (var resBuf = IntellectualEntity.GetDataForXData())
+                    using (var resBuf = SmartEntity.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }

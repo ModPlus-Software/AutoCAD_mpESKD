@@ -16,7 +16,7 @@
     using Overrules;
 
     /// <inheritdoc />
-    public class SectionFunction : IIntellectualEntityFunction
+    public class SectionFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
@@ -35,7 +35,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
             Statistic.SendCommandStarting(SectionDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -57,7 +57,7 @@
 
                 var blockReference = MainFunction.CreateBlock(section);
 
-                section.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                section.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 InsertSectionWithJig(true, section, blockReference);
             }

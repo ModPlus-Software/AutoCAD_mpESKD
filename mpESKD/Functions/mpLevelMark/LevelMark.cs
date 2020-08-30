@@ -14,9 +14,9 @@
     /// <summary>
     /// Отметка уровня
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h105")]
+    [SmartEntityDisplayNameKey("h105")]
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
-    public class LevelMark : IntellectualEntity
+    public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -33,7 +33,7 @@
             : base(objectId)
         {
         }
-        
+
         /// <summary>
         /// Точка уровня (точка объекта измерения)
         /// </summary>
@@ -95,7 +95,7 @@
                 ? value
                 : new Point3d(value.X, ObjectPoint.Y, value.Z);
         }
-        
+
         /// <summary>
         /// Состояние Jig при создании высотной отметки
         /// </summary>
@@ -233,57 +233,79 @@
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 2, "p65", null, isReadOnly: true, propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public double MeasuredValue { get; set; }
+
+        /// <summary>
+        /// Выравнивание основного значения по горизонтали
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 3, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+        [SaveToXData]
+        public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
+
+        /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.Content, 4, "p72", NumberSeparator.Dot, descLocalKey: "d72")]
+        [SaveToXData]
+        public NumberSeparator NumberSeparator { get; set; } = NumberSeparator.Dot;
 
         /// <summary>
         /// Переопределение текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "p66", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p66", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string OverrideValue { get; set; } = string.Empty;
 
         /// <summary>
         /// Показывать плюс
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "p64", true, descLocalKey: "d64")]
+        [EntityProperty(PropertiesCategory.Content, 6, "p64", true, descLocalKey: "d64")]
         [SaveToXData]
         public bool ShowPlus { get; set; } = true;
 
         /// <summary>
         /// Точность
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 5, "p67", 3, 0, 5, descLocalKey: "d67")]
+        [EntityProperty(PropertiesCategory.Content, 7, "p67", 3, 0, 5, descLocalKey: "d67")]
         [SaveToXData]
         public int Accuracy { get; set; } = 3;
 
         /// <summary>
         /// Примечание
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p68", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 8, "p68", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string Note { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Выравнивание примечания по горизонтали
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 9, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+        [SaveToXData]
+        public TextHorizontalAlignment NoteHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
 
         /// <summary>
         /// Высота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 7, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+        [EntityProperty(PropertiesCategory.Content, 10, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
         [SaveToXData]
         public double MainTextHeight { get; set; } = 3.5;
 
         /// <summary>
         /// Высота малого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 8, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+        [EntityProperty(PropertiesCategory.Content, 11, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
 
         /// <summary>
         /// Масштаб измерений
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
         [SaveToXData]
         public double MeasurementScale { get; set; } = 1.0;
-        
+
         /// <summary>
         /// Нижняя полка
         /// </summary>
@@ -557,11 +579,11 @@
                 TextString = Note,
                 Position = bottomTextPosition
             };
-
+            
             if (isLeft)
             {
                 _topDbText.SetPropertiesToDbText(
-                    TextStyle, mainTextHeight, TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BottomRight);
+                    TextStyle, mainTextHeight, TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
                 _topDbText.AlignmentPoint = topTextPosition;
 
                 _bottomDbText.SetPropertiesToDbText(
@@ -575,7 +597,7 @@
                     TextStyle, secondTextHeight, TextHorizontalMode.TextLeft, TextVerticalMode.TextBottom, AttachmentPoint.TopLeft);
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
-
+            
             // верхний текст всегда имеет содержимое
             var topTextLength =
                 Math.Abs(_topDbText.GeometricExtents.MaxPoint.X - _topDbText.GeometricExtents.MinPoint.X);
@@ -589,6 +611,46 @@
                 : Math.Max(topTextLength, bottomTextLength);
             AcadUtils.WriteMessageInDebug($"Max text width: {maxTextWidth}");
             var topShelfLength = textIndent + maxTextWidth + (ShelfLedge * scale);
+
+            // если нижнего текста нет, то и выравнивать ничего не нужно
+            if (!double.IsNaN(bottomTextLength))
+            {
+                var diff = Math.Abs(topTextLength - bottomTextLength);
+                if (topTextLength > bottomTextLength)
+                {
+                    if (NoteHorizontalAlignment == TextHorizontalAlignment.Center)
+                    {
+                        var pt = _bottomDbText.Position + (diff / 2 * horV);
+                        _bottomDbText.Position = pt;
+                        _bottomDbText.AlignmentPoint = pt;
+                    }
+                    else if ((isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Left) ||
+                             (!isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Right))
+                    {
+                        var pt = _bottomDbText.Position + (diff * horV);
+                        _bottomDbText.Position = pt;
+                        _bottomDbText.AlignmentPoint = pt;
+                    }
+                }
+                else
+                {
+                    if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
+                    {
+                        var pt = _topDbText.Position + (diff / 2 * horV);
+                        _topDbText.Position = pt;
+                        if (isLeft)
+                            _topDbText.AlignmentPoint = pt;
+                    }
+                    else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left) ||
+                             (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right))
+                    {
+                        var pt = _topDbText.Position + (diff * horV);
+                        _topDbText.Position = pt;
+                        if (isLeft)
+                            _topDbText.AlignmentPoint = pt;
+                    }
+                }
+            }
 
             _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
         }
@@ -623,10 +685,16 @@
             if (MeasuredValue >= 0)
             {
                 var plus = ShowPlus ? "+" : string.Empty;
-                return $"{plus}{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}";
+                return ReplaceSeparator($"{plus}{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}");
             }
 
-            return $"{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}";
+            return ReplaceSeparator($"{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}");
+        }
+
+        private string ReplaceSeparator(string numericValue)
+        {
+            var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
+            return numericValue.Replace(',', '.').Replace('.', c);
         }
     }
 }

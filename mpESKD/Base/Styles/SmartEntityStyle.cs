@@ -12,7 +12,7 @@
     /// <summary>
     /// Стиль интеллектуального объекта
     /// </summary>
-    public class IntellectualEntityStyle : VmBase
+    public class SmartEntityStyle : VmBase
     {
         private string _name;
         private string _description;
@@ -20,21 +20,21 @@
         private bool _isCurrent;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntellectualEntityStyle"/> class.
+        /// Initializes a new instance of the <see cref="SmartEntityStyle"/> class.
         /// </summary>
         /// <param name="entityType">Тип интеллектуального объекта</param>
         /// <param name="fillDefaultProperties">Заполнять ли значениями по умолчанию</param>
-        public IntellectualEntityStyle(Type entityType, bool fillDefaultProperties = false)
+        public SmartEntityStyle(Type entityType, bool fillDefaultProperties = false)
         {
             EntityType = entityType;
-            Properties = new ObservableCollection<IntellectualEntityProperty>();
+            Properties = new ObservableCollection<SmartEntityProperty>();
             if (fillDefaultProperties)
             {
                 this.FillStyleDefaultProperties(EntityType);
             }
         }
 
-        public ObservableCollection<IntellectualEntityProperty> Properties { get; }
+        public ObservableCollection<SmartEntityProperty> Properties { get; }
 
         /// <summary>
         /// Тип интеллектуального примитива, к которому относится стиль

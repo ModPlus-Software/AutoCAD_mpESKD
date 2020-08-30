@@ -13,7 +13,7 @@
     /// <summary>
     /// Описание ручки линии обрыва
     /// </summary>
-    public class BreakLineGrip : IntellectualEntityGripData
+    public class BreakLineGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BreakLineGrip"/> class.

@@ -14,8 +14,8 @@ namespace mpESKD.Functions.mpBreakLine
     /// <summary>
     /// Линия обрыва
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h48")]
-    public class BreakLine : IntellectualEntity
+    [SmartEntityDisplayNameKey("h48")]
+    public class BreakLine : SmartEntity
     {
         #region Constructors
 

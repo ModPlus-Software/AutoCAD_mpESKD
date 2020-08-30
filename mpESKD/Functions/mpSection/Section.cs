@@ -16,8 +16,8 @@
     /// <summary>
     /// Разрез
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h79")]
-    public class Section : IntellectualEntity
+    [SmartEntityDisplayNameKey("h79")]
+    public class Section : SmartEntity, ITextValueEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Section"/> class.
@@ -159,6 +159,7 @@
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 4, "p51", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string Designation { get; set; } = string.Empty;
 
         /// <summary>
@@ -166,6 +167,7 @@
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 5, "p52", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
+        [ValueToSearchBy]
         public string DesignationPrefix { get; set; } = string.Empty;
 
         /// <summary>
@@ -173,6 +175,7 @@
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 6, "p53", "", propertyScope: PropertyScope.Palette, descLocalKey: "d53")]
         [SaveToXData]
+        [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
 
         /// <summary>

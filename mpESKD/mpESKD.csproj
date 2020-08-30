@@ -103,15 +103,21 @@
   <ItemGroup>
     <Compile Include="Base\Attributes\EntityPropertyAttribute.cs" />
     <Compile Include="Base\Attributes\EnumPropertyDisplayValueKeyAttribute.cs" />
-    <Compile Include="Base\Attributes\IntellectualEntityDisplayNameKeyAttribute.cs" />
+    <Compile Include="Base\Attributes\SmartEntityDisplayNameKeyAttribute.cs" />
     <Compile Include="Base\Attributes\PropertyVisibilityDependencyAttribute.cs" />
     <Compile Include="Base\Attributes\SaveToXDataAttribute.cs" />
+    <Compile Include="Base\Attributes\ValueToSearchByAttribute.cs" />
     <Compile Include="Base\Binder.cs" />
+    <Compile Include="Base\Enums\GlobalNumberSeparator.cs" />
+    <Compile Include="Base\Enums\NumberSeparator.cs" />
     <Compile Include="Base\Enums\LayerActionOnCreateAnalog.cs" />
     <Compile Include="Base\Enums\SearchProceedOption.cs" />
+    <Compile Include="Base\Enums\TextHorizontalAlignment.cs" />
     <Compile Include="Base\Enums\WaterProofingFirstStrokeOffset.cs" />
-    <Compile Include="Base\IIntellectualEntity.cs" />
+    <Compile Include="Base\INumericValueEntity.cs" />
+    <Compile Include="Base\ISmartEntity.cs" />
     <Compile Include="Base\ILinearEntity.cs" />
+    <Compile Include="Base\ITextValueEntity.cs" />
     <Compile Include="Base\Overrules\Grips\LinearEntityAddVertexGrip.cs" />
     <Compile Include="Base\Overrules\Grips\LinearEntityVertexGrip.cs" />
     <Compile Include="Base\Overrules\Grips\LinearEntityReverseGrip.cs" />
@@ -141,19 +147,19 @@
     <Compile Include="Base\Utils\MathExtensions.cs" />
     <Compile Include="Base\Utils\TextStyleUtils.cs" />
     <Compile Include="Base\IIntellectualEntityDescriptor.cs" />
-    <Compile Include="Base\IIntellectualEntityFunction.cs" />
-    <Compile Include="Base\IntellectualEntity.cs" />
-    <Compile Include="Base\Overrules\IntellectualEntityGripData.cs" />
+    <Compile Include="Base\ISmartEntityFunction.cs" />
+    <Compile Include="Base\SmartEntity.cs" />
+    <Compile Include="Base\Overrules\SmartEntityGripData.cs" />
     <Compile Include="Base\Enums\GripType.cs" />
-    <Compile Include="Base\Properties\Controls\ControlStylesForEditor.xaml.cs">
+    <Compile Include="Base\Controls\ControlStylesForEditor.xaml.cs">
       <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Base\Properties\Controls\ControlStyles.xaml.cs">
+    <Compile Include="Base\Controls\ControlStyles.xaml.cs">
       <DependentUpon>ControlStyles.xaml</DependentUpon>
     </Compile>
     <Compile Include="Base\Properties\EntityPropertyProvider.cs" />
     <Compile Include="Base\Properties\EnumPropertyValueConverter.cs" />
-    <Compile Include="Base\Properties\IntellectualEntityProperty.cs" />
+    <Compile Include="Base\Properties\SmartEntityProperty.cs" />
     <Compile Include="Base\Properties\PaletteSettings.xaml.cs">
       <DependentUpon>PaletteSettings.xaml</DependentUpon>
     </Compile>
@@ -164,7 +170,7 @@
     <Compile Include="Base\Properties\SummaryProperty.cs" />
     <Compile Include="Base\Properties\SummaryPropertyCollection.cs" />
     <Compile Include="Base\Styles\EntityStyles.cs" />
-    <Compile Include="Base\Styles\IntellectualEntityStyle.cs" />
+    <Compile Include="Base\Styles\SmartEntityStyle.cs" />
     <Compile Include="Base\Styles\StyleManager.cs" />
     <Compile Include="Base\TypeFactory.cs" />
     <Compile Include="BeditCommandWatcher.cs" />
@@ -233,13 +239,19 @@
     <Compile Include="Functions\mpWaterProofing\WaterProofing.cs" />
     <Compile Include="Functions\mpWaterProofing\WaterProofingDescriptor.cs" />
     <Compile Include="Functions\mpWaterProofing\WaterProofingFunction.cs" />
+    <Compile Include="Functions\SearchEntitiesByValues\SearchByValuesResultItem.cs" />
+    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesCommand.cs" />
+    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesViewModel.cs" />
+    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesWindow.xaml.cs">
+      <DependentUpon>SearchEntitiesByValuesWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Functions\SearchEntities\SearchEntitiesCommand.cs" />
     <Compile Include="Functions\SearchEntities\SearchEntitiesSettings.xaml.cs">
       <DependentUpon>SearchEntitiesSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="ModPlusConnector.cs" />
-    <Compile Include="Base\Utils\RibbonBuilder.cs" />
+    <Compile Include="RibbonBuilder.cs" />
     <Compile Include="MainFunction.cs" />
     <Compile Include="MainSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -250,11 +262,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Base\Properties\Controls\ControlStylesForEditor.xaml">
+    <Page Include="Base\Controls\ControlStylesForEditor.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Base\Properties\Controls\ControlStyles.xaml">
+    <Page Include="Base\Controls\ControlStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -307,6 +319,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Functions\mpSection\SectionValueEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -486,7 +502,7 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="ModPlusAPI">
-      <Version>3.2.0</Version>
+      <Version>3.8.0</Version>
       <ExcludeAssets>runtime</ExcludeAssets>
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -518,6 +534,10 @@
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SearchEntitiesByValues_32x32.png" />
+    <Resource Include="Resources\SearchEntitiesByValues_32x32_dark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

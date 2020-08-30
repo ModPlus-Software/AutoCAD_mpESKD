@@ -14,7 +14,6 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Enums;
-    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using Functions.mpAxis;
@@ -158,7 +157,7 @@
             if (psr.Value == null || psr.Value.Count != 1) 
                 return;
 
-            IntellectualEntity intellectualEntity = null;
+            SmartEntity intellectualEntity = null;
             using (AcadUtils.Document.LockDocument())
             {
                 using (var tr = new OpenCloseTransaction())
@@ -221,7 +220,7 @@
         /// Создание блока для интеллектуального объекта
         /// </summary>
         /// <param name="intellectualEntity">Интеллектуальный объект</param>
-        public static BlockReference CreateBlock(IntellectualEntity intellectualEntity)
+        public static BlockReference CreateBlock(SmartEntity intellectualEntity)
         {
             BlockReference blockReference;
             using (AcadUtils.Document.LockDocument())
@@ -423,7 +422,7 @@
                 var timer = Stopwatch.StartNew();
                 using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
                 {
-                    foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfIntellectualEntities(
+                    foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfSmartEntities(
                         TypeFactory.Instance.GetEntityCommandNames(), tr))
                     {
                         var ie = EntityReaderService.Instance.GetFromEntity(blockReference);

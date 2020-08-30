@@ -9,7 +9,7 @@ namespace mpESKD.Base
     /// <summary>
     /// Интеллектуальный объект
     /// </summary>
-    public interface IIntellectualEntity
+    public interface ISmartEntity
     {
         /// <summary>
         /// Первая точка примитива в мировой системе координат.
@@ -167,7 +167,7 @@ namespace mpESKD.Base
         /// </summary>
         /// <param name="sourceEntity">Интеллектуальный объекта</param>
         /// <param name="copyLayer">Копировать слой</param>
-        void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity, bool copyLayer);
+        void SetPropertiesFromSmartEntity(SmartEntity sourceEntity, bool copyLayer);
 
         /// <summary>
         /// Установка свойств для примитивов, которые не меняются

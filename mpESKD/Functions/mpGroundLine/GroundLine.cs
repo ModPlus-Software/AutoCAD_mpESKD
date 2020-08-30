@@ -14,8 +14,8 @@ namespace mpESKD.Functions.mpGroundLine
     /// <summary>
     /// Линия грунта
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h73")]
-    public class GroundLine : IntellectualEntity, ILinearEntity
+    [SmartEntityDisplayNameKey("h73")]
+    public class GroundLine : SmartEntity, ILinearEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GroundLine"/> class.

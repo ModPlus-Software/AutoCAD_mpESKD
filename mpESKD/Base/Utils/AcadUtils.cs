@@ -489,7 +489,7 @@
         /// <typeparam name="T">Допустимый тип</typeparam>
         /// <param name="entityType">Тип интеллектуального объекта для поиска</param>
         public static List<T> GetAllIntellectualEntitiesInCurrentSpace<T>(Type entityType) 
-            where T : IntellectualEntity
+            where T : SmartEntity
         {
             var list = new List<T>();
             var appName = $"mp{entityType.Name}";

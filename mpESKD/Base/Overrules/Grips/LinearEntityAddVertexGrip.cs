@@ -12,17 +12,17 @@
     /// <summary>
     /// Ручка добавления вершины линейного интеллектуального объекта
     /// </summary>
-    public class LinearEntityAddVertexGrip : IntellectualEntityGripData
+    public class LinearEntityAddVertexGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearEntityAddVertexGrip"/> class.
         /// </summary>
-        /// <param name="intellectualEntity">Instance of <see cref="Base.IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
+        /// <param name="smartEntity">Instance of <see cref="Base.SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
         /// <param name="leftPoint">Точка слева</param>
         /// <param name="rightPoint">Точка справа</param>
-        public LinearEntityAddVertexGrip(IntellectualEntity intellectualEntity, Point3d? leftPoint, Point3d? rightPoint)
+        public LinearEntityAddVertexGrip(SmartEntity smartEntity, Point3d? leftPoint, Point3d? rightPoint)
         {
-            IntellectualEntity = intellectualEntity;
+            SmartEntity = smartEntity;
             GripLeftPoint = leftPoint;
             GripRightPoint = rightPoint;
             GripType = GripType.Plus;
@@ -32,7 +32,7 @@
         /// <summary>
         /// Экземпляр интеллектуального объекта
         /// </summary>
-        public IntellectualEntity IntellectualEntity { get; }
+        public SmartEntity SmartEntity { get; }
 
         /// <summary>
         /// Левая точка
@@ -68,26 +68,26 @@
             {
                 AcadUtils.Editor.TurnForcedPickOff();
                 AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-                using (IntellectualEntity)
+                using (SmartEntity)
                 {
                     Point3d? newInsertionPoint = null;
 
-                    var linearEntity = (ILinearEntity)IntellectualEntity;
+                    var linearEntity = (ILinearEntity)SmartEntity;
 
-                    if (GripLeftPoint == IntellectualEntity.InsertionPoint)
+                    if (GripLeftPoint == SmartEntity.InsertionPoint)
                     {
                         linearEntity.MiddlePoints.Insert(0, NewPoint);
                     }
                     else if (GripLeftPoint == null)
                     {
-                        linearEntity.MiddlePoints.Insert(0, IntellectualEntity.InsertionPoint);
-                        IntellectualEntity.InsertionPoint = NewPoint;
+                        linearEntity.MiddlePoints.Insert(0, SmartEntity.InsertionPoint);
+                        SmartEntity.InsertionPoint = NewPoint;
                         newInsertionPoint = NewPoint;
                     }
                     else if (GripRightPoint == null)
                     {
-                        linearEntity.MiddlePoints.Add(IntellectualEntity.EndPoint);
-                        IntellectualEntity.EndPoint = NewPoint;
+                        linearEntity.MiddlePoints.Add(SmartEntity.EndPoint);
+                        SmartEntity.EndPoint = NewPoint;
                     }
                     else
                     {
@@ -95,17 +95,17 @@
                             linearEntity.MiddlePoints.IndexOf(GripLeftPoint.Value) + 1, NewPoint);
                     }
 
-                    IntellectualEntity.UpdateEntities();
-                    IntellectualEntity.BlockRecord.UpdateAnonymousBlocks();
+                    SmartEntity.UpdateEntities();
+                    SmartEntity.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
+                        var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
                         if (newInsertionPoint.HasValue)
                         {
                             ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                         }
 
-                        using (var resBuf = IntellectualEntity.GetDataForXData())
+                        using (var resBuf = SmartEntity.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }

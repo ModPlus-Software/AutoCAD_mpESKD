@@ -24,14 +24,14 @@ namespace mpESKD.Base
     /// Абстрактный класс интеллектуального объекта
     /// </summary>
     [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
-    public abstract class IntellectualEntity : IIntellectualEntity, IDisposable
+    public abstract class SmartEntity : ISmartEntity, IDisposable
     {
         private BlockTableRecord _blockRecord;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntellectualEntity"/> class.
+        /// Initializes a new instance of the <see cref="SmartEntity"/> class.
         /// </summary>
-        protected IntellectualEntity()
+        protected SmartEntity()
         {
             BlockTransform = Matrix3d.Identity;
             var blockTableRecord = new BlockTableRecord
@@ -43,11 +43,11 @@ namespace mpESKD.Base
         }
 
         /// <summary>
-        /// Инициализация экземпляра класса IntellectualEntity без заполнения данными
+        /// Инициализация экземпляра класса SmartEntity без заполнения данными
         /// В данном случае уже все данные получены и нужно только "построить" базовые примитивы
         /// </summary>
         /// <param name="blockId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        protected IntellectualEntity(ObjectId blockId)
+        protected SmartEntity(ObjectId blockId)
         {
             BlockId = blockId;
         }
@@ -639,7 +639,7 @@ namespace mpESKD.Base
         /// </summary>
         /// <param name="sourceEntity">Интеллектуальный объекта</param>
         /// <param name="copyLayer">Копировать слой</param>
-        public void SetPropertiesFromIntellectualEntity(IntellectualEntity sourceEntity, bool copyLayer)
+        public void SetPropertiesFromSmartEntity(SmartEntity sourceEntity, bool copyLayer)
         {
             var dataForXData = sourceEntity.GetDataForXData();
             if (dataForXData != null)

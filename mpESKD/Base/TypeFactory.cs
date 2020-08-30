@@ -67,11 +67,11 @@
         }
 
         /// <summary>
-        /// Возвращает список экземпляров функций, реализующих интерфейс <see cref="IIntellectualEntityFunction"/>
+        /// Возвращает список экземпляров функций, реализующих интерфейс <see cref="ISmartEntityFunction"/>
         /// </summary>
-        public List<IIntellectualEntityFunction> GetEntityFunctionTypes()
+        public List<ISmartEntityFunction> GetEntityFunctionTypes()
         {
-            return new List<IIntellectualEntityFunction>
+            return new List<ISmartEntityFunction>
             {
                 new BreakLineFunction(),
                 new AxisFunction(),

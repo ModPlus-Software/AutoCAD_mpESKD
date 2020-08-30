@@ -1,0 +1,95 @@
+﻿<mps:ModPlusWindow
+    x:Class="mpESKD.Functions.SearchEntitiesByValues.SearchEntitiesByValuesWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:mpESKD.Functions.SearchEntitiesByValues"
+    xmlns:mps="https://modplus.org/winfx/xaml/controls"
+    mc:Ignorable="d" Topmost="True" SizeToContent="Height"
+    MaxHeight="450" Width="400"
+    d:DataContext="{d:DesignInstance local:SearchEntitiesByValuesViewModel, IsDesignTimeCreatable=False}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- settings -->
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Row="0" Grid.Column="0"
+                     mps:TextFieldAssist.ClearTextButton="True"
+                     mps:HintAssist.Hint="{Binding Source={StaticResource Lang}, XPath=h120}"
+                     Text="{Binding Path=SearchValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Grid.Row="0" Grid.Column="1"
+                    Command="{Binding Path=SearchCommand}"
+                    Content="{Binding Source={StaticResource Lang}, XPath=h121}"/>
+
+            <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h122}"
+                          IsChecked="{Binding Path=SearchByValuesFullMatch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h123}"
+                          IsChecked="{Binding Path=SearchByValuesCaseSensitive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- no found message -->
+        <TextBlock Grid.Row="1" Margin="{DynamicResource ModPlusDefaultMargin}"
+                   HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"
+                   Text="{Binding Path=NoFoundMessage, Mode=OneWay}"
+                   Visibility="{Binding Path=NoFoundMessageVisibility}"
+                   Foreground="{DynamicResource ErrorBrush}"
+                   FontWeight="SemiBold"/>
+
+        <!-- result -->
+        <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Path=ResultItems}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="local:SearchByValuesResultItem">
+                        <mps:Card>
+                            <Expander Header="{Binding Path=Title}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- select all -->
+                                    <Button Grid.Row="0" Style="{DynamicResource ModPlusFlatButton}"
+                                            HorizontalAlignment="Left"
+                                            MinHeight="0" MinWidth="0" Padding="2" Margin="4 0 0 0"
+                                            Content="{Binding Source={StaticResource Lang}, XPath=h125}"
+                                            Command="{Binding Path=SelectAllCommand}"/>
+
+                                    <!-- list -->
+                                    <ListBox Grid.Row="1" mps:RippleAssist.IsDisabled="True"
+                                             ItemsSource="{Binding Path=Blocks}" Name="BlocksList"
+                                             SelectionChanged="BlocksList_OnSelectionChanged"
+                                             DisplayMemberPath="ObjectId" MaxHeight="150"/>
+                                </Grid>
+                            </Expander>
+                        </mps:Card>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</mps:ModPlusWindow>

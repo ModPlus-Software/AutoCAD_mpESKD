@@ -69,7 +69,7 @@
                 {
                     var btr = (BlockTableRecord)tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead);
 
-                    var blockReferences = GetBlockReferencesOfIntellectualEntities(entitiesToProceed, tr).ToList();
+                    var blockReferences = GetBlockReferencesOfSmartEntities(entitiesToProceed, tr).ToList();
 
                     if (blockReferences.Any())
                     {
@@ -143,7 +143,7 @@
         /// <param name="typeNames">Список имен типов, интеллектуальные объекты которых нужно найти</param>
         /// <param name="tr">Открытая транзакция</param>
         /// <returns>Коллекция блоков</returns>
-        public static IEnumerable<BlockReference> GetBlockReferencesOfIntellectualEntities(
+        public static IEnumerable<BlockReference> GetBlockReferencesOfSmartEntities(
             ICollection<string> typeNames, Transaction tr)
         {
             var btr = (BlockTableRecord)tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead);

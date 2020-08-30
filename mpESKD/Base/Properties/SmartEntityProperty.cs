@@ -10,20 +10,20 @@
     /// <summary>
     /// Свойство интеллектуального объекта
     /// </summary>
-    public class IntellectualEntityProperty : VmBase
+    public class SmartEntityProperty : VmBase
     {
         private object _value;
         private double _doubleValue;
         private int _intValue;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntellectualEntityProperty"/> class.
+        /// Initializes a new instance of the <see cref="SmartEntityProperty"/> class.
         /// </summary>
         /// <param name="attribute">Атрибут <see cref="EntityPropertyAttribute"/></param>
         /// <param name="entityType">Тип интеллектуального объекта</param>
         /// <param name="value">Значение свойства</param>
         /// <param name="ownerObjectId">Идентификатор блока</param>
-        public IntellectualEntityProperty(
+        public SmartEntityProperty(
             EntityPropertyAttribute attribute,
             Type entityType,
             object value,
@@ -138,7 +138,7 @@
         }
 
         /// <summary>
-        /// Подробнее смотри в описании метода <see cref="mpESKD.Base.Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// Подробнее смотри в описании метода <see cref="Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public double DoubleValue
         {
@@ -157,7 +157,7 @@
         }
 
         /// <summary>
-        /// Подробнее смотри в описании метода <see cref="mpESKD.Base.Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// Подробнее смотри в описании метода <see cref="Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public int IntValue
         {

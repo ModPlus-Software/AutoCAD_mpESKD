@@ -50,18 +50,18 @@
         /// Обработка объекта в методе Close класса <see cref="ObjectOverrule"/>
         /// </summary>
         /// <param name="dbObject">Instance of <see cref="DBObject"/></param>
-        /// <param name="intellectualEntity">Метод получения объекта из блока</param>
-        public static void ObjectOverruleProcess(DBObject dbObject, Func<IntellectualEntity> intellectualEntity)
+        /// <param name="smartEntity">Метод получения объекта из блока</param>
+        public static void ObjectOverruleProcess(DBObject dbObject, Func<SmartEntity> smartEntity)
         {
             try
             {
                 if (AcadUtils.Document == null)
                     return;
 
-                if (dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadUtils.Database ||
-                    dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData)
+                if ((dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadUtils.Database) ||
+                    (dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData))
                 {
-                    var entity = intellectualEntity.Invoke();
+                    var entity = smartEntity.Invoke();
                     if (entity == null)
                         return;
 
@@ -107,7 +107,7 @@
         /// <param name="getEditor">Метод получения редактора свойств для интеллектуального объекта</param>
         public static void DoubleClickEdit(
             BlockReference blockReference,
-            Func<IntellectualEntity, Window> getEditor)
+            Func<SmartEntity, Window> getEditor)
         {
             BeditCommandWatcher.UseBedit = false;
 
@@ -143,16 +143,16 @@
         /// </summary>
         /// <param name="linearEntity">Линейный интеллектуальный объекты</param>
         /// <param name="curViewUnitSize">Размер единиц текущего вида</param>
-        public static IEnumerable<IntellectualEntityGripData> GetLinearEntityGeneralGrips(
+        public static IEnumerable<SmartEntityGripData> GetLinearEntityGeneralGrips(
             ILinearEntity linearEntity, double curViewUnitSize)
         {
-            var intellectualEntity = (IntellectualEntity)linearEntity;
+            var smartEntity = (SmartEntity)linearEntity;
 
             // Если средних точек нет, значит линия состоит всего из двух точек
             // в этом случае не нужно добавлять точки удаления крайних вершин
 
             // insertion (start) grip
-            var vertexGrip = new LinearEntityVertexGrip(intellectualEntity, 0)
+            var vertexGrip = new LinearEntityVertexGrip(smartEntity, 0)
             {
                 GripPoint = linearEntity.InsertionPoint
             };
@@ -160,7 +160,7 @@
 
             if (linearEntity.MiddlePoints.Any())
             {
-                var removeVertexGrip = new LinearEntityRemoveVertexGrip(intellectualEntity, 0)
+                var removeVertexGrip = new LinearEntityRemoveVertexGrip(smartEntity, 0)
                 {
                     GripPoint = linearEntity.InsertionPoint - (Vector3d.YAxis * 20 * curViewUnitSize)
                 };
@@ -170,13 +170,13 @@
             // middle points
             for (var index = 0; index < linearEntity.MiddlePoints.Count; index++)
             {
-                vertexGrip = new LinearEntityVertexGrip(intellectualEntity, index + 1)
+                vertexGrip = new LinearEntityVertexGrip(smartEntity, index + 1)
                 {
                     GripPoint = linearEntity.MiddlePoints[index]
                 };
                 yield return vertexGrip;
 
-                var removeVertexGrip = new LinearEntityRemoveVertexGrip(intellectualEntity, index + 1)
+                var removeVertexGrip = new LinearEntityRemoveVertexGrip(smartEntity, index + 1)
                 {
                     GripPoint = linearEntity.MiddlePoints[index] - (Vector3d.YAxis * 20 * curViewUnitSize)
                 };
@@ -184,7 +184,7 @@
             }
 
             // end point
-            vertexGrip = new LinearEntityVertexGrip(intellectualEntity, linearEntity.MiddlePoints.Count + 1)
+            vertexGrip = new LinearEntityVertexGrip(smartEntity, linearEntity.MiddlePoints.Count + 1)
             {
                 GripPoint = linearEntity.EndPoint
             };
@@ -192,7 +192,7 @@
 
             if (linearEntity.MiddlePoints.Any())
             {
-                var removeVertexGrip = new LinearEntityRemoveVertexGrip(intellectualEntity, linearEntity.MiddlePoints.Count + 1)
+                var removeVertexGrip = new LinearEntityRemoveVertexGrip(smartEntity, linearEntity.MiddlePoints.Count + 1)
                 {
                     GripPoint = linearEntity.EndPoint - (Vector3d.YAxis * 20 * curViewUnitSize)
                 };
@@ -207,7 +207,7 @@
                 if (i == 0)
                 {
                     var addVertexGrip = new LinearEntityAddVertexGrip(
-                        intellectualEntity,
+                        smartEntity,
                         linearEntity.InsertionPoint, linearEntity.MiddlePoints[i])
                     {
                         GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.InsertionPoint, linearEntity.MiddlePoints[i])
@@ -217,7 +217,7 @@
                 else
                 {
                     var addVertexGrip = new LinearEntityAddVertexGrip(
-                        intellectualEntity,
+                        smartEntity,
                         linearEntity.MiddlePoints[i - 1], linearEntity.MiddlePoints[i])
                     {
                         GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.MiddlePoints[i - 1], linearEntity.MiddlePoints[i])
@@ -229,7 +229,7 @@
                 if (i == linearEntity.MiddlePoints.Count - 1)
                 {
                     var addVertexGrip = new LinearEntityAddVertexGrip(
-                        intellectualEntity,
+                        smartEntity,
                         linearEntity.MiddlePoints[i], linearEntity.EndPoint)
                     {
                         GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.MiddlePoints[i], linearEntity.EndPoint)
@@ -241,14 +241,14 @@
             {
                 if (linearEntity.MiddlePoints.Any())
                 {
-                    var addVertexGrip = new LinearEntityAddVertexGrip(intellectualEntity, linearEntity.EndPoint, null)
+                    var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
                     {
                         GripPoint = linearEntity.EndPoint +
                                     ((linearEntity.EndPoint - linearEntity.MiddlePoints.Last()).GetNormal() * 20 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
-                    addVertexGrip = new LinearEntityAddVertexGrip(intellectualEntity, null, linearEntity.InsertionPoint)
+                    addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.InsertionPoint)
                     {
                         GripPoint = linearEntity.InsertionPoint +
                                     ((linearEntity.InsertionPoint - linearEntity.MiddlePoints.First()).GetNormal() * 20 * curViewUnitSize)
@@ -257,21 +257,21 @@
                 }
                 else
                 {
-                    var addVertexGrip = new LinearEntityAddVertexGrip(intellectualEntity, linearEntity.EndPoint, null)
+                    var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
                     {
                         GripPoint = linearEntity.EndPoint +
                                     ((linearEntity.InsertionPoint - linearEntity.EndPoint).GetNormal() * 20 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
-                    addVertexGrip = new LinearEntityAddVertexGrip(intellectualEntity, null, linearEntity.EndPoint)
+                    addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.EndPoint)
                     {
                         GripPoint = linearEntity.InsertionPoint +
                                     ((linearEntity.EndPoint - linearEntity.InsertionPoint).GetNormal() * 20 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
-                    addVertexGrip = new LinearEntityAddVertexGrip(intellectualEntity, linearEntity.InsertionPoint, linearEntity.EndPoint)
+                    addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.InsertionPoint, linearEntity.EndPoint)
                     {
                         GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.InsertionPoint, linearEntity.EndPoint)
                     };
@@ -281,13 +281,13 @@
 
             #endregion
 
-            var reverseGrip = new LinearEntityReverseGrip(intellectualEntity)
+            var reverseGrip = new LinearEntityReverseGrip(smartEntity)
             {
                 GripPoint = linearEntity.InsertionPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
             };
             yield return reverseGrip;
 
-            reverseGrip = new LinearEntityReverseGrip(intellectualEntity)
+            reverseGrip = new LinearEntityReverseGrip(smartEntity)
             {
                 GripPoint = linearEntity.EndPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
             };
@@ -308,7 +308,7 @@
             {
                 if (gripData is LinearEntityVertexGrip vertexGrip)
                 {
-                    var intellectualEntity = vertexGrip.IntellectualEntity;
+                    var intellectualEntity = vertexGrip.SmartEntity;
 
                     if (vertexGrip.GripIndex == 0)
                     {

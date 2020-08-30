@@ -24,7 +24,7 @@
         {
             if (EntityStyles == null)
             {
-                EntityStyles = new List<IntellectualEntityStyle>();
+                EntityStyles = new List<SmartEntityStyle>();
                 CheckStyleFiles();
                 CreateSystemStyles();
             }
@@ -33,7 +33,7 @@
         /// <summary>
         /// Статическая коллекция стилей интеллектуальных примитивов
         /// </summary>
-        private static readonly List<IntellectualEntityStyle> EntityStyles;
+        private static readonly List<SmartEntityStyle> EntityStyles;
 
         /// <summary>
         /// Проверка и создание в случае отсутствия файлов хранения пользовательских стилей для всех типов примитивов
@@ -78,7 +78,7 @@
             var entityTypes = TypeFactory.Instance.GetEntityTypes();
             entityTypes.ForEach(et =>
             {
-                var systemStyle = new IntellectualEntityStyle(et)
+                var systemStyle = new SmartEntityStyle(et)
                 {
                     Name =
                         $"{LocalizationUtils.GetEntityLocalizationName(et)} [{Language.GetItem(Invariables.LangItem, "h12")}]",
@@ -98,9 +98,9 @@
         /// <summary>
         /// Наполнение стиля свойствами со значениями по умолчанию
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
         /// <param name="entityType">Тип интеллектуального объекта</param>
-        public static void FillStyleDefaultProperties(this IntellectualEntityStyle style, Type entityType)
+        public static void FillStyleDefaultProperties(this SmartEntityStyle style, Type entityType)
         {
             foreach (var propertyInfo in entityType.GetProperties())
             {
@@ -114,7 +114,7 @@
 
                     if (attribute.Name == "Scale")
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute, 
                             entityType,
                             AcadUtils.AnnotationScaleFromString(attribute.DefaultValue.ToString()),
@@ -122,7 +122,7 @@
                     }
                     else if (attribute.Name == "LayerName")
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute, 
                             entityType,
                             AcadUtils.Layers.Contains(attribute.DefaultValue.ToString())
@@ -132,7 +132,7 @@
                     }
                     else
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute,
                             entityType,
                             attribute.DefaultValue,
@@ -148,7 +148,7 @@
         /// <param name="style">Стиль примитива</param>
         /// <param name="entity">Интеллектуальный примитив</param>
         /// <param name="blockReference">Вставка блока, представляющая интеллектуальный примитив в AutoCAD</param>
-        public static void GetPropertiesFromEntity(this IntellectualEntityStyle style, IntellectualEntity entity, BlockReference blockReference)
+        public static void GetPropertiesFromEntity(this SmartEntityStyle style, SmartEntity entity, BlockReference blockReference)
         {
             var entityType = entity.GetType();
             foreach (var propertyInfo in entityType.GetProperties())
@@ -163,7 +163,7 @@
 
                     if (attribute.Name == "LayerName")
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute, 
                             entityType,
                             blockReference.Layer,
@@ -171,7 +171,7 @@
                     }
                     else if (attribute.Name == "LineType")
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute,
                             entityType,
                             blockReference.Linetype,
@@ -179,7 +179,7 @@
                     }
                     else
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                             attribute,
                             entityType,
                             propertyInfo.GetValue(entity),
@@ -189,7 +189,7 @@
             }
         }
 
-        private static bool HasStyle(IntellectualEntityStyle style)
+        private static bool HasStyle(SmartEntityStyle style)
         {
             return EntityStyles.Any(s => s.EntityType == style.EntityType &&
                                          s.StyleType == style.StyleType &&
@@ -224,7 +224,7 @@
                 var fXel = XElement.Load(stylesFile);
                 foreach (var styleXel in fXel.Elements("UserStyle"))
                 {
-                    var style = new IntellectualEntityStyle(entityType)
+                    var style = new SmartEntityStyle(entityType)
                     {
                         StyleType = StyleType.User
                     };
@@ -261,7 +261,7 @@
                                 var valueType = attribute.DefaultValue.GetType();
                                 if (attribute.Name == "Scale")
                                 {
-                                    style.Properties.Add(new IntellectualEntityProperty(
+                                    style.Properties.Add(new SmartEntityProperty(
                                         attribute, 
                                         entityType,
                                         AcadUtils.AnnotationScaleFromString(xmlValue),
@@ -271,7 +271,7 @@
                                 {
                                     if (valueType == typeof(string))
                                     {
-                                        style.Properties.Add(new IntellectualEntityProperty(
+                                        style.Properties.Add(new SmartEntityProperty(
                                             attribute,
                                             entityType,
                                             xmlProperty.Attribute("Value").Value,
@@ -279,7 +279,7 @@
                                     }
                                     else if (valueType == typeof(int))
                                     {
-                                        style.Properties.Add(new IntellectualEntityProperty(
+                                        style.Properties.Add(new SmartEntityProperty(
                                             attribute, 
                                             entityType,
                                             int.TryParse(xmlValue, out var i) ? i : attribute.DefaultValue,
@@ -287,7 +287,7 @@
                                     }
                                     else if (valueType == typeof(double))
                                     {
-                                        style.Properties.Add(new IntellectualEntityProperty(
+                                        style.Properties.Add(new SmartEntityProperty(
                                             attribute, 
                                             entityType,
                                             double.TryParse(xmlValue, out var d) ? d : attribute.DefaultValue,
@@ -295,7 +295,7 @@
                                     }
                                     else if (valueType == typeof(bool))
                                     {
-                                        style.Properties.Add(new IntellectualEntityProperty(
+                                        style.Properties.Add(new SmartEntityProperty(
                                             attribute, 
                                             entityType,
                                             bool.TryParse(xmlValue, out var b) ? b : attribute.DefaultValue,
@@ -305,7 +305,7 @@
                                     {
                                         try
                                         {
-                                            style.Properties.Add(new IntellectualEntityProperty(
+                                            style.Properties.Add(new SmartEntityProperty(
                                                 attribute,
                                                 entityType,
                                                 Enum.Parse(attribute.DefaultValue.GetType(), xmlValue),
@@ -313,7 +313,7 @@
                                         }
                                         catch
                                         {
-                                            style.Properties.Add(new IntellectualEntityProperty(
+                                            style.Properties.Add(new SmartEntityProperty(
                                                 attribute, 
                                                 entityType,
                                                 attribute.DefaultValue,
@@ -339,7 +339,7 @@
         /// </summary>
         /// <param name="style">Проверяемый стиль</param>
         /// <param name="entityType">Тип примитива</param>
-        private static void CheckMissedProperties(this IntellectualEntityStyle style, Type entityType)
+        private static void CheckMissedProperties(this SmartEntityStyle style, Type entityType)
         {
             foreach (var propertyInfo in entityType.GetProperties())
             {
@@ -354,7 +354,7 @@
                     // ReSharper disable once SimplifyLinqExpression
                     if (!style.Properties.Any(p => p.Name == attribute.Name))
                     {
-                        style.Properties.Add(new IntellectualEntityProperty(
+                        style.Properties.Add(new SmartEntityProperty(
                         attribute,
                         entityType,
                         attribute.DefaultValue,
@@ -404,7 +404,7 @@
         /// <summary>
         /// Конвертировать стиль в XElement
         /// </summary>
-        private static XElement ConvertToXElement(this IntellectualEntityStyle style)
+        private static XElement ConvertToXElement(this SmartEntityStyle style)
         {
             var styleXel = new XElement("UserStyle");
             styleXel.SetAttributeValue(nameof(style.Name), style.Name);
@@ -487,7 +487,7 @@
         /// Сохранить стиль как Текущий в настройки пользователя
         /// </summary>
         /// <param name="style">Сохраняемый стиль</param>
-        public static void SaveCurrentStyleToSettings(IntellectualEntityStyle style)
+        public static void SaveCurrentStyleToSettings(SmartEntityStyle style)
         {
             UserConfigFile.SetValue($"mp{style.EntityType.Name}", "CurrentStyleGuid", style.Guid, true);
         }
@@ -506,7 +506,7 @@
         /// Получить текущий стиль для типа примитива
         /// </summary>
         /// <param name="entityType">Тип интеллектуального объекта</param>
-        public static IntellectualEntityStyle GetCurrentStyle(Type entityType)
+        public static SmartEntityStyle GetCurrentStyle(Type entityType)
         {
             try
             {
@@ -535,7 +535,7 @@
         /// Получить все стили для типа примитива
         /// </summary>
         /// <param name="entityType">Тип интеллектуального объекта</param>
-        public static List<IntellectualEntityStyle> GetStyles(Type entityType)
+        public static List<SmartEntityStyle> GetStyles(Type entityType)
         {
             LoadStylesFromXmlFile(entityType);
 
@@ -565,7 +565,7 @@
         /// <param name="entityType">Тип интеллектуального объекта</param>
         /// <param name="styleName">Имя стиля</param>
         [CanBeNull]
-        public static IntellectualEntityStyle GetStyleByName(Type entityType, string styleName)
+        public static SmartEntityStyle GetStyleByName(Type entityType, string styleName)
         {
             return EntityStyles.FirstOrDefault(s => s.EntityType == entityType && s.Name == styleName);
         }
@@ -573,8 +573,8 @@
         /// <summary>
         /// Добавить стиль в список
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
-        public static void AddStyle(IntellectualEntityStyle style)
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
+        public static void AddStyle(SmartEntityStyle style)
         {
             EntityStyles.Add(style);
         }
@@ -582,8 +582,8 @@
         /// <summary>
         /// Удаление стиля из списка
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
-        public static void RemoveStyle(IntellectualEntityStyle style)
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
+        public static void RemoveStyle(SmartEntityStyle style)
         {
             EntityStyles.Remove(style);
         }
@@ -591,8 +591,8 @@
         /// <summary>
         /// Возвращает значение свойства "Имя слоя" из стиля
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
-        public static string GetLayerNameProperty(this IntellectualEntityStyle style)
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
+        public static string GetLayerNameProperty(this SmartEntityStyle style)
         {
             foreach (var property in style.Properties)
             {
@@ -608,9 +608,9 @@
         /// <summary>
         /// Возвращает значение свойства "Тип линии" из стиля
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
         /// <returns>В случае неудачи возвращает "Continuous"</returns>
-        public static string GetLineTypeProperty(this IntellectualEntityStyle style)
+        public static string GetLineTypeProperty(this SmartEntityStyle style)
         {
             foreach (var property in style.Properties)
             {
@@ -626,9 +626,9 @@
         /// <summary>
         /// Возвращает значение свойства "Текстовый стиль" из стиля
         /// </summary>
-        /// <param name="style">Стиль <see cref="IntellectualEntityStyle"/></param>
+        /// <param name="style">Стиль <see cref="SmartEntityStyle"/></param>
         /// <returns>В случае неудачи возвращает "Standard"</returns>
-        public static string GetTextStyleProperty(this IntellectualEntityStyle style)
+        public static string GetTextStyleProperty(this SmartEntityStyle style)
         {
             foreach (var property in style.Properties)
             {
@@ -648,7 +648,7 @@
         /// <param name="style">Стиль</param>
         /// <param name="isOnEntityCreation">True - применение стиля происходит при создании примитива.
         /// False - применение стиля происходит при выборе стиля в палитре</param>
-        public static void ApplyStyle(this IntellectualEntity entity, IntellectualEntityStyle style, bool isOnEntityCreation)
+        public static void ApplyStyle(this SmartEntity entity, SmartEntityStyle style, bool isOnEntityCreation)
         {
             var type = entity.GetType();
             foreach (var propertyInfo in type.GetProperties())
@@ -734,6 +734,28 @@
                                         propertyInfo.SetValue(entity, textStyleName);
                                     }
                                 }
+                            }
+                        }
+                        else if (attribute.Name == "NumberSeparator")
+                        {
+                            switch (MainSettings.Instance.GlobalNumberSeparator)
+                            {
+                                case GlobalNumberSeparator.FromModPlusSettings:
+                                    propertyInfo.SetValue(
+                                        entity,
+                                        Variables.Separator == "." ? NumberSeparator.Dot : NumberSeparator.Comma);
+                                    break;
+                                case GlobalNumberSeparator.FromStyle:
+                                    propertyInfo.SetValue(entity, propertyFromStyle.Value);
+                                    break;
+                                case GlobalNumberSeparator.Dot:
+                                    propertyInfo.SetValue(entity, NumberSeparator.Dot);
+                                    break;
+                                case GlobalNumberSeparator.Comma:
+                                    propertyInfo.SetValue(entity, NumberSeparator.Comma);
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                         }
                         else

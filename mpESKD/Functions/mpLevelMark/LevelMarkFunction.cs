@@ -16,7 +16,7 @@
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     /// <inheritdoc />
-    public class LevelMarkFunction : IIntellectualEntityFunction
+    public class LevelMarkFunction : ISmartEntityFunction
     {
         /// <inheritdoc/>
         public void Initialize()
@@ -35,7 +35,7 @@
         }
 
         /// <inheritdoc/>
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
             Statistic.SendCommandStarting(LevelMarkDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -53,7 +53,7 @@
 
                 var blockReference = MainFunction.CreateBlock(levelMark);
 
-                levelMark.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                levelMark.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 InsertLevelMarkWithJig(levelMark, blockReference);
             }

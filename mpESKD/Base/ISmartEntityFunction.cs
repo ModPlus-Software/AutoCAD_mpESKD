@@ -3,7 +3,7 @@
     /// <summary>
     /// Интерфейс функции примитива
     /// </summary>
-    public interface IIntellectualEntityFunction
+    public interface ISmartEntityFunction
     {
         /// <summary>
         /// Метод, вызываемый при загрузке AutoCAD
@@ -18,6 +18,8 @@
         /// <summary>
         /// Создать аналог интеллектуального примитива
         /// </summary>
-        void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer);
+        /// <param name="sourceEntity">Объект-источник</param>
+        /// <param name="copyLayer">Копировать ли слой</param>
+        void CreateAnalog(SmartEntity sourceEntity, bool copyLayer);
     }
 }

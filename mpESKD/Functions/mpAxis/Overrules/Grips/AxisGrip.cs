@@ -12,7 +12,7 @@
     /// <summary>
     /// Описание ручки оси
     /// </summary>
-    public class AxisGrip : IntellectualEntityGripData
+    public class AxisGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AxisGrip"/> class.

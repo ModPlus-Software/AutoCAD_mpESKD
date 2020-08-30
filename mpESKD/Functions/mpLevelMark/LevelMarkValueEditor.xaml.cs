@@ -14,7 +14,7 @@
         /// Initializes a new instance of the <see cref="LevelMarkValueEditor"/> class.
         /// </summary>
         /// <param name="intellectualEntity">Редактируемый экземпляр интеллектуального объекта</param>
-        public LevelMarkValueEditor(IntellectualEntity intellectualEntity)
+        public LevelMarkValueEditor(SmartEntity intellectualEntity)
         {
             _levelMark = (LevelMark)intellectualEntity;
             InitializeComponent();

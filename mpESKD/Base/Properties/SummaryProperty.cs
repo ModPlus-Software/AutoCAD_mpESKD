@@ -24,14 +24,14 @@
         public SummaryProperty(Type entityType)
         {
             EntityType = entityType;
-            EntityPropertyDataCollection = new ObservableCollection<IntellectualEntityProperty>();
+            EntityPropertyDataCollection = new ObservableCollection<SmartEntityProperty>();
         }
 
         /// <summary>
-        /// Добавление свойства <see cref="IntellectualEntityProperty"/> в коллекцию
+        /// Добавление свойства <see cref="SmartEntityProperty"/> в коллекцию
         /// </summary>
-        /// <param name="property">Свойство <see cref="IntellectualEntityProperty"/></param>
-        public void AddProperty(IntellectualEntityProperty property)
+        /// <param name="property">Свойство <see cref="SmartEntityProperty"/></param>
+        public void AddProperty(SmartEntityProperty property)
         {
             property.PropertyChanged += Property_PropertyChanged;
             EntityPropertyDataCollection.Add(property);
@@ -50,7 +50,7 @@
         /// <summary>
         /// Коллекция исходных свойств
         /// </summary>
-        public ObservableCollection<IntellectualEntityProperty> EntityPropertyDataCollection { get; }
+        public ObservableCollection<SmartEntityProperty> EntityPropertyDataCollection { get; }
 
         /// <summary>
         /// Категория свойства
@@ -222,7 +222,7 @@
 
         /// <summary>
         /// Подробнее смотри в описании метода
-        /// <see cref="mpESKD.Base.Properties.PropertiesPalette.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// <see cref="PropertiesPalette.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public double? DoubleValue
         {
@@ -261,7 +261,7 @@
 
         /// <summary>
         /// Подробнее смотри в описании метода
-        /// <see cref="mpESKD.Base.Properties.PropertiesPalette.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// <see cref="PropertiesPalette.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public int? IntValue
         {

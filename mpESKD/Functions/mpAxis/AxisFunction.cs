@@ -16,7 +16,7 @@
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     /// <inheritdoc />
-    public class AxisFunction : IIntellectualEntityFunction
+    public class AxisFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
@@ -35,7 +35,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
             // send statistic
             Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -56,7 +56,7 @@
 
                 var blockReference = MainFunction.CreateBlock(axis);
 
-                axis.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                axis.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 // Отключаю видимость кружков направления
                 axis.TopOrientMarkerVisible = false;

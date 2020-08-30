@@ -10,7 +10,7 @@
     /// <summary>
     /// Ручка реверса разреза
     /// </summary>
-    public class SectionReverseGrip : IntellectualEntityGripData
+    public class SectionReverseGrip : SmartEntityGripData
     {
         public SectionReverseGrip(Section section)
         {

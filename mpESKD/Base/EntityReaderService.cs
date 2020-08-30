@@ -18,12 +18,12 @@
         public static EntityReaderService Instance => _entityReaderService ?? (_entityReaderService = new EntityReaderService());
 
         /// <summary>
-        /// Распаковка интеллектуального объекта, приведенного к базовому типу <see cref="IntellectualEntity"/> из
+        /// Распаковка интеллектуального объекта, приведенного к базовому типу <see cref="SmartEntity"/> из
         /// расширенных данных объекта <see cref="DBObject"/>
         /// </summary>
         /// <param name="entity">Объект AutoCAD</param>
         [CanBeNull]
-        public IntellectualEntity GetFromEntity(DBObject entity)
+        public SmartEntity GetFromEntity(DBObject entity)
         {
             var applicableCommands = TypeFactory.Instance.GetEntityCommandNames();
             if (entity.XData == null)
@@ -54,7 +54,7 @@
         /// <param name="entity">Объект AutoCAD</param>
         [CanBeNull]
         public T GetFromEntity<T>(Entity entity) 
-            where T : IntellectualEntity
+            where T : SmartEntity
         {
             return (T)GetFromEntity(entity);
         }
@@ -67,12 +67,12 @@
         /// <param name="entity">Объект AutoCAD</param>
         [CanBeNull]
         public T GetFromEntity<T>(DBObject entity) 
-            where T : IntellectualEntity
+            where T : SmartEntity
         {
             return (T)GetFromEntity(entity);
         }
         
-        private static IntellectualEntity GetEntity(DBObject ent, Type type, string appName)
+        private static SmartEntity GetEntity(DBObject ent, Type type, string appName)
         {
             using (var resBuf = ent.GetXDataForApplication(appName))
             {
@@ -82,7 +82,7 @@
                     return null;
                 }
 
-                var entity = (IntellectualEntity)Activator.CreateInstance(type);
+                var entity = (SmartEntity)Activator.CreateInstance(type);
                 entity.BlockId = ent.ObjectId;
 
                 // Получаем параметры из самого блока

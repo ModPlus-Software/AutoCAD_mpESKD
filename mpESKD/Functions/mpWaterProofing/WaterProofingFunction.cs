@@ -15,7 +15,7 @@
     using Overrules;
 
     /// <inheritdoc />
-    public class WaterProofingFunction : IIntellectualEntityFunction
+    public class WaterProofingFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
@@ -34,7 +34,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
             Statistic.SendCommandStarting(WaterProofingDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -53,7 +53,7 @@
                 var waterProofing = new WaterProofing();
                 var blockReference = MainFunction.CreateBlock(waterProofing);
 
-                waterProofing.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                waterProofing.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 InsertWaterProofingWithJig(waterProofing, blockReference);
             }

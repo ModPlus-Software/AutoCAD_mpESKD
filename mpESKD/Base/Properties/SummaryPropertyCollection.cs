@@ -15,11 +15,11 @@
         {
             foreach (ObjectId objectId in objectIds)
             {
-                EntityPropertyProvider entityPropertyProvider = new EntityPropertyProvider(objectId);
+                var entityPropertyProvider = new EntityPropertyProvider(objectId);
                 if (entityPropertyProvider.IsValid)
                 {
                     entityPropertyProvider.OnLockedLayerEventHandler += EntityPropertyProviderOnOnLockedLayerEventHandler;
-                    foreach (IntellectualEntityProperty entityProperty in entityPropertyProvider.Properties)
+                    foreach (SmartEntityProperty entityProperty in entityPropertyProvider.Properties)
                     {
                         var allowableSummaryProperty = this.FirstOrDefault(
                             si => si.EntityPropertyDataCollection
@@ -29,7 +29,7 @@
                                            ep.Value.GetType() == entityProperty.Value.GetType()));
                         if (allowableSummaryProperty == null)
                         {
-                            SummaryProperty summaryProperty = new SummaryProperty(entityPropertyProvider.EntityType);
+                            var summaryProperty = new SummaryProperty(entityPropertyProvider.EntityType);
                             summaryProperty.AddProperty(entityProperty);
                             Add(summaryProperty);
                         }
@@ -59,7 +59,7 @@
         {
             foreach (SummaryProperty summaryProperty in this)
             {
-                foreach (IntellectualEntityProperty property in summaryProperty.EntityPropertyDataCollection)
+                foreach (SmartEntityProperty property in summaryProperty.EntityPropertyDataCollection)
                 {
                     OnPropertyChanged(new PropertyChangedEventArgs(property.Name));
                 }
@@ -75,7 +75,7 @@
             }
         }
 
-        private void EntityPropertyProviderOnOnLockedLayerEventHandler(object sender, IntellectualEntityProperty e)
+        private void EntityPropertyProviderOnOnLockedLayerEventHandler(object sender, SmartEntityProperty e)
         {
             _hasObjectOnLockedLayer = true;
         }

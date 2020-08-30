@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Utils
+﻿namespace mpESKD
 {
     using System;
     using System.Collections.Generic;
@@ -6,6 +6,7 @@
     using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
+    using Base;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
@@ -278,6 +279,8 @@
             ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
+
+            // Search by types
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpESKDSearch",
@@ -285,7 +288,18 @@
                     _colorTheme == 1 // 1 - light
                         ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32.png"
                         : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                    Language.GetItem(Invariables.LangItem, "tab13"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+            
+            // Search by values
+            ribRowPanel.Items.Add(
+                RibbonHelpers.AddBigButton(
+                    "mpESKDSearchByValues",
+                    Language.GetItem(Invariables.LangItem, "tab12"),
+                    _colorTheme == 1 // 1 - light
+                        ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32.png"
+                        : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32_dark.png",
+                    Language.GetItem(Invariables.LangItem, "tab14"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+
             ribSourcePanel.Items.Add(ribRowPanel);
         }
 

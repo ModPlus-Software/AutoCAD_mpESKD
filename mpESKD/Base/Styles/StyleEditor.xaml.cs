@@ -95,7 +95,7 @@ namespace mpESKD.Base.Styles
                 // image
                 SetImage(entityStyles.EntityType.Name);
             }
-            else if (item is IntellectualEntityStyle style)
+            else if (item is SmartEntityStyle style)
             {
                 BtRemoveStyle.IsEnabled = style.CanEdit;
                 BtSetCurrentStyle.IsEnabled = !style.IsCurrent;
@@ -109,7 +109,7 @@ namespace mpESKD.Base.Styles
             }
         }
 
-        private void ShowStyleProperties(IntellectualEntityStyle style)
+        private void ShowStyleProperties(SmartEntityStyle style)
         {
             var topGrid = new Grid();
             topGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -420,7 +420,7 @@ namespace mpESKD.Base.Styles
         /// Получение локализованного (отображаемого) имени свойства с учётом двух атрибутов
         /// </summary>
         /// <param name="property">Свойство</param>
-        private string GetPropertyDisplayName(IntellectualEntityProperty property)
+        private string GetPropertyDisplayName(SmartEntityProperty property)
         {
             try
             {
@@ -450,7 +450,7 @@ namespace mpESKD.Base.Styles
         /// Получение локализованного описания свойства
         /// </summary>
         /// <param name="property">Свойство</param>
-        private string GetPropertyDescription(IntellectualEntityProperty property)
+        private string GetPropertyDescription(SmartEntityProperty property)
         {
             try
             {
@@ -474,7 +474,7 @@ namespace mpESKD.Base.Styles
         /// <param name="entityProperty">Свойство</param>
         /// <param name="converter">Конвертер (при необходимости)</param>
         /// <returns>Объект типа <see cref="Binding"/></returns>
-        private Binding CreateTwoWayBindingForProperty(IntellectualEntityProperty entityProperty, IValueConverter converter = null)
+        private Binding CreateTwoWayBindingForProperty(SmartEntityProperty entityProperty, IValueConverter converter = null)
         {
             var binding = new Binding
             {
@@ -494,14 +494,14 @@ namespace mpESKD.Base.Styles
         /// <summary>
         /// Создание двусторонней привязки для использования в элементе <see cref="NumericBox"/>
         /// По какой-то причине при привязке к типу object не работает. В связи с этим делаю такой вот
-        /// лайфхак - добавляю в класс <see cref="IntellectualEntityProperty"/> два свойства конкретного типа.
+        /// лайфхак - добавляю в класс <see cref="SmartEntityProperty"/> два свойства конкретного типа.
         /// Это нужно, чтобы решить эту специфическую проблему в данном проекте и не менять из-за этого
         /// библиотеку оформления
         /// </summary>
         /// <param name="entityProperty">Свойство</param>
         /// <param name="isInteger">True - целое число. False - дробное число</param>
         private Binding CreateTwoWayBindingForPropertyForNumericValue(
-            IntellectualEntityProperty entityProperty, bool isInteger)
+            SmartEntityProperty entityProperty, bool isInteger)
         {
             var binding = new Binding
             {
@@ -593,7 +593,7 @@ namespace mpESKD.Base.Styles
 
             if (selected is EntityStyles entityStyles)
             {
-                var newStyle = new IntellectualEntityStyle(entityStyles.EntityType, true)
+                var newStyle = new SmartEntityStyle(entityStyles.EntityType, true)
                 {
                     Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                     StyleType = StyleType.User
@@ -601,9 +601,9 @@ namespace mpESKD.Base.Styles
                 entityStyles.Styles.Add(newStyle);
                 StyleManager.AddStyle(newStyle);
             }
-            else if (selected is IntellectualEntityStyle style)
+            else if (selected is SmartEntityStyle style)
             {
-                var newStyle = new IntellectualEntityStyle(style.EntityType, true)
+                var newStyle = new SmartEntityStyle(style.EntityType, true)
                 {
                     Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                     StyleType = StyleType.User
@@ -646,7 +646,7 @@ namespace mpESKD.Base.Styles
                 return;
             }
 
-            if (selected is IntellectualEntityStyle style && style.CanEdit)
+            if (selected is SmartEntityStyle style && style.CanEdit)
             {
                 if (ModPlusAPI.Windows.MessageBox.ShowYesNo(ModPlusAPI.Language.GetItem(Invariables.LangItem, "h69"), MessageBoxIcon.Question))
                 {
@@ -679,7 +679,7 @@ namespace mpESKD.Base.Styles
                 return;
             }
 
-            if (selected is IntellectualEntityStyle style)
+            if (selected is SmartEntityStyle style)
             {
                 _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
                 BtSetCurrentStyle.IsEnabled = false;
@@ -694,7 +694,7 @@ namespace mpESKD.Base.Styles
                 return;
             }
 
-            if (selected is IntellectualEntityStyle style)
+            if (selected is SmartEntityStyle style)
             {
                 _styles.Single(es => es.EntityType == style.EntityType).SetCurrent(style);
                 BtSetCurrentStyle.IsEnabled = false;
@@ -803,7 +803,7 @@ namespace mpESKD.Base.Styles
                         if (obj is BlockReference blockReference)
                         {
                             var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
-                            var newStyle = new IntellectualEntityStyle(entity.GetType())
+                            var newStyle = new SmartEntityStyle(entity.GetType())
                             {
                                 Name = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h13"),
                                 StyleType = StyleType.User,

@@ -12,16 +12,16 @@
     /// <summary>
     /// Ручка удаления вершины линейного интеллектуального объекта
     /// </summary>
-    public class LinearEntityRemoveVertexGrip : IntellectualEntityGripData
+    public class LinearEntityRemoveVertexGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearEntityRemoveVertexGrip"/> class.
         /// </summary>
-        /// <param name="intellectualEntity">Instance of <see cref="Base.IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
+        /// <param name="smartEntity">Instance of <see cref="Base.SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
         /// <param name="index">Grip index</param>
-        public LinearEntityRemoveVertexGrip(IntellectualEntity intellectualEntity, int index)
+        public LinearEntityRemoveVertexGrip(SmartEntity smartEntity, int index)
         {
-            IntellectualEntity = intellectualEntity;
+            SmartEntity = smartEntity;
             GripIndex = index;
             GripType = GripType.Minus;
         }
@@ -29,7 +29,7 @@
         /// <summary>
         /// Экземпляр интеллектуального объекта
         /// </summary>
-        public IntellectualEntity IntellectualEntity { get; }
+        public SmartEntity SmartEntity { get; }
 
         /// <summary>
         /// Индекс точки
@@ -45,21 +45,21 @@
         /// <inheritdoc />
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
-            using (IntellectualEntity)
+            using (SmartEntity)
             {
                 Point3d? newInsertionPoint = null;
 
-                var linearEntity = (ILinearEntity)IntellectualEntity;
+                var linearEntity = (ILinearEntity)SmartEntity;
 
                 if (GripIndex == 0)
                 {
-                    IntellectualEntity.InsertionPoint = linearEntity.MiddlePoints[0];
+                    SmartEntity.InsertionPoint = linearEntity.MiddlePoints[0];
                     newInsertionPoint = linearEntity.MiddlePoints[0];
                     linearEntity.MiddlePoints.RemoveAt(0);
                 }
                 else if (GripIndex == linearEntity.MiddlePoints.Count + 1)
                 {
-                    IntellectualEntity.EndPoint = linearEntity.MiddlePoints.Last();
+                    SmartEntity.EndPoint = linearEntity.MiddlePoints.Last();
                     linearEntity.MiddlePoints.RemoveAt(linearEntity.MiddlePoints.Count - 1);
                 }
                 else
@@ -67,17 +67,17 @@
                     linearEntity.MiddlePoints.RemoveAt(GripIndex - 1);
                 }
 
-                IntellectualEntity.UpdateEntities();
-                IntellectualEntity.BlockRecord.UpdateAnonymousBlocks();
+                SmartEntity.UpdateEntities();
+                SmartEntity.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
+                    var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
                     if (newInsertionPoint.HasValue)
                     {
                         ((BlockReference)blkRef).Position = newInsertionPoint.Value;
                     }
 
-                    using (var resBuf = IntellectualEntity.GetDataForXData())
+                    using (var resBuf = SmartEntity.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }

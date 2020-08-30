@@ -47,16 +47,16 @@ namespace mpESKD.Base.Properties
         /// </summary>
         private ObjectId _blkRefObjectId;
 
-        private IntellectualEntity _intellectualEntity;
+        private SmartEntity _intellectualEntity;
 
-        public ObservableCollection<IntellectualEntityProperty> Properties { get; } = new ObservableCollection<IntellectualEntityProperty>();
+        public ObservableCollection<SmartEntityProperty> Properties { get; } = new ObservableCollection<SmartEntityProperty>();
 
         public bool IsValid { get; set; }
 
         /// <summary>
         /// Событие, происходящее при попытке отредактировать свойство примитива, находящегося на заблокированном слое
         /// </summary>
-        public event EventHandler<IntellectualEntityProperty> OnLockedLayerEventHandler;
+        public event EventHandler<SmartEntityProperty> OnLockedLayerEventHandler;
 
         public bool Verify(ObjectId breakLineObjectId)
         {
@@ -97,7 +97,7 @@ namespace mpESKD.Base.Properties
                     {
                         if (attribute.Name == "Style")
                         {
-                            var property = new IntellectualEntityProperty(
+                            var property = new SmartEntityProperty(
                                 attribute,
                                 entityType,
                                 StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid),
@@ -107,7 +107,7 @@ namespace mpESKD.Base.Properties
                         }
                         else if (attribute.Name == "LayerName")
                         {
-                            var property = new IntellectualEntityProperty(
+                            var property = new SmartEntityProperty(
                                 attribute, 
                                 entityType,
                                 blockReference.Layer,
@@ -117,7 +117,7 @@ namespace mpESKD.Base.Properties
                         }
                         else if (attribute.Name == "LineType")
                         {
-                            var property = new IntellectualEntityProperty(
+                            var property = new SmartEntityProperty(
                                 attribute,
                                 entityType,
                                 blockReference.Linetype,
@@ -130,7 +130,7 @@ namespace mpESKD.Base.Properties
                             var value = propertyInfo.GetValue(intellectualEntity);
                             if (value != null)
                             {
-                                var property = new IntellectualEntityProperty(
+                                var property = new SmartEntityProperty(
                                     attribute, 
                                     entityType, 
                                     value,
@@ -221,7 +221,7 @@ namespace mpESKD.Base.Properties
             }
 
             Overrule.Overruling = false;
-            var intellectualEntityProperty = (IntellectualEntityProperty)sender;
+            var intellectualEntityProperty = (SmartEntityProperty)sender;
             try
             {
                 using (AcadUtils.Document.LockDocument())

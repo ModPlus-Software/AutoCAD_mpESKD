@@ -16,7 +16,7 @@
     /// <summary>
     /// Ручка вершин
     /// </summary>
-    public class SectionVertexGrip : IntellectualEntityGripData
+    public class SectionVertexGrip : SmartEntityGripData
     {
         private readonly List<Point3d> _points;
 

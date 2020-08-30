@@ -17,7 +17,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
-                <ResourceDictionary Source="../Properties/Controls/ControlStylesForEditor.xaml"/>
+                <ResourceDictionary Source="../Controls/ControlStylesForEditor.xaml"/>
                 <!-- IMAGES -->
                 <ResourceDictionary Source="Images/BreakLine.xaml"/>
                 <ResourceDictionary Source="Images/Axis.xaml"/>
@@ -121,7 +121,7 @@
                                 <TextBlock Text="{Binding Path=DisplayName}" Margin="5,0,0,0"></TextBlock>
                             </StackPanel>
                             <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate DataType="local:IntellectualEntityStyle">
+                                <DataTemplate DataType="local:SmartEntityStyle">
                                     <TextBlock Text="{Binding Path=Name}" FontWeight="{Binding Path=FontWeight}" ></TextBlock>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
@@ -223,14 +223,22 @@
                 <!--Main settings-->
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+                    <Grid.Resources>
+                        <apiConverters:EnumToIntConverter x:Key="EnumToIntConverter"/>
+                        <Style TargetType="{x:Type TextBlock}">
+                            <Setter Property="TextWrapping" Value="Wrap"/>
+                            <Setter Property="Margin" Value="{DynamicResource ModPlusDefaultMargin}"/>
+                        </Style>
+                    </Grid.Resources>
                     <!--Use scale from style-->
                     <CheckBox Grid.Row="0" 
                               Content="{Binding Source={StaticResource Lang}, XPath=h22}"
@@ -245,11 +253,10 @@
                     </CheckBox>
                     <Grid Grid.Row="2" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"  Text="{Binding Source={StaticResource Lang}, XPath=h26}"
-                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                        <TextBlock Grid.Column="0"  Text="{Binding Source={StaticResource Lang}, XPath=h26}"/>
                         <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h27}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h28}"/>
@@ -265,11 +272,10 @@
                     </CheckBox>
                     <Grid Grid.Row="4" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h33}"
-                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h33}"/>
                         <ComboBox Grid.Column="1"  SelectedIndex="{Binding Path=IfNoTextStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h34}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}"/>
@@ -280,14 +286,10 @@
                     <!-- LayerActionOnCreateAnalog -->
                     <Grid Grid.Row="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Grid.Resources>
-                            <apiConverters:EnumToIntConverter x:Key="EnumToIntConverter"/>
-                        </Grid.Resources>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h98}"
-                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h98}"/>
                         <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay,
                             UpdateSourceTrigger=PropertyChanged, 
                             Converter={StaticResource EnumToIntConverter},
@@ -297,17 +299,33 @@
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}"></ComboBoxItem>
                         </ComboBox>
                     </Grid>
+                    <!-- Global integer separator -->
+                    <Grid Grid.Row="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h119}"/>
+                        <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=GlobalNumberSeparator, Mode=TwoWay,
+                            UpdateSourceTrigger=PropertyChanged, 
+                            Converter={StaticResource EnumToIntConverter},
+                            ConverterParameter={x:Type enums:GlobalNumberSeparator}}">
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator1}"/>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator2}"/>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator3}"/>
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator4}"/>
+                        </ComboBox>
+                    </Grid>
                     <!-- Maximum of selected objects -->
-                    <Grid Grid.Row="6"
+                    <Grid Grid.Row="7"
                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h38}"
                           ToolTipService.InitialShowDelay="0"
                           ToolTipService.ShowDuration="30000">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h39}" 
-                                   Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h39}"/>
                         <mps:NumericBox Grid.Column="1"  Minimum="0" Interval="50" NumericInputMode="Numbers"
                                            Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         </mps:NumericBox>

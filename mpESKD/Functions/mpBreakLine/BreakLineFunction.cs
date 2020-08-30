@@ -13,7 +13,7 @@
     using Overrules;
 
     /// <inheritdoc />
-    public class BreakLineFunction : IIntellectualEntityFunction
+    public class BreakLineFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
@@ -32,7 +32,7 @@
         }
 
         /// <inheritdoc />
-        public void CreateAnalog(IntellectualEntity sourceEntity, bool copyLayer)
+        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
             Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -49,7 +49,7 @@
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
 
-                breakLine.SetPropertiesFromIntellectualEntity(sourceEntity, copyLayer);
+                breakLine.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
                 InsertBreakLineWithJig(breakLine, blockReference);
             }

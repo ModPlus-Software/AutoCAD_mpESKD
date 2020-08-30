@@ -14,8 +14,8 @@ namespace mpESKD.Functions.mpWaterProofing
     /// <summary>
     /// Линия гидроизоляции
     /// </summary>
-    [IntellectualEntityDisplayNameKey("h114")]
-    public class WaterProofing : IntellectualEntity, ILinearEntity
+    [SmartEntityDisplayNameKey("h114")]
+    public class WaterProofing : SmartEntity, ILinearEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WaterProofing"/> class.

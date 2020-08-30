@@ -1,5 +1,8 @@
 ﻿namespace mpESKD.Base.Enums
 {
+    /// <summary>
+    /// Тип стиля
+    /// </summary>
     public enum StyleType
     {
         /// <summary>

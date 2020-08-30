@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.7.4.0")]
-[assembly: AssemblyFileVersion("1.7.4.0")]
+[assembly: AssemblyVersion("1.8.7.0")]
+[assembly: AssemblyFileVersion("1.8.7.0")]
 
 #if A2013
 [assembly: AssemblyDescription("2013")]

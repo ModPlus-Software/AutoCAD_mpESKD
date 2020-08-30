@@ -16,7 +16,7 @@
         /// <summary>
         /// Обрабатываемый интеллектуальный примитив
         /// </summary>
-        private readonly IntellectualEntity _intellectualEntity;
+        private readonly SmartEntity _smartEntity;
 
         private readonly JigUtils.PointSampler _insertionPoint = new JigUtils.PointSampler(Point3d.Origin);
 
@@ -25,17 +25,17 @@
         /// <summary>
         /// Экземпляр <see cref="DefaultEntityJig"/>
         /// </summary>
-        /// <param name="intellectualEntity">Экземпляр обрабатываемого интеллектуального примитива</param>
+        /// <param name="smartEntity">Экземпляр обрабатываемого интеллектуального примитива</param>
         /// <param name="blockReference">Вставка блока, представляющая обрабатываемый интеллектуальный примитив</param>
         /// <param name="startValueForNextPoint">Начальное значение для второй точки. Для примитивов, использующих
         /// конечную точку (EndPoint) влияет на отрисовку при указании первой точки</param>
         public DefaultEntityJig(
-            IntellectualEntity intellectualEntity,
+            SmartEntity smartEntity,
             BlockReference blockReference,
             Point3d startValueForNextPoint)
             : base(blockReference)
         {
-            _intellectualEntity = intellectualEntity;
+            _smartEntity = smartEntity;
             _nextPoint = new JigUtils.PointSampler(startValueForNextPoint);
         }
 
@@ -72,7 +72,7 @@
                     case JigState.PromptInsertPoint:
                         return _insertionPoint.Acquire(prompts, $"\n{PromptForInsertionPoint}", value =>
                             {
-                                _intellectualEntity.InsertionPoint = value;
+                                _smartEntity.InsertionPoint = value;
                             });
                     case JigState.PromptNextPoint:
                         {
@@ -84,7 +84,7 @@
 
                             return _nextPoint.Acquire(prompts, $"\n{PromptForNextPoint}", basePoint, value =>
                             {
-                                _intellectualEntity.EndPoint = value;
+                                _smartEntity.EndPoint = value;
                             });
                         }
 
@@ -108,13 +108,13 @@
                     using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                     {
                         var obj = (BlockReference)tr.GetObject(Entity.Id, OpenMode.ForWrite, true, true);
-                        obj.Position = _intellectualEntity.InsertionPoint;
+                        obj.Position = _smartEntity.InsertionPoint;
                         obj.BlockUnit = AcadUtils.Database.Insunits;
                         tr.Commit();
                     }
 
-                    _intellectualEntity.UpdateEntities();
-                    _intellectualEntity.BlockRecord.UpdateAnonymousBlocks();
+                    _smartEntity.UpdateEntities();
+                    _smartEntity.BlockRecord.UpdateAnonymousBlocks();
                 }
 
                 return true;

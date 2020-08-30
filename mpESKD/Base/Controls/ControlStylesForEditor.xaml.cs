@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Properties.Controls
+﻿namespace mpESKD.Base.Controls
 {
     public partial class ControlStylesForEditor
     {

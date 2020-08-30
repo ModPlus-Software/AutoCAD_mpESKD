@@ -140,6 +140,22 @@
             }
         }
 
+        /// <summary>
+        /// Глобальное значение разделителя целой и дробной части для интеллектуальных объектов с числом,
+        /// устанавливаемое при создании объекта
+        /// </summary>
+        public GlobalNumberSeparator GlobalNumberSeparator
+        {
+            get => Enum.TryParse(
+                UserConfigFile.GetValue(PName, nameof(GlobalNumberSeparator)),
+                out GlobalNumberSeparator s) ? s : GlobalNumberSeparator.FromStyle;
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(GlobalNumberSeparator), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Axis

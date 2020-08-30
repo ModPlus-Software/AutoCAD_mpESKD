@@ -6,12 +6,12 @@
     using Enums;
 
     /// <inheritdoc />
-    public abstract class IntellectualEntityGripData : GripData
+    public abstract class SmartEntityGripData : GripData
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntellectualEntityGripData"/> class.
+        /// Initializes a new instance of the <see cref="SmartEntityGripData"/> class.
         /// </summary>
-        protected IntellectualEntityGripData()
+        protected SmartEntityGripData()
         {
             // отключение контекстного меню и возможности менять команду
             // http://help.autodesk.com/view/OARX/2018/ENU/?guid=OREF-AcDbGripData__disableModeKeywords_bool

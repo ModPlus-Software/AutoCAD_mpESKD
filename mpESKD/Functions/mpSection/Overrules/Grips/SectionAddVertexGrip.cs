@@ -13,7 +13,7 @@
     /// <summary>
     /// Ручка добавления вершины
     /// </summary>
-    public class SectionAddVertexGrip : IntellectualEntityGripData
+    public class SectionAddVertexGrip : SmartEntityGripData
     {
         public SectionAddVertexGrip(Section section, Point3d? leftPoint, Point3d? rightPoint)
         {

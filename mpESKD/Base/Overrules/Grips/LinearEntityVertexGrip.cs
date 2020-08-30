@@ -13,16 +13,16 @@
     /// <summary>
     /// Ручка вершин линейного интеллектуального объекта
     /// </summary>
-    public class LinearEntityVertexGrip : IntellectualEntityGripData
+    public class LinearEntityVertexGrip : SmartEntityGripData
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearEntityVertexGrip"/> class.
         /// </summary>
-        /// <param name="intellectualEntity">Instance of <see cref="Base.IntellectualEntity"/> that implement <see cref="ILinearEntity"/></param>
+        /// <param name="smartEntity">Instance of <see cref="Base.SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
         /// <param name="index">Grip index</param>
-        public LinearEntityVertexGrip(IntellectualEntity intellectualEntity, int index)
+        public LinearEntityVertexGrip(SmartEntity smartEntity, int index)
         {
-            IntellectualEntity = intellectualEntity;
+            SmartEntity = smartEntity;
             GripIndex = index;
             GripType = GripType.Point;
         }
@@ -30,7 +30,7 @@
         /// <summary>
         /// Экземпляр интеллектуального объекта
         /// </summary>
-        public IntellectualEntity IntellectualEntity { get; }
+        public SmartEntity SmartEntity { get; }
 
         /// <summary>
         /// Индекс точки
@@ -64,8 +64,8 @@
                 {
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(IntellectualEntity.BlockId, OpenMode.ForWrite, true, true);
-                        using (var resBuf = IntellectualEntity.GetDataForXData())
+                        var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = SmartEntity.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -73,7 +73,7 @@
                         tr.Commit();
                     }
 
-                    IntellectualEntity.Dispose();
+                    SmartEntity.Dispose();
                 }
 
                 // При отмене перемещения возвращаем временные значения
@@ -83,15 +83,15 @@
                     {
                         if (GripIndex == 0)
                         {
-                            IntellectualEntity.InsertionPoint = _gripTmp;
+                            SmartEntity.InsertionPoint = _gripTmp;
                         }
-                        else if (GripIndex == ((ILinearEntity)IntellectualEntity).MiddlePoints.Count + 1)
+                        else if (GripIndex == ((ILinearEntity)SmartEntity).MiddlePoints.Count + 1)
                         {
-                            IntellectualEntity.EndPoint = _gripTmp;
+                            SmartEntity.EndPoint = _gripTmp;
                         }
                         else
                         {
-                            ((ILinearEntity)IntellectualEntity).MiddlePoints[GripIndex - 1] = _gripTmp;
+                            ((ILinearEntity)SmartEntity).MiddlePoints[GripIndex - 1] = _gripTmp;
                         }
                     }
                 }

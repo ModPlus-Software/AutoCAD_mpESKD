@@ -1,5 +1,7 @@
 ﻿namespace mpESKD.Functions.mpLevelMark.Overrules.Grips
 {
+    using Base;
+
     /// <summary>
     /// Имя ручки объекта <see cref="LevelMark"/>
     /// </summary>
@@ -21,7 +23,7 @@
         BottomShelfStartPoint,
 
         /// <summary>
-        /// Точка начала стрелки (соответствует <see cref="Base.IntellectualEntity.EndPoint"/>)
+        /// Точка начала стрелки (соответствует <see cref="SmartEntity.EndPoint"/>)
         /// </summary>
         ArrowPoint,
 
