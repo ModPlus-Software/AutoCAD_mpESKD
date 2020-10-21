@@ -24,6 +24,7 @@
     using ModPlusAPI;
     using mpESKD.Base.Properties;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using SystemVariableChangedEventArgs = Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs;
 
     /// <summary>
     /// Основные команды и инициализация приложения
@@ -64,6 +65,8 @@
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             }
 
+            AcApp.SystemVariableChanged += AcAppOnSystemVariableChanged;
+
             // bedit watcher
             BeditCommandWatcher.Initialize();
             AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
@@ -74,6 +77,15 @@
             foreach (Document document in AcadUtils.Documents)
             {
                 document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+            }
+        }
+
+        private void AcAppOnSystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
+        {
+            if (e.Name.Equals("WSCURRENT") && 
+                MainSettings.Instance.AutoLoad & !MainSettings.Instance.AddToMpPalette)
+            {
+                PropertiesPaletteFunction.Start();
             }
         }
 
@@ -327,17 +339,19 @@
 
         private static void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
         {
-            // now one Ribbon item is initialized, but the Ribbon control
-            // may not be available yet, so check if before
             if (Autodesk.Windows.ComponentManager.Ribbon == null)
-            {
                 return;
-            }
+
+            Autodesk.Windows.ComponentManager.Ribbon.BackgroundRenderFinished += RibbonOnBackgroundRenderFinished;
 
             RibbonBuilder.BuildRibbon();
 
-            // and remove the event handler
             Autodesk.Windows.ComponentManager.ItemInitialized -= ComponentManager_ItemInitialized;
+        }
+
+        private static void RibbonOnBackgroundRenderFinished(object sender, EventArgs e)
+        {
+            RibbonBuilder.BuildRibbon();
         }
 
         /// <summary>
