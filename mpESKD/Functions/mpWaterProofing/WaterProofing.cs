@@ -6,6 +6,7 @@ namespace mpESKD.Functions.mpWaterProofing
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
+    using Base.Abstractions;
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;

@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base
+﻿namespace mpESKD.Base.Abstractions
 {
     using System.Collections.Generic;
     using Autodesk.AutoCAD.Geometry;

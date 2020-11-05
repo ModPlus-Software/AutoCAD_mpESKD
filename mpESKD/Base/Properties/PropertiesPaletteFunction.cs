@@ -71,7 +71,7 @@
 
         private static void PaletteSet_Load(object sender, PalettePersistEventArgs e)
         {
-            var num = (double)e.ConfigurationSection.ReadProperty("mpPropertiesPalette", 22.3);
+            _ = (double)e.ConfigurationSection.ReadProperty("mpPropertiesPalette", 22.3);
         }
 
         private static void PaletteSet_Save(object sender, PalettePersistEventArgs e)

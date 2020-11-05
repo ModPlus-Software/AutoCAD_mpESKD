@@ -11,6 +11,8 @@
 
     public class SummaryPropertyCollection : ObservableCollection<SummaryProperty>
     {
+        private bool _hasObjectOnLockedLayer;
+
         public SummaryPropertyCollection(IEnumerable<ObjectId> objectIds)
         {
             foreach (ObjectId objectId in objectIds)
@@ -52,8 +54,6 @@
             base.Add(data);
             data.PropertyChanged += Data_AnyPropertyChanged;
         }
-
-        private bool _hasObjectOnLockedLayer = false;
 
         private void Data_AnyPropertyChanged(object sender, EventArgs e)
         {

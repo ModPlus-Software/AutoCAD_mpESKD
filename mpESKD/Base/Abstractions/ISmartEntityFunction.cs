@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base
+﻿namespace mpESKD.Base.Abstractions
 {
     /// <summary>
     /// Интерфейс функции примитива

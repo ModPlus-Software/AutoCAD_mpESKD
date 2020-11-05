@@ -5,6 +5,7 @@
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Abstractions;
     using Base.Enums;
     using Base.Styles;
     using Base.Utils;

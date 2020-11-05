@@ -1,546 +1,206 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{60E86B21-3AC7-4413-8EF0-C60665845F65}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <Version>1.8.10.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
-    <AssemblyName>mpESKD</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <PlatformTarget>x64</PlatformTarget>
-    <DebugType>none</DebugType>
+    <AssemblyName>$(RootNamespace)</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Company>modplus.org</Company>
+    <Authors>modplus.org</Authors>
+    <Product>ModPlus</Product>
+    <Copyright>Copyright © ModPlus</Copyright>
     <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>x64</PlatformTarget>
-    <NoWarn>$(NoWarn),1573,1591,1712</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <Platform>x64</Platform>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <DefineConstants>TRACE;DEBUG;A2021</DefineConstants>
-    <AssemblyName>$(AssemblyName)_2021</AssemblyName>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseWpf>true</UseWpf>
   </PropertyGroup>
-  <!-- For AutoCAD versions -->
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2013|x64'">
-    <OutputPath>bin\x64\A2013\</OutputPath>
-    <DefineConstants>TRACE;A2013</DefineConstants>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2013</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2013'">
+    <TargetFramework>net45</TargetFramework>
+    <Description>2013</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2014|x64'">
-    <OutputPath>bin\x64\A2014\</OutputPath>
-    <DefineConstants>TRACE;A2014</DefineConstants>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2014</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2014'">
+    <TargetFramework>net45</TargetFramework>
+    <Description>2014</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2015|x64'">
-    <OutputPath>bin\x64\A2015\</OutputPath>
-    <DefineConstants>TRACE;A2015</DefineConstants>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2015</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2015'">
+    <TargetFramework>net45</TargetFramework>
+    <Description>2015</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2016|x64'">
-    <OutputPath>bin\x64\A2016\</OutputPath>
-    <DefineConstants>TRACE;A2016</DefineConstants>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2016</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2016'">
+    <TargetFramework>net45</TargetFramework>
+    <Description>2016</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2017|x64'">
-    <OutputPath>bin\x64\A2017\</OutputPath>
-    <DefineConstants>TRACE;A2017</DefineConstants>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2017</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2017'">
+    <TargetFramework>net45</TargetFramework>
+    <Description>2017</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2018|x64'">
-    <OutputPath>bin\x64\A2018\</OutputPath>
-    <DefineConstants>TRACE;A2018</DefineConstants>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2018</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2018'">
+    <TargetFramework>net46</TargetFramework>
+    <Description>2018</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2019|x64'">
-    <OutputPath>bin\x64\A2019\</OutputPath>
-    <DefineConstants>TRACE;A2019</DefineConstants>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2019</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2019'">
+    <TargetFramework>net47</TargetFramework>
+    <Description>2019</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2020|x64'">
-    <OutputPath>bin\x64\A2020\</OutputPath>
-    <DefineConstants>TRACE;A2020</DefineConstants>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2020</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2020'">
+    <TargetFramework>net47</TargetFramework>
+    <Description>2020</Description>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'A2021|x64'">
-    <OutputPath>bin\x64\A2021\</OutputPath>
-    <DefineConstants>TRACE;A2021</DefineConstants>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <AssemblyName>$(AssemblyName)_2021</AssemblyName>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'A2021' or '$(Configuration)'=='Debug'">
+    <TargetFramework>net47</TargetFramework>
+    <Description>2021</Description>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <Configurations>Debug</Configurations>
+    <DefineConstants>Debug;A$(Description)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
+    <Configurations>A$(Description)</Configurations>
+    <DefineConstants>A$(Description)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyName>$(AssemblyName)_$(Description)</AssemblyName>
+  </PropertyGroup>
+
+  <Choose>
+    <When Condition="'$(Configuration)'=='A2013'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2013" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2013" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2014'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2014" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2014" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2015'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2015" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2015" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2016'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2017'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2017" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2017" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2018'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2018" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2018" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2019'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2019" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2019" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2020'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2020" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2020" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+    <When Condition="'$(Configuration)'=='A2021' or '$(Configuration)'=='Debug'">
+      <ItemGroup>
+        <PackageReference Include="ModPlus.AutoCAD.API.2021" Version="1.0.0" ExcludeAssets="runtime" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2021" Version="5.1.6.0" ExcludeAssets="runtime" />
+      </ItemGroup>
+    </When>
+  </Choose>
+
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusAPI" Version="4.7.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusStyle" Version="3.6.0" ExcludeAssets="runtime" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Xml" />
-    <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Base\Attributes\EntityPropertyAttribute.cs" />
-    <Compile Include="Base\Attributes\EnumPropertyDisplayValueKeyAttribute.cs" />
-    <Compile Include="Base\Attributes\SmartEntityDisplayNameKeyAttribute.cs" />
-    <Compile Include="Base\Attributes\PropertyVisibilityDependencyAttribute.cs" />
-    <Compile Include="Base\Attributes\SaveToXDataAttribute.cs" />
-    <Compile Include="Base\Attributes\ValueToSearchByAttribute.cs" />
-    <Compile Include="Base\Binder.cs" />
-    <Compile Include="Base\Enums\GlobalNumberSeparator.cs" />
-    <Compile Include="Base\Enums\NumberSeparator.cs" />
-    <Compile Include="Base\Enums\LayerActionOnCreateAnalog.cs" />
-    <Compile Include="Base\Enums\SearchProceedOption.cs" />
-    <Compile Include="Base\Enums\TextHorizontalAlignment.cs" />
-    <Compile Include="Base\Enums\WaterProofingFirstStrokeOffset.cs" />
-    <Compile Include="Base\INumericValueEntity.cs" />
-    <Compile Include="Base\ISmartEntity.cs" />
-    <Compile Include="Base\ILinearEntity.cs" />
-    <Compile Include="Base\ITextValueEntity.cs" />
-    <Compile Include="Base\Overrules\Grips\LinearEntityAddVertexGrip.cs" />
-    <Compile Include="Base\Overrules\Grips\LinearEntityVertexGrip.cs" />
-    <Compile Include="Base\Overrules\Grips\LinearEntityReverseGrip.cs" />
-    <Compile Include="Base\Properties\Converters\ColumnWidthConverter.cs" />
-    <Compile Include="Base\Properties\DoubleEqComparer.cs" />
-    <Compile Include="Base\Styles\AnnotationScaleValueConverter.cs" />
-    <Compile Include="Base\Utils\EntityUtils.cs" />
-    <Compile Include="Base\Utils\ExtendedDataUtils.cs" />
-    <Compile Include="Base\Invariables.cs" />
-    <Compile Include="Base\DefaultEntityJig.cs" />
-    <Compile Include="Base\EntityReaderService.cs" />
-    <Compile Include="Base\Enums\AxisMarkersPosition.cs" />
-    <Compile Include="Base\Enums\AxisMarkerType.cs" />
-    <Compile Include="Base\Enums\BreakLineType.cs" />
-    <Compile Include="Base\Enums\EntityDirection.cs" />
-    <Compile Include="Base\Enums\GroundLineFirstStrokeOffset.cs" />
-    <Compile Include="Base\Enums\JigState.cs" />
-    <Compile Include="Base\Enums\PropertiesCategory.cs" />
-    <Compile Include="Base\Enums\PropertyScope.cs" />
-    <Compile Include="Base\Enums\StyleType.cs" />
-    <Compile Include="Base\Enums\UpdateVariant.cs" />
-    <Compile Include="Base\Utils\AcadUtils.cs" />
-    <Compile Include="Base\Utils\GeometryUtils.cs" />
-    <Compile Include="Base\Utils\JigUtils.cs" />
-    <Compile Include="Base\Utils\LayerUtils.cs" />
-    <Compile Include="Base\Utils\LocalizationUtils.cs" />
-    <Compile Include="Base\Utils\MathExtensions.cs" />
-    <Compile Include="Base\Utils\TextStyleUtils.cs" />
-    <Compile Include="Base\IIntellectualEntityDescriptor.cs" />
-    <Compile Include="Base\ISmartEntityFunction.cs" />
-    <Compile Include="Base\SmartEntity.cs" />
-    <Compile Include="Base\Overrules\SmartEntityGripData.cs" />
-    <Compile Include="Base\Enums\GripType.cs" />
-    <Compile Include="Base\Controls\ControlStylesForEditor.xaml.cs">
-      <DependentUpon>ControlStylesForEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Base\Controls\ControlStyles.xaml.cs">
-      <DependentUpon>ControlStyles.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Base\Properties\EntityPropertyProvider.cs" />
-    <Compile Include="Base\Properties\EnumPropertyValueConverter.cs" />
-    <Compile Include="Base\Properties\SmartEntityProperty.cs" />
-    <Compile Include="Base\Properties\PaletteSettings.xaml.cs">
-      <DependentUpon>PaletteSettings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Base\Properties\PropertiesPalette.xaml.cs">
-      <DependentUpon>PropertiesPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Base\Properties\PropertiesPaletteFunction.cs" />
-    <Compile Include="Base\Properties\SummaryProperty.cs" />
-    <Compile Include="Base\Properties\SummaryPropertyCollection.cs" />
-    <Compile Include="Base\Styles\EntityStyles.cs" />
-    <Compile Include="Base\Styles\SmartEntityStyle.cs" />
-    <Compile Include="Base\Styles\StyleManager.cs" />
-    <Compile Include="Base\TypeFactory.cs" />
-    <Compile Include="BeditCommandWatcher.cs" />
-    <Compile Include="Functions\mpAxis\Axis.cs" />
-    <Compile Include="Functions\mpAxis\AxisFunction.cs" />
-    <Compile Include="Functions\mpAxis\AxisDescriptor.cs" />
-    <Compile Include="Functions\mpAxis\AxisValueEditor.xaml.cs">
-      <DependentUpon>AxisValueEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\mpAxis\Overrules\AxisGripPointOverrule.cs" />
-    <Compile Include="Base\Styles\StyleEditor.xaml.cs">
-      <DependentUpon>StyleEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\mpAxis\Overrules\AxisObjectOverrule.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\AxisOsnapOverrule.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGrip.cs" />
-    <Compile Include="Functions\mpAxis\Overrules\Grips\AxisGripName.cs" />
-    <Compile Include="Functions\mpBreakLine\BreakLine.cs" />
-    <Compile Include="Functions\mpBreakLine\BreakLineFunction.cs" />
-    <Compile Include="Functions\mpBreakLine\BreakLineDescriptor.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineGripPointOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineObjectOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\BreakLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGrip.cs" />
-    <Compile Include="Functions\mpBreakLine\Overrules\Grips\BreakLineGripName.cs" />
-    <Compile Include="Functions\mpGroundLine\GroundLine.cs" />
-    <Compile Include="Functions\mpGroundLine\GroundLineFunction.cs" />
-    <Compile Include="Functions\mpGroundLine\GroundLineDescriptor.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineGripPointOverrule.cs" />
-    <Compile Include="Base\Overrules\Grips\LinearEntityRemoveVertexGrip.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineObjectOverrule.cs" />
-    <Compile Include="Functions\mpGroundLine\Overrules\GroundLineOsnapOverrule.cs" />
-    <Compile Include="Functions\mpLevelMark\LevelMark.cs" />
-    <Compile Include="Functions\mpLevelMark\LevelMarkAlignSetup.xaml.cs">
-      <DependentUpon>LevelMarkAlignSetup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\mpLevelMark\LevelMarkDescriptor.cs" />
-    <Compile Include="Functions\mpLevelMark\LevelMarkFunction.cs" />
-    <Compile Include="Functions\mpLevelMark\LevelMarkJigState.cs" />
-    <Compile Include="Functions\mpLevelMark\LevelMarkValueEditor.xaml.cs">
-      <DependentUpon>LevelMarkValueEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\mpLevelMark\Overrules\Grips\LevelMarkGrip.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\Grips\LevelMarkGripName.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkGripPointOverrule.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkObjectOverrule.cs" />
-    <Compile Include="Functions\mpLevelMark\Overrules\LevelMarkOsnapOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionAddVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionGripPointOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionRemoveVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionReverseGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionTextGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\SectionVertexGrip.cs" />
-    <Compile Include="Functions\mpSection\Overrules\Grips\TextGripName.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionObjectOverrule.cs" />
-    <Compile Include="Functions\mpSection\Overrules\SectionOsnapOverrule.cs" />
-    <Compile Include="Functions\mpSection\Section.cs" />
-    <Compile Include="Functions\mpSection\SectionFunction.cs" />
-    <Compile Include="Functions\mpSection\SectionDescriptor.cs" />
-    <Compile Include="Functions\mpSection\SectionValueEditor.xaml.cs">
-      <DependentUpon>SectionValueEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingGripPointOverrule.cs" />
-    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingObjectOverrule.cs" />
-    <Compile Include="Functions\mpWaterProofing\Overrules\WaterProofingOsnapOverrule.cs" />
-    <Compile Include="Functions\mpWaterProofing\WaterProofing.cs" />
-    <Compile Include="Functions\mpWaterProofing\WaterProofingDescriptor.cs" />
-    <Compile Include="Functions\mpWaterProofing\WaterProofingFunction.cs" />
-    <Compile Include="Functions\SearchEntitiesByValues\SearchByValuesResultItem.cs" />
-    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesCommand.cs" />
-    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesViewModel.cs" />
-    <Compile Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesWindow.xaml.cs">
-      <DependentUpon>SearchEntitiesByValuesWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Functions\SearchEntities\SearchEntitiesCommand.cs" />
-    <Compile Include="Functions\SearchEntities\SearchEntitiesSettings.xaml.cs">
-      <DependentUpon>SearchEntitiesSettings.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="ModPlusConnector.cs" />
-    <Compile Include="RibbonBuilder.cs" />
-    <Compile Include="MainFunction.cs" />
-    <Compile Include="MainSettings.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Base\Controls\ControlStylesForEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Controls\ControlStyles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Base\Properties\PaletteSettings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Base\Properties\PropertiesPalette.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Base\Styles\Images\BreakLine.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\Images\Axis.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\Images\GroundLine.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\Images\WaterProofing.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\Images\Section.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\Images\LevelMark.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\mpAxis\AxisValueEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Base\Styles\StyleEditor.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Functions\mpLevelMark\LevelMarkAlignSetup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\mpLevelMark\LevelMarkValueEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\mpSection\SectionValueEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\SearchEntitiesByValues\SearchEntitiesByValuesWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Functions\SearchEntities\SearchEntitiesSettings.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Functions\mpBreakLine\Help\Curvilinear.png" />
-    <Resource Include="Functions\mpBreakLine\Help\Cylindrical.png" />
-    <Resource Include="Functions\mpBreakLine\Help\Linear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Properties_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\StyleEditor_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\mpESKD_32x32.png" />
-  </ItemGroup>
+
   <ItemGroup>
     <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
-    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
-    <Resource Include="Resources\Properties_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\StyleEditor_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\SearchEntities_32x32.png" />
-    <Resource Include="Resources\SearchEntities_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
+    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
+    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
+    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
-  </ItemGroup>
-  <Choose>
-    <When Condition=" '$(Configuration)'=='A2013' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2013">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2013">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2014' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2014">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2014">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2015' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2015">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2015">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2016' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2016">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2016">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2017' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2017">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2017">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2018' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2018">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2018">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2019' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2019">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2019">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2020' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2020">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2020">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-    <When Condition=" '$(Configuration)'=='A2021' or '$(Configuration)'=='Debug' ">
-      <ItemGroup>
-        <PackageReference Include="ModPlus.AutoCAD.API.2021">
-          <Version>1.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-        <PackageReference Include="ModPlus.AutoCAD.Module.2021">
-          <Version>4.3.0.0</Version>
-          <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
-      </ItemGroup>
-    </When>
-  </Choose>
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations">
-      <Version>2019.1.3</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="ModPlusAPI">
-      <Version>3.8.0</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="ModPlusStyle">
-      <Version>3.5.1</Version>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers">
-      <Version>1.1.118</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\mpLevelMark\Grips\" />
-    <Folder Include="Functions\mpSection\Grips\" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Resources\mpESKD_32x32.png" />
+    <Resource Include="Resources\Properties_32x32.png" />
+    <Resource Include="Resources\Properties_32x32_dark.png" />
     <Resource Include="Resources\SearchEntitiesByValues_32x32.png" />
     <Resource Include="Resources\SearchEntitiesByValues_32x32_dark.png" />
+    <Resource Include="Resources\SearchEntities_32x32.png" />
+    <Resource Include="Resources\SearchEntities_32x32_dark.png" />
+    <Resource Include="Resources\StyleEditor_32x32.png" />
+    <Resource Include="Resources\StyleEditor_32x32_dark.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug ("$(ModPlusPostBuild)" "AutoCAD" "$(TargetPath)")</PostBuildEvent>
-  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
 </Project>

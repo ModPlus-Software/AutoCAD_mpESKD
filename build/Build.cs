@@ -1,77 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using Nuke.Common;
+using ModPlusNuke;
 using Nuke.Common.Execution;
-using Nuke.Common.Git;
-using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
-using Nuke.Common.Tools.MSBuild;
-using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.EnvironmentInfo;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
-using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
-class Build : NukeBuild
+class Build : AutoCADPluginBuild
 {
     public static int Main () => Execute<Build>(x => x.Compile);
-
-    [Solution] readonly Solution Solution;
-
-    // If the solution name and the project (plugin) name are different, then indicate the project (plugin) name here
-    string PluginName => Solution.Name;
-
-    Target Compile => _ => _
-        .Executes(() =>
-        {
-            var project = Solution.GetProject(PluginName);
-            if (project == null)
-                throw new FileNotFoundException("Not found!");
-            
-            var postBuild = Environment.GetEnvironmentVariable("ModPlusPostBuild");
-            var build = new List<string>();
-            foreach (var (_, c) in project.Configurations)
-            {
-                var configuration = c.Split("|")[0];
-                var platform = c.Split("|")[1];
-
-                if (configuration == "Debug" || build.Contains(configuration))
-                    continue;
-
-                Logger.Normal($"Configuration: {configuration}");
-                
-                build.Add(configuration);
-
-                MSBuild(_ => _
-                    .SetProjectFile(project.Path)
-                    .SetConfiguration(configuration)
-                    .SetTargetPlatform(MSBuildTargetPlatform.x64)
-                    .SetTargets("Restore"));
-                MSBuild(_ => _
-                    .SetProjectFile(project.Path)
-                    .SetConfiguration(configuration)
-                    .SetTargetPlatform(MSBuildTargetPlatform.x64)
-                    .SetTargets("Rebuild"));
-
-                if (File.Exists(postBuild))
-                {
-                    var targetPath = Path.Combine(
-                        project.Directory, 
-                        "bin", 
-                        platform,
-                        configuration, 
-                        $"{project.Name}_{configuration.Replace("A", string.Empty)}.dll");
-                    Logger.Success($"TargetPath: {targetPath}");
-                    Process.Start(postBuild, $"AutoCAD \"{targetPath}\" s");
-                }
-                else
-                    Logger.Warn("ModPlus PostBuild application not found");
-            }
-        });
-
 }

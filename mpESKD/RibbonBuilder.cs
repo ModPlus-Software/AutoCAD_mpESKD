@@ -7,6 +7,7 @@
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
     using Base;
+    using Base.Abstractions;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;

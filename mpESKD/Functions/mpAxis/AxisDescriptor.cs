@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Base;
+    using Base.Abstractions;
     using ModPlusAPI;
 
     public class AxisDescriptor : IIntellectualEntityDescriptor

@@ -9,6 +9,7 @@ namespace mpESKD.Base
     using System.Reflection;
     using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
+    using Abstractions;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;

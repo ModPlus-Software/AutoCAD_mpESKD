@@ -8,6 +8,7 @@
     using System.Windows.Input;
     using Autodesk.AutoCAD.DatabaseServices;
     using Base;
+    using Base.Abstractions;
     using Base.Attributes;
     using Base.Utils;
     using ModPlusAPI;
