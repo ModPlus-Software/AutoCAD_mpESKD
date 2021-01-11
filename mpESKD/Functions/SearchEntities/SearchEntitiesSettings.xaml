@@ -58,22 +58,29 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+
             <ComboBox Grid.Column="0" Name="CbSearchProceedOption">
+                <!-- update graphics -->
+                <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so0}"
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot0}"/>
                 <!-- select -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so1}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot1}"></ComboBoxItem>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot1}"/>
                 <!-- remove xdata -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so2}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot2}"></ComboBoxItem>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot2}"/>
                 <!-- explode -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so3}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot3}"></ComboBoxItem>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot3}"/>
                 <!-- delete -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so4}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot4}"></ComboBoxItem>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot4}"/>
             </ComboBox>
-            <Button Grid.Column="1" Name="BtAccept" Content="{Binding Source={StaticResource Lang}, XPath=accept}"
-                    Click="BtAccept_OnClick"></Button>
+            
+            <Button Grid.Column="1"
+                    Name="BtAccept"
+                    Content="{Binding Source={StaticResource Lang}, XPath=accept}"
+                    Click="BtAccept_OnClick"/>
         </Grid>
     </Grid>
 </mps:ModPlusWindow>

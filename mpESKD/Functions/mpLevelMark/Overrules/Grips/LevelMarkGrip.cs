@@ -18,6 +18,9 @@
     public class LevelMarkGrip : SmartEntityGripData
     {
         private readonly List<Point3d> _points;
+        
+        // Временное значение ручки
+        private Point3d _gripTmp;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LevelMarkGrip"/> class.
@@ -65,9 +68,6 @@
             // Переместить
             return Language.GetItem(Invariables.LangItem, "gp1");
         }
-
-        // Временное значение ручки
-        private Point3d _gripTmp;
 
         /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)

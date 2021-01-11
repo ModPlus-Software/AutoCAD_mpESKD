@@ -75,9 +75,23 @@
                     {
                         switch (searchProceedOption)
                         {
+                            case SearchProceedOption.Update:
+                                foreach (var blockReference in blockReferences)
+                                {
+                                    var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
+                                    if (entity != null)
+                                    {
+                                        entity.UpdateEntities();
+                                        entity.BlockRecord.UpdateAnonymousBlocks();
+                                    }
+                                }
+                                
+                                break;
+                            
                             case SearchProceedOption.Select:
                                 AcadUtils.Editor.SetImpliedSelection(blockReferences.Select(b => b.ObjectId).ToArray());
                                 break;
+                            
                             case SearchProceedOption.RemoveData:
                                 foreach (var blockReference in blockReferences)
                                 {
@@ -90,6 +104,7 @@
 
                                 MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
                                 break;
+                            
                             case SearchProceedOption.Explode:
                                 btr.UpgradeOpen();
                                 foreach (var blockReference in blockReferences)
@@ -112,6 +127,7 @@
 
                                 MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
                                 break;
+                            
                             case SearchProceedOption.Delete:
                                 foreach (var blockReference in blockReferences)
                                 {

@@ -6,23 +6,28 @@
     public enum SearchProceedOption
     {
         /// <summary>
+        /// Обновить графику
+        /// </summary>
+        Update = 0,
+        
+        /// <summary>
         /// Выбрать
         /// </summary>
-        Select = 0,
+        Select = 1,
 
         /// <summary>
         /// Удалить расширенные данные
         /// </summary>
-        RemoveData = 1,
+        RemoveData = 2,
 
         /// <summary>
         /// Взорвать
         /// </summary>
-        Explode = 2,
+        Explode = 3,
 
         /// <summary>
         /// Удалить
         /// </summary>
-        Delete = 3
+        Delete = 4
     }
 }

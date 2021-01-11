@@ -1,8 +1,8 @@
-﻿namespace mpESKD.Functions.mpLevelMark
+﻿// ReSharper disable InconsistentNaming
+namespace mpESKD.Functions.mpLevelMark
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
@@ -16,7 +16,6 @@
     /// Отметка уровня
     /// </summary>
     [SmartEntityDisplayNameKey("h105")]
-    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
     public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity
     {
         /// <summary>
@@ -139,6 +138,8 @@
             get => _objectLine;
             set
             {
+                if (_objectLine == value)
+                    return;
                 _objectLine = value;
                 var horV = (EndPoint - ObjectPoint).GetNormal();
                 BottomShelfStartPoint = value
@@ -159,7 +160,10 @@
             get => _objectLineOffset;
             set
             {
+                if (_objectLineOffset == value)
+                    return;
                 _objectLineOffset = value;
+                
                 if (ObjectLine)
                 {
                     var horV = (EndPoint - ObjectPoint).GetNormal();
@@ -167,13 +171,30 @@
                 }
             }
         }
+        
+        private int _bottomShelfLength = 10;
 
         /// <summary>
         /// Длина нижней полки
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 3, "p57", 10, 1, 20, descLocalKey: "d57", nameSymbol: "l2")]
         [SaveToXData]
-        public int BottomShelfLength { get; set; } = 10;
+        public int BottomShelfLength
+        {
+            get => _bottomShelfLength;
+            set
+            {
+                if (_bottomShelfLength == value)
+                    return;
+                _bottomShelfLength = value;
+
+                if (!ObjectLine)
+                {
+                    var horV = (EndPoint - ObjectPoint).GetNormal();
+                    BottomShelfStartPoint = EndPoint - (horV * BottomShelfLength * GetFullScale());
+                }
+            }
+        }
 
         /// <summary>
         /// Выступ нижней полки
@@ -263,18 +284,25 @@
         [EntityProperty(PropertiesCategory.Content, 6, "p64", true, descLocalKey: "d64")]
         [SaveToXData]
         public bool ShowPlus { get; set; } = true;
+        
+        /// <summary>
+        /// Добавление звездочки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 7, "p75", false, descLocalKey: "d75")]
+        [SaveToXData]
+        public bool AddAsterisk { get; set; }
 
         /// <summary>
         /// Точность
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 7, "p67", 3, 0, 5, descLocalKey: "d67")]
+        [EntityProperty(PropertiesCategory.Content, 8, "p67", 3, 0, 5, descLocalKey: "d67")]
         [SaveToXData]
         public int Accuracy { get; set; } = 3;
 
         /// <summary>
         /// Примечание
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 8, "p68", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 9, "p68", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string Note { get; set; } = string.Empty;
@@ -282,28 +310,28 @@
         /// <summary>
         /// Выравнивание примечания по горизонтали
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+        [EntityProperty(PropertiesCategory.Content, 10, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
         [SaveToXData]
         public TextHorizontalAlignment NoteHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
 
         /// <summary>
         /// Высота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 10, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+        [EntityProperty(PropertiesCategory.Content, 11, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
         [SaveToXData]
         public double MainTextHeight { get; set; } = 3.5;
 
         /// <summary>
         /// Высота малого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
 
         /// <summary>
         /// Масштаб измерений
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
+        [EntityProperty(PropertiesCategory.Content, 13, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
         [SaveToXData]
         public double MeasurementScale { get; set; } = 1.0;
 
@@ -336,7 +364,7 @@
         /// Нижний (второстепенный) текст
         /// </summary>
         private DBText _bottomDbText;
-
+        
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -381,10 +409,7 @@
         public void SetArrowPoint(Point3d point3d)
         {
             EndPoint = point3d;
-            ObjectPoint = new Point3d(
-                ObjectPoint.X,
-                EndPoint.Y,
-                ObjectPoint.Z);
+            ObjectPoint = new Point3d(ObjectPoint.X, EndPoint.Y, ObjectPoint.Z);
 
             var horV = (EndPoint - ObjectPoint).GetNormal();
 
@@ -683,13 +708,15 @@
 
             MeasuredValue = (objectPoint.Y - insertionPoint.Y) * MeasurementScale;
 
+            var asterisk = AddAsterisk ? "*" : string.Empty;
+
             if (MeasuredValue >= 0)
             {
                 var plus = ShowPlus ? "+" : string.Empty;
-                return ReplaceSeparator($"{plus}{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}");
+                return ReplaceSeparator($"{plus}{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}{asterisk}");
             }
 
-            return ReplaceSeparator($"{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}");
+            return ReplaceSeparator($"{Math.Round(MeasuredValue, Accuracy).ToString($"F{Accuracy}")}{asterisk}");
         }
 
         private string ReplaceSeparator(string numericValue)

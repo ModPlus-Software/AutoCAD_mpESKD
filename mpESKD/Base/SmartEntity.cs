@@ -185,7 +185,9 @@ namespace mpESKD.Base
         [SaveToXData]
         public abstract string TextStyle { get; set; }
 
-        /// <summary>Текущий численный масштаб масштаб</summary>
+        /// <summary>
+        /// Текущий численный масштаб
+        /// </summary>
         public double GetScale()
         {
             return Scale.GetNumericScale();
