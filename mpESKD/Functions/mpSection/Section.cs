@@ -295,10 +295,7 @@
                 entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
                 {
-                    if (e != null)
-                    {
-                        SetImmutablePropertiesToNestedEntity(e);
-                    }
+                    SetImmutablePropertiesToNestedEntity(e);
                 }
 
                 return entities;

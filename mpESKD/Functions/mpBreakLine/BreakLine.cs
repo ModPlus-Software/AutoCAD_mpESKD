@@ -116,10 +116,7 @@ namespace mpESKD.Functions.mpBreakLine
                 var entities = new List<Entity> { _mainPolyline };
                 foreach (var e in entities)
                 {
-                    if (e != null)
-                    {
-                        SetImmutablePropertiesToNestedEntity(e);
-                    }
+                    SetImmutablePropertiesToNestedEntity(e);
                 }
 
                 return entities;

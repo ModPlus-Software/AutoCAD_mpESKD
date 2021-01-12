@@ -121,7 +121,7 @@ namespace mpESKD.Functions.mpLevelMark
         public override double LineTypeScale { get; set; }
 
         /// <inheritdoc/>
-        [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41-1")]
+        [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
         [SaveToXData]
         public override string TextStyle { get; set; } = "Standard";
 
@@ -382,10 +382,7 @@ namespace mpESKD.Functions.mpLevelMark
 
                 foreach (var e in entities)
                 {
-                    if (e != null)
-                    {
-                        SetImmutablePropertiesToNestedEntity(e);
-                    }
+                    SetImmutablePropertiesToNestedEntity(e);
                 }
 
                 return entities;

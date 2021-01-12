@@ -676,6 +676,8 @@ namespace mpESKD.Base
         /// <param name="entity">Примитив AutoCAD</param>
         public void SetImmutablePropertiesToNestedEntity(Entity entity)
         {
+            if (entity == null)
+                return;
             entity.Layer = "0";
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;
@@ -689,6 +691,8 @@ namespace mpESKD.Base
         /// <param name="entity">Примитив AutoCAD</param>
         public void SetChangeablePropertiesToNestedEntity(Entity entity)
         {
+            if (entity == null)
+                return;
             entity.Layer = "0";
             entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
             entity.LineWeight = LineWeight.ByBlock;

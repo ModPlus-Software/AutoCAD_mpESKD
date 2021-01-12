@@ -207,4 +207,9 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Functions\mpNodalLeader\Icons\" />
+    <Folder Include="Functions\mpNodalLeader\Overrules\" />
+  </ItemGroup>
+
 </Project>

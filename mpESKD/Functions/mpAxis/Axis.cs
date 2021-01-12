@@ -583,16 +583,10 @@
 
                 foreach (var e in entities)
                 {
-                    if (e != null && !(e is DBText))
-                    {
-                        SetImmutablePropertiesToNestedEntity(e);
-                    }
+                    SetImmutablePropertiesToNestedEntity(e);
                 }
 
-                if (_mainLine != null)
-                {
-                    SetChangeablePropertiesToNestedEntity(_mainLine);
-                }
+                SetChangeablePropertiesToNestedEntity(_mainLine);
 
                 entities.Add(_mainLine);
 

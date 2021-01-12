@@ -115,16 +115,10 @@ namespace mpESKD.Functions.mpWaterProofing
                 entities.AddRange(_strokes);
                 foreach (var e in entities)
                 {
-                    if (e != null)
-                    {
-                        SetImmutablePropertiesToNestedEntity(e);
-                    }
+                    SetImmutablePropertiesToNestedEntity(e);
                 }
 
-                if (_mainPolyline != null)
-                {
-                    SetChangeablePropertiesToNestedEntity(_mainPolyline);
-                }
+                SetChangeablePropertiesToNestedEntity(_mainPolyline);
 
                 entities.Add(_mainPolyline);
 

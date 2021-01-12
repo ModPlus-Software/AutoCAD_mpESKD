@@ -19,13 +19,16 @@
         public string Name => "mpWaterProofing";
 
         /// <inheritdoc />
-        public string LName => Language.GetItem(Invariables.LangItem, "h114"); // "Гидроизоляция";
+        // "Гидроизоляция";
+        public string LName => Language.GetItem(Invariables.LangItem, "h114");
 
         /// <inheritdoc />
-        public string Description => Language.GetItem(Invariables.LangItem, "h115"); // Создание линии обозначения гидроизоляции
+        // Создание линии обозначения гидроизоляции
+        public string Description => Language.GetItem(Invariables.LangItem, "h115");
 
         /// <inheritdoc />
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h116"); // Создание интеллектуального объекта на основе анонимного блока, описывающего линию гидроизоляции
+        // Создание интеллектуального объекта на основе анонимного блока, описывающего линию гидроизоляции
+        public string FullDescription => Language.GetItem(Invariables.LangItem, "h116");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
