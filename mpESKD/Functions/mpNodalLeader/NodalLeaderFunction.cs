@@ -142,7 +142,9 @@
                         nodalLeader.NodalLeaderJigState = NodalLeaderJigState.LeaderPoint;
                         entityJig.PromptForNextPoint = leaderPointPrompt;
                         nodalLeader.FramePoint = nodalLeader.EndPoint;
-                        entityJig.PreviousPoint = nodalLeader.FramePoint;
+                        
+                        // Тут не нужна привязка к предыдущей точке
+                        entityJig.PreviousPoint = nodalLeader.InsertionPoint;
                     }
                     else
                     {

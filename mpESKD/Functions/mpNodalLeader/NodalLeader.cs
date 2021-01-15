@@ -321,21 +321,31 @@ namespace mpESKD.Functions.mpNodalLeader
             {
                 _framePolyline = null;
 
-                _frameCircle = new Circle
+                try
                 {
-                    Center = insertionPoint,
-                    Radius = Math.Min(
-                        Math.Abs(framePoint.X - insertionPoint.X),
-                        Math.Abs(framePoint.Y - insertionPoint.Y))
-                };
+                    var radius = Math.Min(
+                        Math.Abs(framePoint.X - insertionPoint.X), Math.Abs(framePoint.Y - insertionPoint.Y));
+                    if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
+                        radius = 5 * scale;
+                    
+                    _frameCircle = new Circle
+                    {
+                        Center = insertionPoint,
+                        Radius = radius
+                    };
 
-                if (!drawLeader)
-                    return;
+                    if (!drawLeader)
+                        return;
 
-                var leaderLine = new Line(insertionPoint, leaderPoint);
-                var pts = new Point3dCollection();
-                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+                    var leaderLine = new Line(insertionPoint, leaderPoint);
+                    var pts = new Point3dCollection();
+                    _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+                    _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+                }
+                catch
+                {
+                    _frameCircle = null;
+                }
             }
             else
             {
