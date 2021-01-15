@@ -29,7 +29,7 @@
             _instance = new SectionGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(SectionDescriptor.Instance.Name);
+            _instance.SetXDataFilter(Section.GetDescriptor().Name);
             return _instance;
         }
 
@@ -340,7 +340,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, SectionDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, mpSection.Section.GetDescriptor().Name);
         }
     }
 }

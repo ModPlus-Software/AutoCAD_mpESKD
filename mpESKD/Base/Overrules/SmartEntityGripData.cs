@@ -62,28 +62,38 @@
 
             worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
             worldDraw.SubEntityTraits.Color = GetGripColor();
-            if (GripType != GripType.Mirror)
+            if (GripType == GripType.TwoArrowsUpDown)
             {
-                worldDraw.Geometry.Polygon(point3dCollections);
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripUpDownFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripUpDownSecondArrow(num, ecs));
+            }
+            else if (GripType == GripType.TwoArrowsLeftRight)
+            {
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightSecondArrow(num, ecs));
             }
             else
             {
-                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, ecs));
-                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, ecs));
+                worldDraw.Geometry.Polygon(point3dCollections);
             }
 
             worldDraw.SubEntityTraits.FillType = FillType.FillNever;
 
             // обводка
             worldDraw.SubEntityTraits.Color = 250;
-            if (GripType != GripType.Mirror)
+            if (GripType == GripType.TwoArrowsUpDown)
             {
-                worldDraw.Geometry.Polygon(point3dCollections);
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripUpDownFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripUpDownSecondArrow(num, ecs));
+            }
+            else if (GripType == GripType.TwoArrowsLeftRight)
+            {
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightFirstArrow(num, ecs));
+                worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightSecondArrow(num, ecs));
             }
             else
             {
-                worldDraw.Geometry.Polygon(PointsForReverseGripFirstArrow(num, ecs));
-                worldDraw.Geometry.Polygon(PointsForReverseGripSecondArrow(num, ecs));
+                worldDraw.Geometry.Polygon(point3dCollections);
             }
             
             // restore
@@ -164,7 +174,7 @@
             };
         }
 
-        private Point3dCollection PointsForReverseGripFirstArrow(double num, CoordinateSystem3d ecs)
+        private Point3dCollection PointsForTwoArrowsGripUpDownFirstArrow(double num, CoordinateSystem3d ecs)
         {
             var horUnit = num * ecs.Xaxis;
             var verUnit = num * ecs.Yaxis;
@@ -180,7 +190,23 @@
             };
         }
 
-        private Point3dCollection PointsForReverseGripSecondArrow(double num, CoordinateSystem3d ecs)
+        private Point3dCollection PointsForTwoArrowsGripLeftRightFirstArrow(double num, CoordinateSystem3d ecs)
+        {
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint - (horUnit * 0.25),
+                GripPoint + (horUnit * 1.25) + (verUnit * 0.75),
+                GripPoint - (horUnit * 0.25) + (verUnit * 1.5),
+                GripPoint - (horUnit * 0.25) + (verUnit * 1.0),
+                GripPoint - (horUnit * 1.25) + (verUnit * 1.0),
+                GripPoint - (horUnit * 1.25) + (verUnit * 0.5),
+                GripPoint - (horUnit * 0.25) + (verUnit * 0.5)
+            };
+        }
+
+        private Point3dCollection PointsForTwoArrowsGripUpDownSecondArrow(double num, CoordinateSystem3d ecs)
         {
             var horUnit = num * ecs.Xaxis;
             var verUnit = num * ecs.Yaxis;
@@ -193,6 +219,22 @@
                 GripPoint + (horUnit * 1.0) + (verUnit * 1.25),
                 GripPoint + (horUnit * 0.5) + (verUnit * 1.25),
                 GripPoint + (horUnit * 0.5) + (verUnit * 0.25)
+            };
+        }
+        
+        private Point3dCollection PointsForTwoArrowsGripLeftRightSecondArrow(double num, CoordinateSystem3d ecs)
+        {
+            var horUnit = num * ecs.Xaxis;
+            var verUnit = num * ecs.Yaxis;
+            return new Point3dCollection
+            {
+                GripPoint + (horUnit * 0.25),
+                GripPoint - (horUnit * 1.25) - (verUnit * 0.75),
+                GripPoint + (horUnit * 0.25) - (verUnit * 1.5),
+                GripPoint + (horUnit * 0.25) - (verUnit * 1.0),
+                GripPoint + (horUnit * 1.25) - (verUnit * 1.0),
+                GripPoint + (horUnit * 1.25) - (verUnit * 0.5),
+                GripPoint + (horUnit * 0.25) - (verUnit * 0.5)
             };
         }
 

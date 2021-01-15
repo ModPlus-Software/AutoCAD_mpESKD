@@ -121,7 +121,7 @@
 
         private static void InsertGroundLineWithJig(GroundLine groundLine, BlockReference blockReference)
         {
-            var nextPointPrompt = Language.GetItem(Invariables.LangItem, "msg5");
+            var nextPointPrompt = Language.GetItem("msg5");
             var entityJig = new DefaultEntityJig(
                 groundLine,
                 blockReference,
@@ -191,12 +191,12 @@
 #endif
             try
             {
-                var peo = new PromptEntityOptions($"\n{Language.GetItem(Invariables.LangItem, "msg6")}")
+                var peo = new PromptEntityOptions($"\n{Language.GetItem("msg6")}")
                 {
                     AllowNone = false,
                     AllowObjectOnLockedLayer = true
                 };
-                peo.SetRejectMessage($"\n{Language.GetItem(Invariables.LangItem, "wrong")}");
+                peo.SetRejectMessage($"\n{Language.GetItem("wrong")}");
                 peo.AddAllowedClass(typeof(Polyline), true);
 
                 var per = AcadUtils.Editor.GetEntity(peo);
@@ -258,7 +258,7 @@
                     AcadUtils.Document.TransactionManager.FlushGraphics();
 
                     // "Удалить исходную полилинию?"
-                    if (MessageBox.ShowYesNo(Language.GetItem(Invariables.LangItem, "msg7"), MessageBoxIcon.Question))
+                    if (MessageBox.ShowYesNo(Language.GetItem("msg7"), MessageBoxIcon.Question))
                     {
                         using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
                         {

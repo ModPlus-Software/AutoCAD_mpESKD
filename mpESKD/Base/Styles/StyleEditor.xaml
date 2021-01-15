@@ -25,6 +25,7 @@
                 <ResourceDictionary Source="Images/Section.xaml"/>
                 <ResourceDictionary Source="Images/LevelMark.xaml"/>
                 <ResourceDictionary Source="Images/WaterProofing.xaml"/>
+                <ResourceDictionary Source="Images/NodalLeader.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -130,7 +131,7 @@
                 </TreeView>
 
                 <mps:Card Grid.Row="3" Grid.Column="0">
-                    <Viewbox  Stretch="Uniform" Name="VbImage"/>
+                    <Viewbox  Stretch="Uniform" Name="VbImage" />
                 </mps:Card>
 
                 <!--Image show controls-->
@@ -377,6 +378,18 @@
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h46}"
                                           IsChecked="{Binding Path=LevelMarkShowHelpLinesOnSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h47}"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
+
+                    <!-- Nodal Leader -->
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h126}">
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h131}"
+                                          IsChecked="{Binding Path=NodalLeaderContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h132}"/>
                             </StackPanel>
                         </Border>
                     </TabItem>

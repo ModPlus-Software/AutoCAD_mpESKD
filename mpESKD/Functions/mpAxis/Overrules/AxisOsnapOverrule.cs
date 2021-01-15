@@ -25,7 +25,7 @@
             _breakLineOsnapOverrule = new AxisOsnapOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineOsnapOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
+            _breakLineOsnapOverrule.SetXDataFilter(Axis.GetDescriptor().Name);
             return _breakLineOsnapOverrule;
         }
 
@@ -47,7 +47,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, Axis.GetDescriptor().Name);
         }
     }
 }

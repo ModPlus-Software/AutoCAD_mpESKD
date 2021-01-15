@@ -16,6 +16,7 @@ namespace mpESKD.Functions.mpWaterProofing
     /// Линия гидроизоляции
     /// </summary>
     [SmartEntityDisplayNameKey("h114")]
+    [SystemStyleDescriptionKey("h129")]
     public class WaterProofing : SmartEntity, ILinearEntity
     {
         /// <summary>
@@ -32,6 +33,14 @@ namespace mpESKD.Functions.mpWaterProofing
         public WaterProofing(ObjectId objectId)
             : base(objectId)
         {
+        }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="WaterProofing"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(WaterProofing));
         }
 
         /// <inheritdoc />

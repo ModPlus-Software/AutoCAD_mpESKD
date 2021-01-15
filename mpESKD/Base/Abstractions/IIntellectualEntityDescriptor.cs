@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base.Abstractions
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -8,6 +9,11 @@
     /// </summary>
     public interface IIntellectualEntityDescriptor
     {
+        /// <summary>
+        /// Тип интеллектуального объекта
+        /// </summary>
+        Type EntityType { get; }
+        
         /// <summary>
         /// Имя функции. Должно быть как имя типа примитива с приставкой "mp". Например, mpAxis, mpGroundLine и т.п.
         /// <remarks>Используется в расширенных данных (XData) для идентификации примитива и соответствует команде AutoCAD</remarks>

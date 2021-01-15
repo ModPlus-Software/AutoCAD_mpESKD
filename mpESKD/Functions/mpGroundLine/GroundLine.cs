@@ -16,6 +16,7 @@ namespace mpESKD.Functions.mpGroundLine
     /// Линия грунта
     /// </summary>
     [SmartEntityDisplayNameKey("h73")]
+    [SystemStyleDescriptionKey("h78")]
     public class GroundLine : SmartEntity, ILinearEntity
     {
         /// <summary>

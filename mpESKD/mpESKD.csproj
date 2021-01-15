@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.8.10.0</Version>
+    <Version>1.9.13.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
   </PropertyGroup>
@@ -78,10 +78,6 @@
     <AssemblyName>$(AssemblyName)_$(Description)</AssemblyName>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <OutputPath>E:\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
-  </PropertyGroup>
-
   <Choose>
     <When Condition="'$(Configuration)'=='A2013'">
       <ItemGroup>
@@ -140,6 +136,11 @@
   </Choose>
 
   <ItemGroup>
+    <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
+    <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusAPI" Version="4.7.0" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusStyle" Version="3.6.0" ExcludeAssets="runtime" />
@@ -171,6 +172,8 @@
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
+    <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
+    <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
@@ -205,11 +208,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Functions\mpNodalLeader\Icons\" />
-    <Folder Include="Functions\mpNodalLeader\Overrules\" />
   </ItemGroup>
 
 </Project>

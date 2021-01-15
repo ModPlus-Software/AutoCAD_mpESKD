@@ -11,7 +11,7 @@
         public SearchEntitiesSettings()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h99");
+            Title = ModPlusAPI.Language.GetItem("h99");
         }
 
         private void BtCheckAll_OnClick(object sender, RoutedEventArgs e)

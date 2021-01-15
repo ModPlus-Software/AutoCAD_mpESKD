@@ -16,6 +16,7 @@ namespace mpESKD.Functions.mpLevelMark
     /// Отметка уровня
     /// </summary>
     [SmartEntityDisplayNameKey("h105")]
+    [SystemStyleDescriptionKey("h108")]
     public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity
     {
         /// <summary>
@@ -33,6 +34,14 @@ namespace mpESKD.Functions.mpLevelMark
             : base(objectId)
         {
         }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="LevelMark"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(LevelMark));
+        }
 
         /// <summary>
         /// Точка уровня (точка объекта измерения)
@@ -43,7 +52,7 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Точка уровня в внутренней системе координат блока
         /// </summary>
-        public Point3d ObjectPointOCS => ObjectPoint.TransformBy(BlockTransform.Inverse());
+        private Point3d ObjectPointOCS => ObjectPoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>
         /// Точка начала (со стороны объекта) нижней полки
@@ -54,7 +63,7 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Точка начала (со стороны объекта) нижней полки в системе координат блока
         /// </summary>
-        public Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
+        private Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>
         /// Точка начала верхней полки. Задает высоту от нижней полки до верхней
@@ -84,7 +93,7 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Точка начала верхней полки в системе координат блока. Задает высоту от нижней полки до верхней
         /// </summary>
-        public Point3d ShelfPointOCS => ShelfPoint.TransformBy(BlockTransform.Inverse());
+        private Point3d ShelfPointOCS => ShelfPoint.TransformBy(BlockTransform.Inverse());
 
         /// <inheritdoc/>
         [SaveToXData]
@@ -567,6 +576,7 @@ namespace mpESKD.Functions.mpLevelMark
             var mainTextHeight = MainTextHeight * scale;
             var secondTextHeight = SecondTextHeight * scale;
             var textIndent = TextIndent * scale;
+            var textVerticalOffset = TextVerticalOffset * scale;
 
             if (ObjectLine)
             {
@@ -585,11 +595,11 @@ namespace mpESKD.Functions.mpLevelMark
             _arrowPolyline = GetArrow(objectPoint, arrowPoint, shelfPoint, scale);
 
             var topTextPosition = isTop
-                ? shelfPoint + (TextVerticalOffset * scale * verV) + (textIndent * horV)
-                : shelfPoint - (TextVerticalOffset * scale * verV) + (textIndent * horV);
+                ? shelfPoint + (textVerticalOffset * verV) + (textIndent * horV)
+                : shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
             var bottomTextPosition = isTop
-                ? shelfPoint - (TextVerticalOffset * scale * verV) + (textIndent * horV)
-                : shelfPoint + (TextVerticalOffset * scale * verV) + (textIndent * horV);
+                ? shelfPoint - (textVerticalOffset * verV) + (textIndent * horV)
+                : shelfPoint + (textVerticalOffset * verV) + (textIndent * horV);
 
             _topDbText = new DBText
             {
@@ -605,28 +615,27 @@ namespace mpESKD.Functions.mpLevelMark
             
             if (isLeft)
             {
-                _topDbText.SetPropertiesToDbText(
-                    TextStyle, mainTextHeight, TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
+                _topDbText.SetProperties(TextStyle, mainTextHeight);
+                _topDbText.SetPosition(TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
                 _topDbText.AlignmentPoint = topTextPosition;
 
-                _bottomDbText.SetPropertiesToDbText(
-                    TextStyle, secondTextHeight, TextHorizontalMode.TextRight, TextVerticalMode.TextBottom, AttachmentPoint.TopRight);
+                _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+                _bottomDbText.SetPosition(TextHorizontalMode.TextRight, TextVerticalMode.TextBottom, AttachmentPoint.TopRight);
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
             else
             {
-                _topDbText.SetPropertiesToDbText(TextStyle, mainTextHeight);
-                _bottomDbText.SetPropertiesToDbText(
-                    TextStyle, secondTextHeight, TextHorizontalMode.TextLeft, TextVerticalMode.TextBottom, AttachmentPoint.TopLeft);
+                _topDbText.SetProperties(TextStyle, mainTextHeight);
+                _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+                _bottomDbText.SetPosition(TextHorizontalMode.TextLeft, TextVerticalMode.TextBottom, AttachmentPoint.TopLeft);
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
             
             // верхний текст всегда имеет содержимое
-            var topTextLength =
-                Math.Abs(_topDbText.GeometricExtents.MaxPoint.X - _topDbText.GeometricExtents.MinPoint.X);
+            var topTextLength = _topDbText.GetLength();
             AcadUtils.WriteMessageInDebug($"Top Text Length: {topTextLength}");
             var bottomTextLength = !string.IsNullOrEmpty(Note)
-                ? Math.Abs(_bottomDbText.GeometricExtents.MaxPoint.X - _bottomDbText.GeometricExtents.MinPoint.X)
+                ? _bottomDbText.GetLength()
                 : double.NaN;
 
             var maxTextWidth = double.IsNaN(bottomTextLength)

@@ -1,34 +1,30 @@
 ﻿namespace mpESKD.Functions.mpWaterProofing
 {
+    using System;
     using System.Collections.Generic;
-    using Base;
     using Base.Abstractions;
     using ModPlusAPI;
 
     /// <inheritdoc />
     public class WaterProofingDescriptor : IIntellectualEntityDescriptor
     {
-        private static WaterProofingDescriptor _instance;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static WaterProofingDescriptor Instance => _instance ?? (_instance = new WaterProofingDescriptor());
+        /// <inheritdoc/>
+        public Type EntityType => typeof(WaterProofing);
 
         /// <inheritdoc />
         public string Name => "mpWaterProofing";
 
         /// <inheritdoc />
         // "Гидроизоляция";
-        public string LName => Language.GetItem(Invariables.LangItem, "h114");
+        public string LName => Language.GetItem("h114");
 
         /// <inheritdoc />
         // Создание линии обозначения гидроизоляции
-        public string Description => Language.GetItem(Invariables.LangItem, "h115");
+        public string Description => Language.GetItem("h115");
 
         /// <inheritdoc />
         // Создание интеллектуального объекта на основе анонимного блока, описывающего линию гидроизоляции
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h116");
+        public string FullDescription => Language.GetItem("h116");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -43,14 +39,14 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // Гидроизоляция из полилинии
-            Language.GetItem(Invariables.LangItem, "h117")
+            Language.GetItem("h117")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // Конвертирование выбранной полилинии в линию обозначения гидроизоляции
-            Language.GetItem(Invariables.LangItem, "h118")
+            Language.GetItem("h118")
         };
 
         /// <inheritdoc />

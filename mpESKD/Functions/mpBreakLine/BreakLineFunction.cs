@@ -36,7 +36,7 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -45,7 +45,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor().Name);
 
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
@@ -85,7 +85,7 @@
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
             // send statistic
-            Statistic.SendCommandStarting(BreakLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
             try
             {
                 Overrule.Overruling = false;
@@ -93,7 +93,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(BreakLineDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor().Name);
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
                 var breakLine = new BreakLine();
 

@@ -15,9 +15,12 @@ namespace mpESKD.Functions.mpNodalLeader
     /// <summary>
     /// Узловая выноска
     /// </summary>
+    [SmartEntityDisplayNameKey("h126")]
+    [SystemStyleDescriptionKey("h130")]
     public class NodalLeader : SmartEntity, ITextValueEntity
     {
         private readonly string _lastNodeNumber;
+        private string _cachedNodeNumber;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodalLeader"/> class.
@@ -45,6 +48,14 @@ namespace mpESKD.Functions.mpNodalLeader
         }
 
         /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="NodalLeader"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(NodalLeader));
+        }
+
+        /// <summary>
         /// Точка рамки
         /// </summary>
         [SaveToXData]
@@ -53,7 +64,7 @@ namespace mpESKD.Functions.mpNodalLeader
         /// <summary>
         /// Точка рамки в внутренней системе координат блока
         /// </summary>
-        public Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
+        private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>
         /// Состояние Jig при создании узловой выноски
@@ -61,13 +72,8 @@ namespace mpESKD.Functions.mpNodalLeader
         public NodalLeaderJigState? NodalLeaderJigState { get; set; }
 
         /// <inheritdoc/>
-        public override double MinDistanceBetweenPoints => 1;
-
-        /// <summary>
-        /// Минимальное расстояние между рамкой и выноской
-        /// </summary>
-        private double MinDistanceBetweenFrameAndLeader => 1;
-
+        public override double MinDistanceBetweenPoints => 5;
+        
         /// <inheritdoc/>
         public override IEnumerable<Entity> Entities
         {
@@ -107,45 +113,6 @@ namespace mpESKD.Functions.mpNodalLeader
         [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Round)]
         [SaveToXData]
         public FrameType FrameType { get; set; } = FrameType.Round;
-
-        /// <summary>
-        /// Высота рамки
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p76", 5.0, 1.0, nameSymbol: "fh")]
-        [SaveToXData]
-        public double FrameHeight
-        {
-            get
-            {
-                if (FramePoint == Point3d.Origin)
-                    return 5;
-                return Math.Abs(FramePoint.Y - InsertionPoint.Y) / GetFullScale();
-            }
-
-            set => FramePoint = FramePoint.Y > InsertionPoint.Y 
-                ? new Point3d(FramePoint.X, InsertionPoint.Y + (value * GetFullScale()), FramePoint.Z)
-                : new Point3d(FramePoint.X, InsertionPoint.Y - (value * GetFullScale()), FramePoint.Z);
-        }
-
-        /// <summary>
-        /// Ширина рамки
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p77", 5.0, 1.0, nameSymbol: "fw")]
-        [SaveToXData]
-        public double FrameWidth
-        {
-            get
-            {
-                if (FramePoint == Point3d.Origin)
-                    return 5;
-                return Math.Abs(FramePoint.X - InsertionPoint.X) / GetFullScale();
-            }
-
-            set =>
-                FramePoint = FramePoint.X > InsertionPoint.X 
-                    ? new Point3d(FramePoint.X + (value * GetFullScale()), InsertionPoint.Y, FramePoint.Z)
-                    : new Point3d(FramePoint.X - (value * GetFullScale()), InsertionPoint.Y, FramePoint.Z);
-        }
 
         /// <summary>
         /// Радиус скругления углов прямоугольной рамки
@@ -188,9 +155,23 @@ namespace mpESKD.Functions.mpNodalLeader
         public override string TextStyle { get; set; } = "Standard";
 
         /// <summary>
+        /// Высота текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+        [SaveToXData]
+        public double MainTextHeight { get; set; } = 3.5;
+
+        /// <summary>
+        /// Высота малого текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+        [SaveToXData]
+        public double SecondTextHeight { get; set; } = 2.5;
+
+        /// <summary>
         /// Номер узла
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 2, "p79", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p79", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string NodeNumber { get; set; } = string.Empty;
@@ -198,7 +179,7 @@ namespace mpESKD.Functions.mpNodalLeader
         /// <summary>
         /// Номер листа
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "p80", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p80", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
@@ -206,7 +187,7 @@ namespace mpESKD.Functions.mpNodalLeader
         /// <summary>
         /// Адрес узла
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "p81", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p81", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
@@ -265,50 +246,61 @@ namespace mpESKD.Functions.mpNodalLeader
                 if (NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.InsertionPoint)
                 {
                     var tempFramePoint = new Point3d(
-                        InsertionPointOCS.X + (FrameHeight * scale),
-                        InsertionPointOCS.Y + (FrameWidth * scale),
-                        InsertionPointOCS.Z);
-                    var tempShelfPoint = new Point3d(
-                        InsertionPointOCS.X + (FrameHeight * scale * 2),
-                        InsertionPointOCS.Y + (FrameWidth * scale * 2),
+                        InsertionPointOCS.X + (5 * scale),
+                        InsertionPointOCS.Y + (5 * scale),
                         InsertionPointOCS.Z);
 
                     AcadUtils.WriteMessageInDebug(
                         "Create when NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.InsertionPoint");
-                    
-                    CreateEntities(InsertionPointOCS, tempFramePoint, tempShelfPoint, scale);
+
+                    CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
                 }
                 //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
                 //// будет перемещена в FramePoint
-                else if (NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.ObjectPoint)
+                else if (NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.FramePoint)
                 {
-                    var tempShelfPoint = new Point3d(
-                        InsertionPointOCS.X + (FrameHeight * scale * 2),
-                        InsertionPointOCS.Y + (FrameWidth * scale * 2),
-                        InsertionPointOCS.Z);
+                    // Так как FramePoint тут еще не задана, то свойства FrameWidth и FrameHeight нужно высчитывать из EndPoint
+                    var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
+                    var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
 
-                    AcadUtils.WriteMessageInDebug(
-                        "Create when NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.ObjectPoint");
-                    
-                    CreateEntities(InsertionPointOCS, FramePointOCS, tempShelfPoint, scale);
+                    AcadUtils.WriteMessageInDebug($"On set FramePoint: frame width: {frameWidth}");
+                    AcadUtils.WriteMessageInDebug($"On set FramePoint: frame height: {frameHeight}");
+
+                    if (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints)
+                    {
+                        var tempFramePoint = new Point3d(
+                            InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
+                            InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
+                            InsertionPointOCS.Z);
+
+                        AcadUtils.WriteMessageInDebug(
+                            "Create when NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.FramePoint and invalid distance");
+
+                        CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
+                    }
+                    else
+                    {
+                        AcadUtils.WriteMessageInDebug(
+                            "Create when NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.FramePoint");
+
+                        CreateEntities(InsertionPointOCS, EndPointOCS, Point3d.Origin, scale, false);
+                    }
                 }
                 //// Прочие случаи
                 else
                 {
-                    //// Если указывается EndPoint (она же точка выноски) и расстояние до рамки меньше допустимого
-                    if (IsInvalidDistanceBetweenFrameAndLeaderPoint())
+                    //// Если указывается EndPoint (она же точка выноски)
+                    if (NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.LeaderPoint)
                     {
+                        AcadUtils.WriteMessageInDebug(
+                            "Create when NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.LeaderPoint");
 
-                    }
-                    //// Если указывается EndPoint (она же точка выноски) и расстояние до рамки допустимое
-                    else if (NodalLeaderJigState == mpNodalLeader.NodalLeaderJigState.EndPoint)
-                    {
-
+                        CreateEntities(InsertionPointOCS, FramePointOCS, EndPointOCS, scale, true);
                     }
                     else
                     {
                         AcadUtils.WriteMessageInDebug("Create other variant");
-                        CreateEntities(InsertionPointOCS, FramePointOCS, EndPointOCS, scale);
+                        CreateEntities(InsertionPointOCS, FramePointOCS, EndPointOCS, scale, true);
                     }
                 }
             }
@@ -322,14 +314,238 @@ namespace mpESKD.Functions.mpNodalLeader
             Point3d insertionPoint,
             Point3d framePoint,
             Point3d leaderPoint,
-            double scale)
+            double scale,
+            bool drawLeader)
         {
+            if (FrameType == FrameType.Round)
+            {
+                _framePolyline = null;
 
+                _frameCircle = new Circle
+                {
+                    Center = insertionPoint,
+                    Radius = Math.Min(
+                        Math.Abs(framePoint.X - insertionPoint.X),
+                        Math.Abs(framePoint.Y - insertionPoint.Y))
+                };
+
+                if (!drawLeader)
+                    return;
+
+                var leaderLine = new Line(insertionPoint, leaderPoint);
+                var pts = new Point3dCollection();
+                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+                _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+            }
+            else
+            {
+                _frameCircle = null;
+
+                var width = Math.Abs(framePoint.X - insertionPoint.X);
+                var height = Math.Abs(framePoint.Y - insertionPoint.Y);
+                var cornerRadius = CornerRadius * scale;
+                
+                if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
+                    ((height * 2) - (cornerRadius * 2)) < (1 * scale))
+                {
+                    var minSize = Math.Min(width * 2, height * 2);
+                    cornerRadius = (int)((minSize - (1 * scale)) / 2);
+                }
+
+                var points = new[]
+                {
+                    new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y - height),
+                    new Point2d(insertionPoint.X - width, insertionPoint.Y - height + cornerRadius),
+                    new Point2d(insertionPoint.X - width, insertionPoint.Y + height - cornerRadius),
+                    new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y + height),
+                    new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y + height),
+                    new Point2d(insertionPoint.X + width, insertionPoint.Y + height - cornerRadius),
+                    new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
+                    new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
+                };
+
+                var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
+                var bulges = new[]
+                {
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0
+                };
+
+                _framePolyline = new Polyline(points.Length);
+
+                for (var i = 0; i < points.Length; i++)
+                {
+                    _framePolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
+                }
+
+                _framePolyline.Closed = true;
+
+                if (!drawLeader)
+                    return;
+
+                var leaderLine = new Line(insertionPoint, leaderPoint);
+                var pts = new Point3dCollection();
+                _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+                _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+            }
+
+            // Если drawLeader == false, то дальше код не выполнится
+
+            SetNodeNumberOnCreation();
+
+            var mainTextHeight = MainTextHeight * scale;
+            var secondTextHeight = SecondTextHeight * scale;
+            var textIndent = TextIndent * scale;
+            var textVerticalOffset = TextVerticalOffset * scale;
+            var shelfLedge = ShelfLedge * scale;
+            var isRight = ShelfPosition == ShelfPosition.Right;
+
+            var topFirstTextLength = 0.0;
+            var topSecondTextLength = 0.0;
+            var bottomTextLength = 0.0;
+
+            if (!string.IsNullOrEmpty(NodeNumber))
+            {
+                _topFirstDbText = new DBText { TextString = NodeNumber };
+                _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+                topFirstTextLength = _topFirstDbText.GetLength();
+            }
+
+            if (!string.IsNullOrEmpty(SheetNumber))
+            {
+                _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
+                _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
+                topSecondTextLength = _topSecondDbText.GetLength();
+            }
+
+            if (!string.IsNullOrEmpty(NodeAddress))
+            {
+                _bottomDbText = new DBText { TextString = NodeAddress };
+                _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+                bottomTextLength = _bottomDbText.GetLength();
+            }
+
+            var topTextLength = topFirstTextLength + topSecondTextLength;
+            var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+            var shelfLength = textIndent + largestTextLength + shelfLedge;
+            
+            if (isRight)
+            {
+                var nodeNumberPosition =
+                    leaderPoint +
+                    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+                    (Vector3d.YAxis * textVerticalOffset);
+
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position = nodeNumberPosition;
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    var sheetNumberPosition = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
+                    _topSecondDbText.Position = sheetNumberPosition;
+                }
+
+                if (_bottomDbText != null)
+                {
+                    var nodeAddressPosition =
+                        leaderPoint +
+                        (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                        (Vector3d.YAxis * textVerticalOffset);
+
+                    _bottomDbText.Position = nodeAddressPosition;
+                    _bottomDbText.SetPosition(TextHorizontalMode.TextLeft, TextVerticalMode.TextBottom, AttachmentPoint.TopLeft);
+                    _bottomDbText.AlignmentPoint = nodeAddressPosition;
+                }
+            }
+            else
+            {
+                var sheetNumberPosition =
+                    leaderPoint -
+                    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+                    (Vector3d.YAxis * textVerticalOffset);
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position = sheetNumberPosition;
+                    _topSecondDbText.SetPosition(TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
+                    _topSecondDbText.AlignmentPoint = sheetNumberPosition;
+                }
+
+                if (_topFirstDbText != null)
+                {
+                    var nodeNumberPosition = sheetNumberPosition - (Vector3d.XAxis * topSecondTextLength);
+                    _topFirstDbText.SetPosition(TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
+                    _topFirstDbText.AlignmentPoint = nodeNumberPosition;
+                }
+
+                if (_bottomDbText != null)
+                {
+                    var nodeAddressPosition =
+                        leaderPoint -
+                        (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                        (Vector3d.YAxis * textVerticalOffset);
+
+                    _bottomDbText.Position = nodeAddressPosition;
+                    _bottomDbText.SetPosition(TextHorizontalMode.TextRight, TextVerticalMode.TextBottom, AttachmentPoint.TopRight);
+                    _bottomDbText.AlignmentPoint = nodeAddressPosition;
+                }
+            }
+
+            _shelfLine = new Line(
+                leaderPoint,
+                ShelfPosition == ShelfPosition.Right
+                    ? leaderPoint + (Vector3d.XAxis * shelfLength)
+                    : leaderPoint - (Vector3d.XAxis * shelfLength));
+        }
+        
+        private void SetNodeNumberOnCreation()
+        {
+            if (!IsValueCreated)
+                return;
+
+            NodeNumber = GetNodeNumberByLastNodeNumber();
         }
 
-        private bool IsInvalidDistanceBetweenFrameAndLeaderPoint()
+        private string GetNodeNumberByLastNodeNumber()
         {
+            var number = "1";
 
+            if (!string.IsNullOrEmpty(_lastNodeNumber))
+            {
+                if (int.TryParse(_lastNodeNumber, out var i))
+                {
+                    _cachedNodeNumber = (i + 1).ToString();
+                }
+                else if (Invariables.AxisRusAlphabet.Contains(_lastNodeNumber))
+                {
+                    var index = Invariables.AxisRusAlphabet.IndexOf(_lastNodeNumber);
+                    _cachedNodeNumber = index == Invariables.AxisRusAlphabet.Count - 1
+                        ? Invariables.AxisRusAlphabet[0]
+                        : Invariables.AxisRusAlphabet[index + 1];
+                }
+                else if (Invariables.AxisEngAlphabet.Contains(_lastNodeNumber))
+                {
+                    var index = Invariables.AxisEngAlphabet.IndexOf(_lastNodeNumber);
+                    _cachedNodeNumber = index == Invariables.AxisEngAlphabet.Count - 1
+                        ? Invariables.AxisEngAlphabet[0]
+                        : Invariables.AxisEngAlphabet[index + 1];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(_cachedNodeNumber))
+            {
+                number = _cachedNodeNumber;
+            }
+
+            return number;
         }
     }
 }

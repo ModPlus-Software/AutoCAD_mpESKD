@@ -24,7 +24,7 @@
             _breakLineObjectOverrule = new BreakLineObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineObjectOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
+            _breakLineObjectOverrule.SetXDataFilter(BreakLine.GetDescriptor().Name);
             return _breakLineObjectOverrule;
         }
 
@@ -44,7 +44,7 @@
         /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLine.GetDescriptor().Name, true);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace mpESKD.Functions.mpAxis
+﻿// ReSharper disable InconsistentNaming
+namespace mpESKD.Functions.mpAxis
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
@@ -16,7 +16,7 @@
     /// Прямая ось
     /// </summary>
     [SmartEntityDisplayNameKey("h41")]
-    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
+    [SystemStyleDescriptionKey("h68")]
     public class Axis : SmartEntity, ITextValueEntity
     {
         /// <summary>
@@ -46,7 +46,15 @@
             _lastHorizontalValue = lastHorizontalValue;
             _lastVerticalValue = lastVerticalValue;
         }
-        
+
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="Axis"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(Axis));
+        }
+
         /// <inheritdoc/>
         public override double MinDistanceBetweenPoints => 1.0;
 
@@ -440,8 +448,8 @@
         
         private void SetPropertiesToDBText(DBText dbText)
         {
-            dbText.SetPropertiesToDbText(
-                TextStyle, TextHeight * GetScale(), TextHorizontalMode.TextCenter, null, AttachmentPoint.MiddleCenter);
+            dbText.SetProperties(TextStyle, TextHeight * GetScale());
+            dbText.SetPosition(TextHorizontalMode.TextCenter, null, AttachmentPoint.MiddleCenter);
             dbText.Rotation = TextRotationAngle.DegreeToRadian();
         }
         
@@ -1150,20 +1158,18 @@
 
         private void SetFirstTextOnCreation()
         {
-            // if (EndPointOCS == Point3d.Origin)
-            //    return;
-            if (IsValueCreated)
+            if (!IsValueCreated)
+                return;
+            
+            var check = 1 / Math.Sqrt(2);
+            var v = (EndPointOCS - InsertionPointOCS).GetNormal();
+            if ((v.X > check || v.X < -check) && (v.Y < check || v.Y > -check))
             {
-                var check = 1 / Math.Sqrt(2);
-                var v = (EndPointOCS - InsertionPointOCS).GetNormal();
-                if ((v.X > check || v.X < -check) && (v.Y < check || v.Y > -check))
-                {
-                    FirstText = GetFirstTextValueByLastAxis("Horizontal");
-                }
-                else
-                {
-                    FirstText = GetFirstTextValueByLastAxis("Vertical");
-                }
+                FirstText = GetFirstTextValueByLastAxis("Horizontal");
+            }
+            else
+            {
+                FirstText = GetFirstTextValueByLastAxis("Vertical");
             }
         }
 

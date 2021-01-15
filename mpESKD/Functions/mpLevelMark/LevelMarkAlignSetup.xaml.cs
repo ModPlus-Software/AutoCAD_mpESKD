@@ -16,22 +16,22 @@
         public LevelMarkAlignSetup()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h110");
+            Title = ModPlusAPI.Language.GetItem("h110");
             Closed += OnClosed;
             ChkAlignArrowPoints.IsChecked =
                 !bool.TryParse(
-                    UserConfigFile.GetValue(LevelMarkDescriptor.Instance.Name, ChkAlignArrowPoints.Name), out var b) || b;
+                    UserConfigFile.GetValue(LevelMark.GetDescriptor().Name, ChkAlignArrowPoints.Name), out var b) || b;
             ChkAlignBasePoints.IsChecked =
                 !bool.TryParse(
-                    UserConfigFile.GetValue(LevelMarkDescriptor.Instance.Name, ChkAlignBasePoints.Name), out b) || b;
+                    UserConfigFile.GetValue(LevelMark.GetDescriptor().Name, ChkAlignBasePoints.Name), out b) || b;
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
             UserConfigFile.SetValue(
-                LevelMarkDescriptor.Instance.Name, ChkAlignArrowPoints.Name, ChkAlignArrowPoints.IsChecked.ToString(), true);
+                LevelMark.GetDescriptor().Name, ChkAlignArrowPoints.Name, ChkAlignArrowPoints.IsChecked.ToString(), true);
             UserConfigFile.SetValue(
-                LevelMarkDescriptor.Instance.Name, ChkAlignBasePoints.Name, ChkAlignBasePoints.IsChecked.ToString(), true);
+                LevelMark.GetDescriptor().Name, ChkAlignBasePoints.Name, ChkAlignBasePoints.IsChecked.ToString(), true);
         }
 
         private void BtAccept_OnClick(object sender, RoutedEventArgs e)

@@ -5,7 +5,6 @@
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
-    using Base;
     using Base.Enums;
     using Base.Overrules;
     using Base.Utils;
@@ -32,7 +31,7 @@
         public LevelMarkGrip(
             LevelMark levelMark,
             GripType gripType,
-            LevelMarkGripName gripName,
+            GripName gripName,
             Point3d gripPoint)
         {
             LevelMark = levelMark;
@@ -60,13 +59,17 @@
         /// <summary>
         /// Имя ручки
         /// </summary>
-        public LevelMarkGripName GripName { get; }
+        public GripName GripName { get; }
 
         /// <inheritdoc />
         public override string GetTooltip()
         {
+            // Растянуть
+            if (GripName == GripName.TopShelfPoint)
+                return Language.GetItem("gp1");
+            
             // Переместить
-            return Language.GetItem(Invariables.LangItem, "gp1");
+            return Language.GetItem("gp2");
         }
 
         /// <inheritdoc />
@@ -106,19 +109,19 @@
                     {
                         switch (GripName)
                         {
-                            case LevelMarkGripName.BasePoint:
+                            case GripName.BasePoint:
                                 LevelMark.InsertionPoint = _gripTmp;
                                 break;
-                            case LevelMarkGripName.ObjectPoint:
+                            case GripName.ObjectPoint:
                                 LevelMark.ObjectPoint = _gripTmp;
                                 break;
-                            case LevelMarkGripName.BottomShelfStartPoint:
+                            case GripName.BottomShelfStartPoint:
                                 LevelMark.BottomShelfStartPoint = _gripTmp;
                                 break;
-                            case LevelMarkGripName.ArrowPoint:
+                            case GripName.ArrowPoint:
                                 LevelMark.EndPoint = _gripTmp;
                                 break;
-                            case LevelMarkGripName.TopShelfPoint:
+                            case GripName.TopShelfPoint:
                                 LevelMark.ShelfPoint = _gripTmp;
                                 break;
                         }

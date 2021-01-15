@@ -118,7 +118,7 @@
             else
             {
                 ModPlusAPI.Windows.MessageBox.Show(
-                    Language.GetItem(Invariables.LangItem, "err5"),
+                    Language.GetItem("err5"),
                     ModPlusAPI.Windows.MessageBoxIcon.Close);
             }
         }
@@ -204,7 +204,7 @@
             else if (layerActionOnCreateAnalog == LayerActionOnCreateAnalog.Ask)
             {
                 var promptKeywordOptions =
-                    new PromptKeywordOptions($"\n{Language.GetItem(Invariables.LangItem, "msg8")}", "Yes No");
+                    new PromptKeywordOptions($"\n{Language.GetItem("msg8")}", "Yes No");
                 var promptResult = AcadUtils.Editor.GetKeywords(promptKeywordOptions);
                 if (promptResult.Status == PromptStatus.OK)
                 {
@@ -274,7 +274,7 @@
                 var flag = false;
                 foreach (Palette palette in mpPaletteSet)
                 {
-                    if (palette.Name.Equals(Language.GetItem(Invariables.LangItem, "h11"))) //// Свойства примитивов ModPlus
+                    if (palette.Name.Equals(Language.GetItem("h11"))) //// Свойства примитивов ModPlus
                     {
                         flag = true;
                     }
@@ -283,7 +283,7 @@
                 if (!flag)
                 {
                     var lmPalette = new PropertiesPalette();
-                    mpPaletteSet.Add(Language.GetItem(Invariables.LangItem, "h11"), new ElementHost
+                    mpPaletteSet.Add(Language.GetItem("h11"), new ElementHost
                     {
                         AutoSize = true,
                         Dock = DockStyle.Fill,
@@ -312,7 +312,7 @@
                 var num = 0;
                 while (num < mpPaletteSet.Count)
                 {
-                    if (!mpPaletteSet[num].Name.Equals(Language.GetItem(Invariables.LangItem, "h11")))
+                    if (!mpPaletteSet[num].Name.Equals(Language.GetItem("h11")))
                     {
                         num++;
                     }
@@ -383,15 +383,15 @@
                         {
                             BeditCommandWatcher.UseBedit = true;
                         }
-                        else if (applicableAppName == AxisDescriptor.Instance.Name)
+                        else if (applicableAppName == Axis.GetDescriptor().Name)
                         {
                             EntityUtils.DoubleClickEdit(blockReference, entity => new AxisValueEditor(entity));
                         }
-                        else if (applicableAppName == SectionDescriptor.Instance.Name)
+                        else if (applicableAppName == Functions.mpSection.Section.GetDescriptor().Name)
                         {
                             EntityUtils.DoubleClickEdit(blockReference, entity => new SectionValueEditor(entity));
                         }
-                        else if (applicableAppName == LevelMarkDescriptor.Instance.Name)
+                        else if (applicableAppName == LevelMark.GetDescriptor().Name)
                         {
                             EntityUtils.DoubleClickEdit(blockReference, entity => new LevelMarkValueEditor(entity));
                         }
@@ -511,7 +511,7 @@
             if (_intellectualEntityContextMenu == null)
             {
                 _intellectualEntityContextMenu = new ContextMenuExtension();
-                var menuItem = new Autodesk.AutoCAD.Windows.MenuItem(Language.GetItem(Invariables.LangItem, "h95"));
+                var menuItem = new Autodesk.AutoCAD.Windows.MenuItem(Language.GetItem("h95"));
                 menuItem.Click += CreateAnalogMenuItem_Click;
                 _intellectualEntityContextMenu.MenuItems.Add(menuItem);
             }

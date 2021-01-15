@@ -27,7 +27,7 @@
             _breakLineGripPointOverrule = new BreakLineGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineGripPointOverrule.SetXDataFilter(BreakLineDescriptor.Instance.Name);
+            _breakLineGripPointOverrule.SetXDataFilter(BreakLine.GetDescriptor().Name);
             return _breakLineGripPointOverrule;
         }
 
@@ -70,21 +70,21 @@
                     if (breakLine != null)
                     {
                         // Получаем первую ручку (совпадает с точкой вставки блока)
-                        var gp = new BreakLineGrip(breakLine, BreakLineGripName.StartGrip)
+                        var gp = new BreakLineGrip(breakLine, GripName.StartGrip)
                         {
                             GripPoint = breakLine.InsertionPoint
                         };
                         grips.Add(gp);
 
                         // получаем среднюю ручку
-                        gp = new BreakLineGrip(breakLine, BreakLineGripName.MiddleGrip)
+                        gp = new BreakLineGrip(breakLine, GripName.MiddleGrip)
                         {
                             GripPoint = breakLine.MiddlePoint
                         };
                         grips.Add(gp);
 
                         // получаем конечную ручку
-                        gp = new BreakLineGrip(breakLine, BreakLineGripName.EndGrip)
+                        gp = new BreakLineGrip(breakLine, GripName.EndGrip)
                         {
                             GripPoint = breakLine.EndPoint
                         };
@@ -116,7 +116,7 @@
                             var scale = breakLine.GetFullScale();
 
                             // Далее, в зависимости от имени ручки произвожу действия
-                            if (gripPoint.GripName == BreakLineGripName.StartGrip)
+                            if (gripPoint.GripName == GripName.StartGrip)
                             {
                                 // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                                 // Все точки всегда совпадают (+ ручка)
@@ -150,7 +150,7 @@
                                 }
                             }
 
-                            if (gripPoint.GripName == BreakLineGripName.MiddleGrip)
+                            if (gripPoint.GripName == GripName.MiddleGrip)
                             {
                                 // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
                                 // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
@@ -159,7 +159,7 @@
                                 ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lengthVector;
                             }
 
-                            if (gripPoint.GripName == BreakLineGripName.EndGrip)
+                            if (gripPoint.GripName == GripName.EndGrip)
                             {
                                 var newPt = gripPoint.GripPoint + offset;
                                 if (newPt.Equals(((BlockReference)entity).Position))
@@ -201,7 +201,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, BreakLine.GetDescriptor().Name);
         }
     }
 }

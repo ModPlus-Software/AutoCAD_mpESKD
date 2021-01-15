@@ -32,24 +32,24 @@
         /// <summary>
         /// Имя ручки
         /// </summary>
-        public AxisGripName GripName { get; set; }
+        public GripName GripName { get; set; }
 
         /// <inheritdoc />
         public override string GetTooltip()
         {
             switch (GripName)
             {
-                case AxisGripName.StartGrip:
-                case AxisGripName.EndGrip:
-                case AxisGripName.BottomMarkerGrip:
-                case AxisGripName.TopMarkerGrip:
-                case AxisGripName.BottomOrientGrip:
-                case AxisGripName.TopOrientGrip:
+                case GripName.StartGrip:
+                case GripName.EndGrip:
+                case GripName.BottomMarkerGrip:
+                case GripName.TopMarkerGrip:
+                case GripName.BottomOrientGrip:
+                case GripName.TopOrientGrip:
                 {
-                    return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
+                    return Language.GetItem("gp1"); // stretch
                 }
 
-                case AxisGripName.MiddleGrip: return Language.GetItem(Invariables.LangItem, "gp2"); // move
+                case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
             }
 
             return base.GetTooltip();

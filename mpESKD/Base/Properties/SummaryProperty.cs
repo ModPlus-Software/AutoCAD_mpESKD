@@ -143,8 +143,8 @@
             get
             {
                 IsDifferentOrUndefined = false;
-                var different = $"*{ModPlusAPI.Language.GetItem(Invariables.LangItem, "vc1")}*";
-                var undefined = $"*{ModPlusAPI.Language.GetItem(Invariables.LangItem, "vc2")}*";
+                var different = $"*{ModPlusAPI.Language.GetItem("vc1")}*";
+                var undefined = $"*{ModPlusAPI.Language.GetItem("vc2")}*";
                 var values = EntityPropertyDataCollection.Select(e => e.Value).ToList();
                 var value = values.FirstOrDefault();
                 if (value != null)

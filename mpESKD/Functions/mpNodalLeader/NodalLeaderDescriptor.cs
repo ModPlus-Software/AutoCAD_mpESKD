@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Functions.mpNodalLeader
 {
+    using System;
     using System.Collections.Generic;
     using Base.Abstractions;
     using ModPlusAPI;
@@ -7,12 +8,8 @@
     /// <inheritdoc/>
     public class NodalLeaderDescriptor : IIntellectualEntityDescriptor
     {
-        private static NodalLeaderDescriptor _instance;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static NodalLeaderDescriptor Instance => _instance ?? (_instance = new NodalLeaderDescriptor());
+        /// <inheritdoc/>
+        public Type EntityType => typeof(NodalLeader);
 
         /// <inheritdoc/>
         public string Name => "mpNodalLeader";
@@ -30,21 +27,21 @@
         public string FullDescription => Language.GetItem("h128");
 
         /// <inheritdoc/>
-        public string ToolTipHelpImage { get; }
+        public string ToolTipHelpImage => string.Empty;
 
         /// <inheritdoc/>
-        public List<string> SubFunctionsNames { get; }
+        public List<string> SubFunctionsNames => new List<string>();
 
         /// <inheritdoc/>
-        public List<string> SubFunctionsLNames { get; }
+        public List<string> SubFunctionsLNames => new List<string>();
 
         /// <inheritdoc/>
-        public List<string> SubDescriptions { get; }
+        public List<string> SubDescriptions => new List<string>();
 
         /// <inheritdoc/>
-        public List<string> SubFullDescriptions { get; }
+        public List<string> SubFullDescriptions => new List<string>();
 
         /// <inheritdoc/>
-        public List<string> SubHelpImages { get; }
+        public List<string> SubHelpImages => new List<string>();
     }
 }

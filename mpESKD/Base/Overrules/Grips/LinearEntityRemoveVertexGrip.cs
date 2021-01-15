@@ -40,7 +40,7 @@
         /// <inheritdoc />
         public override string GetTooltip()
         {
-            return Language.GetItem(Invariables.LangItem, "gp3"); // "Удалить вершину";
+            return Language.GetItem("gp3"); // "Удалить вершину";
         }
 
         /// <inheritdoc />

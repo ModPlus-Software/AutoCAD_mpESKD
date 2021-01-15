@@ -210,7 +210,7 @@
                 return;
             }
 
-            if (!layerName.Equals(Language.GetItem(Invariables.LangItem, "defl"))) //// "По умолчанию"
+            if (!layerName.Equals(Language.GetItem("defl"))) //// "По умолчанию"
             {
                 if (LayerUtils.HasLayer(layerName))
                 {
@@ -344,7 +344,7 @@
                                 {
                                     // Не удалось найти файл
                                     MessageBox.Show(
-                                        $"{Language.GetItem(Invariables.LangItem, "err1")}: {filename}",
+                                        $"{Language.GetItem("err1")}: {filename}",
                                         MessageBoxIcon.Close);
                                 }
                                 else if (exception.ErrorStatus == ErrorStatus.DuplicateRecordName)
@@ -355,7 +355,7 @@
                                 {
                                     // Не удалось загрузить тип линий
                                     MessageBox.Show(
-                                        $"{Language.GetItem(Invariables.LangItem, "err2")}: {lineTypeName}", 
+                                        $"{Language.GetItem("err2")}: {lineTypeName}", 
                                         MessageBoxIcon.Close);
                                 }
                             }

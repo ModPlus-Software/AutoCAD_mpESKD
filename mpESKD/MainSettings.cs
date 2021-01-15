@@ -253,5 +253,24 @@
         }
 
         #endregion
+
+        #region NodalLeader
+
+        // TODO To settings
+        /// <summary>
+        /// Продолжать нумерацию узла при создании новой узловой выноски
+        /// </summary>
+        public bool NodalLeaderContinueNodeNumber
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(NodalLeaderContinueNodeNumber)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(NodalLeaderContinueNodeNumber), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
     }
 }

@@ -4,12 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using Abstractions;
-    using Functions.mpAxis;
-    using Functions.mpBreakLine;
-    using Functions.mpGroundLine;
-    using Functions.mpLevelMark;
-    using Functions.mpSection;
-    using Functions.mpWaterProofing;
 
     /// <summary>
     /// Фабрика типов интеллектуальных примитивов
@@ -17,6 +11,9 @@
     public class TypeFactory
     {
         private static TypeFactory _instance;
+        private List<Type> _entityTypes;
+        private List<ISmartEntityFunction> _smartEntityFunctions;
+        private Dictionary<Type, IIntellectualEntityDescriptor> _entityDescriptors;
 
         /// <summary>
         /// Singleton instance
@@ -28,15 +25,10 @@
         /// </summary>
         public List<Type> GetEntityTypes()
         {
-            return new List<Type>
-            {
-                typeof(BreakLine),
-                typeof(Axis),
-                typeof(GroundLine),
-                typeof(Section),
-                typeof(LevelMark),
-                typeof(WaterProofing)
-            };
+            return _entityTypes ?? (_entityTypes = typeof(TypeFactory).Assembly
+                .GetTypes()
+                .Where(t => t.IsSubclassOf(typeof(SmartEntity)))
+                .ToList());
         }
 
         /// <summary>
@@ -46,25 +38,17 @@
         /// <returns></returns>
         public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
         {
-            if (entityType == typeof(BreakLine))
-                return BreakLineDescriptor.Instance;
+            if (_entityDescriptors == null)
+            {
+                _entityDescriptors = typeof(TypeFactory).Assembly
+                    .GetTypes()
+                    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IIntellectualEntityDescriptor)))
+                    .Select(Activator.CreateInstance)
+                    .Cast<IIntellectualEntityDescriptor>()
+                    .ToDictionary(d => d.EntityType, d => d);
+            }
 
-            if (entityType == typeof(Axis))
-                return AxisDescriptor.Instance;
-
-            if (entityType == typeof(GroundLine))
-                return GroundLineDescriptor.Instance;
-
-            if (entityType == typeof(Section))
-                return SectionDescriptor.Instance;
-
-            if (entityType == typeof(LevelMark))
-                return LevelMarkDescriptor.Instance;
-
-            if (entityType == typeof(WaterProofing))
-                return WaterProofingDescriptor.Instance;
-
-            return null;
+            return _entityDescriptors[entityType];
         }
 
         /// <summary>
@@ -72,15 +56,12 @@
         /// </summary>
         public List<ISmartEntityFunction> GetEntityFunctionTypes()
         {
-            return new List<ISmartEntityFunction>
-            {
-                new BreakLineFunction(),
-                new AxisFunction(),
-                new GroundLineFunction(),
-                new SectionFunction(),
-                new LevelMarkFunction(),
-                new WaterProofingFunction()
-            };
+            return _smartEntityFunctions ?? (_smartEntityFunctions = typeof(TypeFactory).Assembly
+                .GetTypes()
+                .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(ISmartEntityFunction)))
+                .Select(Activator.CreateInstance)
+                .Cast<ISmartEntityFunction>()
+                .ToList());
         }
 
         /// <summary>
@@ -90,45 +71,6 @@
         public List<string> GetEntityCommandNames()
         {
             return GetEntityTypes().Select(t => $"mp{t.Name}").ToList();
-        }
-
-        /// <summary>
-        /// Возвращает локализованное описание базового стиля
-        /// </summary>
-        /// <param name="entityType">Тип интеллектуального примитива</param>
-        public string GetSystemStyleLocalizedDescription(Type entityType)
-        {
-            switch (entityType.Name)
-            {
-                case nameof(BreakLine):
-                    return TryGetLocalizationValue("h53");
-                case nameof(Axis):
-                    return TryGetLocalizationValue("h68");
-                case nameof(GroundLine):
-                    return TryGetLocalizationValue("h78");
-                case nameof(Section):
-                    return TryGetLocalizationValue("h96");
-                case nameof(LevelMark):
-                    return TryGetLocalizationValue("h108");
-                case nameof(WaterProofing):
-                    return TryGetLocalizationValue("h114");
-            }
-
-            return string.Empty;
-        }
-
-        private static string TryGetLocalizationValue(string key)
-        {
-            try
-            {
-                return ModPlusAPI.Language.GetItem(Invariables.LangItem, key);
-            }
-            catch
-            {
-                // ignore
-            }
-
-            return string.Empty;
         }
     }
 }

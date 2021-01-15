@@ -18,7 +18,7 @@
         {
             _smartEntity = (Section)smartEntity;
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h79");
+            Title = ModPlusAPI.Language.GetItem("h79");
 
             SetValues();
         }

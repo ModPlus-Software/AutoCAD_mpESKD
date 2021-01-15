@@ -25,7 +25,7 @@
             _instance = new WaterProofingGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(WaterProofingDescriptor.Instance.Name);
+            _instance.SetXDataFilter(WaterProofing.GetDescriptor().Name);
             return _instance;
         }
 
@@ -83,7 +83,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofingDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofing.GetDescriptor().Name);
         }
     }
 }

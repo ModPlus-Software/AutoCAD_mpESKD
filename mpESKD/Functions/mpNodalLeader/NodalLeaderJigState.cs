@@ -13,11 +13,11 @@
         /// <summary>
         /// Происходит указание точки рамки
         /// </summary>
-        ObjectPoint,
+        FramePoint,
 
         /// <summary>
         /// Указание конечной точки (точка выноски)
         /// </summary>
-        EndPoint
+        LeaderPoint
     }
 }

@@ -67,7 +67,7 @@
                     try
                     {
                         enumPropertyLocalizationValues.Add(
-                            ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey));
+                            ModPlusAPI.Language.GetItem(attribute.LocalizationKey));
                     }
                     catch
                     {
@@ -102,7 +102,7 @@
             {
                 try
                 {
-                    var localName = ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey);
+                    var localName = ModPlusAPI.Language.GetItem(attribute.LocalizationKey);
                     if (!EntityLocalizationNames.ContainsKey(entityType))
                     {
                         EntityLocalizationNames.Add(entityType, localName);
@@ -145,7 +145,7 @@
                 {
                     try
                     {
-                        var localName = ModPlusAPI.Language.GetItem(Invariables.LangItem, attribute.LocalizationKey);
+                        var localName = ModPlusAPI.Language.GetItem(attribute.LocalizationKey);
                         if (!CategoryLocalizationNames.ContainsKey(category.ToString()))
                         {
                             CategoryLocalizationNames.Add(category.ToString(), localName);

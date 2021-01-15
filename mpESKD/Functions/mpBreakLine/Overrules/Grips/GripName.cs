@@ -3,7 +3,7 @@
     /// <summary>
     /// Grip names
     /// </summary>
-    public enum BreakLineGripName
+    public enum GripName
     {
         /// <summary>
         /// Start grip

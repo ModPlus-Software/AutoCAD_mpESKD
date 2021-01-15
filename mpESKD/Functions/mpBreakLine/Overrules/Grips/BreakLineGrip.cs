@@ -20,7 +20,7 @@
         /// </summary>
         /// <param name="breakLine">Экземпляр класса <see cref="mpBreakLine.BreakLine"/>, связанный с этой ручкой</param>
         /// <param name="gripName">Имя ручки</param>
-        public BreakLineGrip(BreakLine breakLine, BreakLineGripName gripName)
+        public BreakLineGrip(BreakLine breakLine, GripName gripName)
         {
             BreakLine = breakLine;
             GripName = gripName;
@@ -35,20 +35,20 @@
         /// <summary>
         /// Имя ручки
         /// </summary>
-        public BreakLineGripName GripName { get; }
+        public GripName GripName { get; }
 
         /// <inheritdoc />
         public override string GetTooltip()
         {
             switch (GripName)
             {
-                case BreakLineGripName.StartGrip:
-                case BreakLineGripName.EndGrip:
+                case GripName.StartGrip:
+                case GripName.EndGrip:
                 {
-                    return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
+                    return Language.GetItem("gp1"); // stretch
                 }
 
-                case BreakLineGripName.MiddleGrip: return Language.GetItem(Invariables.LangItem, "gp2"); // move
+                case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
             }
 
             return base.GetTooltip();
@@ -69,17 +69,17 @@
                 // Запоминаем начальные значения
                 if (newStatus == Status.GripStart)
                 {
-                    if (GripName == BreakLineGripName.StartGrip)
+                    if (GripName == GripName.StartGrip)
                     {
                         _startGripTmp = GripPoint;
                     }
 
-                    if (GripName == BreakLineGripName.EndGrip)
+                    if (GripName == GripName.EndGrip)
                     {
                         _endGripTmp = GripPoint;
                     }
 
-                    if (GripName == BreakLineGripName.MiddleGrip)
+                    if (GripName == GripName.MiddleGrip)
                     {
                         _startGripTmp = BreakLine.InsertionPoint;
                         _endGripTmp = BreakLine.EndPoint;
@@ -107,18 +107,18 @@
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
-                    if (_startGripTmp != null & GripName == BreakLineGripName.StartGrip)
+                    if (_startGripTmp != null & GripName == GripName.StartGrip)
                     {
                         BreakLine.InsertionPoint = GripPoint;
                     }
 
-                    if (GripName == BreakLineGripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
+                    if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
                     {
                         BreakLine.InsertionPoint = _startGripTmp;
                         BreakLine.EndPoint = _endGripTmp;
                     }
 
-                    if (_endGripTmp != null & GripName == BreakLineGripName.EndGrip)
+                    if (_endGripTmp != null & GripName == GripName.EndGrip)
                     {
                         BreakLine.EndPoint = GripPoint;
                     }

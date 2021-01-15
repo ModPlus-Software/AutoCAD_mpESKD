@@ -19,7 +19,7 @@
         {
             _smartEntity = (Axis)smartEntity;
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h41");
+            Title = ModPlusAPI.Language.GetItem("h41");
 
             SetValues();
         }

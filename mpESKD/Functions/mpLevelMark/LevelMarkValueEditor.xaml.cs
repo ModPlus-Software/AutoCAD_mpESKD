@@ -18,7 +18,7 @@
         {
             _levelMark = (LevelMark)intellectualEntity;
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "h105");
+            Title = ModPlusAPI.Language.GetItem("h105");
 
             SetValues();
         }

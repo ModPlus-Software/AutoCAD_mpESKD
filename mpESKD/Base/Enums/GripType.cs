@@ -31,9 +31,14 @@
         List,
 
         /// <summary>
-        /// Ручка "Развернуть"
+        /// Две стрелки с направлением "Вверх-вниз"
         /// </summary>
-        Mirror,
+        TwoArrowsUpDown,
+        
+        /// <summary>
+        /// Две стрелки с направлением "Влево-вправо"
+        /// </summary>
+        TwoArrowsLeftRight,
 
         /// <summary>
         /// Точка отсчета

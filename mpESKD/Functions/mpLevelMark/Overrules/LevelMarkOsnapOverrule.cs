@@ -25,7 +25,7 @@
             _instance = new LevelMarkOsnapOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(LevelMarkDescriptor.Instance.Name);
+            _instance.SetXDataFilter(LevelMark.GetDescriptor().Name);
             return _instance;
         }
 
@@ -51,7 +51,7 @@
         /// <param name="overruledSubject">Instance of <see cref="RXObject"/></param>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, LevelMarkDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, LevelMark.GetDescriptor().Name);
         }
     }
 }

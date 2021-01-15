@@ -3,7 +3,6 @@ namespace mpESKD.Base
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -24,10 +23,10 @@ namespace mpESKD.Base
     /// <summary>
     /// Абстрактный класс интеллектуального объекта
     /// </summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "<Ожидание>")]
     public abstract class SmartEntity : ISmartEntity, IDisposable
     {
         private BlockTableRecord _blockRecord;
+        private AnnotationScale _scale;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmartEntity"/> class.
@@ -54,79 +53,48 @@ namespace mpESKD.Base
         }
 
         /// <summary>
-        /// Первая точка примитива в мировой системе координат.
-        /// Должна соответствовать точке вставке блока
-        /// </summary>
-        public Point3d InsertionPoint { get; set; } = Point3d.Origin;
-
-        /// <summary>
-        /// Первая точка примитива в системе координат блока для работы с геометрией в
-        /// методе <see cref="UpdateEntities"/> ("внутри" блока)
-        /// </summary>
-        public Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
-
-        /// <summary>
-        /// Конечная точка примитива в мировой системе координат. Свойство содержится в базовом классе для
-        /// работы <see cref="DefaultEntityJig"/>. Имеется в каждом примитиве, но
-        /// если не требуется, то просто не использовать её
-        /// </summary>
-        [SaveToXData]
-        public virtual Point3d EndPoint { get; set; } = Point3d.Origin;
-
-        /// <summary>
-        /// Конечная точка примитива в системе координат блока для работы с геометрией в
-        /// методе <see cref="UpdateEntities"/> ("внутри" блока). Имеется в каждом примитиве, но
-        /// если не требуется, то просто не использовать её
-        /// </summary>
-        public Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
-
-        /// <summary>
-        /// Минимальное расстояние между точками (обычно начальной и конечной точкой)
-        /// </summary>
-        public abstract double MinDistanceBetweenPoints { get; }
-
-        /// <summary>
-        /// Коллекция примитивов, создающих графическое представление интеллектуального примитива
-        /// согласно его свойств
-        /// </summary>
-        public abstract IEnumerable<Entity> Entities { get; }
-
-        /// <summary>
         /// Коллекция примитивов, которая передается в BlockReference
         /// </summary>
-        private IEnumerable<Entity> _entitiesToBeDrawn
+        private IEnumerable<Entity> EntitiesToBeDrawn
         {
             get { return Entities.Where(e => e != null); }
         }
 
-        /// <summary>
-        /// Is value created
-        /// </summary>
+        /// <inheritdoc />
+        public Point3d InsertionPoint { get; set; } = Point3d.Origin;
+
+        /// <inheritdoc />
+        public Point3d InsertionPointOCS => InsertionPoint.TransformBy(BlockTransform.Inverse());
+
+        /// <inheritdoc />
+        [SaveToXData]
+        public virtual Point3d EndPoint { get; set; } = Point3d.Origin;
+
+        /// <inheritdoc />
+        public Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
+
+        /// <inheritdoc/>
+        public abstract double MinDistanceBetweenPoints { get; }
+
+        /// <inheritdoc />
+        public abstract IEnumerable<Entity> Entities { get; }
+
+        /// <inheritdoc />
         public bool IsValueCreated { get; set; }
 
-        /// <summary>
-        /// Матрица трансформации BlockReference
-        /// </summary>
+        /// <inheritdoc />
         public Matrix3d BlockTransform { get; set; }
 
-        /// <summary>
-        /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
-        /// </summary>
+        /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 1, "h50", "", propertyScope: PropertyScope.Palette, descLocalKey: "h52")]
         public string Style { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Имя слоя
-        /// </summary>
+        /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 2, "p7", "", descLocalKey: "d7")]
         [SaveToXData]
         public string LayerName { get; set; } = string.Empty;
 
-        private AnnotationScale _scale;
-
-        /// <summary>
-        /// Масштаб примитива
-        /// </summary>
+        /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 3, "p5", "1:1", descLocalKey: "d5")]
         [SaveToXData]
         public AnnotationScale Scale
@@ -152,70 +120,26 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>
-        /// Метод обработки события изменения масштаба
-        /// </summary>
-        /// <param name="oldScale">Старый масштаб</param>
-        /// <param name="newScale">Новый масштаб</param>
-        protected virtual void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
-        {
-        }
-
-        /// <summary>
-        /// Тип линии. Свойство является абстрактным, так как в зависимости от интеллектуального примитива
-        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 4
-        /// </summary>
+        /// <inheritdoc />
         [SaveToXData]
         public abstract string LineType { get; set; }
 
-        /// <summary>
-        /// Масштаб типа линии для примитивов, имеющих изменяемый тип линии.
-        /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
-        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 5
-        /// </summary>
+        /// <inheritdoc />
         [SaveToXData]
         public abstract double LineTypeScale { get; set; }
 
-        /// <summary>
-        /// Текстовый стиль.
-        /// Свойство является абстрактным, так как в зависимости от интеллектуального примитива
-        /// может отличатся описание или может вообще быть не нужным. Индекс всегда нужно ставить = 1
-        /// Категория всегда Content
-        /// </summary>
+        /// <inheritdoc />
         [SaveToXData]
         public abstract string TextStyle { get; set; }
 
-        /// <summary>
-        /// Текущий численный масштаб
-        /// </summary>
-        public double GetScale()
-        {
-            return Scale.GetNumericScale();
-        }
+        /// <inheritdoc />
+        [SaveToXData]
+        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
 
-        /// <summary>
-        /// Текущий полный численный масштаб (с учетом масштаба блока)
-        /// </summary>
-        public double GetFullScale()
-        {
-            return GetScale() * BlockTransform.GetScale();
-        }
-
-        /// <summary>
-        /// Возвращает коллекцию точек, которые используются для привязки
-        /// </summary>
-        public abstract IEnumerable<Point3d> GetPointsForOsnap();
-
-        #region Block
-
-        /// <summary>
-        /// Идентификатор (ObjectId) блока
-        /// </summary>
+        /// <inheritdoc />
         public ObjectId BlockId { get; set; }
 
-        /// <summary>
-        /// Запись (описание) блока
-        /// </summary>
+        /// <inheritdoc />
         public BlockTableRecord BlockRecord
         {
             get
@@ -263,7 +187,7 @@ namespace mpESKD.Base
                                 var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
 
                                 // Debug.Print("Transformed copy");
-                                foreach (var entity in _entitiesToBeDrawn)
+                                foreach (var entity in EntitiesToBeDrawn)
                                 {
                                     if (entity.Visible)
                                     {
@@ -283,7 +207,7 @@ namespace mpESKD.Base
                     {
                         // Debug.Print("Value not created");
                         var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                        foreach (var entity in _entitiesToBeDrawn)
+                        foreach (var entity in EntitiesToBeDrawn)
                         {
                             var transformedCopy = entity.GetTransformedCopy(matrix3D);
                             _blockRecord.AppendEntity(transformedCopy);
@@ -301,11 +225,32 @@ namespace mpESKD.Base
             }
             set => _blockRecord = value;
         }
-
+        
         /// <summary>
-        /// Возвращает <see cref="BlockTableRecord"/> для обработки команды Undo
+        /// Метод обработки события изменения масштаба
         /// </summary>
-        /// <param name="blockReference"><see cref="BlockReference"/></param>
+        /// <param name="oldScale">Старый масштаб</param>
+        /// <param name="newScale">Новый масштаб</param>
+        protected virtual void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
+        {
+        }
+
+        /// <inheritdoc />
+        public double GetScale()
+        {
+            return Scale.GetNumericScale();
+        }
+
+        /// <inheritdoc />
+        public double GetFullScale()
+        {
+            return GetScale() * BlockTransform.GetScale();
+        }
+
+        /// <inheritdoc />
+        public abstract IEnumerable<Point3d> GetPointsForOsnap();
+
+        /// <inheritdoc />
         public BlockTableRecord GetBlockTableRecordForUndo(BlockReference blockReference)
         {
             BlockTableRecord blockTableRecord;
@@ -329,7 +274,7 @@ namespace mpESKD.Base
                     blockTableRecord = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite, true, true);
                     blockTableRecord.BlockScaling = BlockScaling.Uniform;
                     var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                    foreach (var entity in _entitiesToBeDrawn)
+                    foreach (var entity in EntitiesToBeDrawn)
                     {
                         var transformedCopy = entity.GetTransformedCopy(matrix3D);
                         blockTableRecord.AppendEntity(transformedCopy);
@@ -345,10 +290,7 @@ namespace mpESKD.Base
         }
 
 #pragma warning disable CS0618 // Тип или член устарел
-        /// <summary>
-        /// Возвращает описание блока с открытием без использования транзакции
-        /// </summary>
-        /// <param name="blockReference">Вхождение блока</param>
+        /// <inheritdoc />
         public BlockTableRecord GetBlockTableRecordWithoutTransaction(BlockReference blockReference)
         {
             BlockTableRecord blockTableRecord;
@@ -366,7 +308,7 @@ namespace mpESKD.Base
                             }
                         }
 
-                        foreach (var entity in _entitiesToBeDrawn)
+                        foreach (var entity in EntitiesToBeDrawn)
                         {
                             using (entity)
                             {
@@ -382,12 +324,7 @@ namespace mpESKD.Base
         }
 #pragma warning restore CS0618 // Тип или член устарел
 
-        #endregion
-
-        /// <summary>
-        /// Получение свойств блока, которые присуще примитиву
-        /// </summary>
-        /// <param name="entity">Объект <see cref="DBObject"/></param>
+        /// <inheritdoc />
         public void GetPropertiesFromCadEntity(DBObject entity)
         {
             var blockReference = (BlockReference)entity;
@@ -398,20 +335,10 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>
-        /// Идентификатор стиля
-        /// </summary>
-        [SaveToXData]
-        public string StyleGuid { get; set; } = "00000000-0000-0000-0000-000000000000";
-
-        /// <summary>
-        /// Перерисовка элементов блока по параметрам ЕСКД элемента
-        /// </summary>
+        /// <inheritdoc />
         public abstract void UpdateEntities();
 
-        /// <summary>
-        /// Сериализация значений параметров, помеченных атрибутом <see cref="SaveToXDataAttribute"/>, в экземпляр <see cref="ResultBuffer"/>
-        /// </summary>
+        /// <inheritdoc />
         public ResultBuffer GetDataForXData()
         {
             return GetDataForXData("mp" + GetType().Name);
@@ -492,11 +419,7 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>
-        /// Установка значений свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
-        /// </summary>
-        /// <param name="resultBuffer"><see cref="ResultBuffer"/></param>
-        /// <param name="skipPoints">Пропускать ли точки</param>
+        /// <inheritdoc />
         public void SetPropertiesValuesFromXData(ResultBuffer resultBuffer, bool skipPoints = false)
         {
             try
@@ -510,7 +433,7 @@ namespace mpESKD.Base
                     var deserialize = binaryFormatter.Deserialize(memoryStream);
                     if (deserialize is DataHolder dataHolder)
                     {
-                        WritePropertiesFromReadedData(skipPoints, dataHolder.Data);
+                        WritePropertiesFromReadData(skipPoints, dataHolder.Data);
                     }
                 }
             }
@@ -546,7 +469,7 @@ namespace mpESKD.Base
         /// </summary>
         /// <param name="skipPoints">Пропускать ли точки</param>
         /// <param name="data">Словарь данных</param>
-        private void WritePropertiesFromReadedData(bool skipPoints, Dictionary<string, object> data)
+        private void WritePropertiesFromReadData(bool skipPoints, Dictionary<string, object> data)
         {
             /*
              * Сначала нужно установить свойство LineTypeScale
@@ -563,7 +486,7 @@ namespace mpESKD.Base
                 property.SetValue(this, dataValue);
                 data.Remove(nameof(LineTypeScale));
             }
-            
+
             property = properties.FirstOrDefault(p => p.Name == nameof(Scale));
             if (property != null && data.TryGetValue(nameof(Scale), out dataValue))
             {
@@ -579,7 +502,7 @@ namespace mpESKD.Base
                     var valueForProperty = data[propertyInfo.Name] != null
                         ? data[propertyInfo.Name].ToString()
                         : string.Empty;
-                    
+
                     if (string.IsNullOrEmpty(valueForProperty))
                         continue;
 
@@ -636,12 +559,7 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>
-        /// Копирование свойств, отмеченных атрибутом <see cref="SaveToXDataAttribute"/> из расширенных данных примитива AutoCAD
-        /// в текущий интеллектуальный примитив
-        /// </summary>
-        /// <param name="sourceEntity">Интеллектуальный объекта</param>
-        /// <param name="copyLayer">Копировать слой</param>
+        /// <inheritdoc />
         public void SetPropertiesFromSmartEntity(SmartEntity sourceEntity, bool copyLayer)
         {
             var dataForXData = sourceEntity.GetDataForXData();
@@ -670,10 +588,7 @@ namespace mpESKD.Base
             }
         }
 
-        /// <summary>
-        /// Установка свойств для примитивов, которые не меняются
-        /// </summary>
-        /// <param name="entity">Примитив AutoCAD</param>
+        /// <inheritdoc />
         public void SetImmutablePropertiesToNestedEntity(Entity entity)
         {
             if (entity == null)
@@ -685,10 +600,7 @@ namespace mpESKD.Base
             entity.LinetypeScale = 1.0;
         }
 
-        /// <summary>
-        /// Установка свойств для примитива, которые могут меняться "из вне" (ByBlock)
-        /// </summary>
-        /// <param name="entity">Примитив AutoCAD</param>
+        /// <inheritdoc />
         public void SetChangeablePropertiesToNestedEntity(Entity entity)
         {
             if (entity == null)

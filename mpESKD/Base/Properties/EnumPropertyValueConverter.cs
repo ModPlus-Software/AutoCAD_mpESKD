@@ -24,7 +24,7 @@
                 var attr = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
                 if (attr != null)
                 {
-                    return ModPlusAPI.Language.GetItem(Invariables.LangItem, attr.LocalizationKey);
+                    return ModPlusAPI.Language.GetItem(attr.LocalizationKey);
                 }
             }
 
@@ -41,7 +41,7 @@
                 {
                     var attr = fieldInfo.GetCustomAttribute<EnumPropertyDisplayValueKeyAttribute>();
                     if (attr != null &&
-                        ModPlusAPI.Language.GetItem(Invariables.LangItem, attr.LocalizationKey) == s)
+                        ModPlusAPI.Language.GetItem(attr.LocalizationKey) == s)
                     {
                         return Enum.Parse(_enumType, fieldInfo.Name);
                     }

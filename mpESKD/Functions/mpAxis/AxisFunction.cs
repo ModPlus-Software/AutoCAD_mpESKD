@@ -38,8 +38,10 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-            // send statistic
-            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#if !DEBUG
+            Statistic.SendCommandStarting(Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
+
             try
             {
                 Overrule.Overruling = false;
@@ -48,7 +50,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor().Name);
 
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
@@ -87,7 +89,7 @@
         private static void CreateAxis()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(AxisDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -97,7 +99,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(AxisDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor().Name);
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 
@@ -176,33 +178,34 @@
         /// <param name="axisLastVerticalValue">Последнее значение для вертикальной оси</param>
         private static void FindLastAxisValues(ref string axisLastHorizontalValue, ref string axisLastVerticalValue)
         {
-            if (MainSettings.Instance.AxisSaveLastTextAndContinueNew)
-            {
-                var allIntegerValues = new List<int>();
-                var allLetterValues = new List<string>();
-                AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<Axis>(typeof(Axis)).ForEach(a =>
-                {
-                    var s = a.FirstText;
-                    if (int.TryParse(s, out var i))
-                    {
-                        allIntegerValues.Add(i);
-                    }
-                    else
-                    {
-                        allLetterValues.Add(s);
-                    }
-                });
-                if (allIntegerValues.Any())
-                {
-                    allIntegerValues.Sort();
-                    axisLastVerticalValue = allIntegerValues.Last().ToString();
-                }
+            if (!MainSettings.Instance.AxisSaveLastTextAndContinueNew)
+                return;
 
-                if (allLetterValues.Any())
+            var allIntegerValues = new List<int>();
+            var allLetterValues = new List<string>();
+            AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<Axis>(typeof(Axis)).ForEach(a =>
+            {
+                var s = a.FirstText;
+                if (int.TryParse(s, out var i))
                 {
-                    allLetterValues.Sort();
-                    axisLastHorizontalValue = allLetterValues.Last();
+                    allIntegerValues.Add(i);
                 }
+                else
+                {
+                    allLetterValues.Add(s);
+                }
+            });
+
+            if (allIntegerValues.Any())
+            {
+                allIntegerValues.Sort();
+                axisLastVerticalValue = allIntegerValues.Last().ToString();
+            }
+
+            if (allLetterValues.Any())
+            {
+                allLetterValues.Sort();
+                axisLastHorizontalValue = allLetterValues.Last();
             }
         }
     }

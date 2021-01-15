@@ -1,34 +1,30 @@
 ﻿namespace mpESKD.Functions.mpSection
 {
+    using System;
     using System.Collections.Generic;
-    using Base;
     using Base.Abstractions;
     using ModPlusAPI;
 
     /// <inheritdoc />
     public class SectionDescriptor : IIntellectualEntityDescriptor
     {
-        private static SectionDescriptor _instance;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static SectionDescriptor Instance => _instance ?? (_instance = new SectionDescriptor());
+        /// <inheritdoc/>
+        public Type EntityType => typeof(Section);
 
         /// <inheritdoc />
         public string Name => "mpSection";
 
         /// <inheritdoc />
         // Разрез
-        public string LName => Language.GetItem(Invariables.LangItem, "h79");
+        public string LName => Language.GetItem("h79");
 
         /// <inheritdoc />
         // Создание обозначения разреза (сечения) по ГОСТ 2.305-68
-        public string Description => Language.GetItem(Invariables.LangItem, "h80");
+        public string Description => Language.GetItem("h80");
 
         /// <inheritdoc />
         // Создание интеллектуального объекта на основе анонимного блока, описывающего разрез (сечение) по ГОСТ 2.305-68
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h81");
+        public string FullDescription => Language.GetItem("h81");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -44,20 +40,20 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // Ломаный разрез
-            Language.GetItem(Invariables.LangItem, "h82"),
+            Language.GetItem("h82"),
 
             // Разрез из полилинии
-            Language.GetItem(Invariables.LangItem, "h83")
+            Language.GetItem("h83")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // Отрисовка обозначения ломаного разреза (сечения) по ГОСТ 2.305-68
-            Language.GetItem(Invariables.LangItem, "h84"),
+            Language.GetItem("h84"),
 
             // Конвертирование выбранной полилинии в обозначение разреза
-            Language.GetItem(Invariables.LangItem, "h85")
+            Language.GetItem("h85")
         };
 
         /// <inheritdoc />

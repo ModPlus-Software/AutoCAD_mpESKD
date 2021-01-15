@@ -24,7 +24,7 @@
             _instance = new AxisObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(AxisDescriptor.Instance.Name);
+            _instance.SetXDataFilter(Axis.GetDescriptor().Name);
             return _instance;
         }
 
@@ -44,7 +44,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, Axis.GetDescriptor().Name, true);
         }
     }
 }

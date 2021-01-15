@@ -29,7 +29,7 @@
             _instance = new LevelMarkGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(LevelMarkDescriptor.Instance.Name);
+            _instance.SetXDataFilter(LevelMark.GetDescriptor().Name);
             return _instance;
         }
 
@@ -50,15 +50,15 @@
                     if (levelMark != null)
                     {
                         grips.Add(new LevelMarkGrip(
-                            levelMark, GripType.BasePoint, LevelMarkGripName.BasePoint, levelMark.InsertionPoint));
+                            levelMark, GripType.BasePoint, GripName.BasePoint, levelMark.InsertionPoint));
                         grips.Add(new LevelMarkGrip(
-                            levelMark, GripType.Point, LevelMarkGripName.ObjectPoint, levelMark.ObjectPoint));
+                            levelMark, GripType.Point, GripName.ObjectPoint, levelMark.ObjectPoint));
                         grips.Add(new LevelMarkGrip(
-                               levelMark, GripType.Point, LevelMarkGripName.BottomShelfStartPoint, levelMark.BottomShelfStartPoint));
+                               levelMark, GripType.Point, GripName.BottomShelfStartPoint, levelMark.BottomShelfStartPoint));
                         grips.Add(new LevelMarkGrip(
-                            levelMark, GripType.Point, LevelMarkGripName.ArrowPoint, levelMark.EndPoint));
+                            levelMark, GripType.Point, GripName.ArrowPoint, levelMark.EndPoint));
                         grips.Add(new LevelMarkGrip(
-                            levelMark, GripType.Point, LevelMarkGripName.TopShelfPoint, levelMark.ShelfPoint));
+                            levelMark, GripType.Point, GripName.TopShelfPoint, levelMark.ShelfPoint));
 
                         _cachedBottomShelfLength = Math.Abs(levelMark.EndPoint.X - levelMark.BottomShelfStartPoint.X);
                     }
@@ -88,12 +88,12 @@
                             var scale = levelMark.GetFullScale();
                             var horV = (levelMark.EndPoint - levelMark.ObjectPoint).GetNormal();
 
-                            if (levelMarkGrip.GripName == LevelMarkGripName.BasePoint)
+                            if (levelMarkGrip.GripName == GripName.BasePoint)
                             {
                                 ((BlockReference)entity).Position = gripPoint + offset;
                                 levelMark.InsertionPoint = gripPoint + offset;
                             }
-                            else if (levelMarkGrip.GripName == LevelMarkGripName.ObjectPoint)
+                            else if (levelMarkGrip.GripName == GripName.ObjectPoint)
                             {
                                 levelMark.ObjectPoint = gripPoint + offset;
                                 levelMark.BottomShelfStartPoint = new Point3d(
@@ -105,7 +105,7 @@
                                     levelMark.ObjectPoint.Y,
                                     levelMark.EndPoint.Z);
                             }
-                            else if (levelMarkGrip.GripName == LevelMarkGripName.BottomShelfStartPoint)
+                            else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                             {
                                 levelMark.BottomShelfStartPoint = gripPoint + offset;
                                 if (levelMark.ObjectLine)
@@ -126,11 +126,11 @@
                                         levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale);
                                 }
                             }
-                            else if (levelMarkGrip.GripName == LevelMarkGripName.ArrowPoint)
+                            else if (levelMarkGrip.GripName == GripName.ArrowPoint)
                             {
                                 levelMark.SetArrowPoint(gripPoint + offset);
                             }
-                            else if (levelMarkGrip.GripName == LevelMarkGripName.TopShelfPoint)
+                            else if (levelMarkGrip.GripName == GripName.TopShelfPoint)
                             {
                                 levelMark.ShelfPoint = gripPoint + offset;
                             }
@@ -163,7 +163,7 @@
         /// <param name="overruledSubject">Instance of <see cref="RXObject"/></param>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, LevelMarkDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, LevelMark.GetDescriptor().Name);
         }
     }
 }

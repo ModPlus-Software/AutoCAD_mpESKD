@@ -81,8 +81,8 @@
                 var systemStyle = new SmartEntityStyle(et)
                 {
                     Name =
-                        $"{LocalizationUtils.GetEntityLocalizationName(et)} [{Language.GetItem(Invariables.LangItem, "h12")}]",
-                    Description = TypeFactory.Instance.GetSystemStyleLocalizedDescription(et),
+                        $"{LocalizationUtils.GetEntityLocalizationName(et)} [{Language.GetItem("h12")}]",
+                    Description = GetBaseStyleDescription(et),
                     Guid = "00000000-0000-0000-0000-000000000000",
                     StyleType = StyleType.System
                 };
@@ -93,6 +93,13 @@
                     EntityStyles.Add(systemStyle);
                 }
             });
+        }
+
+        private static string GetBaseStyleDescription(Type et)
+        {
+            if (et.GetCustomAttribute(typeof(SystemStyleDescriptionKeyAttribute)) is SystemStyleDescriptionKeyAttribute a)
+                return Language.GetItem(a.LocalizationKey) ?? string.Empty;
+            return string.Empty;
         }
 
         /// <summary>
@@ -127,7 +134,7 @@
                             entityType,
                             AcadUtils.Layers.Contains(attribute.DefaultValue.ToString())
                                 ? attribute.DefaultValue
-                                : Language.GetItem(Invariables.LangItem, "defl"),
+                                : Language.GetItem("defl"),
                             ObjectId.Null));
                     }
                     else
@@ -556,7 +563,7 @@
             }
 
             // Стиль отсутствует в базе
-            return Language.GetItem(Invariables.LangItem, "h103");
+            return Language.GetItem("h103");
         }
 
         /// <summary>
@@ -682,7 +689,7 @@
                             var layerName = propertyFromStyle.Value.ToString();
                             if (string.IsNullOrEmpty(layerName))
                             {
-                                layerName = Language.GetItem(Invariables.LangItem, "defl");
+                                layerName = Language.GetItem("defl");
                             }
 
                             if (isOnEntityCreation)

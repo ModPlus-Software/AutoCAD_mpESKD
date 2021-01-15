@@ -6,6 +6,7 @@ namespace mpESKD.Functions.mpBreakLine
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
+    using Base.Abstractions;
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
@@ -15,10 +16,9 @@ namespace mpESKD.Functions.mpBreakLine
     /// Линия обрыва
     /// </summary>
     [SmartEntityDisplayNameKey("h48")]
+    [SystemStyleDescriptionKey("h53")]
     public class BreakLine : SmartEntity
     {
-        #region Constructors
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BreakLine"/> class.
         /// </summary>
@@ -35,7 +35,13 @@ namespace mpESKD.Functions.mpBreakLine
         {
         }
 
-        #endregion
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="BreakLine"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(BreakLine));
+        }
 
         #region Properties
 

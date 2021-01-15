@@ -39,7 +39,7 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(LevelMarkDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -49,7 +49,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMarkDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor().Name);
                 var levelMark = new LevelMark();
 
                 var blockReference = MainFunction.CreateBlock(levelMark);
@@ -100,10 +100,10 @@
                 var pso = new PromptSelectionOptions
                 {
                     // Выберите отметки уровня:
-                    MessageForAdding = $"\n{Language.GetItem(Invariables.LangItem, "msg14")}",
+                    MessageForAdding = $"\n{Language.GetItem("msg14")}",
 
                     // Убрать объекты из выбора:
-                    MessageForRemoval = $"\n{Language.GetItem(Invariables.LangItem, "msg16")}",
+                    MessageForRemoval = $"\n{Language.GetItem("msg16")}",
                     AllowSubSelections = false,
                     AllowDuplicates = true,
                     RejectObjectsFromNonCurrentSpace = true,
@@ -112,7 +112,7 @@
 
                 var availTypedValues = new TypedValue[1];
                 availTypedValues.SetValue(
-                    new TypedValue((int)DxfCode.ExtendedDataRegAppName, LevelMarkDescriptor.Instance.Name), 0);
+                    new TypedValue((int)DxfCode.ExtendedDataRegAppName, LevelMark.GetDescriptor().Name), 0);
 
                 var filter = new SelectionFilter(availTypedValues);
 
@@ -125,10 +125,10 @@
                 pso = new PromptSelectionOptions
                 {
                     // Выберите эталонную отметку уровня:
-                    MessageForAdding = $"\n{Language.GetItem(Invariables.LangItem, "msg15")}",
+                    MessageForAdding = $"\n{Language.GetItem("msg15")}",
 
                     // Убрать объекты из выбора:
-                    MessageForRemoval = $"\n{Language.GetItem(Invariables.LangItem, "msg16")}",
+                    MessageForRemoval = $"\n{Language.GetItem("msg16")}",
                     AllowSubSelections = false,
                     AllowDuplicates = true,
                     RejectObjectsFromNonCurrentSpace = true,
@@ -196,7 +196,7 @@
         private static void CreateLevelMark()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(LevelMarkDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -206,7 +206,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMarkDescriptor.Instance.Name);
+                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor().Name);
                 var style = StyleManager.GetCurrentStyle(typeof(LevelMark));
                 var levelMark = new LevelMark();
 
@@ -228,13 +228,13 @@
         private static void InsertLevelMarkWithJig(LevelMark levelMark, BlockReference blockReference)
         {
             // <msg11>Укажите точку начала отсчета:</msg11>
-            var basePointPrompt = Language.GetItem(Invariables.LangItem, "msg11");
+            var basePointPrompt = Language.GetItem("msg11");
 
             // <msg12>Укажите точку уровня:</msg12>
-            var levelPointPrompt = Language.GetItem(Invariables.LangItem, "msg12");
+            var levelPointPrompt = Language.GetItem("msg12");
 
             // <msg13>Укажите точку положения отметки уровня:</msg13>
-            var levelMarkPositionPointPrompt = Language.GetItem(Invariables.LangItem, "msg13");
+            var levelMarkPositionPointPrompt = Language.GetItem("msg13");
 
             var entityJig = new DefaultEntityJig(levelMark, blockReference, new Point3d(0, 0, 0))
             {

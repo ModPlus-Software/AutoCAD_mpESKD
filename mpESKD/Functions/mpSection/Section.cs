@@ -18,6 +18,7 @@
     /// Разрез
     /// </summary>
     [SmartEntityDisplayNameKey("h79")]
+    [SystemStyleDescriptionKey("h96")]
     public class Section : SmartEntity, ITextValueEntity
     {
         /// <summary>
@@ -45,6 +46,14 @@
         {
             _lastIntegerValue = lastIntegerValue;
             _lastLetterValue = lastLetterValue;
+        }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="Section"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(Section));
         }
         
         /// <summary>

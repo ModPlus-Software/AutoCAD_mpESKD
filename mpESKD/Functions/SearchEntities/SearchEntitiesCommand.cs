@@ -102,7 +102,7 @@
                                         new TypedValue((int)DxfCode.ExtendedDataRegAppName, typedValue.Value.ToString()));
                                 }
 
-                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                MessageBox.Show($"{Language.GetItem("msg9")}: {blockReferences.Count}");
                                 break;
                             
                             case SearchProceedOption.Explode:
@@ -125,7 +125,7 @@
                                     blockReference.Erase(true);
                                 }
 
-                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                MessageBox.Show($"{Language.GetItem("msg9")}: {blockReferences.Count}");
                                 break;
                             
                             case SearchProceedOption.Delete:
@@ -135,13 +135,13 @@
                                     blockReference.Erase(true);
                                 }
 
-                                MessageBox.Show($"{Language.GetItem(Invariables.LangItem, "msg9")}: {blockReferences.Count}");
+                                MessageBox.Show($"{Language.GetItem("msg9")}: {blockReferences.Count}");
                                 break;
                         }
                     }
                     else
                     {
-                        MessageBox.Show(Language.GetItem(Invariables.LangItem, "msg10"));
+                        MessageBox.Show(Language.GetItem("msg10"));
                     }
 
                     tr.Commit();

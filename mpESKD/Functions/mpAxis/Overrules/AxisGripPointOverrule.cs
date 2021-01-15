@@ -16,7 +16,10 @@
     public class AxisGripPointOverrule : GripOverrule
     {
         private static AxisGripPointOverrule _axisGripPointOverrule;
-
+        private Point3d _initInsertionPoint;
+        private Point3d _initBottomOrientPoint;
+        private Point3d _initTopOrientPoint;
+        
         /// <summary>
         /// Singleton instance
         /// </summary>
@@ -30,13 +33,9 @@
             _axisGripPointOverrule = new AxisGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _axisGripPointOverrule.SetXDataFilter(AxisDescriptor.Instance.Name);
+            _axisGripPointOverrule.SetXDataFilter(Axis.GetDescriptor().Name);
             return _axisGripPointOverrule;
         }
-
-        private Point3d _initInsertionPoint;
-        private Point3d _initBottomOrientPoint;
-        private Point3d _initTopOrientPoint;
 
         /// <inheritdoc />
         public override void GetGripPoints(
@@ -80,7 +79,7 @@
                         // Получаем первую ручку (совпадает с точкой вставки блока)
                         var gp = new AxisGrip(axis)
                         {
-                            GripName = AxisGripName.StartGrip,
+                            GripName = GripName.StartGrip,
                             GripPoint = axis.InsertionPoint // вот эта точка из экземпляра класса axis
                         };
                         grips.Add(gp);
@@ -89,7 +88,7 @@
                         // получаем среднюю ручку
                         gp = new AxisGrip(axis)
                         {
-                            GripName = AxisGripName.MiddleGrip,
+                            GripName = GripName.MiddleGrip,
                             GripPoint = axis.MiddlePoint
                         };
                         grips.Add(gp);
@@ -97,7 +96,7 @@
                         // получаем конечную ручку
                         gp = new AxisGrip(axis)
                         {
-                            GripName = AxisGripName.EndGrip,
+                            GripName = GripName.EndGrip,
                             GripPoint = axis.EndPoint
                         };
                         grips.Add(gp);
@@ -108,7 +107,7 @@
                             // other points
                             gp = new AxisGrip(axis)
                             {
-                                GripName = AxisGripName.BottomMarkerGrip,
+                                GripName = GripName.BottomMarkerGrip,
                                 GripPoint = axis.BottomMarkerPoint
                             };
                             grips.Add(gp);
@@ -119,7 +118,7 @@
                         {
                             gp = new AxisGrip(axis)
                             {
-                                GripName = AxisGripName.TopMarkerGrip,
+                                GripName = GripName.TopMarkerGrip,
                                 GripPoint = axis.TopMarkerPoint
                             };
                             grips.Add(gp);
@@ -132,7 +131,7 @@
                             {
                                 gp = new AxisGrip(axis)
                                 {
-                                    GripName = AxisGripName.BottomOrientGrip,
+                                    GripName = GripName.BottomOrientGrip,
                                     GripPoint = axis.BottomOrientPoint
                                 };
                                 grips.Add(gp);
@@ -146,7 +145,7 @@
                             {
                                 gp = new AxisGrip(axis)
                                 {
-                                    GripName = AxisGripName.TopOrientGrip,
+                                    GripName = GripName.TopOrientGrip,
                                     GripPoint = axis.TopOrientPoint
                                 };
                                 grips.Add(gp);
@@ -184,7 +183,7 @@
                             var axis = gripPoint.Axis;
                             var scale = axis.GetFullScale();
 
-                            if (gripPoint.GripName == AxisGripName.StartGrip)
+                            if (gripPoint.GripName == GripName.StartGrip)
                             {
                                 // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                                 // Все точки всегда совпадают (+ ручка)
@@ -218,7 +217,7 @@
                                 }
                             }
 
-                            if (gripPoint.GripName == AxisGripName.MiddleGrip)
+                            if (gripPoint.GripName == GripName.MiddleGrip)
                             {
                                 // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
                                 // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
@@ -227,7 +226,7 @@
                                 ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lengthVector;
                             }
 
-                            if (gripPoint.GripName == AxisGripName.EndGrip)
+                            if (gripPoint.GripName == GripName.EndGrip)
                             {
                                 var newPt = gripPoint.GripPoint + offset;
                                 Point3d newEndPoint;
@@ -253,7 +252,7 @@
                                     _initBottomOrientPoint);
                             }
 
-                            if (gripPoint.GripName == AxisGripName.BottomMarkerGrip)
+                            if (gripPoint.GripName == GripName.BottomMarkerGrip)
                             {
                                 var mainVector = axis.EndPoint - axis.InsertionPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
@@ -266,7 +265,7 @@
                                 }
                             }
 
-                            if (gripPoint.GripName == AxisGripName.TopMarkerGrip)
+                            if (gripPoint.GripName == GripName.TopMarkerGrip)
                             {
                                 var mainVector = axis.InsertionPoint - axis.EndPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
@@ -279,7 +278,7 @@
                                 }
                             }
 
-                            if (gripPoint.GripName == AxisGripName.BottomOrientGrip)
+                            if (gripPoint.GripName == GripName.BottomOrientGrip)
                             {
                                 var mainVector = axis.EndPoint - axis.InsertionPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
@@ -305,7 +304,7 @@
                                 }
                             }
 
-                            if (gripPoint.GripName == AxisGripName.TopOrientGrip)
+                            if (gripPoint.GripName == GripName.TopOrientGrip)
                             {
                                 var mainVector = axis.InsertionPoint - axis.EndPoint;
                                 var v = mainVector.CrossProduct(Vector3d.ZAxis).GetNormal();
@@ -356,7 +355,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, AxisDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, Axis.GetDescriptor().Name);
         }
 
         #region Helpers

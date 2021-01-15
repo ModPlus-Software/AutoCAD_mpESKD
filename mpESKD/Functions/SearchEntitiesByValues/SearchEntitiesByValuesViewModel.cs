@@ -159,7 +159,7 @@
 
                     if (!ResultItems.Any())
                     {
-                        NoFoundMessage = string.Format(Language.GetItem(Invariables.LangItem, "h124"), searchValue);
+                        NoFoundMessage = string.Format(Language.GetItem("h124"), searchValue);
                     }
 
                     tr.Commit();

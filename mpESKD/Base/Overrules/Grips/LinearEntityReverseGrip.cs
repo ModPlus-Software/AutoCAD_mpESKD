@@ -17,7 +17,7 @@
         public LinearEntityReverseGrip(SmartEntity smartEntity)
         {
             SmartEntity = smartEntity;
-            GripType = GripType.Mirror;
+            GripType = GripType.TwoArrowsUpDown;
         }
 
         /// <summary>

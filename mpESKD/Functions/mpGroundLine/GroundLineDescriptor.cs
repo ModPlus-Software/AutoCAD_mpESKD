@@ -1,7 +1,7 @@
 ﻿namespace mpESKD.Functions.mpGroundLine
 {
+    using System;
     using System.Collections.Generic;
-    using Base;
     using Base.Abstractions;
     using ModPlusAPI;
 
@@ -15,17 +15,23 @@
         /// </summary>
         public static GroundLineDescriptor Instance => _instance ?? (_instance = new GroundLineDescriptor());
 
+        /// <inheritdoc/>
+        public Type EntityType => typeof(GroundLine);
+
         /// <inheritdoc />
         public string Name => "mpGroundLine";
 
         /// <inheritdoc />
-        public string LName => Language.GetItem(Invariables.LangItem, "h73"); // "Линия грунта";
+        // "Линия грунта";
+        public string LName => Language.GetItem("h73");
 
         /// <inheritdoc />
-        public string Description => Language.GetItem(Invariables.LangItem, "h74"); // "Отрисовка линии обозначения грунта";
+        // "Отрисовка линии обозначения грунта";
+        public string Description => Language.GetItem("h74");
 
         /// <inheritdoc />
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h75"); // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
+        // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
+        public string FullDescription => Language.GetItem("h75");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -40,14 +46,14 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // "Линия грунта из полилинии"
-            Language.GetItem(Invariables.LangItem, "h76")
+            Language.GetItem("h76")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // "Конвертирование выбранной полилинии в линию обозначения грунта"
-            Language.GetItem(Invariables.LangItem, "h77")
+            Language.GetItem("h77")
         };
 
         /// <inheritdoc />

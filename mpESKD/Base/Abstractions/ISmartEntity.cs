@@ -93,8 +93,25 @@ namespace mpESKD.Base.Abstractions
         /// Категория всегда Content
         /// </summary>
         string TextStyle { get; set; }
+        
+        /// <summary>
+        /// Идентификатор стиля
+        /// </summary>
+        string StyleGuid { get; set; }
+        
+        /// <summary>
+        /// Идентификатор (ObjectId) блока
+        /// </summary>
+        ObjectId BlockId { get; set; }
 
-        /// <summary>Текущий численный масштаб масштаб</summary>
+        /// <summary>
+        /// Запись (описание) блока
+        /// </summary>
+        BlockTableRecord BlockRecord { get; set; }
+
+        /// <summary>
+        /// Текущий численный масштаб масштаб
+        /// </summary>
         double GetScale();
 
         /// <summary>
@@ -106,18 +123,6 @@ namespace mpESKD.Base.Abstractions
         /// Возвращает коллекцию точек, которые используются для привязки
         /// </summary>
         IEnumerable<Point3d> GetPointsForOsnap();
-
-        #region Block
-
-        /// <summary>
-        /// Идентификатор (ObjectId) блока
-        /// </summary>
-        ObjectId BlockId { get; set; }
-
-        /// <summary>
-        /// Запись (описание) блока
-        /// </summary>
-        BlockTableRecord BlockRecord { get; set; }
 
         /// <summary>
         /// Возвращает <see cref="BlockTableRecord"/> для обработки команды Undo
@@ -131,19 +136,12 @@ namespace mpESKD.Base.Abstractions
         /// <param name="blockReference">Вхождение блока</param>
         BlockTableRecord GetBlockTableRecordWithoutTransaction(BlockReference blockReference);
 
-        #endregion
-
         /// <summary>
         /// Получение свойств блока, которые присуще примитиву
         /// </summary>
         /// <param name="entity">Объект <see cref="DBObject"/></param>
         void GetPropertiesFromCadEntity(DBObject entity);
-
-        /// <summary>
-        /// Идентификатор стиля
-        /// </summary>
-        string StyleGuid { get; set; }
-
+        
         /// <summary>
         /// Перерисовка элементов блока по параметрам ЕСКД элемента
         /// </summary>

@@ -6,13 +6,12 @@
     using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
-    using Base;
     using Base.Abstractions;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpGroundLine;
     using Functions.mpLevelMark;
-    using Functions.mpSection;
+    using Functions.mpNodalLeader;
     using Functions.mpWaterProofing;
     using ModPlus.Helpers;
     using ModPlusAPI;
@@ -147,6 +146,7 @@
 
                 // add content
                 AddAxisPanel(ribbonTab);
+                AddLeadersPanel(ribbonTab);
                 AddLevelMarksPanel(ribbonTab);
                 AddLinesPanel(ribbonTab);
                 AddViewsPanel(ribbonTab);
@@ -156,7 +156,7 @@
 
                 // add settings panel
                 AddSettingsPanel(ribbonTab);
-                
+
                 ribbonControl.UpdateLayout();
                 if (_wasActive)
                 {
@@ -174,13 +174,36 @@
         /// </summary>
         private static void AddAxisPanel(RibbonTab ribbonTab)
         {
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab3") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab3") };
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
             var ribRowPanel = new RibbonRowPanel();
 
             // mpAxis
-            var ribbonButton = GetBigButton(AxisDescriptor.Instance);
+            var ribbonButton = GetBigButton(Axis.GetDescriptor());
+            if (ribbonButton != null)
+            {
+                ribRowPanel.Items.Add(ribbonButton);
+            }
+
+            if (ribRowPanel.Items.Any())
+            {
+                ribSourcePanel.Items.Add(ribRowPanel);
+            }
+        }
+
+        /// <summary>
+        /// Панель "Выноски"
+        /// </summary>
+        private static void AddLeadersPanel(RibbonTab ribbonTab)
+        {
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab15") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
+            ribbonTab.Panels.Add(ribPanel);
+            var ribRowPanel = new RibbonRowPanel();
+            
+            // mpNodalLeader
+            var ribbonButton = GetBigButton(NodalLeader.GetDescriptor());
             if (ribbonButton != null)
             {
                 ribRowPanel.Items.Add(ribbonButton);
@@ -197,13 +220,13 @@
         /// </summary>
         private static void AddLevelMarksPanel(RibbonTab ribbonTab)
         {
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab11") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab11") };
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
             var ribRowPanel = new RibbonRowPanel();
 
             // mpLevelMark
-            ribRowPanel.Items.Add(GetSplitButton(LevelMarkDescriptor.Instance));
+            ribRowPanel.Items.Add(GetSplitButton(LevelMark.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -217,7 +240,7 @@
         private static void AddLinesPanel(RibbonTab ribbonTab)
         {
             // create the panel source
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab1") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab1") };
 
             // now the panel
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
@@ -226,13 +249,13 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpBreakLine
-            ribRowPanel.Items.Add(GetSplitButton(BreakLineDescriptor.Instance));
+            ribRowPanel.Items.Add(GetSplitButton(BreakLine.GetDescriptor()));
 
             // mpGroundLine
             ribRowPanel.Items.Add(GetSplitButton(GroundLineDescriptor.Instance));
 
             // mpWaterProofing
-            ribRowPanel.Items.Add(GetSplitButton(WaterProofingDescriptor.Instance));
+            ribRowPanel.Items.Add(GetSplitButton(WaterProofing.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -246,14 +269,14 @@
         private static void AddViewsPanel(RibbonTab ribbonTab)
         {
             // create the panel source
-            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem(Invariables.LangItem, "tab8") };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab8") };
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
 
             // mpSection
-            ribRowPanel.Items.Add(GetSplitButton(SectionDescriptor.Instance));
+            ribRowPanel.Items.Add(GetSplitButton(Functions.mpSection.Section.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -269,7 +292,7 @@
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource
             {
-                Title = Language.GetItem(Invariables.LangItem, "tab9")
+                Title = Language.GetItem("tab9")
             };
 
             // now the panel
@@ -285,21 +308,21 @@
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpESKDSearch",
-                    Language.GetItem(Invariables.LangItem, "tab10"),
+                    Language.GetItem("tab10"),
                     _colorTheme == 1 // 1 - light
                         ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32.png"
                         : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab13"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
-            
+                    Language.GetItem("tab13"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+
             // Search by values
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpESKDSearchByValues",
-                    Language.GetItem(Invariables.LangItem, "tab12"),
+                    Language.GetItem("tab12"),
                     _colorTheme == 1 // 1 - light
                         ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32.png"
                         : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab14"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                    Language.GetItem("tab14"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
 
             ribSourcePanel.Items.Add(ribRowPanel);
         }
@@ -312,7 +335,7 @@
             // create the panel source
             var ribSourcePanel = new RibbonPanelSource
             {
-                Title = Language.GetItem(Invariables.LangItem, "tab2")
+                Title = Language.GetItem("tab2")
             };
 
             // now the panel
@@ -326,19 +349,19 @@
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpStyleEditor",
-                    Language.GetItem(Invariables.LangItem, "tab4"),
+                    Language.GetItem("tab4"),
                     _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                    Language.GetItem("tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
             ribRowPanel.Items.Add(
                 RibbonHelpers.AddBigButton(
                     "mpPropertiesPalette",
-                    ConvertLName(Language.GetItem(Invariables.LangItem, "tab6")),
+                    ConvertLName(Language.GetItem("tab6")),
                     _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32_dark.png",
-                    Language.GetItem(Invariables.LangItem, "tab7"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                    Language.GetItem("tab7"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
             ribSourcePanel.Items.Add(ribRowPanel);
         }
 

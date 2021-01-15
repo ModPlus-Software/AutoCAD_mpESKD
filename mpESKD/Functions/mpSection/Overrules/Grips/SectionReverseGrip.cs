@@ -12,14 +12,18 @@
     /// </summary>
     public class SectionReverseGrip : SmartEntityGripData
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SectionReverseGrip"/> class.
+        /// </summary>
+        /// <param name="section">Экземпляр класса <see cref="mpSection.Section"/></param>
         public SectionReverseGrip(Section section)
         {
             Section = section;
-            GripType = GripType.Mirror;
+            GripType = GripType.TwoArrowsUpDown;
         }
 
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр класса <see cref="mpSection.Section"/>
         /// </summary>
         public Section Section { get; }
 

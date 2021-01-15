@@ -1,6 +1,9 @@
 ﻿namespace mpESKD.Functions.mpAxis.Overrules.Grips
 {
-    public enum AxisGripName
+    /// <summary>
+    /// Имя ручки объекта <see cref="Axis"/>
+    /// </summary>
+    public enum GripName
     {
         StartGrip,
         MiddleGrip,

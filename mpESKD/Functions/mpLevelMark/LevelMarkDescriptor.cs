@@ -1,34 +1,30 @@
 ﻿namespace mpESKD.Functions.mpLevelMark
 {
+    using System;
     using System.Collections.Generic;
-    using Base;
     using Base.Abstractions;
     using ModPlusAPI;
 
     /// <inheritdoc />
     public class LevelMarkDescriptor : IIntellectualEntityDescriptor
     {
-        private static LevelMarkDescriptor _instance;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static LevelMarkDescriptor Instance => _instance ?? (_instance = new LevelMarkDescriptor());
+        /// <inheritdoc/>
+        public Type EntityType => typeof(LevelMark);
 
         /// <inheritdoc />
         public string Name => "mpLevelMark";
 
         /// <inheritdoc />
         /// Отметка уровня
-        public string LName => Language.GetItem(Invariables.LangItem, "h105");
+        public string LName => Language.GetItem("h105");
 
         /// <inheritdoc />
         /// Создание высотной отметки по ГОСТ 21.101-97
-        public string Description => Language.GetItem(Invariables.LangItem, "h106");
+        public string Description => Language.GetItem("h106");
 
         /// <inheritdoc />
         /// Создание интеллектуального объекта на основе анонимного блока, описывающего высотную отметку по ГОСТ 21.101-97
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h107");
+        public string FullDescription => Language.GetItem("h107");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -43,14 +39,14 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // Выравнивание отметок уровня
-            Language.GetItem(Invariables.LangItem, "h110")
+            Language.GetItem("h110")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // Команда позволяет выравнивать отметки уровня по различным условиям
-            Language.GetItem(Invariables.LangItem, "h113")
+            Language.GetItem("h113")
         };
 
         /// <inheritdoc />

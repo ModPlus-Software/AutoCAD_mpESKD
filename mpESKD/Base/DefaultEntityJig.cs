@@ -54,13 +54,13 @@
         /// Сообщение для указания первой точки (точки вставки).
         /// Сообщение по умолчанию "Укажите точку вставки:"
         /// </summary>
-        public string PromptForInsertionPoint { get; set; } = Language.GetItem(Invariables.LangItem, "msg1");
+        public string PromptForInsertionPoint { get; set; } = Language.GetItem("msg1");
 
         /// <summary>
         /// Сообщение для указания следующей точки.
         /// Сообщение по умолчанию "Укажите конечную точку:"
         /// </summary>
-        public string PromptForNextPoint { get; set; } = Language.GetItem(Invariables.LangItem, "msg2");
+        public string PromptForNextPoint { get; set; } = Language.GetItem("msg2");
 
         /// <inheritdoc/>
         protected override SamplerStatus Sampler(JigPrompts prompts)

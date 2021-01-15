@@ -15,7 +15,7 @@
         public SearchEntitiesByValuesWindow()
         {
             InitializeComponent();
-            Title = ModPlusAPI.Language.GetItem(Invariables.LangItem, "tab12");
+            Title = ModPlusAPI.Language.GetItem("tab12");
         }
 
         private void BlocksList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

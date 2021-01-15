@@ -152,7 +152,7 @@
         /// <param name="collection"><see cref="SummaryPropertyCollection"/></param>
         public void SetData(SummaryPropertyCollection collection)
         {
-            var different = $"*{ModPlusAPI.Language.GetItem(Invariables.LangItem, "vc1")}*";
+            var different = $"*{ModPlusAPI.Language.GetItem("vc1")}*";
 
             var entityGroups = collection.Where(sp => sp.EntityPropertyDataCollection.Any())
                 .GroupBy(sp => sp.EntityType);
@@ -679,7 +679,7 @@
         {
             try
             {
-                var displayName = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DisplayNameLocalizationKey);
+                var displayName = ModPlusAPI.Language.GetItem(summaryProperty.DisplayNameLocalizationKey);
                 if (!string.IsNullOrEmpty(displayName))
                 {
                     if (!displayName.EndsWith(":"))
@@ -704,7 +704,7 @@
         {
             try
             {
-                var description = ModPlusAPI.Language.GetItem(Invariables.LangItem, summaryProperty.DescriptionLocalizationKey);
+                var description = ModPlusAPI.Language.GetItem(summaryProperty.DescriptionLocalizationKey);
                 if (!string.IsNullOrEmpty(description))
                 {
                     return description;

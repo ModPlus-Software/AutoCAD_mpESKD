@@ -25,7 +25,7 @@
             _groundLineObjectOverrule = new WaterProofingObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineObjectOverrule.SetXDataFilter(WaterProofingDescriptor.Instance.Name);
+            _groundLineObjectOverrule.SetXDataFilter(WaterProofing.GetDescriptor().Name);
             return _groundLineObjectOverrule;
         }
 
@@ -45,7 +45,7 @@
         /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofingDescriptor.Instance.Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofing.GetDescriptor().Name, true);
         }
     }
 }

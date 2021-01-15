@@ -53,7 +53,7 @@
         /// <inheritdoc />
         public override string GetTooltip()
         {
-            return Language.GetItem(Invariables.LangItem, "gp1"); // stretch
+            return Language.GetItem("gp1"); // stretch
         }
 
         // Временное значение ручки

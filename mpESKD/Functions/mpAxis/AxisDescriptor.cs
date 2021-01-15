@@ -1,27 +1,30 @@
 ﻿namespace mpESKD.Functions.mpAxis
 {
+    using System;
     using System.Collections.Generic;
-    using Base;
     using Base.Abstractions;
     using ModPlusAPI;
 
+    /// <inheritdoc />
     public class AxisDescriptor : IIntellectualEntityDescriptor
     {
-        private static AxisDescriptor _instance;
-
-        public static AxisDescriptor Instance => _instance ?? (_instance = new AxisDescriptor());
+        /// <inheritdoc/>
+        public Type EntityType => typeof(Axis);
 
         /// <inheritdoc />
         public string Name => "mpAxis";
 
         /// <inheritdoc />
-        public string LName => Language.GetItem(Invariables.LangItem, "h41"); // "Прямая ось";
+        // "Прямая ось";
+        public string LName => Language.GetItem("h41");
 
         /// <inheritdoc />
-        public string Description => Language.GetItem(Invariables.LangItem, "h65"); // "Отрисовка прямой оси по ГОСТ 21.101-97";
+        // "Отрисовка прямой оси по ГОСТ 21.101-97";
+        public string Description => Language.GetItem("h65");
 
         /// <inheritdoc />
-        public string FullDescription => Language.GetItem(Invariables.LangItem, "h66"); // "Создание интеллектуального объекта на основе анонимного блока, описывающего прямую ось по ГОСТ 21.101-97, путем указания двух точек";
+        // "Создание интеллектуального объекта на основе анонимного блока, описывающего прямую ось по ГОСТ 21.101-97, путем указания двух точек";
+        public string FullDescription => Language.GetItem("h66");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;

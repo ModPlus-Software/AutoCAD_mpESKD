@@ -5,7 +5,7 @@
     /// <summary>
     /// Имя ручки объекта <see cref="LevelMark"/>
     /// </summary>
-    public enum LevelMarkGripName
+    public enum GripName
     {
         /// <summary>
         /// Точка начала отсчета
