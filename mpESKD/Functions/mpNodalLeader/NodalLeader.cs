@@ -323,8 +323,7 @@ namespace mpESKD.Functions.mpNodalLeader
 
                 try
                 {
-                    var radius = Math.Min(
-                        Math.Abs(framePoint.X - insertionPoint.X), Math.Abs(framePoint.Y - insertionPoint.Y));
+                    var radius = framePoint.DistanceTo(insertionPoint);
                     if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
                         radius = 5 * scale;
                     

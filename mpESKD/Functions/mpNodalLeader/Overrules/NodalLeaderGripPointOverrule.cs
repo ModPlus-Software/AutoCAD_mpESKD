@@ -97,13 +97,20 @@
                             }
                             else if (levelMarkGrip.GripName == GripName.FramePoint)
                             {
-                                
-                                var currentPosition = gripPoint + offset;
-                                var frameHeight = Math.Abs(currentPosition.Y - nodalLeader.InsertionPoint.Y) / scale;
-                                var frameWidth = Math.Abs(currentPosition.X - nodalLeader.InsertionPoint.X) / scale;
+                                if (nodalLeader.FrameType == FrameType.Rectangular)
+                                {
+                                    var currentPosition = gripPoint + offset;
+                                    var frameHeight = 
+                                        Math.Abs(currentPosition.Y - nodalLeader.InsertionPoint.Y) / scale;
+                                    var frameWidth = Math.Abs(currentPosition.X - nodalLeader.InsertionPoint.X) / scale;
 
-                                if (!(frameHeight <= nodalLeader.MinDistanceBetweenPoints) &&
-                                    !(frameWidth <= nodalLeader.MinDistanceBetweenPoints))
+                                    if (!(frameHeight <= nodalLeader.MinDistanceBetweenPoints) &&
+                                        !(frameWidth <= nodalLeader.MinDistanceBetweenPoints))
+                                    {
+                                        nodalLeader.FramePoint = gripPoint + offset;
+                                    }
+                                }
+                                else
                                 {
                                     nodalLeader.FramePoint = gripPoint + offset;
                                 }
