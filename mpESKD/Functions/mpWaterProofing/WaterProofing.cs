@@ -224,7 +224,7 @@ namespace mpESKD.Functions.mpWaterProofing
             }
 
             _offsetPolylineEntities.Clear();
-            foreach (Entity offsetCurve in _mainPolyline.GetOffsetCurves(LineThickness))
+            foreach (Entity offsetCurve in _mainPolyline.GetOffsetCurves(LineThickness * scale))
             {
                 _offsetPolylineEntities.Add(offsetCurve);
             }
