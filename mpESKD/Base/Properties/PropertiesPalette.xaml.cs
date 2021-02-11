@@ -856,7 +856,7 @@
 
         private void LmSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            var lmSetting = new PaletteSettings();
+            var lmSetting = new View.PaletteSettings();
             lmSetting.ShowDialog();
 
             if (MainSettings.Instance.AddToMpPalette)

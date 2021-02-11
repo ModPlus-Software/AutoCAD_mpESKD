@@ -3,6 +3,7 @@ namespace mpESKD.Base
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -60,6 +61,9 @@ namespace mpESKD.Base
             get { return Entities.Where(e => e != null); }
         }
 
+        /// <inheritdoc/>
+        public bool IsXDataReadingProcess { get; private set; }
+
         /// <inheritdoc />
         public Point3d InsertionPoint { get; set; } = Point3d.Origin;
 
@@ -84,6 +88,12 @@ namespace mpESKD.Base
 
         /// <inheritdoc />
         public Matrix3d BlockTransform { get; set; }
+
+        /// <inheritdoc/>
+        public double Rotation { get; set; }
+
+        /// <inheritdoc/>
+        public bool IsRotated => Rotation != 0.0;
 
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 1, "h50", "", propertyScope: PropertyScope.Palette, descLocalKey: "h52")]
@@ -247,6 +257,12 @@ namespace mpESKD.Base
             return GetScale() * BlockTransform.GetScale();
         }
 
+        /// <inheritdoc/>
+        public Matrix3d GetBackRotationMatrix(Point3d center)
+        {
+            return Matrix3d.Rotation(-Rotation, Vector3d.ZAxis, center);
+        }
+
         /// <inheritdoc />
         public abstract IEnumerable<Point3d> GetPointsForOsnap();
 
@@ -332,6 +348,7 @@ namespace mpESKD.Base
             {
                 InsertionPoint = blockReference.Position;
                 BlockTransform = blockReference.BlockTransform;
+                Rotation = blockReference.Rotation;
             }
         }
 
@@ -428,11 +445,12 @@ namespace mpESKD.Base
                     tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
                 if (typedValue1001.Value != null)
                 {
-                    var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
+                    var binaryFormatter = new BinaryFormatter {Binder = new Binder()};
                     var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
                     var deserialize = binaryFormatter.Deserialize(memoryStream);
                     if (deserialize is DataHolder dataHolder)
                     {
+                        IsXDataReadingProcess = true;
                         WritePropertiesFromReadData(skipPoints, dataHolder.Data);
                     }
                 }
@@ -444,6 +462,10 @@ namespace mpESKD.Base
             catch (Exception exception)
             {
                 ExceptionBox.Show(exception);
+            }
+            finally
+            {
+                IsXDataReadingProcess = false;
             }
         }
 
@@ -505,7 +527,7 @@ namespace mpESKD.Base
 
                     if (string.IsNullOrEmpty(valueForProperty))
                         continue;
-
+                    
                     if (propertyInfo.Name == nameof(StyleGuid))
                     {
                         StyleGuid = valueForProperty;

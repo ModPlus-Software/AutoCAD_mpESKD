@@ -10,7 +10,6 @@
 
     public static class PropertiesPaletteFunction
     {
-        private const string LangItem = "mpESKD";
         private static PropertiesPalette _propertiesPalette;
 
         public static PaletteSet PaletteSet { get; private set; }
@@ -30,7 +29,7 @@
                     else
                     {
                         PaletteSet = new PaletteSet(
-                            Language.GetItem(LangItem, "h11"), // Свойства примитивов ModPlus
+                            Language.GetItem("h11"), // Свойства ЕСКД
                             "mpPropertiesPalette",
                             new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
                         PaletteSet.Load += PaletteSet_Load;
@@ -43,7 +42,7 @@
                             Child = _propertiesPalette
                         };
                         PaletteSet.Add(
-                            Language.GetItem(LangItem, "h11"), // Свойства примитивов ModPlus
+                            Language.GetItem("h11"), // Свойства ЕСКД
                             elementHost);
                         PaletteSet.Style = PaletteSetStyles.ShowCloseButton | 
                                            PaletteSetStyles.ShowPropertiesMenu |

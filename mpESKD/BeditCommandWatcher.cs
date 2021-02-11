@@ -13,6 +13,9 @@
         /// </summary>
         public static bool UseBedit = true;
 
+        /// <summary>
+        /// Инициализация
+        /// </summary>
         public static void Initialize()
         {
             Application.DocumentManager.DocumentLockModeChanged += DocumentManager_DocumentLockModeChanged;

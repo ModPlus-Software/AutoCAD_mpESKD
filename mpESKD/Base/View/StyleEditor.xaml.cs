@@ -1,5 +1,5 @@
-﻿// Редактор стилей реализую без использования паттерна Mvvm, так как на событиях в данном случае удобней
-namespace mpESKD.Base.Styles
+﻿//// Редактор стилей реализую без использования паттерна Mvvm, так как на событиях в данном случае удобней
+namespace mpESKD.Base.View
 {
     using System;
     using System.Collections.ObjectModel;
@@ -18,6 +18,7 @@ namespace mpESKD.Base.Styles
     using ModPlusAPI.Windows;
     using ModPlusStyle.Controls;
     using Properties;
+    using Styles;
     using Utils;
 
     /// <summary>
@@ -25,6 +26,8 @@ namespace mpESKD.Base.Styles
     /// </summary>
     public partial class StyleEditor
     {
+        private ObservableCollection<EntityStyles> _styles;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StyleEditor"/> class.
         /// </summary>
@@ -40,8 +43,6 @@ namespace mpESKD.Base.Styles
         {
             SizeToContent = SizeToContent.Manual;
         }
-
-        private ObservableCollection<EntityStyles> _styles;
 
         private void StyleEditor_ContentRendered(object sender, EventArgs e)
         {

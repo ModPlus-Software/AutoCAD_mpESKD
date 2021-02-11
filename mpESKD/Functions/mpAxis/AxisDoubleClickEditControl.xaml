@@ -1,0 +1,167 @@
+﻿<UserControl x:Class="mpESKD.Functions.mpAxis.AxisDoubleClickEditControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mps="https://modplus.org/winfx/xaml/controls"
+             xmlns:properties="clr-namespace:mpESKD.Base.Properties"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:enums="clr-namespace:mpESKD.Base.Enums"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../../Base/View/DoubleClickEditControlResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <properties:EnumPropertyValueConverter x:Key="EnumPropertyValueConverter"/>
+            <ObjectDataProvider x:Key="DataFromAxisMarkersPositionEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+                <ObjectDataProvider.MethodParameters>
+                    <x:Type TypeName="enums:AxisMarkersPosition"></x:Type>
+                </ObjectDataProvider.MethodParameters>
+            </ObjectDataProvider>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <mps:Card>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- first value -->
+            <TextBlock Grid.Column="0"
+                       Grid.Row="0"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p22}"
+                       Visibility="{Binding ElementName=TbFirstText, Path=Visibility}"/>
+
+            <TextBox Grid.Column="1"
+                     Grid.Row="0"
+                     Name="TbFirstPrefix"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="3"/>
+
+            <TextBox Grid.Column="2"
+                     Grid.Row="0"
+                     Name="TbFirstText"
+                     MaxLength="2"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+
+            <TextBox Grid.Column="3"
+                     Grid.Row="0"
+                     Name="TbFirstSuffix"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="3"/>
+
+            <!-- second value -->
+            <TextBlock Grid.Column="0"
+                       Grid.Row="1"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p25}"
+                       Visibility="{Binding ElementName=TbSecondText, Path=Visibility}"/>
+
+            <TextBox Grid.Row="1"
+                     Grid.Column="1"
+                     Name="TbSecondPrefix"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="3"
+                     MinWidth="20"/>
+
+            <TextBox Grid.Row="1"
+                     Grid.Column="2"
+                     Name="TbSecondText"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="2"
+                     MinWidth="20"/>
+
+            <TextBox Grid.Row="1"
+                     Grid.Column="3"
+                     Name="TbSecondSuffix"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="3"/>
+
+            <!-- third value -->
+            <TextBlock Grid.Column="0"
+                       Grid.Row="2"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p28}"
+                       Visibility="{Binding ElementName=TbThirdText, Path=Visibility}"/>
+
+            <TextBox Grid.Row="2"
+                     Grid.Column="1"
+                     Name="TbThirdPrefix"
+                     MaxLength="3"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MinWidth="20"/>
+
+            <TextBox Grid.Row="2"
+                     Grid.Column="2"
+                     Name="TbThirdText"
+                     MaxLength="2"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MinWidth="20"/>
+
+            <TextBox Grid.Row="2"
+                     Grid.Column="3"
+                     Name="TbThirdSuffix"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"
+                     MaxLength="3"/>
+
+            <!-- Orient value -->
+            <TextBlock Grid.Column="0"
+                       Grid.Row="3"
+                       Grid.ColumnSpan="3"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p31}"
+                       Visibility="{Binding ElementName=TbTopOrientText, Path=Visibility}"/>
+
+            <TextBox Grid.Column="3"
+                     Grid.Row="3"
+                     Name="TbTopOrientText"
+                     MaxLength="2"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+
+            <TextBlock Grid.Column="0"
+                       Grid.Row="4"
+                       Grid.ColumnSpan="3"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p30}"
+                       Visibility ="{Binding ElementName=TbBottomOrientText, Path=Visibility}"/>
+
+            <TextBox Grid.Column="3"
+                     Grid.Row="4"
+                     Name="TbBottomOrientText"
+                     MaxLength="2"
+                     MinWidth="20"
+                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+
+            <!-- markers position -->
+            <StackPanel Grid.Column="0"
+                        Grid.Row="5"
+                        Orientation="Horizontal">
+                <TextBlock Text="{Binding Source={StaticResource Lang}, XPath=p8}"/>
+                <ComboBox x:Name="CbMarkersPosition"
+                              ItemsSource="{Binding Source={StaticResource DataFromAxisMarkersPositionEnum}}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource EnumPropertyValueConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+    </mps:Card>
+</UserControl>

@@ -12,6 +12,11 @@ namespace mpESKD.Base.Abstractions
     public interface ISmartEntity
     {
         /// <summary>
+        /// True - происходит чтение и установка данных из XData
+        /// </summary>
+        bool IsXDataReadingProcess { get; }
+        
+        /// <summary>
         /// Первая точка примитива в мировой системе координат.
         /// Должна соответствовать точке вставке блока
         /// </summary>
@@ -57,6 +62,16 @@ namespace mpESKD.Base.Abstractions
         /// Матрица трансформации BlockReference
         /// </summary>
         Matrix3d BlockTransform { get; set; }
+        
+        /// <summary>
+        /// Угол поворота BlockReference
+        /// </summary>
+        double Rotation { get; set; }
+        
+        /// <summary>
+        /// BlockReference повернут (имеет угол, отличный от 0,0)
+        /// </summary>
+        bool IsRotated { get; }
 
         /// <summary>
         /// Стиль примитива. Свойство используется для работы палитры, а стиль задается через свойство <see cref="StyleGuid"/>
@@ -118,6 +133,13 @@ namespace mpESKD.Base.Abstractions
         /// Текущий полный численный масштаб (с учетом масштаба блока)
         /// </summary>
         double GetFullScale();
+        
+        /// <summary>
+        /// Возвращает матрицу обратного поворота по отношению к углу поворота блока <see cref="Rotation"/>.
+        /// Поворот выполняется вокруг оси Z
+        /// </summary>
+        /// <param name="center">Центр поворота</param>
+        Matrix3d GetBackRotationMatrix(Point3d center);
 
         /// <summary>
         /// Возвращает коллекцию точек, которые используются для привязки

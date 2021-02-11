@@ -24,6 +24,7 @@
     using ModPlusAPI;
     using mpESKD.Base.Properties;
     using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using StyleEditor = Base.View.StyleEditor;
     using SystemVariableChangedEventArgs = Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs;
 
     /// <summary>
@@ -380,25 +381,9 @@
                         var applicableAppName = ExtendedDataUtils.ApplicableAppName(blockReference);
 
                         if (string.IsNullOrEmpty(applicableAppName))
-                        {
                             BeditCommandWatcher.UseBedit = true;
-                        }
-                        else if (applicableAppName == Axis.GetDescriptor().Name)
-                        {
-                            EntityUtils.DoubleClickEdit(blockReference, entity => new AxisValueEditor(entity));
-                        }
-                        else if (applicableAppName == Functions.mpSection.Section.GetDescriptor().Name)
-                        {
-                            EntityUtils.DoubleClickEdit(blockReference, entity => new SectionValueEditor(entity));
-                        }
-                        else if (applicableAppName == LevelMark.GetDescriptor().Name)
-                        {
-                            EntityUtils.DoubleClickEdit(blockReference, entity => new LevelMarkValueEditor(entity));
-                        }
                         else
-                        {
-                            BeditCommandWatcher.UseBedit = true;
-                        }
+                            EntityUtils.DoubleClickEdit(blockReference);
                     }
                     else
                     {

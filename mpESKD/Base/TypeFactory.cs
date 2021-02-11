@@ -14,6 +14,7 @@
         private List<Type> _entityTypes;
         private List<ISmartEntityFunction> _smartEntityFunctions;
         private Dictionary<Type, IIntellectualEntityDescriptor> _entityDescriptors;
+        private Dictionary<Type, IDoubleClickEditControl> _entityEditControls;
 
         /// <summary>
         /// Singleton instance
@@ -21,7 +22,7 @@
         public static TypeFactory Instance => _instance ?? (_instance = new TypeFactory());
 
         /// <summary>
-        /// Возвращает список типов примитивов
+        /// Возвращает список типов интеллектуальных объектов
         /// </summary>
         public List<Type> GetEntityTypes()
         {
@@ -32,10 +33,9 @@
         }
 
         /// <summary>
-        /// Возвращает дескриптор для примитива по типу примитива
+        /// Возвращает дескриптор для примитива по типу интеллектуального объекта
         /// </summary>
-        /// <param name="entityType">Тип примитива</param>
-        /// <returns></returns>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
         public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
         {
             if (_entityDescriptors == null)
@@ -71,6 +71,25 @@
         public List<string> GetEntityCommandNames()
         {
             return GetEntityTypes().Select(t => $"mp{t.Name}").ToList();
+        }
+
+        /// <summary>
+        /// Возвращает экземпляр редактора по двойному клику для типа интеллектуального объекта
+        /// </summary>
+        /// <param name="entityType">Тип интеллектуального объекта</param>
+        public IDoubleClickEditControl GetClickEditControl(Type entityType)
+        {
+            if (_entityEditControls == null)
+            {
+                _entityEditControls = typeof(TypeFactory).Assembly
+                    .GetTypes()
+                    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IDoubleClickEditControl)))
+                    .Select(Activator.CreateInstance)
+                    .Cast<IDoubleClickEditControl>()
+                    .ToDictionary(c => c.EntityType, c => c);
+            }
+
+            return _entityEditControls[entityType];
         }
     }
 }

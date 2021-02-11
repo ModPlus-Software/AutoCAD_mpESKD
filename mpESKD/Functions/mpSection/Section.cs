@@ -19,7 +19,7 @@
     /// </summary>
     [SmartEntityDisplayNameKey("h79")]
     [SystemStyleDescriptionKey("h96")]
-    public class Section : SmartEntity, ITextValueEntity
+    public class Section : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Section"/> class.
@@ -163,11 +163,22 @@
         [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
+        
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
+        [SaveToXData]
+        public bool HideTextBackground { get; set; }
+
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 5, "p86", 0.5, 0.0, 5.0)]
+        [SaveToXData]
+        public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
         /// Обозначение разреза
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "p51", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string Designation { get; set; } = string.Empty;
@@ -175,7 +186,7 @@
         /// <summary>
         /// Префикс обозначения
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 5, "p52", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p52", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string DesignationPrefix { get; set; } = string.Empty;
@@ -183,7 +194,7 @@
         /// <summary>
         /// Номер листа (пишется в скобках после обозначения)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p53", "", propertyScope: PropertyScope.Palette, descLocalKey: "d53")]
+        [EntityProperty(PropertiesCategory.Content, 8, "p53", "", propertyScope: PropertyScope.Palette, descLocalKey: "d53")]
         [SaveToXData]
         [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
@@ -191,7 +202,7 @@
         /// <summary>
         /// Позиция номера листа
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 7, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
         [SaveToXData]
         public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
 
@@ -279,9 +290,11 @@
 
         #region Text entities
 
-        private MText _topMText;
+        private DBText _topDbText;
+        private Wipeout _topTextMask;
 
-        private MText _bottomMText;
+        private DBText _bottomDbText;
+        private Wipeout _bottomTextMask;
 
         #endregion
 
@@ -292,14 +305,17 @@
             {
                 var entities = new List<Entity>
                 {
+                    _topTextMask,
+                    _bottomTextMask,
+                    
                     _topShelfLine,
                     _topShelfArrow,
                     _topStroke,
                     _bottomShelfLine,
                     _bottomShelfArrow,
                     _bottomStroke,
-                    _topMText,
-                    _bottomMText
+                    _topDbText,
+                    _bottomDbText
                 };
                 entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
@@ -440,81 +456,77 @@
             var textContentsForBottomText = GetTextContents(false);
             if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
             {
-                var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
                 var textHeight = MainTextHeight * scale;
-                _topMText = new MText
-                {
-                    TextStyleId = textStyleId,
-                    Contents = textContentsForTopText,
-                    TextHeight = textHeight,
-                    Attachment = AttachmentPoint.MiddleCenter
-                };
+                _topDbText = new DBText();
+                _topDbText.SetProperties(TextStyle, textHeight);
+                _topDbText.TextString = textContentsForTopText;
 
-                _bottomMText = new MText
-                {
-                    TextStyleId = textStyleId,
-                    Contents = textContentsForBottomText,
-                    TextHeight = textHeight,
-                    Attachment = AttachmentPoint.MiddleCenter
-                };
-
-                // TextActualHeight = _topMText.ActualHeight;
-                // TextActualWidth = _topMText.ActualWidth;
+                _bottomDbText = new DBText();
+                _bottomDbText.SetProperties(TextStyle, textHeight);
+                _bottomDbText.TextString = textContentsForBottomText;
 
                 var check = 1 / Math.Sqrt(2);
 
                 // top
-                var alongShelfTextOffset = _topMText.ActualWidth / 2;
-                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+                var topTextLength = _topDbText.GetLength();
+                var topTextHeight = _topDbText.GetHeight();
+                var alongShelfTextOffset = topTextLength / 2;
+                var acrossShelfTextOffset = topTextHeight / 2;
                 if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
                 {
                     if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
                         (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
                     {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                        alongShelfTextOffset = topTextHeight / 2;
+                        acrossShelfTextOffset = topTextLength / 2;
                     }
 
                     var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
                     var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _topMText.Location = topTextCenterPoint;
+                    _topDbText.Position = topTextCenterPoint;
                 }
                 else
                 {
                     var tempPoint = topShelfEndPoint +
-                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
-                    _topMText.Location = topTextCenterPoint;
+                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (topTextLength / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (topTextHeight / 2))));
+                    _topDbText.Position = topTextCenterPoint;
                 }
+                
+                UpdateTextEntity(_topDbText, ref _topTextMask);
 
-                TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
+                TopDesignationPoint = _topDbText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
 
                 // bottom
-                alongShelfTextOffset = _bottomMText.ActualWidth / 2;
-                acrossShelfTextOffset = _bottomMText.ActualHeight / 2;
+                var bottomTextLength = _bottomDbText.GetLength();
+                var bottomTextHeight = _bottomDbText.GetHeight();
+                alongShelfTextOffset = bottomTextLength / 2;
+                acrossShelfTextOffset = bottomTextHeight / 2;
                 if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
                 {
                     if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
                         (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
                     {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                        alongShelfTextOffset = topTextHeight / 2;
+                        acrossShelfTextOffset = topTextLength / 2;
                     }
 
                     var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset);
                     var bottomTextCenterPoint = tempPoint + (bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _bottomMText.Location = bottomTextCenterPoint;
+                    _bottomDbText.Position = bottomTextCenterPoint;
                 }
                 else
                 {
                     var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
-                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2)));
+                                    (AlongBottomShelfTextOffset + (bottomTextLength / 2)));
                     var bottomTextCenterPoint =
-                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2))));
-                    _bottomMText.Location = bottomTextCenterPoint;
+                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (bottomTextHeight / 2))));
+                    _bottomDbText.Position = bottomTextCenterPoint;
                 }
+                
+                UpdateTextEntity(_bottomDbText, ref _bottomTextMask);
 
-                BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
+                BottomDesignationPoint = _bottomDbText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
             }
 
             _middleStrokes.Clear();
@@ -682,6 +694,29 @@
             }
 
             return prefixAndDesignation;
+        }
+        
+        /// <summary>
+        /// Смещение однострочного текста из точки вставки на половину ширины влево и
+        /// половину высоты вниз (чтобы геометрический центр оказался в точке вставки) и создание маскировки при
+        /// необходимости
+        /// </summary>
+        /// <param name="dbText">Изменяемый экземпляр <see cref="DBText"/></param>
+        /// <param name="mask">Маскировка фона</param>
+        private void UpdateTextEntity(DBText dbText, ref Wipeout mask)
+        {
+            if (dbText == null)
+                return;
+
+            var maskOffset = TextMaskOffset * GetScale();
+            dbText.Position = dbText.Position -
+                              (Vector3d.XAxis * (dbText.GetLength() / 2)) -
+                              (Vector3d.YAxis * (dbText.GetHeight() / 2));
+                
+            if (HideTextBackground)
+            {
+                mask = dbText.GetBackgroundMask(maskOffset);
+            }
         }
     }
 }

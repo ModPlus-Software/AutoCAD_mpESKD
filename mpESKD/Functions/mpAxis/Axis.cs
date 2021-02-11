@@ -17,7 +17,7 @@ namespace mpESKD.Functions.mpAxis
     /// </summary>
     [SmartEntityDisplayNameKey("h41")]
     [SystemStyleDescriptionKey("h68")]
-    public class Axis : SmartEntity, ITextValueEntity
+    public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Axis"/> class.
@@ -242,10 +242,10 @@ namespace mpESKD.Functions.mpAxis
 
         // Отступы маркеров-ориентиров
         [SaveToXData]
-        private double BottomOrientMarkerOffset { get; set; } = double.NaN;
+        public double BottomOrientMarkerOffset { get; set; } = double.NaN;
 
         [SaveToXData]
-        private double TopOrientMarkerOffset { get; set; } = double.NaN;
+        public double TopOrientMarkerOffset { get; set; } = double.NaN;
 
         //// текст и текстовые значения
 
@@ -255,75 +255,86 @@ namespace mpESKD.Functions.mpAxis
         [EntityProperty(PropertiesCategory.Content, 2, "p18", 3.5, 0.000000001, 1.0000E+99, descLocalKey: "d18", nameSymbol: "h")]
         [SaveToXData]
         public double TextHeight { get; set; } = 3.5;
+        
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 3, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
+        [SaveToXData]
+        public bool HideTextBackground { get; set; }
+
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 4, "p86", 0.5, 0.0, 5.0)]
+        [SaveToXData]
+        public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
         /// Угол поворота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "p71", 0, 0, 359)]
+        [EntityProperty(PropertiesCategory.Content, 5, "p71", 0, 0, 359)]
         [SaveToXData]
         public int TextRotationAngle { get; set; } = 0;
 
-        [EntityProperty(PropertiesCategory.Content, 4, "p20", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p20", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string FirstTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 5, "p22", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p22", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string FirstText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 6, "p21", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 8, "p21", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string FirstTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 7, "", "", propertyScope: PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 9, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(SecondText), nameof(SecondTextPrefix), nameof(SecondTextSuffix), nameof(SecondMarkerType) })]
         [SaveToXData]
         public bool SecondTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 8, "p23", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 10, "p23", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string SecondTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 9, "p25", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 11, "p25", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string SecondText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 10, "p24", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 12, "p24", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string SecondTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 11, "", "", propertyScope: PropertyScope.Hidden)]
+        [EntityProperty(PropertiesCategory.Content, 13, "", "", propertyScope: PropertyScope.Hidden)]
         [PropertyVisibilityDependency(new[] { nameof(ThirdText), nameof(ThirdTextPrefix), nameof(ThirdTextSuffix), nameof(ThirdMarkerType) })]
         [SaveToXData]
         public bool ThirdTextVisibility { get; set; }
 
-        [EntityProperty(PropertiesCategory.Content, 12, "p26", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 14, "p26", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string ThirdTextPrefix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 13, "p28", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 15, "p28", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string ThirdText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 14, "p27", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 16, "p27", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string ThirdTextSuffix { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 15, "p30", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 17, "p30", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string BottomOrientText { get; set; } = string.Empty;
 
-        [EntityProperty(PropertiesCategory.Content, 16, "p31", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 18, "p31", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string TopOrientText { get; set; } = string.Empty;
@@ -393,7 +404,9 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        /// <summary>Нижняя точка маркера ориентира</summary>
+        /// <summary>
+        /// Нижняя точка маркера ориентира
+        /// </summary>
         public Point3d BottomOrientPoint
         {
             get
@@ -415,7 +428,9 @@ namespace mpESKD.Functions.mpAxis
             }
         }
 
-        /// <summary>Верхняя точка маркера ориентации</summary>
+        /// <summary>
+        /// Верхняя точка маркера ориентации
+        /// </summary>
         public Point3d TopOrientPoint
         {
             get
@@ -445,15 +460,10 @@ namespace mpESKD.Functions.mpAxis
         private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
 
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
-        
-        private void SetPropertiesToDBText(DBText dbText)
-        {
-            dbText.SetProperties(TextStyle, TextHeight * GetScale());
-            dbText.SetPosition(TextHorizontalMode.TextCenter, null, AttachmentPoint.MiddleCenter);
-            dbText.Rotation = TextRotationAngle.DegreeToRadian();
-        }
-        
-        /// <summary>Средняя (основная) линия оси</summary>
+
+        /// <summary>
+        /// Средняя (основная) линия оси
+        /// </summary>
         private Line _mainLine;
 
         private Line _bottomOrientLine;
@@ -531,20 +541,28 @@ namespace mpESKD.Functions.mpAxis
         #region Texts
 
         private DBText _bottomFirstDBText;
+        private Wipeout _bottomFirstTextMask;
 
         private DBText _topFirstDBText;
+        private Wipeout _topFirstTextMask;
 
         private DBText _bottomSecondDBText;
+        private Wipeout _bottomSecondTextMask;
 
         private DBText _topSecondDBText;
+        private Wipeout _topSecondTextMask;
 
         private DBText _bottomThirdDBText;
+        private Wipeout _bottomThirdTextMask;
 
         private DBText _topThirdDBText;
+        private Wipeout _topThirdTextMask;
 
         private DBText _bottomOrientDBText;
+        private Wipeout _bottomOrientTextMask;
 
         private DBText _topOrientDBText;
+        private Wipeout _topOrientTextMask;
 
         #endregion
 
@@ -555,6 +573,15 @@ namespace mpESKD.Functions.mpAxis
             {
                 var entities = new List<Entity>
                 {
+                    _bottomFirstTextMask,
+                    _topFirstTextMask,
+                    _bottomSecondTextMask,
+                    _topSecondTextMask,
+                    _bottomThirdTextMask,
+                    _topThirdTextMask,
+                    _bottomOrientTextMask,
+                    _topOrientTextMask,
+
                     _bottomOrientLine,
                     _topOrientLine,
                     _bottomOrientArrow,
@@ -696,6 +723,8 @@ namespace mpESKD.Functions.mpAxis
         /// </summary>
         private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
         {
+            var textHeight = TextHeight * GetScale();
+            
             // main line
             _mainLine = new Line
             {
@@ -742,9 +771,8 @@ namespace mpESKD.Functions.mpAxis
                     !string.IsNullOrEmpty(FirstTextSuffix))
                 {
                     _bottomFirstDBText = new DBText();
-                    SetPropertiesToDBText(_bottomFirstDBText);
+                    _bottomFirstDBText.SetProperties(TextStyle, textHeight);
                     _bottomFirstDBText.Position = firstMarkerCenter;
-                    _bottomFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
 
                 // Второй кружок первого маркера
@@ -774,9 +802,8 @@ namespace mpESKD.Functions.mpAxis
                         !string.IsNullOrEmpty(SecondTextSuffix))
                     {
                         _bottomSecondDBText = new DBText();
-                        SetPropertiesToDBText(_bottomSecondDBText);
+                        _bottomSecondDBText.SetProperties(TextStyle, textHeight);
                         _bottomSecondDBText.Position = secondMarkerCenter;
-                        _bottomSecondDBText.AlignmentPoint = secondMarkerCenter;
                     }
 
                     // второй кружок второго маркера
@@ -805,9 +832,8 @@ namespace mpESKD.Functions.mpAxis
                             !string.IsNullOrEmpty(ThirdTextSuffix))
                         {
                             _bottomThirdDBText = new DBText();
-                            SetPropertiesToDBText(_bottomThirdDBText);
+                            _bottomThirdDBText.SetProperties(TextStyle, textHeight);
                             _bottomThirdDBText.Position = thirdMarkerCenter;
-                            _bottomThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
 
                         // второй кружок третьего маркера
@@ -867,9 +893,8 @@ namespace mpESKD.Functions.mpAxis
                     if (!string.IsNullOrEmpty(BottomOrientText))
                     {
                         _bottomOrientDBText = new DBText();
-                        SetPropertiesToDBText(_bottomOrientDBText);
+                        _bottomOrientDBText.SetProperties(TextStyle, textHeight);
                         _bottomOrientDBText.Position = bottomOrientMarkerCenter;
-                        _bottomOrientDBText.AlignmentPoint = bottomOrientMarkerCenter;
                     }
 
                     // type2
@@ -945,9 +970,8 @@ namespace mpESKD.Functions.mpAxis
                     !string.IsNullOrEmpty(FirstTextSuffix))
                 {
                     _topFirstDBText = new DBText();
-                    SetPropertiesToDBText(_topFirstDBText);
+                    _topFirstDBText.SetProperties(TextStyle, textHeight);
                     _topFirstDBText.Position = firstMarkerCenter;
-                    _topFirstDBText.AlignmentPoint = firstMarkerCenter;
                 }
 
                 // Второй кружок первого маркера
@@ -977,9 +1001,8 @@ namespace mpESKD.Functions.mpAxis
                         !string.IsNullOrEmpty(SecondTextSuffix))
                     {
                         _topSecondDBText = new DBText();
-                        SetPropertiesToDBText(_topSecondDBText);
+                        _topSecondDBText.SetProperties(TextStyle, textHeight);
                         _topSecondDBText.Position = secondMarkerCenter;
-                        _topSecondDBText.AlignmentPoint = secondMarkerCenter;
                     }
 
                     // второй кружок второго маркера
@@ -1008,9 +1031,8 @@ namespace mpESKD.Functions.mpAxis
                             !string.IsNullOrEmpty(ThirdTextSuffix))
                         {
                             _topThirdDBText = new DBText();
-                            SetPropertiesToDBText(_topThirdDBText);
+                            _topThirdDBText.SetProperties(TextStyle, textHeight);
                             _topThirdDBText.Position = thirdMarkerCenter;
-                            _topThirdDBText.AlignmentPoint = thirdMarkerCenter;
                         }
 
                         // второй кружок третьего маркера
@@ -1071,9 +1093,8 @@ namespace mpESKD.Functions.mpAxis
                     if (!string.IsNullOrEmpty(TopOrientText))
                     {
                         _topOrientDBText = new DBText();
-                        SetPropertiesToDBText(_topOrientDBText);
+                        _topOrientDBText.SetProperties(TextStyle, textHeight);
                         _topOrientDBText.Position = topOrientMarkerCenter;
-                        _topOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                     }
 
                     // type2
@@ -1112,47 +1133,66 @@ namespace mpESKD.Functions.mpAxis
             #endregion
         }
 
+        /// <summary>
+        /// Установка текстового значения, смещение однострочного текста из точки вставки на половину ширины влево и
+        /// половину высоты вниз (чтобы геометрический центр оказался в точке вставки), создание маскировки при
+        /// необходимости и поворот текста и маскировки при необходимости для всех созданных текстовых объектов
+        /// </summary>
         private void UpdateTextEntities()
         {
             SetFirstTextOnCreation();
-            if (_bottomFirstDBText != null)
-            {
-                _bottomFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            }
 
-            if (_bottomSecondDBText != null)
-            {
-                _bottomSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            }
+            UpdateTextEntity(
+                _bottomFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, ref _bottomFirstTextMask);
 
-            if (_bottomThirdDBText != null)
-            {
-                _bottomThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            }
+            UpdateTextEntity(
+                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, ref _bottomSecondTextMask);
 
-            if (_topFirstDBText != null)
-            {
-                _topFirstDBText.TextString = FirstTextPrefix + FirstText + FirstTextSuffix;
-            }
+            UpdateTextEntity(
+                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, ref _bottomThirdTextMask);
 
-            if (_topSecondDBText != null)
-            {
-                _topSecondDBText.TextString = SecondTextPrefix + SecondText + SecondTextSuffix;
-            }
+            UpdateTextEntity(
+                _topFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, ref _topFirstTextMask);
 
-            if (_topThirdDBText != null)
-            {
-                _topThirdDBText.TextString = ThirdTextPrefix + ThirdText + ThirdTextSuffix;
-            }
+            UpdateTextEntity(
+                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, ref _topSecondTextMask);
 
-            if (_bottomOrientDBText != null)
-            {
-                _bottomOrientDBText.TextString = BottomOrientText;
-            }
+            UpdateTextEntity(
+                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, ref _topThirdTextMask);
 
-            if (_topOrientDBText != null)
+            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, ref _bottomOrientTextMask);
+
+            UpdateTextEntity(_topOrientDBText, TopOrientText, ref _topOrientTextMask);
+        }
+
+        /// <summary>
+        /// Установка текстового значения, смещение однострочного текста из точки вставки на половину ширины влево и
+        /// половину высоты вниз (чтобы геометрический центр оказался в точке вставки), создание маскировки при
+        /// необходимости и поворот текста и маскировки при необходимости
+        /// </summary>
+        /// <param name="dbText">Изменяемый экземпляр <see cref="DBText"/></param>
+        /// <param name="textString">Текстовое значение</param>
+        /// <param name="mask">Маскировка фона</param>
+        private void UpdateTextEntity(DBText dbText, string textString, ref Wipeout mask)
+        {
+            if (dbText == null)
+                return;
+
+            var maskOffset = TextMaskOffset * GetScale();
+            var textRotation = TextRotationAngle.DegreeToRadian();
+            dbText.TextString = textString;
+            var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
+            dbText.Position = dbText.Position -
+                                          (Vector3d.XAxis * (dbText.GetLength() / 2)) -
+                                          (Vector3d.YAxis * (dbText.GetHeight() / 2));
+            if (textRotation != 0.0)
+                dbText.TransformBy(rotationMatrix);
+                
+            if (HideTextBackground)
             {
-                _topOrientDBText.TextString = TopOrientText;
+                mask = dbText.GetBackgroundMask(maskOffset);
+                if (textRotation != 0.0)
+                    mask.TransformBy(rotationMatrix);
             }
         }
 

@@ -86,6 +86,8 @@
                                     }
                                 }
                                 
+                                AcadUtils.Editor.Regen();
+                                
                                 break;
                             
                             case SearchProceedOption.Select:

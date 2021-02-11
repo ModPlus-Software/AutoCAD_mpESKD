@@ -1,18 +1,17 @@
-﻿<mps:ModPlusWindow 
-    x:Class="mpESKD.Base.Styles.StyleEditor"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-    xmlns:local="clr-namespace:mpESKD.Base.Styles"
-    xmlns:mps="https://modplus.org/winfx/xaml/controls"
-    xmlns:mpEskd="clr-namespace:mpESKD"
-    xmlns:apiConverters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
-    xmlns:enums="clr-namespace:mpESKD.Base.Enums"
-    mc:Ignorable="d" SizeToContent="WidthAndHeight" 
-    ResizeMode="CanResizeWithGrip"
-    MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
-    Closing="StyleEditor_OnClosing">
+﻿<mps:ModPlusWindow x:Class="mpESKD.Base.View.StyleEditor"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+                   xmlns:local="clr-namespace:mpESKD.Base.Styles"
+                   xmlns:mps="https://modplus.org/winfx/xaml/controls"
+                   xmlns:mpEskd="clr-namespace:mpESKD"
+                   xmlns:apiConverters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
+                   xmlns:enums="clr-namespace:mpESKD.Base.Enums"
+                   mc:Ignorable="d" SizeToContent="WidthAndHeight" 
+                   ResizeMode="CanResizeWithGrip"
+                   MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
+                   Closing="StyleEditor_OnClosing">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

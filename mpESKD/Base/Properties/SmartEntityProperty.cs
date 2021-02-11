@@ -6,6 +6,7 @@
     using Enums;
     using JetBrains.Annotations;
     using ModPlusAPI.Mvvm;
+    using View;
 
     /// <summary>
     /// Свойство интеллектуального объекта
@@ -138,7 +139,7 @@
         }
 
         /// <summary>
-        /// Подробнее смотри в описании метода <see cref="Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// Подробнее смотри в описании метода <see cref="StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public double DoubleValue
         {
@@ -157,7 +158,7 @@
         }
 
         /// <summary>
-        /// Подробнее смотри в описании метода <see cref="Styles.StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
+        /// Подробнее смотри в описании метода <see cref="StyleEditor.CreateTwoWayBindingForPropertyForNumericValue"/>
         /// </summary>
         public int IntValue
         {

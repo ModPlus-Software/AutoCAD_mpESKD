@@ -17,7 +17,7 @@ namespace mpESKD.Functions.mpLevelMark
     /// </summary>
     [SmartEntityDisplayNameKey("h105")]
     [SystemStyleDescriptionKey("h108")]
-    public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity
+    public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -34,7 +34,7 @@ namespace mpESKD.Functions.mpLevelMark
             : base(objectId)
         {
         }
-        
+
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="LevelMark"/>
         /// </summary>
@@ -172,7 +172,7 @@ namespace mpESKD.Functions.mpLevelMark
                 if (_objectLineOffset == value)
                     return;
                 _objectLineOffset = value;
-                
+
                 if (ObjectLine)
                 {
                     var horV = (EndPoint - ObjectPoint).GetNormal();
@@ -180,7 +180,7 @@ namespace mpESKD.Functions.mpLevelMark
                 }
             }
         }
-        
+
         private int _bottomShelfLength = 10;
 
         /// <summary>
@@ -259,10 +259,21 @@ namespace mpESKD.Functions.mpLevelMark
         [SaveToXData]
         public int ShelfLedge { get; set; } = 1;
 
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 2, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
+        [SaveToXData]
+        public bool HideTextBackground { get; set; }
+
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 3, "p86", 0.5, 0.0, 5.0)]
+        [SaveToXData]
+        public double TextMaskOffset { get; set; } = 0.5;
+
         /// <summary>
         /// Измеренное значение
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 2, "p65", null, isReadOnly: true, propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 4, "p65", null, isReadOnly: true, propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public double MeasuredValue { get; set; }
@@ -270,19 +281,19 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Выравнивание основного значения по горизонтали
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 3, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+        [EntityProperty(PropertiesCategory.Content, 5, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
         [SaveToXData]
         public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
 
         /// <inheritdoc />
-        [EntityProperty(PropertiesCategory.Content, 4, "p72", NumberSeparator.Dot, descLocalKey: "d72")]
+        [EntityProperty(PropertiesCategory.Content, 6, "p72", NumberSeparator.Dot, descLocalKey: "d72")]
         [SaveToXData]
         public NumberSeparator NumberSeparator { get; set; } = NumberSeparator.Dot;
 
         /// <summary>
         /// Переопределение текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 5, "p66", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 7, "p66", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string OverrideValue { get; set; } = string.Empty;
@@ -290,28 +301,28 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Показывать плюс
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p64", true, descLocalKey: "d64")]
+        [EntityProperty(PropertiesCategory.Content, 8, "p64", true, descLocalKey: "d64")]
         [SaveToXData]
         public bool ShowPlus { get; set; } = true;
-        
+
         /// <summary>
         /// Добавление звездочки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 7, "p75", false, descLocalKey: "d75")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p75", false, descLocalKey: "d75")]
         [SaveToXData]
         public bool AddAsterisk { get; set; }
 
         /// <summary>
         /// Точность
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 8, "p67", 3, 0, 5, descLocalKey: "d67")]
+        [EntityProperty(PropertiesCategory.Content, 10, "p67", 3, 0, 5, descLocalKey: "d67")]
         [SaveToXData]
         public int Accuracy { get; set; } = 3;
 
         /// <summary>
         /// Примечание
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p68", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 11, "p68", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string Note { get; set; } = string.Empty;
@@ -319,28 +330,28 @@ namespace mpESKD.Functions.mpLevelMark
         /// <summary>
         /// Выравнивание примечания по горизонтали
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 10, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
         [SaveToXData]
         public TextHorizontalAlignment NoteHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
 
         /// <summary>
         /// Высота текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+        [EntityProperty(PropertiesCategory.Content, 13, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
         [SaveToXData]
         public double MainTextHeight { get; set; } = 3.5;
 
         /// <summary>
         /// Высота малого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+        [EntityProperty(PropertiesCategory.Content, 14, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
 
         /// <summary>
         /// Масштаб измерений
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 13, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
+        [EntityProperty(PropertiesCategory.Content, 15, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
         [SaveToXData]
         public double MeasurementScale { get; set; } = 1.0;
 
@@ -368,12 +379,14 @@ namespace mpESKD.Functions.mpLevelMark
         /// Верхний (основной) текст
         /// </summary>
         private DBText _topDbText;
+        private Wipeout _topTextMask;
 
         /// <summary>
         /// Нижний (второстепенный) текст
         /// </summary>
         private DBText _bottomDbText;
-        
+        private Wipeout _bottomTextMask;
+
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -381,6 +394,9 @@ namespace mpESKD.Functions.mpLevelMark
             {
                 var entities = new List<Entity>
                 {
+                    _topTextMask,
+                    _bottomTextMask,
+
                     _bottomShelfLine,
                     _topShelfLine,
                     _verticalLine,
@@ -607,81 +623,84 @@ namespace mpESKD.Functions.mpLevelMark
                 Position = topTextPosition
             };
 
-            _bottomDbText = new DBText
+            _topDbText.SetProperties(TextStyle, mainTextHeight);
+
+            if (!string.IsNullOrEmpty(Note))
             {
-                TextString = Note,
-                Position = bottomTextPosition
-            };
-            
-            if (isLeft)
-            {
-                _topDbText.SetProperties(TextStyle, mainTextHeight);
-                _topDbText.SetPosition(TextHorizontalMode.TextRight, attachmentPoint: AttachmentPoint.BaseRight);
-                _topDbText.AlignmentPoint = topTextPosition;
+                _bottomDbText = new DBText
+                {
+                    TextString = Note,
+                    Position = bottomTextPosition
+                };
 
                 _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-                _bottomDbText.SetPosition(TextHorizontalMode.TextRight, TextVerticalMode.TextBottom, AttachmentPoint.TopRight);
-                _bottomDbText.AlignmentPoint = bottomTextPosition;
+                
+                if (isTop)
+                    _bottomDbText.Position -= verV * _bottomDbText.GetHeight();
+                else
+                    _bottomDbText.Position += verV * _bottomDbText.GetHeight();
             }
-            else
+
+            if (isLeft)
             {
-                _topDbText.SetProperties(TextStyle, mainTextHeight);
-                _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-                _bottomDbText.SetPosition(TextHorizontalMode.TextLeft, TextVerticalMode.TextBottom, AttachmentPoint.TopLeft);
-                _bottomDbText.AlignmentPoint = bottomTextPosition;
+                _topDbText.Position += horV * _topDbText.GetLength();
+
+                if (_bottomDbText != null)
+                    _bottomDbText.Position += horV * _bottomDbText.GetLength();
             }
-            
+
             // верхний текст всегда имеет содержимое
             var topTextLength = _topDbText.GetLength();
-            AcadUtils.WriteMessageInDebug($"Top Text Length: {topTextLength}");
-            var bottomTextLength = !string.IsNullOrEmpty(Note)
-                ? _bottomDbText.GetLength()
-                : double.NaN;
+
+            var bottomTextLength = _bottomDbText != null ? _bottomDbText.GetLength() : double.NaN;
 
             var maxTextWidth = double.IsNaN(bottomTextLength)
                 ? topTextLength
                 : Math.Max(topTextLength, bottomTextLength);
-            AcadUtils.WriteMessageInDebug($"Max text width: {maxTextWidth}");
+
             var topShelfLength = textIndent + maxTextWidth + (ShelfLedge * scale);
 
             // если нижнего текста нет, то и выравнивать ничего не нужно
-            if (!double.IsNaN(bottomTextLength))
+            if (_bottomDbText != null)
             {
+                AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
+                AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
+                
                 var diff = Math.Abs(topTextLength - bottomTextLength);
+                AcadUtils.WriteMessageInDebug($"Diff: {diff}");
                 if (topTextLength > bottomTextLength)
                 {
                     if (NoteHorizontalAlignment == TextHorizontalAlignment.Center)
                     {
-                        var pt = _bottomDbText.Position + (diff / 2 * horV);
-                        _bottomDbText.Position = pt;
-                        _bottomDbText.AlignmentPoint = pt;
+                        _bottomDbText.Position += diff / 2 * horV;
                     }
                     else if ((isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Left) ||
                              (!isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Right))
                     {
-                        var pt = _bottomDbText.Position + (diff * horV);
-                        _bottomDbText.Position = pt;
-                        _bottomDbText.AlignmentPoint = pt;
+                        _bottomDbText.Position += diff * horV;
                     }
                 }
                 else
                 {
                     if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
                     {
-                        var pt = _topDbText.Position + (diff / 2 * horV);
-                        _topDbText.Position = pt;
-                        if (isLeft)
-                            _topDbText.AlignmentPoint = pt;
+                        AcadUtils.WriteMessageInDebug($"Diff if center: {diff}");
+                        _topDbText.Position += diff / 2 * horV;
                     }
                     else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left) ||
                              (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right))
                     {
-                        var pt = _topDbText.Position + (diff * horV);
-                        _topDbText.Position = pt;
-                        if (isLeft)
-                            _topDbText.AlignmentPoint = pt;
+                        _topDbText.Position += diff * horV;
                     }
                 }
+            }
+
+            if (HideTextBackground)
+            {
+                var maskOffset = TextMaskOffset * scale;
+                _topTextMask = _topDbText.GetBackgroundMask(maskOffset);
+                if (_bottomDbText != null)
+                    _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset);
             }
 
             _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));

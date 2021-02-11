@@ -78,6 +78,10 @@
     <AssemblyName>$(AssemblyName)_$(Description)</AssemblyName>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <OutputPath>E:\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
+  </PropertyGroup>
+
   <Choose>
     <When Condition="'$(Configuration)'=='A2013'">
       <ItemGroup>

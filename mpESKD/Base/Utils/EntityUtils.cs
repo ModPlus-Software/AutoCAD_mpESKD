@@ -11,6 +11,7 @@
     using ModPlusAPI.Windows;
     using Overrules;
     using Overrules.Grips;
+    using View;
 
     /// <summary>
     /// Утилиты для объектов
@@ -65,8 +66,12 @@
                 if (AcadUtils.Document == null)
                     return;
 
-                if ((dbObject != null && dbObject.IsNewObject & dbObject.Database == AcadUtils.Database) ||
-                    (dbObject != null && dbObject.IsUndoing & dbObject.IsModifiedXData))
+                if (dbObject == null)
+                    return;
+
+                if ((dbObject.IsNewObject && dbObject.Database == AcadUtils.Database) ||
+                    (dbObject.IsUndoing && dbObject.IsModifiedXData) ||
+                    (dbObject.IsModified && AcadUtils.Database.TransactionManager.TopTransaction == null))
                 {
                     var entity = smartEntity.Invoke();
                     if (entity == null)
@@ -112,6 +117,7 @@
         /// </summary>
         /// <param name="blockReference">Блок, представляющий интеллектуальный объект</param>
         /// <param name="getEditor">Метод получения редактора свойств для интеллектуального объекта</param>
+        [Obsolete]
         public static void DoubleClickEdit(
             BlockReference blockReference,
             Func<SmartEntity, Window> getEditor)
@@ -141,6 +147,47 @@
                 }
 
                 intellectualEntity.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Редактирование свойств для интеллектуального объекта в специальном окне. Применяется для интеллектуальных
+        /// объектов, содержащих текстовые значения
+        /// </summary>
+        /// <param name="blockReference">Блок, представляющий интеллектуальный объект</param>
+        public static void DoubleClickEdit(BlockReference blockReference)
+        {
+            BeditCommandWatcher.UseBedit = false;
+
+            var smartEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
+            if (smartEntity is IWithDoubleClickEditor entityWithEditor)
+            {
+                smartEntity.UpdateEntities();
+                var saveBack = false;
+
+                var entityType = entityWithEditor.GetType();
+                var control = TypeFactory.Instance.GetClickEditControl(entityType);
+                control.Initialize(entityWithEditor);
+                var sectionValueEditor = new DoubleClickEditor(
+                    TypeFactory.Instance.GetDescriptor(entityType).LName,
+                    control);
+
+                if (sectionValueEditor.ShowDialog() == true)
+                {
+                    saveBack = true;
+                }
+
+                if (saveBack)
+                {
+                    smartEntity.UpdateEntities();
+                    smartEntity.BlockRecord.UpdateAnonymousBlocks();
+                    using (var resBuf = smartEntity.GetDataForXData())
+                    {
+                        blockReference.XData = resBuf;
+                    }
+                }
+
+                smartEntity.Dispose();
             }
         }
 
@@ -354,6 +401,53 @@
         public static double GetLength(this DBText dbText)
         {
             return Math.Abs(dbText.GeometricExtents.MaxPoint.X - dbText.GeometricExtents.MinPoint.X);
+        }
+
+        /// <summary>
+        /// Возвращает геометрическую высоту однострочного текста
+        /// </summary>
+        /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
+        public static double GetHeight(this DBText dbText)
+        {
+            return Math.Abs(dbText.GeometricExtents.MaxPoint.Y - dbText.GeometricExtents.MinPoint.Y);
+        }
+
+        /// <summary>
+        /// Возвращает маскировку, созданную по контуру текста с указанным отступом
+        /// </summary>
+        /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
+        /// <param name="offset">Отступ</param>
+        public static Wipeout GetBackgroundMask(this DBText dbText, double offset)
+        {
+            if (dbText == null)
+                return null;
+
+            try
+            {
+                var minPoint = dbText.GeometricExtents.MinPoint;
+                var maxPoint = dbText.GeometricExtents.MaxPoint;
+                var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
+                var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
+                var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
+                var bottomRightPoint = new Point2d(maxPoint.X + offset, minPoint.Y - offset);
+
+                var wipeout = new Wipeout();
+                wipeout.SetFrom(
+                    new Point2dCollection
+                    {
+                        bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
+                    }, Vector3d.ZAxis);
+                return wipeout;
+            }
+            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            {
+                if (ex.Message == "eNullExtents")
+                {
+                    return null;
+                }
+                
+                throw;
+            }
         }
     }
 }
