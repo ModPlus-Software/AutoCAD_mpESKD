@@ -410,12 +410,12 @@
             var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
 
             _topStroke = new Polyline(2);
-            _topStroke.AddVertexAt(0, topStrokeEndPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _topStroke.AddVertexAt(1, insertionPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
             _bottomStroke = new Polyline(2);
-            _bottomStroke.AddVertexAt(0, endPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ConvertPoint3dToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _bottomStroke.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
             var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
@@ -442,14 +442,14 @@
             // shelf arrows
             var topShelfArrowStartPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale);
             _topShelfArrow = new Polyline(2);
-            _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+            _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+            _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ToPoint2d(), 0.0, 0.0, 0.0);
 
             var bottomShelfArrowStartPoint =
                 bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale);
             _bottomShelfArrow = new Polyline(2);
-            _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+            _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+            _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ToPoint2d(), 0.0, 0.0, 0.0);
 
             // text
             var textContentsForTopText = GetTextContents(true);
@@ -549,12 +549,12 @@
                     var middleStrokePolyline = new Polyline(3);
                     middleStrokePolyline.AddVertexAt(
                         0,
-                        (currentPoint + ((previousPoint - currentPoint).GetNormal() * middleStrokeLength)).ConvertPoint3dToPoint2d(),
+                        (currentPoint + ((previousPoint - currentPoint).GetNormal() * middleStrokeLength)).ToPoint2d(),
                         0, strokesWidth, strokesWidth);
-                    middleStrokePolyline.AddVertexAt(1, currentPoint.ConvertPoint3dToPoint2d(), 0, strokesWidth, strokesWidth);
+                    middleStrokePolyline.AddVertexAt(1, currentPoint.ToPoint2d(), 0, strokesWidth, strokesWidth);
                     middleStrokePolyline.AddVertexAt(
                         2,
-                        (currentPoint + ((nextPoint - currentPoint).GetNormal() * middleStrokeLength)).ConvertPoint3dToPoint2d(),
+                        (currentPoint + ((nextPoint - currentPoint).GetNormal() * middleStrokeLength)).ToPoint2d(),
                         0, strokesWidth, strokesWidth);
 
                     _middleStrokes.Add(middleStrokePolyline);

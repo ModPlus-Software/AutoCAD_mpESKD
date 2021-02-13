@@ -142,6 +142,8 @@
   <ItemGroup>
     <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
     <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
+    <None Remove="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
+    <None Remove="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -178,6 +180,8 @@
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
     <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
     <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
+    <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
+    <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
@@ -200,6 +204,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
@@ -212,6 +219,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

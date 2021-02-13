@@ -320,9 +320,9 @@ namespace mpESKD.Functions.mpGroundLine
             // ReSharper disable once UseObjectOrCollectionInitializer
             var points = new Point2dCollection();
 
-            points.Add(insertionPoint.ConvertPoint3dToPoint2d());
-            middlePoints.ForEach(p => points.Add(p.ConvertPoint3dToPoint2d()));
-            points.Add(endPoint.ConvertPoint3dToPoint2d());
+            points.Add(insertionPoint.ToPoint2d());
+            middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
+            points.Add(endPoint.ToPoint2d());
 
             return points;
         }

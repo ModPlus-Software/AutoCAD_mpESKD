@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpNodalLeader
+﻿namespace mpESKD.Functions.mpSecantNodalLeader
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -17,29 +17,29 @@
     using Overrules;
 
     /// <inheritdoc/>
-    public class NodalLeaderFunction : ISmartEntityFunction
+    public class SecantNodalLeaderFunction : ISmartEntityFunction
     {
         /// <inheritdoc/>
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderObjectOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc/>
         public void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderObjectOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderObjectOverrule.Instance());
         }
 
         /// <inheritdoc/>
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(NodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -49,13 +49,13 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(SecantNodalLeader.GetDescriptor().Name);
                 var lastNodeNumber = FindLastNodeNumber();
-                var nodalLeader = new NodalLeader(lastNodeNumber);
+                var nodalLeader = new SecantNodalLeader(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(nodalLeader);
                 nodalLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-                InsertNodalLeaderWithJig(nodalLeader, blockReference);
+                InsertSecantNodalLeaderWithJig(nodalLeader, blockReference);
             }
             catch (Exception exception)
             {
@@ -66,20 +66,20 @@
                 Overrule.Overruling = true;
             }
         }
-
+        
         /// <summary>
-        /// Команда создания узловой выноски
+        /// Команда создания секущей узловой выноски
         /// </summary>
-        [CommandMethod("ModPlus", "mpNodalLeader", CommandFlags.Modal)]
-        public void CreateNodalLeaderCommand()
+        [CommandMethod("ModPlus", "mpSecantNodalLeader", CommandFlags.Modal)]
+        public void CreateSecantNodalLeaderCommand()
         {
-            CreateNodalLeader();
+            CreateSecantNodalLeader();
         }
-
-        private static void CreateNodalLeader()
+        
+        private static void CreateSecantNodalLeader()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(NodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -89,15 +89,15 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor().Name);
-                var style = StyleManager.GetCurrentStyle(typeof(NodalLeader));
+                ExtendedDataUtils.AddRegAppTableRecord(SecantNodalLeader.GetDescriptor().Name);
+                var style = StyleManager.GetCurrentStyle(typeof(SecantNodalLeader));
                 var lastNodeNumber = FindLastNodeNumber();
-                var nodalLeader = new NodalLeader(lastNodeNumber);
+                var nodalLeader = new SecantNodalLeader(lastNodeNumber);
 
                 var blockReference = MainFunction.CreateBlock(nodalLeader);
                 nodalLeader.ApplyStyle(style, true);
 
-                InsertNodalLeaderWithJig(nodalLeader, blockReference);
+                InsertSecantNodalLeaderWithJig(nodalLeader, blockReference);
             }
             catch (Exception exception)
             {
@@ -108,43 +108,31 @@
                 Overrule.Overruling = true;
             }
         }
-
-        private static void InsertNodalLeaderWithJig(NodalLeader nodalLeader, BlockReference blockReference)
+        
+        private static void InsertSecantNodalLeaderWithJig(SecantNodalLeader secantNodalLeader, BlockReference blockReference)
         {
             // <msg1>Укажите точку вставки:</msg1>
             var insertionPointPrompt = Language.GetItem("msg1");
 
-            // <msg17>Укажите точку рамки:</msg17>
-            var framePointPrompt = Language.GetItem("msg17");
-
             // <msg18>Укажите точку выноски:</msg18>
             var leaderPointPrompt = Language.GetItem("msg18");
             
-            var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0))
+            var entityJig = new DefaultEntityJig(secantNodalLeader, blockReference, new Point3d(0, 0, 0))
             {
                 PromptForInsertionPoint = insertionPointPrompt
             };
             
-            nodalLeader.JigState = NodalLeaderJigState.InsertionPoint;
+            secantNodalLeader.JigState = SecantNodalLeaderJigState.InsertionPoint;
             do
             {
                 var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
-                    if (nodalLeader.JigState == NodalLeaderJigState.InsertionPoint)
+                    if (secantNodalLeader.JigState == SecantNodalLeaderJigState.InsertionPoint)
                     {
-                        nodalLeader.JigState = NodalLeaderJigState.FramePoint;
-                        entityJig.PromptForNextPoint = framePointPrompt;
-                        entityJig.PreviousPoint = nodalLeader.InsertionPoint;
-                    }
-                    else if (nodalLeader.JigState == NodalLeaderJigState.FramePoint)
-                    {
-                        nodalLeader.JigState = NodalLeaderJigState.LeaderPoint;
+                        secantNodalLeader.JigState = SecantNodalLeaderJigState.LeaderPoint;
                         entityJig.PromptForNextPoint = leaderPointPrompt;
-                        nodalLeader.FramePoint = nodalLeader.EndPoint;
-                        
-                        // Тут не нужна привязка к предыдущей точке
-                        entityJig.PreviousPoint = nodalLeader.InsertionPoint;
+                        entityJig.PreviousPoint = secantNodalLeader.InsertionPoint;
                     }
                     else
                     {
@@ -171,12 +159,12 @@
             }
             while (true);
             
-            if (!nodalLeader.BlockId.IsErased)
+            if (!secantNodalLeader.BlockId.IsErased)
             {
                 using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
-                    var ent = tr.GetObject(nodalLeader.BlockId, OpenMode.ForWrite, true, true);
-                    ent.XData = nodalLeader.GetDataForXData();
+                    var ent = tr.GetObject(secantNodalLeader.BlockId, OpenMode.ForWrite, true, true);
+                    ent.XData = secantNodalLeader.GetDataForXData();
                     tr.Commit();
                 }
             }
@@ -191,7 +179,7 @@
                 return string.Empty;
 
             var allValues = new List<string>();
-            AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<NodalLeader>(typeof(NodalLeader)).ForEach(a =>
+            AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<SecantNodalLeader>(typeof(SecantNodalLeader)).ForEach(a =>
             {
                 allValues.Add(a.NodeNumber);
             });

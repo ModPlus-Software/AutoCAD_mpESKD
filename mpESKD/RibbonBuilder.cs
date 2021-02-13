@@ -12,6 +12,7 @@
     using Functions.mpGroundLine;
     using Functions.mpLevelMark;
     using Functions.mpNodalLeader;
+    using Functions.mpSecantNodalLeader;
     using Functions.mpWaterProofing;
     using ModPlus.Helpers;
     using ModPlusAPI;
@@ -204,6 +205,13 @@
             
             // mpNodalLeader
             var ribbonButton = GetBigButton(NodalLeader.GetDescriptor());
+            if (ribbonButton != null)
+            {
+                ribRowPanel.Items.Add(ribbonButton);
+            }
+            
+            // mpSecantNodalLeader
+            ribbonButton = GetSmallButton(SecantNodalLeader.GetDescriptor());
             if (ribbonButton != null)
             {
                 ribRowPanel.Items.Add(ribbonButton);
@@ -416,6 +424,22 @@
                 GetBigIconForFunction(descriptor.Name, descriptor.Name),
                 descriptor.Description,
                 orientation,
+                descriptor.FullDescription,
+                GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
+                "help/mpeskd");
+        }
+        
+        /// <summary>
+        /// Получить маленькую кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        private static RibbonButton GetSmallButton(IIntellectualEntityDescriptor descriptor)
+        {
+            return RibbonHelpers.AddSmallButton(
+                descriptor.Name,
+                descriptor.LName,
+                GetSmallIconForFunction(descriptor.Name, descriptor.Name),
+                descriptor.Description,
                 descriptor.FullDescription,
                 GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
                 "help/mpeskd");

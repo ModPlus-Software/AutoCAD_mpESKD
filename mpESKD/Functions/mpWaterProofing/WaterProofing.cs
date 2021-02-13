@@ -364,9 +364,9 @@ namespace mpESKD.Functions.mpWaterProofing
                         }
 
                         var stroke = new Polyline(2);
-                        stroke.AddVertexAt(0, firstStrokePoint.ConvertPoint3dToPoint2d(), 0.0, lineThickness,
+                        stroke.AddVertexAt(0, firstStrokePoint.ToPoint2d(), 0.0, lineThickness,
                             lineThickness);
-                        stroke.AddVertexAt(1, secondStrokePoint.ConvertPoint3dToPoint2d(), 0.0, lineThickness,
+                        stroke.AddVertexAt(1, secondStrokePoint.ToPoint2d(), 0.0, lineThickness,
                             lineThickness);
 
                         SetImmutablePropertiesToNestedEntity(stroke);
@@ -396,9 +396,9 @@ namespace mpESKD.Functions.mpWaterProofing
             // ReSharper disable once UseObjectOrCollectionInitializer
             var points = new Point2dCollection();
 
-            points.Add(insertionPoint.ConvertPoint3dToPoint2d());
-            middlePoints.ForEach(p => points.Add(p.ConvertPoint3dToPoint2d()));
-            points.Add(endPoint.ConvertPoint3dToPoint2d());
+            points.Add(insertionPoint.ToPoint2d());
+            middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
+            points.Add(endPoint.ToPoint2d());
 
             return points;
         }

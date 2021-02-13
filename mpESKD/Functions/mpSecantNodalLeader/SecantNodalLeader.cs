@@ -1,5 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
-namespace mpESKD.Functions.mpNodalLeader
+﻿namespace mpESKD.Functions.mpSecantNodalLeader
 {
     using System;
     using System.Collections.Generic;
@@ -13,11 +12,11 @@ namespace mpESKD.Functions.mpNodalLeader
     using ModPlusAPI.Windows;
 
     /// <summary>
-    /// Узловая выноска
+    /// Секущая узловая выноска
     /// </summary>
-    [SmartEntityDisplayNameKey("h126")]
-    [SystemStyleDescriptionKey("h130")]
-    public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
+    [SmartEntityDisplayNameKey("h133")]
+    [SystemStyleDescriptionKey("h138")]
+    public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         private readonly string _lastNodeNumber;
         private string _cachedNodeNumber;
@@ -25,14 +24,9 @@ namespace mpESKD.Functions.mpNodalLeader
         #region Entities
 
         /// <summary>
-        /// Рамка узла при типе "Прямоугольная"
+        /// Секущая часть
         /// </summary>
-        private Polyline _framePolyline;
-
-        /// <summary>
-        /// Рамка узла при типе "Круглая"
-        /// </summary>
-        private Circle _frameCircle;
+        private Polyline _secantPolyline;
 
         /// <summary>
         /// Линия выноски
@@ -77,48 +71,37 @@ namespace mpESKD.Functions.mpNodalLeader
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLeader"/> class.
+        /// Initializes a new instance of the <see cref="SecantNodalLeader"/> class.
         /// </summary>
-        public NodalLeader()
+        public SecantNodalLeader()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLeader"/> class.
+        /// Initializes a new instance of the <see cref="SecantNodalLeader"/> class.
         /// </summary>
         /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        public NodalLeader(ObjectId objectId)
+        public SecantNodalLeader(ObjectId objectId)
             : base(objectId)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLeader"/> class.
+        /// Initializes a new instance of the <see cref="SecantNodalLeader"/> class.
         /// </summary>
         /// <param name="lastNodeNumber">Номер узла последней созданной узловой выноски</param>
-        public NodalLeader(string lastNodeNumber)
+        public SecantNodalLeader(string lastNodeNumber)
         {
             _lastNodeNumber = lastNodeNumber;
         }
 
         /// <summary>
-        /// Точка рамки
+        /// Состояние Jig при создании секущей узловой выноски
         /// </summary>
-        [SaveToXData]
-        public Point3d FramePoint { get; set; }
-
-        /// <summary>
-        /// Точка рамки в внутренней системе координат блока
-        /// </summary>
-        private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
-
-        /// <summary>
-        /// Состояние Jig при создании узловой выноски
-        /// </summary>
-        public NodalLeaderJigState? JigState { get; set; }
+        public SecantNodalLeaderJigState? JigState { get; set; }
 
         /// <inheritdoc/>
-        public override double MinDistanceBetweenPoints => 5;
+        public override double MinDistanceBetweenPoints => SecantLength + 1;
 
         /// <inheritdoc/>
         public override IEnumerable<Entity> Entities
@@ -131,8 +114,7 @@ namespace mpESKD.Functions.mpNodalLeader
                     _topSecondTextMask,
                     _bottomTextMask,
 
-                    _framePolyline,
-                    _frameCircle,
+                    _secantPolyline,
                     _leaderLine,
                     _shelfLine,
                     _topFirstDbText,
@@ -158,18 +140,18 @@ namespace mpESKD.Functions.mpNodalLeader
         public override double LineTypeScale { get; set; }
 
         /// <summary>
-        /// Тип рамки
+        /// Толщина секущего элемента
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Round)]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p87", 1.0, 0.1, 3.0, nameSymbol: "t")]
         [SaveToXData]
-        public FrameType FrameType { get; set; } = FrameType.Round;
+        public double SecantThickness { get; set; } = 1.0;
 
         /// <summary>
-        /// Радиус скругления углов прямоугольной рамки
+        /// Длина секущего элемента
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p83", 2, 1, 10, descLocalKey: "d83", nameSymbol: "r")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p88", 10, 5, 20, nameSymbol: "s")]
         [SaveToXData]
-        public int CornerRadius { get; set; } = 2;
+        public int SecantLength { get; set; } = 10;
 
         /// <summary>
         /// Отступ текста
@@ -259,20 +241,19 @@ namespace mpESKD.Functions.mpNodalLeader
         [SaveToXData]
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
-        
+
         /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="NodalLeader"/>
+        /// Возвращает локализованное описание для типа <see cref="SecantNodalLeader"/>
         /// </summary>
         public static IIntellectualEntityDescriptor GetDescriptor()
         {
-            return TypeFactory.Instance.GetDescriptor(typeof(NodalLeader));
+            return TypeFactory.Instance.GetDescriptor(typeof(SecantNodalLeader));
         }
 
         /// <inheritdoc/>
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return FramePoint;
             yield return EndPoint;
         }
 
@@ -284,42 +265,31 @@ namespace mpESKD.Functions.mpNodalLeader
                 var scale = GetScale();
 
                 //// Задание первой точки (точки вставки). Она же точка начала отсчета
-                if (JigState == NodalLeaderJigState.InsertionPoint)
+                if (JigState == SecantNodalLeaderJigState.InsertionPoint)
                 {
-                    var tempFramePoint = new Point3d(
-                        InsertionPointOCS.X + (5 * scale),
-                        InsertionPointOCS.Y + (5 * scale),
+                    var tempEndPoint = new Point3d(
+                        InsertionPointOCS.X,
+                        InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
                         InsertionPointOCS.Z);
-                    
-                    CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
+
+                    CreateEntities(InsertionPointOCS, tempEndPoint, scale);
                 }
-                //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
-                //// будет перемещена в FramePoint
-                else if (JigState == NodalLeaderJigState.FramePoint)
+                //// Указание точки выноски
+                else
                 {
-                    // Так как FramePoint тут еще не задана, то свойства FrameWidth и FrameHeight нужно высчитывать из EndPoint
-                    var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
-                    var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
-                    
-                    if (FrameType == FrameType.Rectangular &&
-                        (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
+                    // Если конечная точка на расстоянии, менее допустимого
+                    if (EndPointOCS.DistanceTo(InsertionPointOCS) < MinDistanceBetweenPoints * scale)
                     {
-                        var tempFramePoint = new Point3d(
-                            InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
-                            InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
-                            InsertionPointOCS.Z);
-                        
-                        CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
+                        var v = (EndPointOCS - InsertionPointOCS).GetNormal();
+                        var tempEndPoint = InsertionPointOCS + (MinDistanceBetweenPoints * scale * v);
+
+                        CreateEntities(InsertionPointOCS, tempEndPoint, scale);
                     }
                     else
                     {
-                        CreateEntities(InsertionPointOCS, EndPointOCS, Point3d.Origin, scale, false);
+                        // Прочие случаи
+                        CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                     }
-                }
-                //// Прочие случаи (включая указание точки выноски)
-                else
-                {
-                    CreateEntities(InsertionPointOCS, FramePointOCS, EndPointOCS, scale, true);
                 }
             }
             catch (Exception exception)
@@ -330,102 +300,23 @@ namespace mpESKD.Functions.mpNodalLeader
 
         private void CreateEntities(
             Point3d insertionPoint,
-            Point3d framePoint,
             Point3d leaderPoint,
-            double scale,
-            bool drawLeader)
+            double scale)
         {
-            if (FrameType == FrameType.Round)
-            {
-                _framePolyline = null;
+            var secantThickness = SecantThickness * scale;
+            var secantLength = SecantLength * scale;
+            var v = (leaderPoint - insertionPoint).GetNormal();
 
-                try
-                {
-                    var radius = framePoint.DistanceTo(insertionPoint);
-                    if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-                        radius = 5 * scale;
+            var secantEnd = insertionPoint + (v * secantLength);
+            _secantPolyline = new Polyline(2);
+            _secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, secantThickness, secantThickness);
+            _secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, secantThickness, secantThickness);
 
-                    _frameCircle = new Circle
-                    {
-                        Center = insertionPoint,
-                        Radius = radius
-                    };
+            if (secantEnd.DistanceTo(leaderPoint) > 0.0)
+                _leaderLine = new Line(secantEnd, leaderPoint);
 
-                    if (!drawLeader)
-                        return;
-
-                    var leaderLine = new Line(insertionPoint, leaderPoint);
-                    var pts = new Point3dCollection();
-                    _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                    _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-                }
-                catch
-                {
-                    _frameCircle = null;
-                }
-            }
-            else
-            {
-                _frameCircle = null;
-
-                var width = Math.Abs(framePoint.X - insertionPoint.X);
-                var height = Math.Abs(framePoint.Y - insertionPoint.Y);
-                var cornerRadius = CornerRadius * scale;
-
-                if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
-                    ((height * 2) - (cornerRadius * 2)) < (1 * scale))
-                {
-                    var minSize = Math.Min(width * 2, height * 2);
-                    cornerRadius = (int)((minSize - (1 * scale)) / 2);
-                }
-
-                var points = new[]
-                {
-                    new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y - height),
-                    new Point2d(insertionPoint.X - width, insertionPoint.Y - height + cornerRadius),
-                    new Point2d(insertionPoint.X - width, insertionPoint.Y + height - cornerRadius),
-                    new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y + height),
-                    new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y + height),
-                    new Point2d(insertionPoint.X + width, insertionPoint.Y + height - cornerRadius),
-                    new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
-                    new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
-                };
-
-                var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-                var bulges = new[]
-                {
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0
-                };
-
-                _framePolyline = new Polyline(points.Length);
-
-                for (var i = 0; i < points.Length; i++)
-                {
-                    _framePolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
-                }
-
-                _framePolyline.Closed = true;
-
-                if (!drawLeader)
-                    return;
-
-                var leaderLine = new Line(insertionPoint, leaderPoint);
-                var pts = new Point3dCollection();
-                _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-            }
-
-            // Если drawLeader == false, то дальше код не выполнится
+            //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
             
-            //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
-
             SetNodeNumberOnCreation();
 
             var mainTextHeight = MainTextHeight * scale;

@@ -10,7 +10,8 @@
                    xmlns:enums="clr-namespace:mpESKD.Base.Enums"
                    mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                    ResizeMode="CanResizeWithGrip"
-                   MinHeight="410" MinWidth="580" Closed="StyleEditor_OnClosed"
+                   MinHeight="410" MinWidth="580"
+                   Closed="StyleEditor_OnClosed"
                    Closing="StyleEditor_OnClosing">
     <Window.Resources>
         <ResourceDictionary>
@@ -25,6 +26,7 @@
                 <ResourceDictionary Source="Images/LevelMark.xaml"/>
                 <ResourceDictionary Source="Images/WaterProofing.xaml"/>
                 <ResourceDictionary Source="Images/NodalLeader.xaml"/>
+                <ResourceDictionary Source="Images/SecantNodalLeader.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -107,22 +109,24 @@
                 </Grid>
 
                 <!--Styles-->
-                <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50" SelectedItemChanged="TvStyles_OnSelectedItemChanged"
+                <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50"
+                          SelectedItemChanged="TvStyles_OnSelectedItemChanged"
                           MouseDoubleClick="TvStyles_OnMouseDoubleClick"
-                          Name="TvStyles" ItemsSource="{Binding Path=Styles}">
+                          Name="TvStyles"
+                          ItemsSource="{Binding Path=Styles}">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=Styles}" DataType="local:EntityStyles">
                             <StackPanel Orientation="Horizontal">
                                 <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
                                     <Rectangle.OpacityMask>
-                                        <VisualBrush Visual="{StaticResource Folder}" Stretch="Uniform"></VisualBrush>
+                                        <VisualBrush Visual="{StaticResource Folder}" Stretch="Uniform"/>
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <TextBlock Text="{Binding Path=DisplayName}" Margin="5,0,0,0"></TextBlock>
+                                <TextBlock Text="{Binding Path=DisplayName}" Margin="5,0,0,0"/>
                             </StackPanel>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate DataType="local:SmartEntityStyle">
-                                    <TextBlock Text="{Binding Path=Name}" FontWeight="{Binding Path=FontWeight}" ></TextBlock>
+                                    <TextBlock Text="{Binding Path=Name}" FontWeight="{Binding Path=FontWeight}"/>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
                         </HierarchicalDataTemplate>
@@ -389,6 +393,18 @@
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h131}"
                                           IsChecked="{Binding Path=NodalLeaderContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h132}"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
+
+                    <!-- Secant Nodal Leader -->
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h133}">
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h136}"
+                                          IsChecked="{Binding Path=SecantNodalLeaderContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h137}"/>
                             </StackPanel>
                         </Border>
                     </TabItem>

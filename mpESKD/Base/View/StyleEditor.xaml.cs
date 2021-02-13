@@ -2,6 +2,7 @@
 namespace mpESKD.Base.View
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
@@ -49,6 +50,7 @@ namespace mpESKD.Base.View
             try
             {
                 _styles = new ObservableCollection<EntityStyles>();
+                var styles = new List<EntityStyles>();
                 TypeFactory.Instance.GetEntityTypes().ForEach(entityType =>
                 {
                     var currentStyleGuidForEntity = StyleManager.GetCurrentStyleGuidForEntity(entityType);
@@ -62,9 +64,16 @@ namespace mpESKD.Base.View
 
                         entityStyles.Styles.Add(style);
                     });
-                    _styles.Add(entityStyles);
+                    styles.Add(entityStyles);
                 });
+                
+                foreach (var entityStyles in styles.OrderBy(s => s.DisplayName))
+                {
+                    _styles.Add(entityStyles);
+                }
+                
                 TvStyles.ItemsSource = _styles;
+                
                 if (_styles.Any())
                 {
                     BtCreateStyleFromEntity.IsEnabled = true;

@@ -216,7 +216,7 @@ namespace mpESKD.Functions.mpBreakLine
                 }
 
                 // Первая точка, соответствующая ручке
-                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
+                pts.Add(insertionPoint.ToPoint2d());
                 bulges.Add(0.0);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - (BreakWidth / 2.0 * scale)));
                 bulges.Add(0.0);
@@ -253,7 +253,7 @@ namespace mpESKD.Functions.mpBreakLine
                 }
 
                 // Первая точка, соответствующая ручке
-                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
+                pts.Add(insertionPoint.ToPoint2d());
                 bulges.Add(length / 10 / length / 2 * 4);
 
                 // Средняя точка
@@ -276,7 +276,7 @@ namespace mpESKD.Functions.mpBreakLine
             if (BreakLineType == BreakLineType.Cylindrical)
             {
                 // first
-                pts.Add(insertionPoint.ConvertPoint3dToPoint2d());
+                pts.Add(insertionPoint.ToPoint2d());
                 bulges.Add(-0.392699081698724);
                 pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
                     insertionPoint,

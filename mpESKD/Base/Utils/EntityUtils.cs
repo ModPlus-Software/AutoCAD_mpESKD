@@ -449,5 +449,44 @@
                 throw;
             }
         }
+        
+        /// <summary>
+        /// Возвращает номер узла в зависимости от номера узла последнего созданного объекта
+        /// </summary>
+        /// <param name="lastNodeNumber">Номер узла последнего созданного объекта</param>
+        /// <param name="cachedNodeNumber">Кэш номера узла для корректного обновления объекта</param>
+        public static string GetNodeNumberByLastNodeNumber(string lastNodeNumber, ref string cachedNodeNumber)
+        {
+            var number = "1";
+
+            if (!string.IsNullOrEmpty(lastNodeNumber))
+            {
+                if (int.TryParse(lastNodeNumber, out var i))
+                {
+                    cachedNodeNumber = (i + 1).ToString();
+                }
+                else if (Invariables.AxisRusAlphabet.Contains(lastNodeNumber))
+                {
+                    var index = Invariables.AxisRusAlphabet.IndexOf(lastNodeNumber);
+                    cachedNodeNumber = index == Invariables.AxisRusAlphabet.Count - 1
+                        ? Invariables.AxisRusAlphabet[0]
+                        : Invariables.AxisRusAlphabet[index + 1];
+                }
+                else if (Invariables.AxisEngAlphabet.Contains(lastNodeNumber))
+                {
+                    var index = Invariables.AxisEngAlphabet.IndexOf(lastNodeNumber);
+                    cachedNodeNumber = index == Invariables.AxisEngAlphabet.Count - 1
+                        ? Invariables.AxisEngAlphabet[0]
+                        : Invariables.AxisEngAlphabet[index + 1];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(cachedNodeNumber))
+            {
+                number = cachedNodeNumber;
+            }
+
+            return number;
+        }
     }
 }

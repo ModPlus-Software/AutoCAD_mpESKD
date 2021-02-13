@@ -19,6 +19,126 @@ namespace mpESKD.Functions.mpAxis
     [SystemStyleDescriptionKey("h68")]
     public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
+        // last values
+        private readonly string _lastHorizontalValue = string.Empty;
+        private readonly string _lastVerticalValue = string.Empty;
+        
+        private int _bottomFractureOffset;
+        private int _markersCount = 1;
+        private bool _bottomOrientMarkerVisible;
+        private bool _topOrientMarkerVisible;
+        private Point3d _topMarkerPoint;
+        private Point3d _bottomMarkerPoint;
+
+        #region Entities
+
+        /// <summary>
+        /// Средняя (основная) линия оси
+        /// </summary>
+        private Line _mainLine;
+
+        private Line _bottomOrientLine;
+
+        private Line _topOrientLine;
+
+        private Polyline _bottomOrientArrow;
+
+        private Polyline _topOrientArrow;
+
+        #region Fractures
+
+        /// <summary>"Палочка" от конечной точки до кружка (маркера)</summary>
+        private Line _bottomMarkerLine;
+
+        /// <summary>Палочка отступа нижнего излома</summary>
+        private Line _bottomFractureOffsetLine;
+
+        /// <summary>Палочка отступа верхнего излома</summary>
+        private Line _topFractureOffsetLine;
+
+        /// <summary>Палочка от точки вставки до кружка (маркера)</summary>
+        private Line _topMarkerLine;
+
+        #endregion
+
+        #region Circles
+
+        #region Bottom
+
+        private Circle _bottomFirstMarker;
+
+        private Circle _bottomFirstMarkerType2;
+
+        private Circle _bottomSecondMarker;
+
+        private Circle _bottomSecondMarkerType2;
+
+        private Circle _bottomThirdMarker;
+
+        private Circle _bottomThirdMarkerType2;
+
+        #endregion
+
+        #region Top
+
+        private Circle _topFirstMarker;
+
+        private Circle _topFirstMarkerType2;
+
+        private Circle _topSecondMarker;
+
+        private Circle _topSecondMarkerType2;
+
+        private Circle _topThirdMarker;
+
+        private Circle _topThirdMarkerType2;
+
+        #endregion
+
+        #region Orient
+
+        private Circle _bottomOrientMarker;
+
+        private Circle _bottomOrientMarkerType2;
+
+        private Circle _topOrientMarker;
+
+        private Circle _topOrientMarkerType2;
+
+        #endregion
+
+        #endregion
+
+        #region Texts
+
+        private DBText _bottomFirstDBText;
+        private Wipeout _bottomFirstTextMask;
+
+        private DBText _topFirstDBText;
+        private Wipeout _topFirstTextMask;
+
+        private DBText _bottomSecondDBText;
+        private Wipeout _bottomSecondTextMask;
+
+        private DBText _topSecondDBText;
+        private Wipeout _topSecondTextMask;
+
+        private DBText _bottomThirdDBText;
+        private Wipeout _bottomThirdTextMask;
+
+        private DBText _topThirdDBText;
+        private Wipeout _topThirdTextMask;
+
+        private DBText _bottomOrientDBText;
+        private Wipeout _bottomOrientTextMask;
+
+        private DBText _topOrientDBText;
+        private Wipeout _topOrientTextMask;
+
+        #endregion
+
+        #endregion
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="Axis"/> class.
         /// </summary>
@@ -47,29 +167,8 @@ namespace mpESKD.Functions.mpAxis
             _lastVerticalValue = lastVerticalValue;
         }
 
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="Axis"/>
-        /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(Axis));
-        }
-
         /// <inheritdoc/>
         public override double MinDistanceBetweenPoints => 1.0;
-
-        /// <inheritdoc/>
-        protected override void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
-        {
-            base.ProcessScaleChange(oldScale, newScale);
-            if (oldScale != null && newScale != null)
-            {
-                if (MainSettings.Instance.AxisLineTypeScaleProportionScale)
-                {
-                    LineTypeScale = LineTypeScale * newScale.GetNumericScale() / oldScale.GetNumericScale();
-                }
-            }
-        }
 
         /// <inheritdoc />
         [EntityProperty(PropertiesCategory.General, 4, "p19", "осевая")]
@@ -83,8 +182,6 @@ namespace mpESKD.Functions.mpAxis
         [EntityProperty(PropertiesCategory.Content, 1, "p17", "Standard", descLocalKey: "d17")]
         public override string TextStyle { get; set; } = "Standard";
         
-        private int _bottomFractureOffset;
-
         /// <summary>Положение маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 1, "p8", AxisMarkersPosition.Bottom, descLocalKey: "d8")]
         [SaveToXData]
@@ -121,8 +218,6 @@ namespace mpESKD.Functions.mpAxis
         [EntityProperty(PropertiesCategory.Geometry, 5, "p10", 10, 6, 12, descLocalKey: "d10", nameSymbol: "d")]
         [SaveToXData]
         public int MarkersDiameter { get; set; } = 10;
-
-        private int _markersCount = 1;
 
         /// <summary>Количество маркеров</summary>
         [EntityProperty(PropertiesCategory.Geometry, 6, "p11", 1, 1, 3, descLocalKey: "d11")]
@@ -174,8 +269,6 @@ namespace mpESKD.Functions.mpAxis
 
         // Orient markers
 
-        private bool _bottomOrientMarkerVisible;
-
         /// <summary>
         /// Видимость нижнего бокового кружка
         /// </summary>
@@ -198,8 +291,6 @@ namespace mpESKD.Functions.mpAxis
                 }
             }
         }
-
-        private bool _topOrientMarkerVisible;
 
         /// <summary>
         /// Видимость верхнего бокового кружка
@@ -339,11 +430,6 @@ namespace mpESKD.Functions.mpAxis
         [ValueToSearchBy]
         public string TopOrientText { get; set; } = string.Empty;
 
-        // last values
-        private readonly string _lastHorizontalValue = string.Empty;
-
-        private readonly string _lastVerticalValue = string.Empty;
-
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint => new Point3d(
             (InsertionPoint.X + EndPoint.X) / 2,
@@ -353,9 +439,9 @@ namespace mpESKD.Functions.mpAxis
         [SaveToXData]
         public double BottomLineAngle { get; set; }
 
-        private Point3d _bottomMarkerPoint;
-
-        /// <summary>Нижняя точка расположения маркеров</summary>  
+        /// <summary>
+        /// Нижняя точка расположения маркеров
+        /// </summary>  
         public Point3d BottomMarkerPoint
         {
             get
@@ -380,9 +466,9 @@ namespace mpESKD.Functions.mpAxis
         [SaveToXData]
         public double TopLineAngle { get; set; }
 
-        private Point3d _topMarkerPoint;
-
-        /// <summary>Верхняя точка расположения маркеров</summary>
+        /// <summary>
+        /// Верхняя точка расположения маркеров
+        /// </summary>
         public Point3d TopMarkerPoint
         {
             get
@@ -461,111 +547,6 @@ namespace mpESKD.Functions.mpAxis
 
         private Point3d TopOrientPointOCS => TopOrientPoint.TransformBy(BlockTransform.Inverse());
 
-        /// <summary>
-        /// Средняя (основная) линия оси
-        /// </summary>
-        private Line _mainLine;
-
-        private Line _bottomOrientLine;
-
-        private Line _topOrientLine;
-
-        private Polyline _bottomOrientArrow;
-
-        private Polyline _topOrientArrow;
-
-        #region Fractures
-
-        /// <summary>"Палочка" от конечной точки до кружка (маркера)</summary>
-        private Line _bottomMarkerLine;
-
-        /// <summary>Палочка отступа нижнего излома</summary>
-        private Line _bottomFractureOffsetLine;
-
-        /// <summary>Палочка отступа верхнего излома</summary>
-        private Line _topFractureOffsetLine;
-
-        /// <summary>Палочка от точки вставки до кружка (маркера)</summary>
-        private Line _topMarkerLine;
-
-        #endregion
-
-        #region Circles
-
-        #region Bottom
-
-        private Circle _bottomFirstMarker;
-
-        private Circle _bottomFirstMarkerType2;
-
-        private Circle _bottomSecondMarker;
-
-        private Circle _bottomSecondMarkerType2;
-
-        private Circle _bottomThirdMarker;
-
-        private Circle _bottomThirdMarkerType2;
-
-        #endregion
-
-        #region Top
-
-        private Circle _topFirstMarker;
-
-        private Circle _topFirstMarkerType2;
-
-        private Circle _topSecondMarker;
-
-        private Circle _topSecondMarkerType2;
-
-        private Circle _topThirdMarker;
-
-        private Circle _topThirdMarkerType2;
-
-        #endregion
-
-        #region Orient
-
-        private Circle _bottomOrientMarker;
-
-        private Circle _bottomOrientMarkerType2;
-
-        private Circle _topOrientMarker;
-
-        private Circle _topOrientMarkerType2;
-
-        #endregion
-
-        #endregion
-
-        #region Texts
-
-        private DBText _bottomFirstDBText;
-        private Wipeout _bottomFirstTextMask;
-
-        private DBText _topFirstDBText;
-        private Wipeout _topFirstTextMask;
-
-        private DBText _bottomSecondDBText;
-        private Wipeout _bottomSecondTextMask;
-
-        private DBText _topSecondDBText;
-        private Wipeout _topSecondTextMask;
-
-        private DBText _bottomThirdDBText;
-        private Wipeout _bottomThirdTextMask;
-
-        private DBText _topThirdDBText;
-        private Wipeout _topThirdTextMask;
-
-        private DBText _bottomOrientDBText;
-        private Wipeout _bottomOrientTextMask;
-
-        private DBText _topOrientDBText;
-        private Wipeout _topOrientTextMask;
-
-        #endregion
-
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -627,6 +608,27 @@ namespace mpESKD.Functions.mpAxis
 
                 return entities;
             }
+        }
+        
+        /// <inheritdoc/>
+        protected override void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
+        {
+            base.ProcessScaleChange(oldScale, newScale);
+            if (oldScale != null && newScale != null)
+            {
+                if (MainSettings.Instance.AxisLineTypeScaleProportionScale)
+                {
+                    LineTypeScale = LineTypeScale * newScale.GetNumericScale() / oldScale.GetNumericScale();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="Axis"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(Axis));
         }
 
         /// <inheritdoc />
@@ -884,8 +886,8 @@ namespace mpESKD.Functions.mpAxis
                                 bottomOrientLineEndPoint,
                                 bottomOrientLineStartPoint,
                                 bottomOrientLineEndPoint, ArrowsSize * scale);
-                            _bottomOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                            _bottomOrientArrow.AddVertexAt(1, bottomOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+                            _bottomOrientArrow.AddVertexAt(0, arrowStartPoint.ToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                            _bottomOrientArrow.AddVertexAt(1, bottomOrientLineEndPoint.ToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
 
@@ -1084,8 +1086,8 @@ namespace mpESKD.Functions.mpAxis
                                 topOrientLineEndPoint,
                                 topOrientLineStartPoint,
                                 topOrientLineEndPoint, ArrowsSize * scale);
-                            _topOrientArrow.AddVertexAt(0, arrowStartPoint.ConvertPoint3dToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
-                            _topOrientArrow.AddVertexAt(1, topOrientLineEndPoint.ConvertPoint3dToPoint2d(), 0.0, 0.0, 0.0);
+                            _topOrientArrow.AddVertexAt(0, arrowStartPoint.ToPoint2d(), 0.0, ArrowsSize * scale * 1 / 3, 0.0);
+                            _topOrientArrow.AddVertexAt(1, topOrientLineEndPoint.ToPoint2d(), 0.0, 0.0, 0.0);
                         }
                     }
 

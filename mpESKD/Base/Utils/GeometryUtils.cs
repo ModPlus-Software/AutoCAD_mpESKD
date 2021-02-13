@@ -75,7 +75,7 @@
         /// Конвертация Point3d в Point2d путем отбрасывания Z
         /// </summary>
         /// <param name="point3d">3d точка</param>
-        public static Point2d ConvertPoint3dToPoint2d(this Point3d point3d)
+        public static Point2d ToPoint2d(this Point3d point3d)
         {
             return new Point2d(point3d.X, point3d.Y);
         }

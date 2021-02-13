@@ -720,9 +720,9 @@ namespace mpESKD.Functions.mpLevelMark
             var pt2 = endPoint + (width / 2 / Math.Sin(angle) * verV);
             var pt1 = pt2 - (wingProjection * horV) + (height * verV);
             var pt3 = pt1 + (wingProjection * 2 * horV);
-            polyline.AddVertexAt(0, pt1.ConvertPoint3dToPoint2d(), 0.0, width, width);
-            polyline.AddVertexAt(0, pt2.ConvertPoint3dToPoint2d(), 0.0, width, width);
-            polyline.AddVertexAt(0, pt3.ConvertPoint3dToPoint2d(), 0.0, width, width);
+            polyline.AddVertexAt(0, pt1.ToPoint2d(), 0.0, width, width);
+            polyline.AddVertexAt(0, pt2.ToPoint2d(), 0.0, width, width);
+            polyline.AddVertexAt(0, pt3.ToPoint2d(), 0.0, width, width);
             return polyline;
         }
 
