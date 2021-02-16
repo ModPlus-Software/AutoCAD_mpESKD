@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Base.Utils
 {
     using System.Linq;
+    using Abstractions;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
 
@@ -12,28 +13,12 @@
         /// <summary>
         /// Добавление регистрации приложения в соответствующую таблицу чертежа
         /// </summary>
-        /// <param name="appName">Имя типа интеллектуального объекта</param>
-        public static void AddRegAppTableRecord(string appName)
+        /// <param name="descriptor">Дескриптор интеллектуального объекта</param>
+        public static void AddRegAppTableRecord(IIntellectualEntityDescriptor descriptor)
         {
-            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-            {
-                var rat =
-                    (RegAppTable)tr.GetObject(AcadUtils.Database.RegAppTableId, OpenMode.ForRead, false);
-                if (!rat.Has(appName))
-                {
-                    rat.UpgradeOpen();
-                    var regAppTableRecord = new RegAppTableRecord
-                    {
-                        Name = appName
-                    };
-                    rat.Add(regAppTableRecord);
-                    tr.AddNewlyCreatedDBObject(regAppTableRecord, true);
-                }
-
-                tr.Commit();
-            }
+            AddRegAppTableRecord(descriptor.Name);
         }
-
+        
         /// <summary>
         /// Проверка поддерживаемости примитива для Overrule
         /// </summary>
@@ -159,6 +144,31 @@
         {
             var rb = dbObject.GetXDataForApplication(appName);
             return rb != null;
+        }
+        
+        /// <summary>
+        /// Добавление регистрации приложения в соответствующую таблицу чертежа
+        /// </summary>
+        /// <param name="appName">Имя типа интеллектуального объекта</param>
+        private static void AddRegAppTableRecord(string appName)
+        {
+            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
+            {
+                var rat =
+                    (RegAppTable)tr.GetObject(AcadUtils.Database.RegAppTableId, OpenMode.ForRead, false);
+                if (!rat.Has(appName))
+                {
+                    rat.UpgradeOpen();
+                    var regAppTableRecord = new RegAppTableRecord
+                    {
+                        Name = appName
+                    };
+                    rat.Add(regAppTableRecord);
+                    tr.AddNewlyCreatedDBObject(regAppTableRecord, true);
+                }
+
+                tr.Commit();
+            }
         }
     }
 }

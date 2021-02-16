@@ -1,6 +1,6 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Functions.mpWaterProofing
 {
-    using Attributes;
+    using Base.Attributes;
 
     /// <summary>
     /// Отступ первого штриха линии гидроизоляции

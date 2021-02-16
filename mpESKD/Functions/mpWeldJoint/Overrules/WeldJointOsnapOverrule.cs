@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpWeldJoint.Overrules
 {
     using System;
     using System.Diagnostics;
@@ -8,24 +8,24 @@
     using Base.Utils;
 
     /// <inheritdoc />
-    public class GroundLineOsnapOverrule : OsnapOverrule
+    public class WeldJointOsnapOverrule : OsnapOverrule
     {
-        private static GroundLineOsnapOverrule _instance;
+        private static WeldJointOsnapOverrule _instance;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
-        public static GroundLineOsnapOverrule Instance()
+        public static WeldJointOsnapOverrule Instance()
         {
             if (_instance != null)
             {
                 return _instance;
             }
 
-            _instance = new GroundLineOsnapOverrule();
+            _instance = new WeldJointOsnapOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(GroundLine.GetDescriptor().Name);
+            _instance.SetXDataFilter(WeldJoint.GetDescriptor().Name);
             return _instance;
         }
 
@@ -33,7 +33,7 @@
         public override void GetObjectSnapPoints(Entity entity, ObjectSnapModes snapMode, IntPtr gsSelectionMark, Point3d pickPoint,
             Point3d lastPoint, Matrix3d viewTransform, Point3dCollection snapPoints, IntegerCollection geometryIds)
         {
-            Debug.Print("GroundLineOsnapOverrule");
+            Debug.Print("WeldJointOsnapOverrule");
             if (IsApplicable(entity))
             {
                 EntityUtils.OsnapOverruleProcess(entity, snapPoints);
@@ -47,7 +47,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLine.GetDescriptor().Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WeldJoint.GetDescriptor().Name);
         }
     }
 }

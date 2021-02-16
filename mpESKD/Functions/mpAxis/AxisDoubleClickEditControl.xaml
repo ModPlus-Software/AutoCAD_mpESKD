@@ -6,7 +6,7 @@
              xmlns:mps="https://modplus.org/winfx/xaml/controls"
              xmlns:properties="clr-namespace:mpESKD.Base.Properties"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             xmlns:enums="clr-namespace:mpESKD.Base.Enums"
+             xmlns:mpAxis="clr-namespace:mpESKD.Functions.mpAxis"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -17,7 +17,7 @@
             <properties:EnumPropertyValueConverter x:Key="EnumPropertyValueConverter"/>
             <ObjectDataProvider x:Key="DataFromAxisMarkersPositionEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
                 <ObjectDataProvider.MethodParameters>
-                    <x:Type TypeName="enums:AxisMarkersPosition"></x:Type>
+                    <x:Type TypeName="mpAxis:AxisMarkersPosition"></x:Type>
                 </ObjectDataProvider.MethodParameters>
             </ObjectDataProvider>
         </ResourceDictionary>

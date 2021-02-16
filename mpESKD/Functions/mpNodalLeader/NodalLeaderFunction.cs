@@ -49,7 +49,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor());
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new NodalLeader(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(nodalLeader);
@@ -89,7 +89,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor());
                 var style = StyleManager.GetCurrentStyle(typeof(NodalLeader));
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new NodalLeader(lastNodeNumber);

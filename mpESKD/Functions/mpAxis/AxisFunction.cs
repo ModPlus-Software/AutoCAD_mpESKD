@@ -50,7 +50,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor());
 
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
@@ -99,7 +99,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor());
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 

@@ -136,6 +136,14 @@ namespace mpESKD.Functions.mpGroundLine
                 return entities;
             }
         }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="GroundLine"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(GroundLine));
+        }
 
         /// <inheritdoc />
         public void RebasePoints()

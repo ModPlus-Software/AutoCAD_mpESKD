@@ -27,7 +27,7 @@
             _instance = new GroundLineGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(GroundLineDescriptor.Instance.Name);
+            _instance.SetXDataFilter(GroundLine.GetDescriptor().Name);
             return _instance;
         }
 
@@ -85,7 +85,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLineDescriptor.Instance.Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLine.GetDescriptor().Name);
         }
     }
 }

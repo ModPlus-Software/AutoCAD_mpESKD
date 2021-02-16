@@ -19,6 +19,25 @@ namespace mpESKD.Functions.mpWaterProofing
     [SystemStyleDescriptionKey("h129")]
     public class WaterProofing : SmartEntity, ILinearEntity
     {
+        #region Entities
+
+        /// <summary>
+        /// Главная полилиния объекта
+        /// </summary>
+        private Polyline _mainPolyline;
+
+        /// <summary>
+        /// Вторая полилиния, являющаяся смещенной копией первой
+        /// </summary>
+        private readonly List<Entity> _offsetPolylineEntities = new List<Entity>();
+
+        /// <summary>
+        /// Список штрихов
+        /// </summary>
+        private readonly List<Polyline> _strokes = new List<Polyline>();
+
+        #endregion
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="WaterProofing"/> class.
         /// </summary>
@@ -35,14 +54,6 @@ namespace mpESKD.Functions.mpWaterProofing
         {
         }
         
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="WaterProofing"/>
-        /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(WaterProofing));
-        }
-
         /// <inheritdoc />
         [SaveToXData]
         public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
@@ -100,21 +111,6 @@ namespace mpESKD.Functions.mpWaterProofing
         /// Не используется!
         public override string TextStyle { get; set; }
 
-        /// <summary>
-        /// Главная полилиния объекта
-        /// </summary>
-        private Polyline _mainPolyline;
-
-        /// <summary>
-        /// Вторая полилиния, являющаяся смещенной копией первой
-        /// </summary>
-        private readonly List<Entity> _offsetPolylineEntities = new List<Entity>();
-
-        /// <summary>
-        /// Список штрихов
-        /// </summary>
-        private readonly List<Polyline> _strokes = new List<Polyline>();
-
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -139,6 +135,14 @@ namespace mpESKD.Functions.mpWaterProofing
 
                 return entities;
             }
+        }
+        
+        /// <summary>
+        /// Возвращает локализованное описание для типа <see cref="WaterProofing"/>
+        /// </summary>
+        public static IIntellectualEntityDescriptor GetDescriptor()
+        {
+            return TypeFactory.Instance.GetDescriptor(typeof(WaterProofing));
         }
 
         /// <inheritdoc />
@@ -217,7 +221,6 @@ namespace mpESKD.Functions.mpWaterProofing
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
             _mainPolyline = new Polyline(points.Count);
-            SetImmutablePropertiesToNestedEntity(_mainPolyline);
             for (var i = 0; i < points.Count; i++)
             {
                 _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);

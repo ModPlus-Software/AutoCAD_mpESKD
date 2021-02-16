@@ -49,7 +49,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
 
                 var sectionLastLetterValue = string.Empty;
                 var sectionLastIntegerValue = string.Empty;
@@ -120,7 +120,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;
@@ -201,7 +201,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;

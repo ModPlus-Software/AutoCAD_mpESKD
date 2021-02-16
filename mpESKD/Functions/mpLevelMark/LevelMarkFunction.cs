@@ -49,7 +49,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor());
                 var levelMark = new LevelMark();
 
                 var blockReference = MainFunction.CreateBlock(levelMark);
@@ -206,7 +206,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor());
                 var style = StyleManager.GetCurrentStyle(typeof(LevelMark));
                 var levelMark = new LevelMark();
 

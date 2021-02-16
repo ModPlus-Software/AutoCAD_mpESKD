@@ -1,6 +1,6 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Functions.mpGroundLine
 {
-    using Attributes;
+    using Base.Attributes;
 
     /// <summary>
     /// Отступ первого штриха в объекте GroundLine

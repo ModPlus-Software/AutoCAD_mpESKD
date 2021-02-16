@@ -81,6 +81,11 @@
                     entity.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
                 }
             }
+            catch (Autodesk.AutoCAD.Runtime.Exception exception)
+            {
+                if (exception.Message != "eWrongDatabase")
+                    throw;
+            }
             catch (Exception exception)
             {
                 ExceptionBox.Show(exception);

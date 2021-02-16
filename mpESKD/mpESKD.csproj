@@ -140,10 +140,22 @@
   </Choose>
 
   <ItemGroup>
+    <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
+    <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
+    <None Remove="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
+    <None Remove="Functions\mpGroundLine\Icons\mpGroundLine_16x16_dark.png" />
     <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
     <None Remove="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
     <None Remove="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
     <None Remove="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
+    <None Remove="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
+    <None Remove="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
+    <None Remove="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16.png" />
+    <None Remove="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16_dark.png" />
+    <None Remove="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32.png" />
+    <None Remove="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32_dark.png" />
+    <None Remove="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32.png" />
+    <None Remove="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32_dark.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -170,8 +182,12 @@
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
+    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
@@ -188,10 +204,18 @@
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16.png" />
+    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
+    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32.png" />
+    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32.png" />
+    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32_dark.png" />
     <Resource Include="Resources\mpESKD_32x32.png" />
     <Resource Include="Resources\Properties_32x32.png" />
     <Resource Include="Resources\Properties_32x32_dark.png" />
@@ -222,6 +246,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Base\View\Images\WeldJoint.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>

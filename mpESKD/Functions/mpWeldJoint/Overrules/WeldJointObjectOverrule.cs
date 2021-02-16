@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpGroundLine.Overrules
+﻿namespace mpESKD.Functions.mpWeldJoint.Overrules
 {
     using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
@@ -7,36 +7,36 @@
     using Base.Utils;
 
     /// <inheritdoc />
-    public class GroundLineObjectOverrule : ObjectOverrule
+    public class WeldJointObjectOverrule : ObjectOverrule
     {
-        private static GroundLineObjectOverrule _groundLineObjectOverrule;
+        private static WeldJointObjectOverrule _groundLineObjectOverrule;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
         /// <returns></returns>
-        public static GroundLineObjectOverrule Instance()
+        public static WeldJointObjectOverrule Instance()
         {
             if (_groundLineObjectOverrule != null)
             {
                 return _groundLineObjectOverrule;
             }
 
-            _groundLineObjectOverrule = new GroundLineObjectOverrule();
+            _groundLineObjectOverrule = new WeldJointObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _groundLineObjectOverrule.SetXDataFilter(GroundLine.GetDescriptor().Name);
+            _groundLineObjectOverrule.SetXDataFilter(WeldJoint.GetDescriptor().Name);
             return _groundLineObjectOverrule;
         }
 
         /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
-            Debug.Print("GroundLineObjectOverrule");
+            Debug.Print("WeldJointObjectOverrule");
             if (IsApplicable(dbObject))
             {
                 EntityUtils.ObjectOverruleProcess(
-                    dbObject, () => EntityReaderService.Instance.GetFromEntity<GroundLine>(dbObject));
+                    dbObject, () => EntityReaderService.Instance.GetFromEntity<WeldJoint>(dbObject));
             }
 
             base.Close(dbObject);
@@ -45,7 +45,7 @@
         /// <inheritdoc/>
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, GroundLine.GetDescriptor().Name, true);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WeldJoint.GetDescriptor().Name, true);
         }
     }
 }

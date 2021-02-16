@@ -27,6 +27,7 @@
                 <ResourceDictionary Source="Images/WaterProofing.xaml"/>
                 <ResourceDictionary Source="Images/NodalLeader.xaml"/>
                 <ResourceDictionary Source="Images/SecantNodalLeader.xaml"/>
+                <ResourceDictionary Source="Images/WeldJoint.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

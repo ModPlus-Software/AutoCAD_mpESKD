@@ -1,6 +1,6 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Functions.mpBreakLine
 {
-    using Attributes;
+    using Base.Attributes;
 
     /// <summary>
     /// Тип линии: линейный, криволинейный, цилиндрический

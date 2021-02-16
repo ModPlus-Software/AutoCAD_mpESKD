@@ -1,6 +1,6 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Functions.mpAxis
 {
-    using Attributes;
+    using Base.Attributes;
 
     /// <summary>
     /// Позиция маркеров оси

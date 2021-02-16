@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpGroundLine
+﻿namespace mpESKD.Functions.mpWeldJoint
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
@@ -10,29 +10,29 @@
     using Overrules;
 
     /// <inheritdoc />
-    public class GroundLineFunction : ISmartEntityFunction
+    public class WeldJointFunction : ISmartEntityFunction
     {
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointOsnapOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointObjectOverrule.Instance(), true);
         }
 
         /// <inheritdoc />
         public void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), GroundLineObjectOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointGripPointOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointOsnapOverrule.Instance());
+            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointObjectOverrule.Instance());
         }
 
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
 
             try
@@ -43,14 +43,14 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
 
-                var groundLine = new GroundLine();
-                var blockReference = MainFunction.CreateBlock(groundLine);
+                var waterProofing = new WeldJoint();
+                var blockReference = MainFunction.CreateBlock(waterProofing);
 
-                groundLine.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+                waterProofing.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-                LinearEntityUtils.InsertWithJig(groundLine, blockReference);
+                LinearEntityUtils.InsertWithJig(waterProofing, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -65,34 +65,33 @@
         /// <summary>
         /// Команда создания линии грунта
         /// </summary>
-        [CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
-        public void CreateGroundLineCommand()
+        [CommandMethod("ModPlus", "mpWeldJoint", CommandFlags.Modal)]
+        public void CreateWeldJointCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
-            CreateGroundLine();
+            CreateWeldJoint();
         }
 
         /// <summary>
         /// Команда создания линия грунта из полилинии
         /// </summary>
-        [CommandMethod("ModPlus", "mpGroundLineFromPolyline", CommandFlags.Modal)]
-        public void CreateGroundLineFromPolylineCommand()
+        [CommandMethod("ModPlus", "mpWeldJointFromPolyline", CommandFlags.Modal)]
+        public void CreateWeldJointFromPolylineCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting("mpGroundLineFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting("mpWeldJointFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе
              * При инициализации плагина регистрации нет!
              */
-            
-            ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
-            LinearEntityUtils.CreateFromPolyline<GroundLine>();
+            ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
+            LinearEntityUtils.CreateFromPolyline<WeldJoint>();
         }
 
-        private void CreateGroundLine()
+        private void CreateWeldJoint()
         {
             try
             {
@@ -102,15 +101,15 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
 
-                var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
-                var groundLine = new GroundLine();
+                var style = StyleManager.GetCurrentStyle(typeof(WeldJoint));
+                var waterProofing = new WeldJoint();
 
-                var blockReference = MainFunction.CreateBlock(groundLine);
-                groundLine.ApplyStyle(style, true);
+                var blockReference = MainFunction.CreateBlock(waterProofing);
+                waterProofing.ApplyStyle(style, true);
 
-                LinearEntityUtils.InsertWithJig(groundLine, blockReference);
+                LinearEntityUtils.InsertWithJig(waterProofing, blockReference);
             }
             catch (System.Exception exception)
             {

@@ -45,7 +45,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor());
 
                 var breakLine = new BreakLine();
                 var blockReference = MainFunction.CreateBlock(breakLine);
@@ -93,7 +93,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor().Name);
+                ExtendedDataUtils.AddRegAppTableRecord(BreakLine.GetDescriptor());
                 var style = StyleManager.GetCurrentStyle(typeof(BreakLine));
                 var breakLine = new BreakLine();
 

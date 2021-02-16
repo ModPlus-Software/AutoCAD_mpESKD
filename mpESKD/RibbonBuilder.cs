@@ -14,6 +14,7 @@
     using Functions.mpNodalLeader;
     using Functions.mpSecantNodalLeader;
     using Functions.mpWaterProofing;
+    using Functions.mpWeldJoint;
     using ModPlus.Helpers;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
@@ -234,7 +235,7 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpLevelMark
-            ribRowPanel.Items.Add(GetSplitButton(LevelMark.GetDescriptor()));
+            ribRowPanel.Items.Add(GetBigSplitButton(LevelMark.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -257,13 +258,25 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpBreakLine
-            ribRowPanel.Items.Add(GetSplitButton(BreakLine.GetDescriptor()));
+            ribRowPanel.Items.Add(GetBigSplitButton(BreakLine.GetDescriptor()));
+            
+            // mpWeldJoint
+            ribRowPanel.Items.Add(GetBigSplitButton(WeldJoint.GetDescriptor()));
+            
+            if (ribRowPanel.Items.Any())
+            {
+                ribSourcePanel.Items.Add(ribRowPanel);
+            }
+
+            ribRowPanel = new RibbonRowPanel();
 
             // mpGroundLine
-            ribRowPanel.Items.Add(GetSplitButton(GroundLineDescriptor.Instance));
+            ribRowPanel.Items.Add(GetSmallSplitButton(GroundLine.GetDescriptor()));
+            
+            ribRowPanel.Items.Add(new RibbonRowBreak());
 
             // mpWaterProofing
-            ribRowPanel.Items.Add(GetSplitButton(WaterProofing.GetDescriptor()));
+            ribRowPanel.Items.Add(GetSmallSplitButton(WaterProofing.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -284,7 +297,7 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpSection
-            ribRowPanel.Items.Add(GetSplitButton(Functions.mpSection.Section.GetDescriptor()));
+            ribRowPanel.Items.Add(GetBigSplitButton(Functions.mpSection.Section.GetDescriptor()));
 
             if (ribRowPanel.Items.Any())
             {
@@ -378,26 +391,23 @@
         /// </summary>
         /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
-        /// <param name="size">Размер кнопки</param>
-        private static RibbonSplitButton GetSplitButton(
+        private static RibbonSplitButton GetBigSplitButton(
             IIntellectualEntityDescriptor descriptor,
-            Orientation orientation = Orientation.Vertical,
-            RibbonItemSize size = RibbonItemSize.Large)
+            Orientation orientation = Orientation.Vertical)
         {
             // Создаем SplitButton
             var risSplitBtn = new RibbonSplitButton
             {
                 Text = "RibbonSplitButton",
                 Orientation = orientation,
-                Size = size,
+                Size = RibbonItemSize.Large,
                 ShowImage = true,
                 ShowText = true,
                 ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
                 ResizeStyle = RibbonItemResizeStyles.NoResize,
                 ListStyle = RibbonSplitButtonListStyle.List
             };
-
-            // Добавляем в него первую функцию, которую делаем основной
+            
             var ribBtn = GetBigButton(descriptor, orientation);
             if (ribBtn != null)
             {
@@ -409,6 +419,61 @@
             GetBigButtonsForSubFunctions(descriptor, orientation).ForEach(b => risSplitBtn.Items.Add(b));
 
             return risSplitBtn;
+        }
+        
+        /// <summary>
+        /// Получить SplitButton (основная команда + все вложенные команды) для дескриптора функции
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        private static RibbonSplitButton GetSmallSplitButton(
+            IIntellectualEntityDescriptor descriptor,
+            Orientation orientation = Orientation.Vertical)
+        {
+            // Создаем SplitButton
+            var risSplitBtn = new RibbonSplitButton
+            {
+                Text = "RibbonSplitButton",
+                Orientation = orientation,
+                Size = RibbonItemSize.Standard,
+                ShowImage = true,
+                ShowText = false,
+                ListButtonStyle = Autodesk.Private.Windows.RibbonListButtonStyle.SplitButton,
+                ResizeStyle = RibbonItemResizeStyles.NoResize,
+                ListStyle = RibbonSplitButtonListStyle.List
+            };
+            
+            var ribBtn = GetButton(descriptor, orientation);
+            if (ribBtn != null)
+            {
+                risSplitBtn.Items.Add(ribBtn);
+                risSplitBtn.Current = ribBtn;
+            }
+
+            // Вложенные команды
+            GetButtonsForSubFunctions(descriptor, orientation).ForEach(b => risSplitBtn.Items.Add(b));
+
+            return risSplitBtn;
+        }
+        
+        /// <summary>
+        /// Получить кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
+        /// </summary>
+        /// <remarks>Для команды должно быть две иконки (16х16 и 32х32) в ресурсах!</remarks>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        private static RibbonButton GetButton(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        {
+            return RibbonHelpers.AddButton(
+                descriptor.Name,
+                descriptor.LName,
+                GetSmallIconForFunction(descriptor.Name, descriptor.Name),
+                GetBigIconForFunction(descriptor.Name, descriptor.Name),
+                descriptor.Description,
+                orientation,
+                descriptor.FullDescription,
+                GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
+                "help/mpeskd");
         }
 
         /// <summary>
@@ -443,6 +508,35 @@
                 descriptor.FullDescription,
                 GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
                 "help/mpeskd");
+        }
+        
+        /// <summary>
+        /// Получить список кнопок для вложенных команды по дескриптору
+        /// </summary>
+        /// <remarks>Для всех команд должно быть две иконки (16х16 и 32х32) в ресурсах!</remarks>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий
+        /// интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="orientation">Ориентация кнопки</param>
+        private static List<RibbonButton> GetButtonsForSubFunctions(
+            IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        {
+            var buttons = new List<RibbonButton>();
+
+            for (var i = 0; i < descriptor.SubFunctionsNames.Count; i++)
+            {
+                buttons.Add(RibbonHelpers.AddButton(
+                    descriptor.SubFunctionsNames[i],
+                    descriptor.SubFunctionsLNames[i],
+                    GetSmallIconForFunction(descriptor.Name, descriptor.SubFunctionsNames[i]),
+                    GetBigIconForFunction(descriptor.Name, descriptor.SubFunctionsNames[i]),
+                    descriptor.SubDescriptions[i],
+                    orientation,
+                    descriptor.SubFullDescriptions[i],
+                    GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i]),
+                    "help/mpeskd"));
+            }
+
+            return buttons;
         }
 
         /// <summary>

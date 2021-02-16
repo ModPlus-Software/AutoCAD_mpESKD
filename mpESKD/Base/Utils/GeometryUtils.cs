@@ -79,5 +79,14 @@
         {
             return new Point2d(point3d.X, point3d.Y);
         }
+
+        /// <summary>
+        /// Конвертация Point2d в Point3d с заданием Z = 0.0
+        /// </summary>
+        /// <param name="point2d">2d точка</param>
+        public static Point3d ToPoint3d(this Point2d point2d)
+        {
+            return new Point3d(point2d.X, point2d.Y, 0.0);
+        }
     }
 }

@@ -8,13 +8,6 @@
     /// <inheritdoc />
     public class GroundLineDescriptor : IIntellectualEntityDescriptor
     {
-        private static GroundLineDescriptor _instance;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static GroundLineDescriptor Instance => _instance ?? (_instance = new GroundLineDescriptor());
-
         /// <inheritdoc/>
         public Type EntityType => typeof(GroundLine);
 

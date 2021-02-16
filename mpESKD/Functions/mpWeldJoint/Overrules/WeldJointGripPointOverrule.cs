@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpWaterProofing.Overrules
+﻿namespace mpESKD.Functions.mpWeldJoint.Overrules
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -8,24 +8,24 @@
     using ModPlusAPI.Windows;
 
     /// <inheritdoc />
-    public class WaterProofingGripPointOverrule : GripOverrule
+    public class WeldJointGripPointOverrule : GripOverrule
     {
-        private static WaterProofingGripPointOverrule _instance;
+        private static WeldJointGripPointOverrule _instance;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
-        public static WaterProofingGripPointOverrule Instance()
+        public static WeldJointGripPointOverrule Instance()
         {
             if (_instance != null)
             {
                 return _instance;
             }
 
-            _instance = new WaterProofingGripPointOverrule();
+            _instance = new WeldJointGripPointOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _instance.SetXDataFilter(WaterProofing.GetDescriptor().Name);
+            _instance.SetXDataFilter(WeldJoint.GetDescriptor().Name);
             return _instance;
         }
 
@@ -40,10 +40,10 @@
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    var waterProofing = EntityReaderService.Instance.GetFromEntity<WaterProofing>(entity);
-                    if (waterProofing != null)
+                    var weldJoint = EntityReaderService.Instance.GetFromEntity<WeldJoint>(entity);
+                    if (weldJoint != null)
                     {
-                        foreach (var grip in EntityUtils.GetLinearEntityGeneralGrips(waterProofing, curViewUnitSize))
+                        foreach (var grip in EntityUtils.GetLinearEntityGeneralGrips(weldJoint, curViewUnitSize))
                         {
                             grips.Add(grip);
                         }
@@ -83,7 +83,7 @@
         /// <inheritdoc />
         public override bool IsApplicable(RXObject overruledSubject)
         {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, WaterProofing.GetDescriptor().Name);
+            return ExtendedDataUtils.IsApplicable(overruledSubject, WeldJoint.GetDescriptor().Name);
         }
     }
 }
