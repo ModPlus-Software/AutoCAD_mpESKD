@@ -32,7 +32,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                GroundLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
 
             try
@@ -69,7 +70,8 @@
         public void CreateGroundLineCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(GroundLineDescriptor.Instance.Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                GroundLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             CreateGroundLine();
         }
@@ -81,7 +83,8 @@
         public void CreateGroundLineFromPolylineCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting("mpGroundLineFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                "mpGroundLineFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе

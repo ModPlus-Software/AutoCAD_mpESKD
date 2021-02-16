@@ -32,7 +32,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
 
             try
@@ -69,7 +70,8 @@
         public void CreateWaterProofingCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             CreateWaterProofing();
         }
@@ -81,7 +83,8 @@
         public void CreateWaterProofingFromPolylineCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting("mpWaterProofingFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                "mpWaterProofingFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе

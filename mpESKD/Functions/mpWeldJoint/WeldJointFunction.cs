@@ -32,7 +32,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
 
             try
@@ -69,7 +70,8 @@
         public void CreateWeldJointCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             CreateWeldJoint();
         }
@@ -81,7 +83,8 @@
         public void CreateWeldJointFromPolylineCommand()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting("mpWeldJointFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                "mpWeldJointFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе

@@ -36,7 +36,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(
+                BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -84,8 +85,10 @@
 
         private static void CreateBreakLine(BreakLineType breakLineType)
         {
-            // send statistic
-            Statistic.SendCommandStarting(BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#if !DEBUG
+            Statistic.SendCommandStarting(
+                BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+#endif
             try
             {
                 Overrule.Overruling = false;
@@ -148,7 +151,7 @@
 
                     break;
                 }
-            } 
+            }
             while (true);
 
             if (!breakLine.BlockId.IsErased)

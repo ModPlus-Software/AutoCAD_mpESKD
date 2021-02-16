@@ -14,7 +14,6 @@
     using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Overrules;
-    using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     /// <inheritdoc />
     public class LevelMarkFunction : ISmartEntityFunction
@@ -39,7 +38,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(
+                LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -196,7 +196,8 @@
         private static void CreateLevelMark()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(
+                LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {

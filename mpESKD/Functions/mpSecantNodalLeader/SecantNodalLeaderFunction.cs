@@ -39,7 +39,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(
+                SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -79,7 +80,8 @@
         private static void CreateSecantNodalLeader()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(
+                SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {

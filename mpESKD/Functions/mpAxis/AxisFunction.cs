@@ -11,10 +11,8 @@
     using Base.Enums;
     using Base.Styles;
     using Base.Utils;
-    using ModPlusAPI;
     using ModPlusAPI.Windows;
     using Overrules;
-    using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
     /// <inheritdoc />
     public class AxisFunction : ISmartEntityFunction
@@ -39,7 +37,8 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
 
             try
@@ -89,7 +88,8 @@
         private static void CreateAxis()
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            ModPlusAPI.Statistic.SendCommandStarting(
+                Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
