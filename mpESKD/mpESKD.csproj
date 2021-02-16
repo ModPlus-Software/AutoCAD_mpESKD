@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.9.14.0</Version>
+    <Version>1.13.20.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
   </PropertyGroup>
@@ -76,10 +76,6 @@
 
   <PropertyGroup>
     <AssemblyName>$(AssemblyName)_$(Description)</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <OutputPath>E:\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
   </PropertyGroup>
 
   <Choose>
