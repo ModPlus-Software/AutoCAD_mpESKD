@@ -70,8 +70,8 @@
                     return;
 
                 if ((dbObject.IsNewObject && dbObject.Database == AcadUtils.Database) ||
-                    (dbObject.IsUndoing && dbObject.IsModifiedXData) ||
-                    (dbObject.IsModified && AcadUtils.Database.TransactionManager.TopTransaction == null))
+                    (dbObject.IsUndoing && dbObject.IsModifiedXData)) //// ||
+                    ////(dbObject.IsModified && AcadUtils.Database.TransactionManager.TopTransaction == null))
                 {
                     var entity = smartEntity.Invoke();
                     if (entity == null)
@@ -426,11 +426,34 @@
         {
             if (dbText == null)
                 return null;
+            
+            return GetBackgroundMask(dbText.GeometricExtents, offset);
+        }
+        
+        /// <summary>
+        /// Возвращает маскировку, созданную по контуру текста с указанным отступом
+        /// </summary>
+        /// <param name="mText">Экземпляр <see cref="DBText"/></param>
+        /// <param name="offset">Отступ</param>
+        public static Wipeout GetBackgroundMask(this MText mText, double offset)
+        {
+            if (mText == null)
+                return null;
 
+            return GetBackgroundMask(mText.GeometricExtents, offset);
+        }
+
+        /// <summary>
+        /// Возвращает маскировку, созданную по контуру с указанным отступом
+        /// </summary>
+        /// <param name="extents3d">Крайние границы</param>
+        /// <param name="offset">Отступ</param>
+        private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset)
+        {
             try
             {
-                var minPoint = dbText.GeometricExtents.MinPoint;
-                var maxPoint = dbText.GeometricExtents.MaxPoint;
+                var minPoint = extents3d.MinPoint;
+                var maxPoint = extents3d.MaxPoint;
                 var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
                 var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
                 var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
