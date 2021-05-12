@@ -71,18 +71,6 @@
             CreateFragmentMarker(FragmentMarkerType.Linear);
         }
 
-        [CommandMethod("ModPlus", "mpFragmentMarkerCurve", CommandFlags.Modal)]
-        public void CreateCurvilinearBreakLine()
-        {
-            CreateFragmentMarker(FragmentMarkerType.Curvilinear);
-        }
-
-        [CommandMethod("ModPlus", "mpFragmentMarkerCylinder", CommandFlags.Modal)]
-        public void CreateCylindricalBreakLine()
-        {
-            CreateFragmentMarker(FragmentMarkerType.Cylindrical);
-        }
-
         private static void CreateFragmentMarker(FragmentMarkerType fragmentMarkerType)
         {
 #if !DEBUG

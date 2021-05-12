@@ -15,11 +15,11 @@
         public string Name => "mpFragmentMarker";
 
         /// <inheritdoc />
-        // "Линия обрыва"
+        // "обозначение фрагмента
         public string LName => Language.GetItem("h48");
 
         /// <inheritdoc />
-        // "Создание линии обрыва по ГОСТ 2.303-68"
+        // "Создание линии фрагмента"
         public string Description => Language.GetItem("h56");
 
         /// <inheritdoc />
@@ -27,46 +27,36 @@
         public string FullDescription => Language.GetItem("h57");
 
         /// <inheritdoc />
-        public string ToolTipHelpImage => "Linear.png";
+        public string ToolTipHelpImage => string.Empty;
 
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
-            "mpFragmentMarker", 
-            "mpFragmentMarkerCylinder"
+            "mpFragmentMarker"
         };
 
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            // "Криволинейный обрыв"
+            // "Обозначение фрагмента"
             Language.GetItem("h58"),
-
-            // "Цилиндрический обрыв"
-            Language.GetItem("h59")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            // "Создание криволинейного обрыва"
+            // "Создание фрагмента"
             Language.GetItem("h60"),
-
-            // "Создание цилиндрического обрыва"
-            Language.GetItem("h61")
         };
 
         /// <inheritdoc />
         public List<string> SubFullDescriptions => new List<string>
         {
             // "Создание интеллектуального объекта на основе анонимного блока, описывающего криволинейный обрыв, путем указания двух точек"
-            Language.GetItem("h62"),
-
-            // "Создание интеллектуального объекта на основе анонимного блока, описывающего цилиндрический обрыв, путем указания двух точек"
-            Language.GetItem("h63")
+            string.Empty
         };
 
         /// <inheritdoc />
-        public List<string> SubHelpImages => new List<string> { "Curvilinear.png", "Cylindrical.png" };
+        public List<string> SubHelpImages => new List<string> { string.Empty};
     }
 }

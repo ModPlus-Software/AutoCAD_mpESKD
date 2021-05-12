@@ -12,17 +12,6 @@
         /// </summary>
         [EnumPropertyDisplayValueKey("blt1")]
         Linear = 1,
-
-        /// <summary>
-        /// Криволинейный
-        /// </summary>
-        [EnumPropertyDisplayValueKey("blt2")]
-        Curvilinear = 2,
-
-        /// <summary>
-        /// Цилиндрический
-        /// </summary>
-        [EnumPropertyDisplayValueKey("blt3")]
-        Cylindrical = 3
+        
     }
 }
