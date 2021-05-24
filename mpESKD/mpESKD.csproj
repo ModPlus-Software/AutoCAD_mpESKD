@@ -84,7 +84,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>c:\Users\yusufzhon.marasulov\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <Choose>
