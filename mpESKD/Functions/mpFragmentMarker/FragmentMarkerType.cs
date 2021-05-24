@@ -12,6 +12,5 @@
         /// </summary>
         [EnumPropertyDisplayValueKey("blt1")]
         Linear = 1,
-        
     }
 }
