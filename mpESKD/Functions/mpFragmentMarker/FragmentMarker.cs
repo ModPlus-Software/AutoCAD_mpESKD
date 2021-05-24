@@ -230,11 +230,11 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             //Первая точка начало арки радиус 5
 
-            
-            double len = 5;
+
+            double len = 5 * scale;
 
             Vector3d v = (endPoint - insertionPoint).GetNormal();
-            
+
             pts.Add(insertionPoint.ToPoint2d());
             bulges.Add(-0.4141);
 
@@ -242,35 +242,33 @@ namespace mpESKD.Functions.mpFragmentMarker
             // 1. от первой точки до второй проводим линию, от начала этой линии отсчитываем 5 по Х
             // 2. находим Y от Х перпендикуляр 
 
-            Point3d p2_v = insertionPoint + v * 5.0;
-            Point3d p2 = p2_v + (v * 5.0).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            Point3d p2_v = insertionPoint + v * len;
+            Point3d p2 = p2_v + (v * len).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p2.ToPoint2d());
             bulges.Add(0.0);
 
-            Point3d p3_v = insertionPoint + v * 10.0;
-            Point3d p3 = p3_v + (v * 5.0).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            Point3d p3_v = insertionPoint + v * len * 2;
+            Point3d p3 = p3_v + (v * len).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p3.ToPoint2d());
             bulges.Add(0.4141);
 
-            Point3d p4_v = insertionPoint + v * 15.0;
-            Point3d p4 = p4_v + (v * 10.0).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            Point3d p4_v = insertionPoint + v * len * 3;
+            Point3d p4 = p4_v + (v * len * 2).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p4.ToPoint2d());
             bulges.Add(0.4141);
 
-            Point3d p5_v = insertionPoint + v * 20.0;
-            Point3d p5 = p5_v + (v * 5.0).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            Point3d p5_v = insertionPoint + v * len * 4;
+            Point3d p5 = p5_v + (v * len).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p5.ToPoint2d());
             bulges.Add(0.0);
 
-            Point3d p6_v = insertionPoint + v * 25.0;
-            Point3d p6 = p6_v + (v * 5.0).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            Point3d p6_v = insertionPoint + v * len * 5;
+            Point3d p6 = p6_v + (v * len).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p6.ToPoint2d());
             bulges.Add(-0.4141);
 
             pts.Add(endPoint.ToPoint2d());
             bulges.Add(0.0);
-
-
 
             //if (Overhang > 0)
             //{
