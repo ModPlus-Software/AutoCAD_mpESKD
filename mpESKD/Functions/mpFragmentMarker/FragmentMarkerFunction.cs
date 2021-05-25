@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker
+﻿using System;
+using Autodesk.AutoCAD.ApplicationServices;
+
+namespace mpESKD.Functions.mpFragmentMarker
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -66,12 +69,12 @@
         }
 
         [CommandMethod("ModPlus", "mpFragmentMarker", CommandFlags.Modal)]
-        public void CreateLinearBreakLine()
+        public void CreateFragment()
         {
-            CreateFragmentMarker(FragmentMarkerType.Linear);
+            CreateFragmentMarker();
         }
 
-        private static void CreateFragmentMarker(FragmentMarkerType fragmentMarkerType)
+        private static void CreateFragmentMarker()
         {
 #if !DEBUG
             Statistic.SendCommandStarting(
@@ -90,7 +93,6 @@
 
                 var blockReference = MainFunction.CreateBlock(breakLine);
                 breakLine.ApplyStyle(style, true);
-                breakLine.FragmentMakerType = fragmentMarkerType;
 
                 InsertFragmentMarkerWithJig(breakLine, blockReference);
             }

@@ -1,4 +1,7 @@
 ﻿// ReSharper disable RedundantNameQualifier
+
+using System.Diagnostics;
+
 namespace mpESKD.Base
 {
     using System;
@@ -165,7 +168,7 @@ namespace mpESKD.Base
                                 _blockRecord = (BlockTableRecord)tr.GetObject(blkRef.BlockTableRecord, OpenMode.ForWrite, true, true);
                                 if (_blockRecord.GetBlockReferenceIds(true, true).Count <= 1)
                                 {
-                                    // Debug.Print("Erasing");
+                                    Debug.Print("Erasing");
                                     foreach (var objectId in _blockRecord)
                                     {
                                         tr.GetObject(objectId, OpenMode.ForWrite, true, true).Erase();
