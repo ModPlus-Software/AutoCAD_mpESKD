@@ -141,15 +141,12 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
-
-
         /// <summary>
         /// Построение "базового" простого варианта ЕСКД примитива
         /// Тот вид, который висит на мышке при создании и указании точки вставки
         /// </summary>
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
-            
             if (variant == UpdateVariant.SetInsertionPoint)
             {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
@@ -186,40 +183,40 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             // Первая точка начало дуги радиус Radius * scale
             // 1. От первой точки до второй проводим линию это будет вектор
-            // 2. Чтобу получить точку от начала вектора, получаем нормаль и умножаем на нужную длину
+            // 2. Чтобы получить точку от начала вектора, получаем нормаль и умножаем на нужную длину
             // 3. Поворачиваем полученный вектор на 90 градусов и отсчитываем необходимую высоту
 
-            double lengthRadius = Radius * scale;
+            var lengthRadius = Radius * scale;
 
-            Vector3d normal = (endPoint - insertionPoint).GetNormal();
+            var normal = (endPoint - insertionPoint).GetNormal();
 
             _pts.Add(insertionPoint.ToPoint2d());
             _bulges.Add(-0.4141);
 
             var vectorLength = normal * lengthRadius;
 
-            Point3d p2_v = insertionPoint + vectorLength;
-            Point3d p2 = p2_v + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            var p2_v = insertionPoint + vectorLength;
+            var p2 = p2_v + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             _pts.Add(p2.ToPoint2d());
             _bulges.Add(0.0);
 
-            var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - (lengthRadius));
-            Point3d p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - lengthRadius);
+            var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             _pts.Add(p3.ToPoint2d());
             _bulges.Add(0.4141);
 
-            var p4_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2));
-            Point3d p4 = p4_t.ToPoint3d() + (vectorLength * 2).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            var p4_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2);
+            var p4 = p4_t.ToPoint3d() + (vectorLength * 2).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             _pts.Add(p4.ToPoint2d());
             _bulges.Add(0.4141);
 
-            var p5_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) + (lengthRadius));
-            Point3d p5 = p5_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            var p5_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + lengthRadius);
+            var p5 = p5_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             _pts.Add(p5.ToPoint2d());
             _bulges.Add(0.0);
 
-            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length - (lengthRadius));
-            Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length - lengthRadius);
+            var p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             _pts.Add(p6.ToPoint2d());
             _bulges.Add(-0.4141);
 
