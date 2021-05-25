@@ -40,7 +40,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
 #if !DEBUG
             Statistic.SendCommandStarting(
-                BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+                FragmentMarker.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {

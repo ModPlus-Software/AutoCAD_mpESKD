@@ -45,8 +45,6 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         #region fields
 
-        
-        //private Point3d _tmpEndPoint;
         private double _scale;
         private List<double> _bulges;
         private Point2dCollection _pts;
@@ -69,13 +67,6 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20;
-
-        /// <summary>
-        /// Тип 
-        /// </summary>
-        //[EntityProperty(PropertiesCategory.Geometry, 1, "p1", FragmentMarkerType.Linear, descLocalKey: "d1")]
-        //[SaveToXData]
-        //public FragmentMarkerType FragmentMakerType { get; set; } = FragmentMarkerType.Linear;
 
         /// <summary>
         /// Радиус скругления
@@ -194,16 +185,14 @@ namespace mpESKD.Functions.mpFragmentMarker
             _bulges = new List<double>();
             _pts = new Point2dCollection();
 
-            //Первая точка начало дуги радиус 5
-
-            
-            // 1. от первой точки до второй проводим линию, от начала этой линии отсчитываем Radius по Х
-            // 2. находим Y от Х перпендикуляр 
+            // Первая точка начало дуги радиус Radius * scale
+            // 1. От первой точки до второй проводим линию это будет вектор
+            // 2. Чтобу получить точку от начала вектора, получаем нормаль и умножаем на нужную длину
+            // 3. Поварачиваем полученный вектор на 90 градусов и отсчитываем необходимую высоту
 
             double lengthRadius = Radius * _scale;
 
-            var vector3d = endPoint - insertionPoint;
-            Vector3d normal = vector3d.GetNormal();
+            Vector3d normal = (endPoint - insertionPoint).GetNormal();
 
             _pts.Add(insertionPoint.ToPoint2d());
             _bulges.Add(-0.4141);
@@ -252,13 +241,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 _mainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
             }
-        }
-
-        private Point2d SetPointsAndBulges(double distance, Vector3d vectorLength)
-        {
-            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(InsertionPoint, EndPoint, distance);
-            Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            return p6.ToPoint2d();
         }
 
         #endregion
