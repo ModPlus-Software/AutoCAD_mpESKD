@@ -43,13 +43,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             return TypeFactory.Instance.GetDescriptor(typeof(FragmentMarker));
         }
 
-        #region fields
-        
-        private List<double> _bulges;
-        private Point2dCollection _pts;
-
-        #endregion
-
         #region Properties
 
         /// <inheritdoc />
@@ -131,8 +124,8 @@ namespace mpESKD.Functions.mpFragmentMarker
                 else
                 {
                     // Задание второй точки
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
-                    FillMainPolylineWithPoints(pts, _bulges);
+                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                    FillMainPolylineWithPoints(pts, bulges);
                 }
             }
             catch (Exception exception)
@@ -147,27 +140,29 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// </summary>
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
+            List<double> bulges;
+
             if (variant == UpdateVariant.SetInsertionPoint)
             {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                var endPoint = new Point3d(
+                var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
 
-                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, endPoint);
-                FillMainPolylineWithPoints(pts, _bulges);
+                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
+                FillMainPolylineWithPoints(pts, bulges);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                var endPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, endPoint);
-                FillMainPolylineWithPoints(pts, _bulges);
-                EndPoint = endPoint.TransformBy(BlockTransform);
+                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
+                FillMainPolylineWithPoints(pts, bulges);
+                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
 
@@ -175,11 +170,11 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// Получение точек для построения базовой полилинии
         /// </summary>
         private Point2dCollection PointsToCreatePolyline(
-            double scale, Point3d insertionPoint, Point3d endPoint)
+            double scale, Point3d insertionPoint, Point3d endPoint,  out List<double> bulges)
         {
             var length = endPoint.DistanceTo(insertionPoint);
-            _bulges = new List<double>();
-            _pts = new Point2dCollection();
+            bulges = new List<double>();
+            var pts = new Point2dCollection();
 
             // Первая точка начало дуги радиус Radius * scale
             // 1. От первой точки до второй проводим линию это будет вектор
@@ -190,40 +185,40 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             var normal = (endPoint - insertionPoint).GetNormal();
 
-            _pts.Add(insertionPoint.ToPoint2d());
-            _bulges.Add(-0.4141);
+            pts.Add(insertionPoint.ToPoint2d());
+            bulges.Add(-0.4141);
 
             var vectorLength = normal * lengthRadius;
 
             var p2_v = insertionPoint + vectorLength;
             var p2 = p2_v + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            _pts.Add(p2.ToPoint2d());
-            _bulges.Add(0.0);
+            pts.Add(p2.ToPoint2d());
+            bulges.Add(0.0);
 
             var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - lengthRadius);
             var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            _pts.Add(p3.ToPoint2d());
-            _bulges.Add(0.4141);
+            pts.Add(p3.ToPoint2d());
+            bulges.Add(0.4141);
 
             var p4_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2);
             var p4 = p4_t.ToPoint3d() + (vectorLength * 2).RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            _pts.Add(p4.ToPoint2d());
-            _bulges.Add(0.4141);
+            pts.Add(p4.ToPoint2d());
+            bulges.Add(0.4141);
 
             var p5_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + lengthRadius);
             var p5 = p5_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            _pts.Add(p5.ToPoint2d());
-            _bulges.Add(0.0);
+            pts.Add(p5.ToPoint2d());
+            bulges.Add(0.0);
 
             var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length - lengthRadius);
             var p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            _pts.Add(p6.ToPoint2d());
-            _bulges.Add(-0.4141);
+            pts.Add(p6.ToPoint2d());
+            bulges.Add(-0.4141);
 
-            _pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
-            _bulges.Add(0.0);
+            pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
+            bulges.Add(0.0);
 
-            return _pts;
+            return pts;
         }
 
         /// <summary>Изменение точек полилинии</summary>
