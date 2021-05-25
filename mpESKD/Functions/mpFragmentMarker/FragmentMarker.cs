@@ -44,8 +44,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         }
 
         #region fields
-
-        private double _scale;
+        
         private List<double> _bulges;
         private Point2dCollection _pts;
 
@@ -118,21 +117,21 @@ namespace mpESKD.Functions.mpFragmentMarker
             try
             {
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
-                _scale = GetScale();
+                var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, _scale);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < MinDistanceBetweenPoints * _scale)
+                else if (length < MinDistanceBetweenPoints * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, _scale);
+                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
                 }
                 else
                 {
                     // Задание второй точки
-                    var pts = PointsToCreatePolyline(_scale, InsertionPointOCS, EndPointOCS);
+                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
                     FillMainPolylineWithPoints(pts, _bulges);
                 }
             }
@@ -188,9 +187,9 @@ namespace mpESKD.Functions.mpFragmentMarker
             // Первая точка начало дуги радиус Radius * scale
             // 1. От первой точки до второй проводим линию это будет вектор
             // 2. Чтобу получить точку от начала вектора, получаем нормаль и умножаем на нужную длину
-            // 3. Поварачиваем полученный вектор на 90 градусов и отсчитываем необходимую высоту
+            // 3. Поворачиваем полученный вектор на 90 градусов и отсчитываем необходимую высоту
 
-            double lengthRadius = Radius * _scale;
+            double lengthRadius = Radius * scale;
 
             Vector3d normal = (endPoint - insertionPoint).GetNormal();
 
@@ -241,13 +240,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 _mainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
             }
-        }
-
-        private Point2d SetPointsAndBulges(double distance, Vector3d vectorLength)
-        {
-            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(InsertionPoint, EndPoint, distance);
-            Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            return p6.ToPoint2d();
         }
 
         #endregion
