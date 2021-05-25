@@ -634,7 +634,7 @@ namespace mpESKD.Functions.mpLevelMark
                 };
 
                 _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-                
+
                 if (isTop)
                     _bottomDbText.Position -= verV * _bottomDbText.GetHeight();
                 else
@@ -665,7 +665,7 @@ namespace mpESKD.Functions.mpLevelMark
             {
                 AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
                 AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
-                
+
                 var diff = Math.Abs(topTextLength - bottomTextLength);
                 AcadUtils.WriteMessageInDebug($"Diff: {diff}");
                 if (topTextLength > bottomTextLength)

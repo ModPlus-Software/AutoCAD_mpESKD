@@ -147,6 +147,15 @@
   </Choose>
 
   <ItemGroup>
+    <Compile Remove="Functions\mpFragmentMarker\Help\**" />
+    <EmbeddedResource Remove="Functions\mpFragmentMarker\Help\**" />
+    <None Remove="Functions\mpFragmentMarker\Help\**" />
+    <Page Remove="Functions\mpFragmentMarker\Help\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
+    <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
@@ -189,6 +198,8 @@
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
+    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
+    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
