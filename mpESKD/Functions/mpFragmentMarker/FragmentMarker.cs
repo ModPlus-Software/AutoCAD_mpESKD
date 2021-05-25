@@ -243,6 +243,13 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
+        private Point2d SetPointsAndBulges(double distance, Vector3d vectorLength)
+        {
+            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(InsertionPoint, EndPoint, distance);
+            Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            return p6.ToPoint2d();
+        }
+
         #endregion
     }
 }
