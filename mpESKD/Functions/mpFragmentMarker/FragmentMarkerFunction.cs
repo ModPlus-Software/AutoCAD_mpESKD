@@ -1,7 +1,4 @@
-﻿using System;
-using Autodesk.AutoCAD.ApplicationServices;
-
-namespace mpESKD.Functions.mpFragmentMarker
+﻿namespace mpESKD.Functions.mpFragmentMarker
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -78,7 +75,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
 #if !DEBUG
             Statistic.SendCommandStarting(
-                BreakLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+                FragmentMarker.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {

@@ -63,7 +63,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// <summary>
         /// Радиус скругления
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p83", 5, 0, 10, descLocalKey: "d86", nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p83", 5, 0, 10, descLocalKey: "d83-1", nameSymbol: "a")]
         [SaveToXData]
         public int Radius { get; set; } = 5;
 
@@ -195,7 +195,7 @@ namespace mpESKD.Functions.mpFragmentMarker
             pts.Add(p2.ToPoint2d());
             bulges.Add(0.0);
 
-            var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 - lengthRadius);
+            var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - lengthRadius);
             var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p3.ToPoint2d());
             bulges.Add(0.4141);
@@ -205,7 +205,7 @@ namespace mpESKD.Functions.mpFragmentMarker
             pts.Add(p4.ToPoint2d());
             bulges.Add(0.4141);
 
-            var p5_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, length / 2 + lengthRadius);
+            var p5_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) + lengthRadius);
             var p5 = p5_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
             pts.Add(p5.ToPoint2d());
             bulges.Add(0.0);
