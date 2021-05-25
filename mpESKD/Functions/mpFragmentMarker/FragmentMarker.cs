@@ -13,10 +13,10 @@ namespace mpESKD.Functions.mpFragmentMarker
     using ModPlusAPI.Windows;
 
     /// <summary>
-    /// Линия обрыва
+    /// Линия фрагмента
     /// </summary>
-    [SmartEntityDisplayNameKey("h48")]
-    [SystemStyleDescriptionKey("h53")]
+    [SmartEntityDisplayNameKey("h145")]
+    [SystemStyleDescriptionKey("h146")]
     public class FragmentMarker : SmartEntity
     {
         /// <summary>
@@ -46,10 +46,10 @@ namespace mpESKD.Functions.mpFragmentMarker
         #region fields
 
         
-        private Point3d _tmpEndPoint;
+        //private Point3d _tmpEndPoint;
         private double _scale;
         private List<double> _bulges;
-        private Point2dCollection _pts ;
+        private Point2dCollection _pts;
 
         #endregion
 
@@ -80,19 +80,9 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// <summary>
         /// Радиус скругления
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "f1", 5, 0, 20, descLocalKey: "ff1", nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p83", 5, 0, 10, descLocalKey: "d86", nameSymbol: "a")]
         [SaveToXData]
         public int Radius { get; set; } = 5;
-
-        ///// <summary>Ширина ???? </summary>
-        //[EntityProperty(PropertiesCategory.Geometry, 3, "p3", 5, 1, 10, descLocalKey: "d3", nameSymbol: "w")]
-        //[SaveToXData]
-        //public int BreakWidth { get; set; } = 5;
-
-        ///// <summary>Длина обрыва для линейного обрыва</summary>
-        //[EntityProperty(PropertiesCategory.Geometry, 4, "p4", 10, 1, 13, descLocalKey: "d4", nameSymbol: "h")]
-        //[SaveToXData]
-        //public int BreakHeight { get; set; } = 10;
 
         #endregion
 
@@ -170,16 +160,15 @@ namespace mpESKD.Functions.mpFragmentMarker
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
             
-            
             if (variant == UpdateVariant.SetInsertionPoint)
             {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
-                _tmpEndPoint = new Point3d(
+                var endPoint = new Point3d(
                     InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
 
-                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, _tmpEndPoint);
+                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, endPoint);
                 FillMainPolylineWithPoints(pts, _bulges);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
@@ -187,11 +176,11 @@ namespace mpESKD.Functions.mpFragmentMarker
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
-                 _tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                var endPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, _tmpEndPoint);
+                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, endPoint);
                 FillMainPolylineWithPoints(pts, _bulges);
-                EndPoint = _tmpEndPoint.TransformBy(BlockTransform);
+                EndPoint = endPoint.TransformBy(BlockTransform);
             }
         }
 
@@ -204,38 +193,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             var length = endPoint.DistanceTo(insertionPoint);
             _bulges = new List<double>();
             _pts = new Point2dCollection();
-
-            // точки
-            //if (Overhang > 0)
-            //{
-            //    //pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
-            //    //    insertionPoint,
-            //    //    ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang / 100.0 * length),
-            //    //    -Overhang / 200.0 * length));
-            //    //bulges.Add(length / 5 / length / 4 * 2);
-            //    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(endPoint, insertionPoint, insertionPoint, Overhang * scale));
-            //    bulges.Add(0.0);
-            //}
-
-            //// Первая точка, соответствующая ручке`
-            //pts.Add(insertionPoint.ToPoint2d());
-            //bulges.Add(length / 5 / length / 2 * 4);
-
-            //// Средняя точка
-            //pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length / 8));
-            //bulges.Add(-length / 10 / length / 2 * 4);
-
-            //// Конечная точка, соответствующая ручке
-            //pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
-            //bulges.Add(0);
-            //if (Overhang > 0)
-            //{
-            //    pts.Add(ModPlus.Helpers.GeometryHelpers.GetPerpendicularPoint2d(
-            //        insertionPoint,
-            //        ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(insertionPoint, endPoint, endPoint, Overhang / 100.0 * length),
-            //        -Overhang / 200.0 * length));
-            //    bulges.Add(length / 10 / length / 4 * 2);
-            //}
 
             //Первая точка начало дуги радиус 5
 
@@ -281,12 +238,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             _pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length));
             _bulges.Add(0.0);
 
-            //if (Overhang > 0)
-            //{
-            //    pts.Add(ModPlus.Helpers.GeometryHelpers.Point2dAtDirection(insertionPoint, endPoint, insertionPoint, length + (Overhang * scale)));
-            //    bulges.Add(0.0);
-            //}
-
             return _pts;
         }
 
@@ -303,12 +254,11 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
-        private void SetPointsAndBulges()
+        private Point2d SetPointsAndBulges(double distance, Vector3d vectorLength)
         {
-            //var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(InsertionPoint, _tmpEndPoint, length - (len));
-            //Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
-            //_pts.Add(p6.ToPoint2d());
-            //_bulges.Add(-0.4141);
+            var p6_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(InsertionPoint, EndPoint, distance);
+            Point3d p6 = p6_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            return p6.ToPoint2d();
         }
 
         #endregion

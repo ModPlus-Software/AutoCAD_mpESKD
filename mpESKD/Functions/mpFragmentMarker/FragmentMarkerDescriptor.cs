@@ -16,15 +16,15 @@
 
         /// <inheritdoc />
         // "обозначение фрагмента
-        public string LName => Language.GetItem("h48");
+        public string LName => Language.GetItem("h145");
 
         /// <inheritdoc />
         // "Создание линии фрагмента"
-        public string Description => Language.GetItem("h56");
+        public string Description => Language.GetItem("h147");
 
         /// <inheritdoc />
         // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию фрагмента, путем указания двух точек"
-        public string FullDescription => Language.GetItem("h57");
+        public string FullDescription => Language.GetItem("h148");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -39,14 +39,14 @@
         public List<string> SubFunctionsLNames => new List<string>
         {
             // "Обозначение фрагмента"
-            Language.GetItem("h58"),
+            Language.GetItem("h145"),
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
             // "Создание фрагмента"
-            Language.GetItem("h60"),
+            Language.GetItem("h147"),
         };
 
         /// <inheritdoc />

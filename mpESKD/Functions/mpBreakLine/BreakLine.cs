@@ -15,8 +15,8 @@ namespace mpESKD.Functions.mpBreakLine
     /// <summary>
     /// Линия обрыва
     /// </summary>
-    [SmartEntityDisplayNameKey("h48")]
-    [SystemStyleDescriptionKey("h53")]
+    [SmartEntityDisplayNameKey("h48")] //Линия обрыва
+    [SystemStyleDescriptionKey("h53")] //Базовый стиль для линии обрыва
     public class BreakLine : SmartEntity
     {
         /// <summary>
