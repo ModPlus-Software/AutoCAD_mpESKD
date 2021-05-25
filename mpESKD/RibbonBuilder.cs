@@ -9,6 +9,7 @@
     using Base.Abstractions;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
+    using Functions.mpFragmentMarker;
     using Functions.mpGroundLine;
     using Functions.mpLevelMark;
     using Functions.mpNodalLeader;
@@ -150,6 +151,7 @@
                 AddAxisPanel(ribbonTab);
                 AddLeadersPanel(ribbonTab);
                 AddLevelMarksPanel(ribbonTab);
+                AddMarksPanel(ribbonTab);
                 AddLinesPanel(ribbonTab);
                 AddViewsPanel(ribbonTab);
 
@@ -299,6 +301,29 @@
             // mpSection
             ribRowPanel.Items.Add(GetBigSplitButton(Functions.mpSection.Section.GetDescriptor()));
 
+            if (ribRowPanel.Items.Any())
+            {
+                ribSourcePanel.Items.Add(ribRowPanel);
+            }
+        }
+
+        /// <summary>
+        /// Панель "Обозначения
+        /// </summary>
+        private static void AddMarksPanel(RibbonTab ribbonTab)
+        {
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab16") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
+            ribbonTab.Panels.Add(ribPanel);
+            var ribRowPanel = new RibbonRowPanel();
+            
+            // mpFragmentMarker
+            var ribbonButton = GetBigButton(FragmentMarker.GetDescriptor());
+            if (ribbonButton != null)
+            {
+                ribRowPanel.Items.Add(ribbonButton);
+            }
+            
             if (ribRowPanel.Items.Any())
             {
                 ribSourcePanel.Items.Add(ribRowPanel);

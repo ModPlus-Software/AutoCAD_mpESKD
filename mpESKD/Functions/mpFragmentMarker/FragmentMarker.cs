@@ -63,7 +63,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// <summary>
         /// Радиус скругления
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p83", 5, 0, 10, descLocalKey: "d83-1", nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p83", 5, 1, 10, descLocalKey: "d83-1", nameSymbol: "r")]
         [SaveToXData]
         public int Radius { get; set; } = 5;
 
