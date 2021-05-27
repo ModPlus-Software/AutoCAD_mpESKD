@@ -1,4 +1,7 @@
 ﻿// ReSharper disable InconsistentNaming
+
+using mpESKD.Functions.mpNodalLeader.Overrules;
+
 namespace mpESKD.Functions.mpFragmentMarker
 {
     using System;
@@ -17,8 +20,65 @@ namespace mpESKD.Functions.mpFragmentMarker
     /// </summary>
     [SmartEntityDisplayNameKey("h145")]
     [SystemStyleDescriptionKey("h146")]
-    public class FragmentMarker : SmartEntity
+    public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
+        private readonly string _lastNodeNumber;
+        private string _cachedNodeNumber;
+
+        #region Entities
+
+        /// <summary>
+        /// Рамка узла при типе "Прямоугольная"
+        /// </summary>
+        private Polyline _framePolyline;
+
+        /// <summary>
+        /// Рамка узла при типе "Круглая"
+        /// </summary>
+        private Circle _frameCircle;
+
+        /// <summary>
+        /// Линия выноски
+        /// </summary>
+        private Line _leaderLine;
+
+        /// <summary>
+        /// Полка выноски
+        /// </summary>
+        private Line _shelfLine;
+
+        /// <summary>
+        /// Верхний первый текст (номер узла)
+        /// </summary>
+        private DBText _topFirstDbText;
+
+        /// <summary>
+        /// Маскировка фона верхнего первого текста (номер узла)
+        /// </summary>
+        private Wipeout _topFirstTextMask;
+
+        /// <summary>
+        /// Верхний второй текст (номер листа)
+        /// </summary>
+        private DBText _topSecondDbText;
+
+        /// <summary>
+        /// Маскировка фона верхнего второго текста (номер листа)
+        /// </summary>
+        private Wipeout _topSecondTextMask;
+
+        /// <summary>
+        /// Нижний текст (адрес узла)
+        /// </summary>
+        private DBText _bottomDbText;
+
+        /// <summary>
+        /// Маскировка нижнего текста (адрес узла)
+        /// </summary>
+        private Wipeout _bottomTextMask;
+
+        #endregion
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FragmentMarker"/> class.
         /// </summary>
@@ -33,6 +93,15 @@ namespace mpESKD.Functions.mpFragmentMarker
         public FragmentMarker(ObjectId blockId)
             : base(blockId)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodalLeader"/> class.
+        /// </summary>
+        /// <param name="lastNodeNumber">Номер узла последней созданной узловой выноски</param>
+        public FragmentMarker(string lastNodeNumber)
+        {
+            _lastNodeNumber = lastNodeNumber;
         }
 
         /// <summary>
@@ -67,6 +136,95 @@ namespace mpESKD.Functions.mpFragmentMarker
         [SaveToXData]
         public int Radius { get; set; } = 5;
 
+        [SaveToXData]
+        public Point3d FramePoint { get; set; }
+
+        /// <summary>
+        /// Точка рамки в внутренней системе координат блока
+        /// </summary>
+        private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
+
+        /// <summary>
+        /// Состояние Jig при создании узловой выноски
+        /// </summary
+        //public NodalLeaderJigState? JigState { get; set; }
+
+        /// <summary>
+        /// Отступ текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 3.0, nameSymbol: "o")]
+        [SaveToXData]
+        public double TextIndent { get; set; } = 1.0;
+
+        /// <summary>
+        /// Вертикальный отступ текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
+        [SaveToXData]
+        public double TextVerticalOffset { get; set; } = 1.0;
+
+        /// <summary>
+        /// Выступ полки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 3, descLocalKey: "d63", nameSymbol: "l")]
+        [SaveToXData]
+        public int ShelfLedge { get; set; } = 1;
+
+        /// <summary>
+        /// Положение полки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 8, "p78", ShelfPosition.Right)]
+        [SaveToXData]
+        public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
+
+        /// <summary>
+        /// Высота текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+        [SaveToXData]
+        public double MainTextHeight { get; set; } = 3.5;
+
+        /// <summary>
+        /// Высота малого текста
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+        [SaveToXData]
+        public double SecondTextHeight { get; set; } = 2.5;
+
+        /// <summary>
+        /// Текст всегда горизонтально
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 4, "p84", false, descLocalKey: "d84")]
+        [SaveToXData]
+        public bool IsTextAlwaysHorizontal { get; set; }
+
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 5, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
+        [SaveToXData]
+        public bool HideTextBackground { get; set; }
+
+        /// <inheritdoc/>
+        [EntityProperty(PropertiesCategory.Content, 6, "p86", 0.5, 0.0, 5.0)]
+        [SaveToXData]
+        public double TextMaskOffset { get; set; } = 0.5;
+
+        /// <summary>
+        /// Номер узла
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 7, "p79", "", propertyScope: PropertyScope.Palette)]
+        [SaveToXData]
+        [ValueToSearchBy]
+        public string NodeNumber { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Адрес узла
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 9, "p81", "", propertyScope: PropertyScope.Palette)]
+        [SaveToXData]
+        [ValueToSearchBy]
+        public string NodeAddress { get; set; } = string.Empty;
+
         #endregion
 
         #region Geometry
@@ -87,7 +245,20 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             get
             {
-                var entities = new List<Entity> { _mainPolyline };
+                var entities = new List<Entity>
+                {
+                    _topFirstTextMask,
+                    _topSecondTextMask,
+                    _bottomTextMask,
+                    _mainPolyline,
+                    _framePolyline,
+                    _frameCircle,
+                    _leaderLine,
+                    _shelfLine,
+                    _topFirstDbText,
+                    _topSecondDbText,
+                    _bottomDbText
+                };
                 foreach (var e in entities)
                 {
                     SetImmutablePropertiesToNestedEntity(e);
@@ -102,6 +273,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             yield return InsertionPoint;
             yield return EndPoint;
+            //yield return LeaderPoint;
         }
 
         /// <inheritdoc />
@@ -126,6 +298,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     // Задание второй точки
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
                     FillMainPolylineWithPoints(pts, bulges);
+                    CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
                 }
             }
             catch (Exception exception)
@@ -152,6 +325,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
+                CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
@@ -163,6 +337,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+                CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
             }
         }
 
@@ -170,7 +345,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// Получение точек для построения базовой полилинии
         /// </summary>
         private Point2dCollection PointsToCreatePolyline(
-            double scale, Point3d insertionPoint, Point3d endPoint,  out List<double> bulges)
+            double scale, Point3d insertionPoint, Point3d endPoint, out List<double> bulges)
         {
             var length = endPoint.DistanceTo(insertionPoint);
             bulges = new List<double>();
@@ -234,6 +409,152 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
+        private void CreateEntities(
+    Point3d insertionPoint,
+    
+    Point3d leaderPoint,
+    double scale,
+    bool drawLeader)
+        {
+
+               
+
+                    //if (!drawLeader)
+                    //    return;
+
+                    //var leaderLine = new Line(insertionPoint, leaderPoint);
+                    //var pts = new Point3dCollection();
+                    //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+                    //_leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+
+            
+
+            
+
+            // Если drawLeader == false, то дальше код не выполнится
+
+            //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
+
+            SetNodeNumberOnCreation();
+
+            var mainTextHeight = MainTextHeight * scale;
+            var secondTextHeight = SecondTextHeight * scale;
+            var textIndent = TextIndent * scale;
+            var textVerticalOffset = TextVerticalOffset * scale;
+            var shelfLedge = ShelfLedge * scale;
+            var isRight = ShelfPosition == ShelfPosition.Right;
+
+            var topFirstTextLength = 0.0;
+            var topSecondTextLength = 0.0;
+            var bottomTextLength = 0.0;
+            var bottomTextHeight = 0.0;
+
+            if (!string.IsNullOrEmpty(NodeNumber))
+            {
+                _topFirstDbText = new DBText { TextString = NodeNumber };
+                _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+                topFirstTextLength = _topFirstDbText.GetLength();
+            }
+
+
+            if (!string.IsNullOrEmpty(NodeAddress))
+            {
+                _bottomDbText = new DBText { TextString = NodeAddress };
+                _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+                bottomTextLength = _bottomDbText.GetLength();
+                bottomTextHeight = _bottomDbText.GetHeight();
+            }
+
+            var topTextLength = topFirstTextLength + topSecondTextLength;
+            var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+            var shelfLength = textIndent + largestTextLength + shelfLedge;
+
+            if (isRight)
+            {
+                var nodeNumberPosition =
+                    leaderPoint +
+                    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+                    (Vector3d.YAxis * textVerticalOffset);
+
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position = nodeNumberPosition;
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
+                }
+
+                if (_bottomDbText != null)
+                {
+                    _bottomDbText.Position = leaderPoint +
+                                             (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                                             (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                }
+            }
+            else
+            {
+                var sheetNumberEndPoint =
+                    leaderPoint -
+                    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+                    (Vector3d.YAxis * textVerticalOffset);
+
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position = sheetNumberEndPoint -
+                                               (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position = sheetNumberEndPoint -
+                                                (Vector3d.XAxis * topSecondTextLength);
+                }
+
+                if (_bottomDbText != null)
+                {
+                    _bottomDbText.Position = leaderPoint -
+                                             (Vector3d.XAxis * shelfLength) +
+                                             (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                                             (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                }
+            }
+
+            var shelfEndPoint = ShelfPosition == ShelfPosition.Right
+                ? leaderPoint + (Vector3d.XAxis * shelfLength)
+                : leaderPoint - (Vector3d.XAxis * shelfLength);
+
+            if (HideTextBackground)
+            {
+                var offset = TextMaskOffset * scale;
+                _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset);
+                _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset);
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
+            }
+
+            if (IsTextAlwaysHorizontal && IsRotated)
+            {
+                var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
+                shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
+                _topFirstDbText?.TransformBy(backRotationMatrix);
+                _topFirstTextMask?.TransformBy(backRotationMatrix);
+                _topSecondDbText?.TransformBy(backRotationMatrix);
+                _topSecondTextMask?.TransformBy(backRotationMatrix);
+                _bottomDbText?.TransformBy(backRotationMatrix);
+                _bottomTextMask?.TransformBy(backRotationMatrix);
+            }
+
+            _shelfLine = new Line(leaderPoint, shelfEndPoint);
+        }
+
+        private void SetNodeNumberOnCreation()
+        {
+            if (!IsValueCreated)
+                return;
+
+            NodeNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
+        }
         #endregion
     }
 }
