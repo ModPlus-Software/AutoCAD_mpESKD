@@ -289,5 +289,24 @@
         }
 
         #endregion
+
+        #region FragmentMarker
+
+        /// <summary>
+        /// Продолжать нумерацию узла при создании новой узловой выноски
+        /// </summary>
+        public bool FragmentMarkerContinueNodeNumber
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(FragmentMarkerContinueNodeNumber)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(FragmentMarkerContinueNodeNumber), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
     }
 }

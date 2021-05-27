@@ -49,7 +49,7 @@
     <Description>2018</Description>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'A2019'">
+  <PropertyGroup Condition="'$(Configuration)' == 'A2019' or '$(Configuration)'=='Debug'">
     <TargetFramework>net47</TargetFramework>
     <Description>2019</Description>
   </PropertyGroup>
@@ -64,7 +64,7 @@
     <Description>2021</Description>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'A2022' or '$(Configuration)'=='Debug'">
+  <PropertyGroup Condition="'$(Configuration)' == 'A2022'">
     <TargetFramework>net48</TargetFramework>
     <Description>2022</Description>
   </PropertyGroup>
@@ -141,7 +141,6 @@
     <When Condition="'$(Configuration)'=='A2022' or '$(Configuration)'=='Debug'">
       <ItemGroup>
         <PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
-        <PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="6.4.0.0" ExcludeAssets="runtime" />
       </ItemGroup>
     </When>
   </Choose>
@@ -176,6 +175,7 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2019" Version="6.4.0" />
     <PackageReference Include="ModPlusAPI" Version="6.9.0" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusStyle" Version="3.8.0" ExcludeAssets="runtime" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
