@@ -298,7 +298,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     // Задание второй точки
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
                     FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(EndPointOCS, pts[3].ToPoint3d(), scale, true);
+                    CreateEntities(EndPointOCS, pts[3].ToPoint3d(), scale);
                 }
             }
             catch (Exception exception)
@@ -325,7 +325,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(),scale, true);
+                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
@@ -337,7 +337,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale, true);
+                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
                 //CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
             }
         }
@@ -410,27 +410,15 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
-        private void CreateEntities(
-    Point3d insertionPoint,
-    
-    Point3d leaderPoint,
-    double scale
-    )
+        private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
         {
+            //if (!drawLeader)
+            //    return;
 
-               
-
-                    //if (!drawLeader)
-                    //    return;
-
-                    //var leaderLine = new Line(insertionPoint, leaderPoint);
-                    //var pts = new Point3dCollection();
-                    //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                    //_leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-
-            
-
-            
+            //var leaderLine = new Line(insertionPoint, leaderPoint);
+            //var pts = new Point3dCollection();
+            //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+            //_leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
 
             // Если drawLeader == false, то дальше код не выполнится
 
