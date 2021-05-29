@@ -298,7 +298,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     // Задание второй точки
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
                     FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
+                    CreateEntities(EndPointOCS, pts[3].ToPoint3d(), scale, true);
                 }
             }
             catch (Exception exception)
@@ -325,7 +325,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
+                CreateEntities(InsertionPoint, pts[3].ToPoint3d(),scale, true);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
@@ -337,7 +337,8 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
+                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale, true);
+                //CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
             }
         }
 
@@ -413,8 +414,8 @@ namespace mpESKD.Functions.mpFragmentMarker
     Point3d insertionPoint,
     
     Point3d leaderPoint,
-    double scale,
-    bool drawLeader)
+    double scale
+    )
         {
 
                
