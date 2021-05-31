@@ -147,7 +147,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// <summary>
         /// Состояние Jig при создании узловой выноски
         /// </summary
-        //public NodalLeaderJigState? JigState { get; set; }
+        public FragmentMarkerJigState? JigState { get; set; }
 
         /// <summary>
         /// Отступ текста
@@ -273,7 +273,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             yield return InsertionPoint;
             yield return EndPoint;
-            //yield return LeaderPoint;
+            yield return EndPoint;
         }
 
         /// <inheritdoc />

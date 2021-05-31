@@ -1,4 +1,9 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker
+﻿using System.Collections.Generic;
+using System.Linq;
+using ModPlusAPI.IO;
+using mpESKD.Functions.mpNodalLeader;
+
+namespace mpESKD.Functions.mpFragmentMarker
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -47,8 +52,8 @@
                  * При инициализации плагина регистрации нет!
                  */
                 ExtendedDataUtils.AddRegAppTableRecord(FragmentMarker.GetDescriptor());
-
-                var fragmentMarker = new FragmentMarker();
+                var lastNodeNumber = FindLastNodeNumber();
+                var fragmentMarker = new FragmentMarker(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(fragmentMarker);
 
                 fragmentMarker.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
@@ -86,12 +91,13 @@
                  */
                 ExtendedDataUtils.AddRegAppTableRecord(FragmentMarker.GetDescriptor());
                 var style = StyleManager.GetCurrentStyle(typeof(FragmentMarker));
-                var breakLine = new FragmentMarker();
+                var lastNodeNumber = FindLastNodeNumber();
+                var fragmentMarker = new FragmentMarker(lastNodeNumber);
 
-                var blockReference = MainFunction.CreateBlock(breakLine);
-                breakLine.ApplyStyle(style, true);
+                var blockReference = MainFunction.CreateBlock(fragmentMarker);
+                fragmentMarker.ApplyStyle(style, true);
 
-                InsertFragmentMarkerWithJig(breakLine, blockReference);
+                InsertFragmentMarkerWithJig(fragmentMarker, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -105,23 +111,48 @@
 
         private static void InsertFragmentMarkerWithJig(FragmentMarker fragmentMarker, BlockReference blockReference)
         {
-            var entityJig = new DefaultEntityJig(
-                fragmentMarker,
-                blockReference,
-                new Point3d(15, 0, 0));
+            // <msg1>Укажите точку вставки:</msg1>
+            var insertionPointPrompt = Language.GetItem("msg1");
+
+            // <msg17>Укажите точку рамки:</msg17>
+            var framePointPrompt = Language.GetItem("msg17");
+
+            // <msg18>Укажите точку выноски:</msg18>
+            var leaderPointPrompt = Language.GetItem("msg18");
+
+            var entityJig = new DefaultEntityJig(fragmentMarker, blockReference, new Point3d(15, 0, 0))
+            {
+                PromptForInsertionPoint = insertionPointPrompt
+            };
+
+            fragmentMarker.JigState = FragmentMarkerJigState.InsertionPoint;
+
             do
             {
                 var status = AcadUtils.Editor.Drag(entityJig).Status;
                 if (status == PromptStatus.OK)
                 {
-                    if (entityJig.JigState == JigState.PromptInsertPoint)
+                    if (fragmentMarker.JigState == FragmentMarkerJigState.InsertionPoint)
                     {
-                        entityJig.JigState = JigState.PromptNextPoint;
+                        fragmentMarker.JigState = FragmentMarkerJigState.FramePoint;
+                        entityJig.PromptForNextPoint = framePointPrompt;
+                        entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                    }
+                    else if (fragmentMarker.JigState == FragmentMarkerJigState.FramePoint)
+                    {
+                        fragmentMarker.JigState = FragmentMarkerJigState.LeaderPoint;
+                        entityJig.PromptForNextPoint = leaderPointPrompt;
+                        fragmentMarker.FramePoint = fragmentMarker.EndPoint;
+                        
+                        // Тут не нужна привязка к предыдущей точке
+                        entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
                     }
                     else
                     {
                         break;
                     }
+
+                    entityJig.JigState = JigState.PromptNextPoint;
                 }
                 else
                 {
@@ -150,6 +181,23 @@
                     tr.Commit();
                 }
             }
+        }
+
+        /// <summary>
+        /// Поиск номера узла последней созданной узловой выноски
+        /// </summary>
+        private static string FindLastNodeNumber()
+        {
+            if (!MainSettings.Instance.NodalLeaderContinueNodeNumber)
+                return string.Empty;
+
+            var allValues = new List<string>();
+            AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<FragmentMarker>(typeof(FragmentMarker)).ForEach(a =>
+            {
+                allValues.Add(a.NodeNumber);
+            });
+
+            return allValues.OrderBy(s => s, new OrdinalStringComparer()).LastOrDefault();
         }
     }
 }
