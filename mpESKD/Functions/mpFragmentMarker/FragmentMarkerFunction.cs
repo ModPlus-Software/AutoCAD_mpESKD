@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using ModPlusAPI.IO;
 using mpESKD.Functions.mpNodalLeader;
@@ -134,12 +135,14 @@ namespace mpESKD.Functions.mpFragmentMarker
                 {
                     if (fragmentMarker.JigState == FragmentMarkerJigState.InsertionPoint)
                     {
+                        Debug.Print(fragmentMarker.JigState.Value.ToString());
                         fragmentMarker.JigState = FragmentMarkerJigState.FramePoint;
                         entityJig.PromptForNextPoint = framePointPrompt;
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
                     }
                     else if (fragmentMarker.JigState == FragmentMarkerJigState.FramePoint)
                     {
+                        Debug.Print(fragmentMarker.JigState.Value.ToString());
                         fragmentMarker.JigState = FragmentMarkerJigState.LeaderPoint;
                         entityJig.PromptForNextPoint = leaderPointPrompt;
                         fragmentMarker.FramePoint = fragmentMarker.EndPoint;
@@ -151,7 +154,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     {
                         break;
                     }
-
+                    Debug.Print(fragmentMarker.JigState.Value.ToString());
                     entityJig.JigState = JigState.PromptNextPoint;
                 }
                 else

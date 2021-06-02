@@ -28,16 +28,6 @@ namespace mpESKD.Functions.mpFragmentMarker
         #region Entities
 
         /// <summary>
-        /// Рамка узла при типе "Прямоугольная"
-        /// </summary>
-        private Polyline _framePolyline;
-
-        /// <summary>
-        /// Рамка узла при типе "Круглая"
-        /// </summary>
-        private Circle _frameCircle;
-
-        /// <summary>
         /// Линия выноски
         /// </summary>
         private Line _leaderLine;
@@ -48,32 +38,23 @@ namespace mpESKD.Functions.mpFragmentMarker
         private Line _shelfLine;
 
         /// <summary>
-        /// Верхний первый текст (номер узла)
+        /// Верхний текст 
         /// </summary>
         private DBText _topFirstDbText;
 
         /// <summary>
-        /// Маскировка фона верхнего первого текста (номер узла)
+        /// Маскировка фона верхнего текста 
         /// </summary>
         private Wipeout _topFirstTextMask;
 
+        
         /// <summary>
-        /// Верхний второй текст (номер листа)
-        /// </summary>
-        private DBText _topSecondDbText;
-
-        /// <summary>
-        /// Маскировка фона верхнего второго текста (номер листа)
-        /// </summary>
-        private Wipeout _topSecondTextMask;
-
-        /// <summary>
-        /// Нижний текст (адрес узла)
+        /// Нижний текст 
         /// </summary>
         private DBText _bottomDbText;
 
         /// <summary>
-        /// Маскировка нижнего текста (адрес узла)
+        /// Маскировка нижнего текста
         /// </summary>
         private Wipeout _bottomTextMask;
 
@@ -102,6 +83,35 @@ namespace mpESKD.Functions.mpFragmentMarker
         public FragmentMarker(string lastNodeNumber)
         {
             _lastNodeNumber = lastNodeNumber;
+        }
+
+        /// <summary>
+        /// Главная полилиния примитива
+        /// </summary>
+        private Polyline _mainPolyline;
+
+        /// <inheritdoc />
+        public override IEnumerable<Entity> Entities
+        {
+            get
+            {
+                var entities = new List<Entity>
+                {
+                    _topFirstTextMask,
+                    _bottomTextMask,
+                    _mainPolyline,
+                    _leaderLine,
+                    _shelfLine,
+                    _topFirstDbText,
+                    _bottomDbText
+                };
+                foreach (var e in entities)
+                {
+                    SetImmutablePropertiesToNestedEntity(e);
+                }
+
+                return entities;
+            }
         }
 
         /// <summary>
@@ -235,44 +245,12 @@ namespace mpESKD.Functions.mpFragmentMarker
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2);
 
-        /// <summary>
-        /// Главная полилиния примитива
-        /// </summary>
-        private Polyline _mainPolyline;
-
-        /// <inheritdoc />
-        public override IEnumerable<Entity> Entities
-        {
-            get
-            {
-                var entities = new List<Entity>
-                {
-                    _topFirstTextMask,
-                    _topSecondTextMask,
-                    _bottomTextMask,
-                    _mainPolyline,
-                    _framePolyline,
-                    _frameCircle,
-                    _leaderLine,
-                    _shelfLine,
-                    _topFirstDbText,
-                    _topSecondDbText,
-                    _bottomDbText
-                };
-                foreach (var e in entities)
-                {
-                    SetImmutablePropertiesToNestedEntity(e);
-                }
-
-                return entities;
-            }
-        }
-
+    
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return EndPoint;
+            yield return FramePoint;
             yield return EndPoint;
         }
 
@@ -283,6 +261,17 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
+                //// Задание первой точки (точки вставки). Она же точка начала отсчета
+                if (JigState == FragmentMarkerJigState.InsertionPoint)
+                {
+                    var tempFramePoint = new Point3d(
+                        InsertionPointOCS.X + (5 * scale),
+                        InsertionPointOCS.Y + (5 * scale),
+                        InsertionPointOCS.Z);
+                    
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
+                }
+
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
@@ -325,7 +314,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
+                CreateEntities(pts[3].ToPoint3d(), InsertionPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
@@ -415,10 +404,10 @@ namespace mpESKD.Functions.mpFragmentMarker
             //if (!drawLeader)
             //    return;
 
-            //var leaderLine = new Line(insertionPoint, leaderPoint);
-            //var pts = new Point3dCollection();
+            var leaderLine = new Line(insertionPoint, leaderPoint);
+            var pts = new Point3dCollection();
             //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-            //_leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+            _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
 
             // Если drawLeader == false, то дальше код не выполнится
 
@@ -470,11 +459,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                     _topFirstDbText.Position = nodeNumberPosition;
                 }
 
-                if (_topSecondDbText != null)
-                {
-                    _topSecondDbText.Position = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
-                }
-
                 if (_bottomDbText != null)
                 {
                     _bottomDbText.Position = leaderPoint +
@@ -495,12 +479,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                                                (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
                 }
 
-                if (_topSecondDbText != null)
-                {
-                    _topSecondDbText.Position = sheetNumberEndPoint -
-                                                (Vector3d.XAxis * topSecondTextLength);
-                }
-
                 if (_bottomDbText != null)
                 {
                     _bottomDbText.Position = leaderPoint -
@@ -518,7 +496,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var offset = TextMaskOffset * scale;
                 _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset);
-                _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset);
                 _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
             }
 
@@ -528,8 +505,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                 shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
                 _topFirstDbText?.TransformBy(backRotationMatrix);
                 _topFirstTextMask?.TransformBy(backRotationMatrix);
-                _topSecondDbText?.TransformBy(backRotationMatrix);
-                _topSecondTextMask?.TransformBy(backRotationMatrix);
                 _bottomDbText?.TransformBy(backRotationMatrix);
                 _bottomTextMask?.TransformBy(backRotationMatrix);
             }
