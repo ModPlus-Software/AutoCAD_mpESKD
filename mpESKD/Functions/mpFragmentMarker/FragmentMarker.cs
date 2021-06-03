@@ -47,7 +47,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// </summary>
         private Wipeout _topFirstTextMask;
 
-        
+
         /// <summary>
         /// Нижний текст 
         /// </summary>
@@ -240,18 +240,18 @@ namespace mpESKD.Functions.mpFragmentMarker
         #region Geometry
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-        public Point3d MiddlePoint => new Point3d(
-            (InsertionPoint.X + EndPoint.X) / 2,
-            (InsertionPoint.Y + EndPoint.Y) / 2,
-            (InsertionPoint.Z + EndPoint.Z) / 2);
+        //public Point3d MiddlePoint => new Point3d(
+        //    (InsertionPoint.X + EndPoint.X) / 2,
+        //    (InsertionPoint.Y + EndPoint.Y) / 2,
+        //    (InsertionPoint.Z + EndPoint.Z) / 2);
 
-    
+
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return FramePoint;
             yield return EndPoint;
+            yield return FramePoint;
         }
 
         /// <inheritdoc />
@@ -268,7 +268,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                         InsertionPointOCS.X + (5 * scale),
                         InsertionPointOCS.Y + (5 * scale),
                         InsertionPointOCS.Z);
-                    
+
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
 
@@ -325,7 +325,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+                //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
                 CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
                 //CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
             }

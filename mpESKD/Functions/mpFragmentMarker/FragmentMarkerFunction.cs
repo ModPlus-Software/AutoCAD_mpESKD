@@ -136,11 +136,11 @@ namespace mpESKD.Functions.mpFragmentMarker
                     if (fragmentMarker.JigState == FragmentMarkerJigState.InsertionPoint)
                     {
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
-                        fragmentMarker.JigState = FragmentMarkerJigState.FramePoint;
+                        fragmentMarker.JigState = FragmentMarkerJigState.EndPoint;
                         entityJig.PromptForNextPoint = framePointPrompt;
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
                     }
-                    else if (fragmentMarker.JigState == FragmentMarkerJigState.FramePoint)
+                    else if (fragmentMarker.JigState == FragmentMarkerJigState.EndPoint)
                     {
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
                         fragmentMarker.JigState = FragmentMarkerJigState.LeaderPoint;
@@ -148,7 +148,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                         fragmentMarker.FramePoint = fragmentMarker.EndPoint;
                         
                         // Тут не нужна привязка к предыдущей точке
-                        entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                        entityJig.PreviousPoint = fragmentMarker.EndPoint;
                     }
                     else
                     {

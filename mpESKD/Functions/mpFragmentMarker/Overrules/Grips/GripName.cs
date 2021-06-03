@@ -21,7 +21,7 @@
         EndGrip, 
 
         /// <summary>
-        /// End grip
+        /// Leader grip
         /// </summary>
         LeaderGrip
     }

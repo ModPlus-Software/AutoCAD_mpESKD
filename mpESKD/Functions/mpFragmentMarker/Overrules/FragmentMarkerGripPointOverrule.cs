@@ -77,16 +77,22 @@
                         grips.Add(gp);
 
                         // получаем среднюю ручку
-                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.MiddleGrip)
-                        {
-                            GripPoint = fragmentMarker.MiddlePoint
-                        };
-                        grips.Add(gp);
+                        //gp = new FragmentMarkerGrip(fragmentMarker, GripName.MiddleGrip)
+                        //{
+                        //    GripPoint = fragmentMarker.MiddlePoint
+                        //};
+                        //grips.Add(gp);
 
                         // получаем конечную ручку
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.EndGrip)
                         {
                             GripPoint = fragmentMarker.EndPoint
+                        };
+                        grips.Add(gp);
+                        // получаем конечную ручку
+                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
+                        {
+                            GripPoint = fragmentMarker.FramePoint
                         };
                         grips.Add(gp);
                     }

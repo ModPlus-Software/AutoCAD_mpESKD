@@ -20,12 +20,12 @@
         /// </summary>
         /// <param name="fragmentMarker">Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой</param>
         /// <param name="gripName">Имя ручки</param>
-        //public FragmentMarkerGrip(FragmentMarker fragmentMarker, GripName gripName)
-        //{
-        //    FragmentMarker = fragmentMarker;
-        //    GripName = gripName;
-        //    GripType = GripType.Point;
-        //}
+        public FragmentMarkerGrip(FragmentMarker fragmentMarker, GripName gripName)
+        {
+            FragmentMarker = fragmentMarker;
+            GripName = gripName;
+            GripType = GripType.Point;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
@@ -34,17 +34,16 @@
         /// <param name="gripType">Вид ручки</param>
         /// <param name="gripName">Имя ручки</param>
         /// <param name="gripPoint">Точка ручки</param>
-        public FragmentMarkerGrip(
-            FragmentMarker fragmentMarker,
-            GripType gripType,
-            GripName gripName,
-            Point3d gripPoint)
-        {
-            FragmentMarker = fragmentMarker;
-            GripName = gripName;
-            GripType = gripType;
-            GripPoint = gripPoint;
-        }
+        //public FragmentMarkerGrip(            FragmentMarker fragmentMarker,
+        //    GripType gripType,
+        //    GripName gripName,
+        //    Point3d gripPoint)
+        //{
+        //    FragmentMarker = fragmentMarker;
+        //    GripName = gripName;
+        //    GripType = gripType;
+        //    GripPoint = gripPoint;
+        //}
 
         /// <summary>
         /// Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой
