@@ -136,6 +136,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     if (fragmentMarker.JigState == FragmentMarkerJigState.InsertionPoint)
                     {
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
+
                         fragmentMarker.JigState = FragmentMarkerJigState.EndPoint;
                         entityJig.PromptForNextPoint = framePointPrompt;
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;

@@ -235,6 +235,8 @@ namespace mpESKD.Functions.mpFragmentMarker
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
 
+        private Point3d _leaderFirstPoint;
+
         #endregion
 
         #region Geometry
@@ -250,8 +252,8 @@ namespace mpESKD.Functions.mpFragmentMarker
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return EndPoint;
             yield return FramePoint;
+            yield return EndPoint;
         }
 
         /// <inheritdoc />
@@ -262,15 +264,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
                 //// Задание первой точки (точки вставки). Она же точка начала отсчета
-                if (JigState == FragmentMarkerJigState.InsertionPoint)
-                {
-                    var tempFramePoint = new Point3d(
-                        InsertionPointOCS.X + (5 * scale),
-                        InsertionPointOCS.Y + (5 * scale),
-                        InsertionPointOCS.Z);
-
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
-                }
 
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
@@ -286,9 +279,13 @@ namespace mpESKD.Functions.mpFragmentMarker
                 {
                     // Задание второй точки
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                    _leaderFirstPoint = pts[3].ToPoint3d();
                     FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(EndPointOCS, pts[3].ToPoint3d(), scale);
+                    
                 }
+
+                CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
+              
             }
             catch (Exception exception)
             {
@@ -326,8 +323,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
-                //CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
+                CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
             }
         }
 
@@ -362,6 +358,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - lengthRadius);
             var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            _leaderFirstPoint = p3;
             pts.Add(p3.ToPoint2d());
             bulges.Add(0.4141);
 
@@ -403,8 +400,8 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             //if (!drawLeader)
             //    return;
-
-            var leaderLine = new Line(insertionPoint, leaderPoint);
+            _leaderFirstPoint = insertionPoint;
+            var leaderLine = new Line(_leaderFirstPoint, leaderPoint);
             var pts = new Point3dCollection();
             //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
             _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
