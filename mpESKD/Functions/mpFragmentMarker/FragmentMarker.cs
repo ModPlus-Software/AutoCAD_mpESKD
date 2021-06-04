@@ -291,9 +291,15 @@ namespace mpESKD.Functions.mpFragmentMarker
                 else if (JigState == FragmentMarkerJigState.LeaderPoint)
                 {
                     // TODO вот тут и происходит указание точки выноски
+                    CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
                 }
-
-                CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
+                else
+                {
+                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                    _leaderFirstPoint = pts[3].ToPoint3d();
+                    FillMainPolylineWithPoints(pts, bulges);
+                    CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
+                }
             }
             catch (Exception exception)
             {
@@ -319,7 +325,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                CreateEntities(pts[3].ToPoint3d(), InsertionPoint, scale);
+                //CreateEntities(pts[3].ToPoint3d(), InsertionPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
@@ -331,7 +337,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
+                //CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
             }
         }
 
