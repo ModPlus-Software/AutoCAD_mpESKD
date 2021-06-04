@@ -146,13 +146,16 @@ namespace mpESKD.Functions.mpFragmentMarker
         [SaveToXData]
         public int Radius { get; set; } = 5;
 
+        /// <summary>
+        /// Точка выноски
+        /// </summary>
         [SaveToXData]
-        public Point3d FramePoint { get; set; }
+        public Point3d LeaderPoint { get; set; }
 
         /// <summary>
-        /// Точка рамки в внутренней системе координат блока
+        /// Точка выноски в внутренней системе координат блока
         /// </summary>
-        private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
+        private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>
         /// Состояние Jig при создании узловой выноски
@@ -252,7 +255,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return FramePoint;
+            yield return LeaderPoint;
             yield return EndPoint;
         }
 
@@ -263,29 +266,34 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
+                
                 //// Задание первой точки (точки вставки). Она же точка начала отсчета
-
-                if (EndPointOCS.Equals(Point3d.Origin))
+                if (JigState == FragmentMarkerJigState.InsertionPoint)
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                else if (length < MinDistanceBetweenPoints * scale)
+                else if (JigState == FragmentMarkerJigState.EndPoint)
                 {
-                    // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                    if (length < MinDistanceBetweenPoints * scale)
+                    {
+                        // Задание второй точки - случай когда расстояние между точками меньше минимального
+                        MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                    }
+                    else
+                    {
+                        // Задание второй точки
+                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                        _leaderFirstPoint = pts[3].ToPoint3d();
+                        FillMainPolylineWithPoints(pts, bulges);
+                    }
                 }
-                else
+                else if (JigState == FragmentMarkerJigState.LeaderPoint)
                 {
-                    // Задание второй точки
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
-                    _leaderFirstPoint = pts[3].ToPoint3d();
-                    FillMainPolylineWithPoints(pts, bulges);
-                    
+                    // TODO вот тут и происходит указание точки выноски
                 }
 
                 CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
-              
             }
             catch (Exception exception)
             {

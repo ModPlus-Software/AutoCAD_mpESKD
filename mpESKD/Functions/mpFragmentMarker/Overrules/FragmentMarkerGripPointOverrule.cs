@@ -92,7 +92,7 @@
                         // получаем конечную ручку
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
                         {
-                            GripPoint = fragmentMarker.FramePoint
+                            GripPoint = fragmentMarker.LeaderPoint
                         };
                         grips.Add(gp);
                     }

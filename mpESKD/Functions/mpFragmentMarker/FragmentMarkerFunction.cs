@@ -115,8 +115,8 @@ namespace mpESKD.Functions.mpFragmentMarker
             // <msg1>Укажите точку вставки:</msg1>
             var insertionPointPrompt = Language.GetItem("msg1");
 
-            // <msg17>Укажите точку рамки:</msg17>
-            var framePointPrompt = Language.GetItem("msg17");
+            // <msg17>Укажите точку рамки:</msg17> // <-- TODO другой текст. Про вторую точку
+            var endPointPrompt = Language.GetItem("msg17");
 
             // <msg18>Укажите точку выноски:</msg18>
             var leaderPointPrompt = Language.GetItem("msg18");
@@ -138,7 +138,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
 
                         fragmentMarker.JigState = FragmentMarkerJigState.EndPoint;
-                        entityJig.PromptForNextPoint = framePointPrompt;
+                        entityJig.PromptForNextPoint = endPointPrompt;
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
                     }
                     else if (fragmentMarker.JigState == FragmentMarkerJigState.EndPoint)
@@ -146,7 +146,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
                         fragmentMarker.JigState = FragmentMarkerJigState.LeaderPoint;
                         entityJig.PromptForNextPoint = leaderPointPrompt;
-                        fragmentMarker.FramePoint = fragmentMarker.EndPoint;
+                        fragmentMarker.LeaderPoint = fragmentMarker.EndPoint;
                         
                         // Тут не нужна привязка к предыдущей точке
                         entityJig.PreviousPoint = fragmentMarker.EndPoint;
@@ -155,7 +155,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     {
                         break;
                     }
-                    Debug.Print(fragmentMarker.JigState.Value.ToString());
+                    
                     entityJig.JigState = JigState.PromptNextPoint;
                 }
                 else
