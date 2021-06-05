@@ -13,7 +13,7 @@
         /// <summary>
         /// Middle grip
         /// </summary>
-        MiddleGrip,
+        //MiddleGrip,
 
         /// <summary>
         /// End grip

@@ -66,7 +66,7 @@
                     return Language.GetItem("gp1"); // stretch
                 }
 
-                case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
+                //case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
             }
 
             return base.GetTooltip();
@@ -77,6 +77,9 @@
 
         // временное значение последней ручки
         private Point3d _endGripTmp;
+
+        // временное значение последней ручки
+        private Point3d _leaderGripTmp;
 
         /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -97,11 +100,16 @@
                         _endGripTmp = GripPoint;
                     }
 
-                    if (GripName == GripName.MiddleGrip)
-                    {
-                        _startGripTmp = FragmentMarker.InsertionPoint;
-                        _endGripTmp = FragmentMarker.EndPoint;
-                    }
+                    //if (GripName == GripName.MiddleGrip)
+                    //{
+                    //    _startGripTmp = FragmentMarker.InsertionPoint;
+                    //    _endGripTmp = FragmentMarker.EndPoint;
+                    //}
+
+                    //if (GripName == GripName.LeaderGrippp)
+                    //{
+                    //    _leaderGripTmp = FragmentMarker.LeaderPoint;
+                    //}
                 }
 
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -130,16 +138,21 @@
                         FragmentMarker.InsertionPoint = GripPoint;
                     }
 
-                    if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
-                    {
-                        FragmentMarker.InsertionPoint = _startGripTmp;
-                        FragmentMarker.EndPoint = _endGripTmp;
-                    }
+                    //if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
+                    //{
+                    //    FragmentMarker.InsertionPoint = _startGripTmp;
+                    //    FragmentMarker.EndPoint = _endGripTmp;
+                    //}
 
                     if (_endGripTmp != null & GripName == GripName.EndGrip)
                     {
                         FragmentMarker.EndPoint = GripPoint;
                     }
+
+                    //if (_leaderGripTmp != null & GripName == GripName.LeaderGrippp)
+                    //{
+                    //    FragmentMarker.LeaderPoint = GripPoint;
+                    //}
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);

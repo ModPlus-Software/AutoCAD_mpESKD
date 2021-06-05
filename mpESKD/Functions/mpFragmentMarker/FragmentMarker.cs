@@ -245,10 +245,10 @@ namespace mpESKD.Functions.mpFragmentMarker
         #region Geometry
 
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-        //public Point3d MiddlePoint => new Point3d(
-        //    (InsertionPoint.X + EndPoint.X) / 2,
-        //    (InsertionPoint.Y + EndPoint.Y) / 2,
-        //    (InsertionPoint.Z + EndPoint.Z) / 2);
+        public Point3d MiddlePoint => new Point3d(
+            (InsertionPoint.X + EndPoint.X) / 2,
+            (InsertionPoint.Y + EndPoint.Y) / 2,
+            (InsertionPoint.Z + EndPoint.Z) / 2);
 
 
         /// <inheritdoc />
@@ -257,6 +257,7 @@ namespace mpESKD.Functions.mpFragmentMarker
             yield return InsertionPoint;
             yield return LeaderPoint;
             yield return EndPoint;
+            
         }
 
         /// <inheritdoc />

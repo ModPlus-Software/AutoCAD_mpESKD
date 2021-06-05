@@ -89,7 +89,7 @@
                             GripPoint = fragmentMarker.EndPoint
                         };
                         grips.Add(gp);
-                        // получаем конечную ручку
+                        // получаем ручку выноски
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
                         {
                             GripPoint = fragmentMarker.LeaderPoint
@@ -116,19 +116,23 @@
                     // Проходим по коллекции ручек
                     foreach (var gripData in grips)
                     {
-                        if (gripData is FragmentMarkerGrip gripPoint)
+                        if (gripData is FragmentMarkerGrip fragmentMarkerGrip)
                         {
-                            var fragmentMarker = gripPoint.FragmentMarker;
+
+                            var gripPoint = fragmentMarkerGrip.GripPoint;
+                            var fragmentMarker = fragmentMarkerGrip.FragmentMarker;
                             var scale = fragmentMarker.GetFullScale();
 
                             // Далее, в зависимости от имени ручки произвожу действия
-                            if (gripPoint.GripName == GripName.StartGrip)
+                            if (fragmentMarkerGrip.GripName == GripName.StartGrip)
                             {
+                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
                                 // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                                 // Все точки всегда совпадают (+ ручка)
-                                var newPt = gripPoint.GripPoint + offset;
+                                ((BlockReference)entity).Position = gripPoint + offset;
+                                var newPt = fragmentMarkerGrip.GripPoint + offset;
                                 var length = fragmentMarker.EndPoint.DistanceTo(newPt);
-                                
+
                                 if (length < fragmentMarker.MinDistanceBetweenPoints * scale)
                                 {
                                     /* Если новая точка получается на расстоянии меньше минимального, то
@@ -151,23 +155,33 @@
                                 }
                                 else
                                 {
-                                    ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
-                                    fragmentMarker.InsertionPoint = gripPoint.GripPoint + offset;
+                                    ((BlockReference)entity).Position = fragmentMarkerGrip.GripPoint + offset;
+                                    fragmentMarker.InsertionPoint = fragmentMarkerGrip.GripPoint + offset;
                                 }
                             }
 
-                            if (gripPoint.GripName == GripName.MiddleGrip)
-                            {
-                                // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
-                                // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
-                                // точку вставки
-                                var lengthVector = (fragmentMarker.InsertionPoint - fragmentMarker.EndPoint) / 2;
-                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lengthVector;
-                            }
+                            //if (fragmentMarkerGrip.GripName == GripName.MiddleGrip)
+                            //{
+                            //    // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
+                            //    // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
+                            //    // точку вставки
+                            //    var lengthVector = (fragmentMarker.InsertionPoint - fragmentMarker.EndPoint) / 2;
+                            //    ((BlockReference)entity).Position = fragmentMarkerGrip.GripPoint + offset + lengthVector;
+                            //}
 
-                            if (gripPoint.GripName == GripName.EndGrip)
+                            if (fragmentMarkerGrip.GripName == GripName.EndGrip)
                             {
-                                var newPt = gripPoint.GripPoint + offset;
+                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
+
+                                fragmentMarker.EndPoint = gripPoint + offset;
+
+                               
+                            }
+                            else if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
+                            {
+                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
+                                
+                                 var newPt = fragmentMarkerGrip.GripPoint + offset;
                                 if (newPt.Equals(((BlockReference)entity).Position))
                                 {
                                     fragmentMarker.EndPoint = new Point3d(
@@ -178,7 +192,7 @@
                                 // С конечной точкой все просто
                                 else
                                 {
-                                    fragmentMarker.EndPoint = gripPoint.GripPoint + offset;
+                                    fragmentMarker.EndPoint = fragmentMarkerGrip.GripPoint + offset;
                                 }
                             }
 
