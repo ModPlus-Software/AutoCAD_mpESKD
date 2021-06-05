@@ -255,9 +255,8 @@ namespace mpESKD.Functions.mpFragmentMarker
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
-            yield return LeaderPoint;
             yield return EndPoint;
-            
+            yield return LeaderPoint;
         }
 
         /// <inheritdoc />

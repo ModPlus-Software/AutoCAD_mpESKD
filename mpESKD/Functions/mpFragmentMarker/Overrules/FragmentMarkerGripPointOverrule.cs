@@ -41,6 +41,7 @@
                 // Проверка дополнительных условий
                 if (IsApplicable(entity))
                 {
+
                     // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
                     // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
                     var blkRef = (BlockReference)entity;
@@ -83,18 +84,19 @@
                         //};
                         //grips.Add(gp);
 
+                        // получаем ручку выноски
+                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
+                        {
+                            GripPoint = fragmentMarker.LeaderPoint
+                        };
+                        
                         // получаем конечную ручку
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.EndGrip)
                         {
                             GripPoint = fragmentMarker.EndPoint
                         };
                         grips.Add(gp);
-                        // получаем ручку выноски
-                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
-                        {
-                            GripPoint = fragmentMarker.LeaderPoint
-                        };
-                        grips.Add(gp);
+
                     }
                 }
             }
@@ -172,14 +174,6 @@
                             if (fragmentMarkerGrip.GripName == GripName.EndGrip)
                             {
                                 Debug.Print(fragmentMarkerGrip.GripName.ToString());
-
-                                fragmentMarker.EndPoint = gripPoint + offset;
-
-                               
-                            }
-                            else if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
-                            {
-                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
                                 
                                  var newPt = fragmentMarkerGrip.GripPoint + offset;
                                 if (newPt.Equals(((BlockReference)entity).Position))
@@ -194,6 +188,12 @@
                                 {
                                     fragmentMarker.EndPoint = fragmentMarkerGrip.GripPoint + offset;
                                 }
+                            }
+                            if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
+                            {
+                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
+
+                                fragmentMarker.EndPoint = gripPoint + offset;
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока

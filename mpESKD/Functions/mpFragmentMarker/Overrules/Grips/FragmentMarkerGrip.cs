@@ -66,7 +66,7 @@
                     return Language.GetItem("gp1"); // stretch
                 }
 
-                //case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
+                case GripName.LeaderGrip: return Language.GetItem("gp2"); // move
             }
 
             return base.GetTooltip();
@@ -106,10 +106,10 @@
                     //    _endGripTmp = FragmentMarker.EndPoint;
                     //}
 
-                    //if (GripName == GripName.LeaderGrippp)
-                    //{
-                    //    _leaderGripTmp = FragmentMarker.LeaderPoint;
-                    //}
+                    if (GripName == GripName.LeaderGrip)
+                    {
+                        _leaderGripTmp = FragmentMarker.LeaderPoint;
+                    }
                 }
 
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -149,10 +149,10 @@
                         FragmentMarker.EndPoint = GripPoint;
                     }
 
-                    //if (_leaderGripTmp != null & GripName == GripName.LeaderGrippp)
-                    //{
-                    //    FragmentMarker.LeaderPoint = GripPoint;
-                    //}
+                    if (_leaderGripTmp != null & GripName == GripName.LeaderGrip)
+                    {
+                        FragmentMarker.LeaderPoint = GripPoint;
+                    }
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);
