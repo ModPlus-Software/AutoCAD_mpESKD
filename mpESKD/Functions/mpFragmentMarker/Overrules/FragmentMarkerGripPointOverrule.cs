@@ -84,19 +84,18 @@
                         //};
                         //grips.Add(gp);
 
-                        // получаем ручку выноски
-                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
-                        {
-                            GripPoint = fragmentMarker.LeaderPoint
-                        };
-                        
                         // получаем конечную ручку
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.EndGrip)
                         {
                             GripPoint = fragmentMarker.EndPoint
                         };
                         grips.Add(gp);
-
+                        // получаем ручку выноски
+                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
+                        {
+                            GripPoint = fragmentMarker.LeaderPoint
+                        };
+                        grips.Add(gp);
                     }
                 }
             }

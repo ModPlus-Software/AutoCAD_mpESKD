@@ -9,11 +9,12 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Base.Abstractions;
 
     /// <summary>
     /// Описание ручки линии обрыва
     /// </summary>
-    public class FragmentMarkerGrip : SmartEntityGripData
+    public class FragmentMarkerGrip : SmartEntityGripData, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FragmentMarkerGrip"/> class.
@@ -162,5 +163,8 @@
                 ExceptionBox.Show(exception);
             }
         }
+
+        public bool HideTextBackground { get; set; }
+        public double TextMaskOffset { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace mpESKD.Functions.mpFragmentMarker
     /// </summary>
     [SmartEntityDisplayNameKey("h145")]
     [SystemStyleDescriptionKey("h146")]
-    public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
+    public class FragmentMarker : SmartEntity
     {
         private readonly string _lastNodeNumber;
         private string _cachedNodeNumber;
@@ -279,6 +279,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     {
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
                         MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                        
                     }
                     else
                     {
@@ -336,6 +337,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
+                _leaderFirstPoint = pts[3].ToPoint3d();
                 //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
                 //CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
             }
