@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using ModPlusAPI.IO;
-
-namespace mpESKD.Functions.mpFragmentMarker
+﻿namespace mpESKD.Functions.mpFragmentMarker
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -18,6 +13,10 @@ namespace mpESKD.Functions.mpFragmentMarker
     using ModPlusAPI.Windows;
     using Overrules;
 
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using ModPlusAPI.IO;
     /// <inheritdoc />
     public class FragmentMarkerFunction : ISmartEntityFunction
     {
@@ -148,7 +147,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                         fragmentMarker.LeaderPoint = fragmentMarker.EndPoint;
                         
                         // Тут не нужна привязка к предыдущей точке
-                        entityJig.PreviousPoint = fragmentMarker.EndPoint;
+                        entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
                     }
                     else
                     {

@@ -1,6 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using mpESKD.Functions.mpNodalLeader.Overrules;
+using System.Diagnostics;
 
 namespace mpESKD.Functions.mpFragmentMarker
 {
@@ -272,34 +272,39 @@ namespace mpESKD.Functions.mpFragmentMarker
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
+                    Debug.Print("FragmentMarkerJigState.InsertionPoint");
                 }
                 else if (JigState == FragmentMarkerJigState.EndPoint)
                 {
+                    Debug.Print("FragmentMarkerJigState.EndPoint");
                     if (length < MinDistanceBetweenPoints * scale)
                     {
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
                         MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
-                        
+                        Debug.Print("length < MinDistanceBetweenPoints * scale");    
                     }
                     else
                     {
                         // Задание второй точки
-                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                         _leaderFirstPoint = pts[3].ToPoint3d();
                         FillMainPolylineWithPoints(pts, bulges);
+                        Debug.Print("JigState == FragmentMarkerJigState.EndPoint else");    
                     }
                 }
                 else if (JigState == FragmentMarkerJigState.LeaderPoint)
                 {
+                    Debug.Print(" FragmentMarkerJigState.LeaderPoint");
                     // TODO вот тут и происходит указание точки выноски
-                    CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
+                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
                 }
                 else
                 {
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
                     _leaderFirstPoint = pts[3].ToPoint3d();
                     FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(_leaderFirstPoint, EndPointOCS, scale);
+                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                    Debug.Print(" else");
                 }
             }
             catch (Exception exception)

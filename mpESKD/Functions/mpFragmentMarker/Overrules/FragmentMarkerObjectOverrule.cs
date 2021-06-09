@@ -31,7 +31,7 @@
         /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
-            Debug.Print(dbObject?.GetRXClass().Name);
+            //Debug.Print(dbObject?.GetRXClass().Name);
             if (IsApplicable(dbObject))
             {
                 EntityUtils.ObjectOverruleProcess(
