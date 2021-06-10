@@ -266,7 +266,7 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
-                
+
                 //// Задание первой точки (точки вставки). Она же точка начала отсчета
                 if (JigState == FragmentMarkerJigState.InsertionPoint)
                 {
@@ -281,7 +281,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     {
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
                         MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
-                        Debug.Print("length < MinDistanceBetweenPoints * scale");    
+                        Debug.Print("length < MinDistanceBetweenPoints * scale");
                     }
                     else
                     {
@@ -289,14 +289,18 @@ namespace mpESKD.Functions.mpFragmentMarker
                         var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                         _leaderFirstPoint = pts[3].ToPoint3d();
                         FillMainPolylineWithPoints(pts, bulges);
-                        Debug.Print("JigState == FragmentMarkerJigState.EndPoint else");    
+                        //Debug.Print("JigState == FragmentMarkerJigState.EndPoint else");
+                        Debug.Print(JigState.ToString());
                     }
+
                 }
                 else if (JigState == FragmentMarkerJigState.LeaderPoint)
                 {
-                    Debug.Print(" FragmentMarkerJigState.LeaderPoint");
-                    // TODO вот тут и происходит указание точки выноски
-                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                        //Debug.Print(" FragmentMarkerJigState.LeaderPoint");
+                        Debug.Print((JigState == FragmentMarkerJigState.EndPoint).ToString());
+                        // TODO вот тут и происходит указание точки выноски
+                        CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+
                 }
                 else
                 {
@@ -323,6 +327,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             if (variant == UpdateVariant.SetInsertionPoint)
             {
+                Debug.Print("variant == UpdateVariant.SetInsertionPoint");
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
@@ -335,6 +340,7 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
+                Debug.Print("variant == UpdateVariant.SetEndPointMinLength");
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */

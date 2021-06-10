@@ -101,11 +101,11 @@
                         _endGripTmp = GripPoint;
                     }
 
-                    //if (GripName == GripName.MiddleGrip)
-                    //{
-                    //    _startGripTmp = FragmentMarker.InsertionPoint;
-                    //    _endGripTmp = FragmentMarker.EndPoint;
-                    //}
+                    if (GripName == GripName.MiddleGrip)
+                    {
+                        _startGripTmp = FragmentMarker.InsertionPoint;
+                        _endGripTmp = FragmentMarker.EndPoint;
+                    }
 
                     if (GripName == GripName.LeaderGrip)
                     {
@@ -139,11 +139,11 @@
                         FragmentMarker.InsertionPoint = GripPoint;
                     }
 
-                    //if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
-                    //{
-                    //    FragmentMarker.InsertionPoint = _startGripTmp;
-                    //    FragmentMarker.EndPoint = _endGripTmp;
-                    //}
+                    if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
+                    {
+                        FragmentMarker.InsertionPoint = _startGripTmp;
+                        FragmentMarker.EndPoint = _endGripTmp;
+                    }
 
                     if (_endGripTmp != null & GripName == GripName.EndGrip)
                     {
