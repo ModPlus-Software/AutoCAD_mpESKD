@@ -1,5 +1,8 @@
 ﻿namespace mpESKD.Functions.mpFragmentMarker
 {
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -10,13 +13,10 @@
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI;
+    using ModPlusAPI.IO;
     using ModPlusAPI.Windows;
     using Overrules;
-
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using ModPlusAPI.IO;
+    
     /// <inheritdoc />
     public class FragmentMarkerFunction : ISmartEntityFunction
     {
@@ -119,7 +119,10 @@
             // <msg18>Укажите точку выноски:</msg18>
             var leaderPointPrompt = Language.GetItem("msg18");
 
-            var entityJig = new DefaultEntityJig(fragmentMarker, blockReference, new Point3d(15, 0, 0))
+            var entityJig = new DefaultEntityJig(fragmentMarker, blockReference, new Point3d(15, 0, 0), point3d =>
+            {
+                fragmentMarker.LeaderPoint = point3d;
+            })
             {
                 PromptForInsertionPoint = insertionPointPrompt
             };
@@ -138,23 +141,25 @@
                         fragmentMarker.JigState = FragmentMarkerJigState.EndPoint;
                         entityJig.PromptForNextPoint = endPointPrompt;
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                        
+                        entityJig.JigState = JigState.PromptNextPoint;
                     }
                     else if (fragmentMarker.JigState == FragmentMarkerJigState.EndPoint)
                     {
                         Debug.Print(fragmentMarker.JigState.Value.ToString());
+                        
                         fragmentMarker.JigState = FragmentMarkerJigState.LeaderPoint;
-                        entityJig.PromptForNextPoint = leaderPointPrompt;
-                        fragmentMarker.LeaderPoint = fragmentMarker.EndPoint;
+                        entityJig.PromptForCustomPoint = leaderPointPrompt;
                         
                         // Тут не нужна привязка к предыдущей точке
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                        
+                        entityJig.JigState = JigState.CustomPoint;
                     }
                     else
                     {
                         break;
                     }
-                    
-                    entityJig.JigState = JigState.PromptNextPoint;
                 }
                 else
                 {
