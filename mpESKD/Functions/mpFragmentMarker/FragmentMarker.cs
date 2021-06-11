@@ -20,7 +20,7 @@ namespace mpESKD.Functions.mpFragmentMarker
     /// </summary>
     [SmartEntityDisplayNameKey("h145")]
     [SystemStyleDescriptionKey("h146")]
-    public class FragmentMarker : SmartEntity
+    public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         private readonly string _lastNodeNumber;
         private string _cachedNodeNumber;
@@ -138,6 +138,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20;
+        public double MinLeaderLength => 10;
 
         /// <summary>
         /// Радиус скругления
@@ -304,11 +305,25 @@ namespace mpESKD.Functions.mpFragmentMarker
                 }
                 else
                 {
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
-                    _leaderFirstPoint = pts[3].ToPoint3d();
-                    FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
-                    Debug.Print(" else");
+                    Debug.Print(length.ToString());
+                    if (length > MinDistanceBetweenPoints * scale)
+                    {
+                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                        _leaderFirstPoint = pts[3].ToPoint3d();
+                        FillMainPolylineWithPoints(pts, bulges);
+                        CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                        Debug.Print("else length < MinDistanceBetweenPoints * scale");
+                        // Задание второй точки - случай когда расстояние между точками меньше минимального
+                      
+                    }
+                    // TODO continue here
+                    else
+                    {
+                        MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                        
+                        Debug.Print(" only else");
+                    }
+                    
                 }
             }
             catch (Exception exception)
@@ -429,10 +444,18 @@ namespace mpESKD.Functions.mpFragmentMarker
             //    return;
             _leaderFirstPoint = insertionPoint;
             var leaderLine = new Line(_leaderFirstPoint, leaderPoint);
+            if (leaderLine.Length < MinLeaderLength)
+            {
+                leaderLine = new Line();
+            }
             var pts = new Point3dCollection();
             //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
             _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+            
 
+            
+
+            //Debug.Print(_leaderLine.Length.ToString());
             // Если drawLeader == false, то дальше код не выполнится
 
             //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
