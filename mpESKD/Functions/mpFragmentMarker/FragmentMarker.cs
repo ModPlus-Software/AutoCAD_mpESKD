@@ -297,10 +297,10 @@ namespace mpESKD.Functions.mpFragmentMarker
                 }
                 else if (JigState == FragmentMarkerJigState.LeaderPoint)
                 {
-                        //Debug.Print(" FragmentMarkerJigState.LeaderPoint");
-                        Debug.Print((JigState == FragmentMarkerJigState.EndPoint).ToString());
-                        // TODO вот тут и происходит указание точки выноски
-                        CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                    //Debug.Print(" FragmentMarkerJigState.LeaderPoint");
+                    Debug.Print((JigState == FragmentMarkerJigState.EndPoint).ToString());
+                    // TODO вот тут и происходит указание точки выноски
+                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
 
                 }
                 else
@@ -314,16 +314,16 @@ namespace mpESKD.Functions.mpFragmentMarker
                         CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
                         Debug.Print("else length < MinDistanceBetweenPoints * scale");
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
-                      
+
                     }
                     // TODO continue here
                     else
                     {
                         MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
-                        
+
                         Debug.Print(" only else");
                     }
-                    
+
                 }
             }
             catch (Exception exception)
@@ -444,16 +444,14 @@ namespace mpESKD.Functions.mpFragmentMarker
             //    return;
             _leaderFirstPoint = insertionPoint;
             var leaderLine = new Line(_leaderFirstPoint, leaderPoint);
-            if (leaderLine.Length < MinLeaderLength)
+            if (leaderLine.Length < MinLeaderLength * scale)
             {
                 leaderLine = new Line();
+                _shelfLine = new Line();
             }
             var pts = new Point3dCollection();
             //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
             _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-            
-
-            
 
             //Debug.Print(_leaderLine.Length.ToString());
             // Если drawLeader == false, то дальше код не выполнится
@@ -481,6 +479,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 topFirstTextLength = _topFirstDbText.GetLength();
             }
 
+            if (NodeNumber != null && NodeNumber == "") _topFirstDbText = null;
 
             if (!string.IsNullOrEmpty(NodeAddress))
             {
@@ -490,6 +489,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 bottomTextHeight = _bottomDbText.GetHeight();
             }
 
+            if (NodeAddress != null && NodeAddress == "") _bottomDbText = null;
             var topTextLength = topFirstTextLength + topSecondTextLength;
             var largestTextLength = Math.Max(topTextLength, bottomTextLength);
             var shelfLength = textIndent + largestTextLength + shelfLedge;
@@ -556,7 +556,11 @@ namespace mpESKD.Functions.mpFragmentMarker
                 _bottomTextMask?.TransformBy(backRotationMatrix);
             }
 
-            _shelfLine = new Line(leaderPoint, shelfEndPoint);
+            if (leaderLine.Length > MinLeaderLength * scale | (_bottomDbText != null & _topFirstDbText != null))
+            {
+                _shelfLine = new Line(leaderPoint, shelfEndPoint);
+            }
+
         }
 
         private void SetNodeNumberOnCreation()
@@ -567,5 +571,16 @@ namespace mpESKD.Functions.mpFragmentMarker
             NodeNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
         }
         #endregion
+
+        private void SetTextPropsValue()
+        {
+            //if (!string.IsNullOrEmpty(NodeAddress))
+            //{
+            //    _bottomDbText = new DBText { TextString = NodeAddress };
+            //    _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            //    bottomTextLength = _bottomDbText.GetLength();
+            //    bottomTextHeight = _bottomDbText.GetHeight();
+            //}
+        }
     }
 }
