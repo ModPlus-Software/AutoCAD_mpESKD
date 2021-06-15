@@ -18,6 +18,11 @@
         /// <summary>
         /// End grip
         /// </summary>
-        EndGrip
+        EndGrip,
+
+        /// <summary>
+        /// Leader grip
+        /// </summary>
+        LeaderGrip
     }
 }

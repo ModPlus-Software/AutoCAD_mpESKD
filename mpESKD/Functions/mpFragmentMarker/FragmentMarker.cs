@@ -27,16 +27,6 @@ namespace mpESKD.Functions.mpFragmentMarker
         #region Entities
 
         /// <summary>
-        /// Рамка узла при типе "Прямоугольная"
-        /// </summary>
-        private Polyline _framePolyline;
-
-        /// <summary>
-        /// Рамка узла при типе "Круглая"
-        /// </summary>
-        private Circle _frameCircle;
-
-        /// <summary>
         /// Линия выноски
         /// </summary>
         private Line _leaderLine;
@@ -47,32 +37,23 @@ namespace mpESKD.Functions.mpFragmentMarker
         private Line _shelfLine;
 
         /// <summary>
-        /// Верхний первый текст (номер узла)
+        /// Верхний текст 
         /// </summary>
         private DBText _topFirstDbText;
 
         /// <summary>
-        /// Маскировка фона верхнего первого текста (номер узла)
+        /// Маскировка фона верхнего текста 
         /// </summary>
         private Wipeout _topFirstTextMask;
 
-        /// <summary>
-        /// Верхний второй текст (номер листа)
-        /// </summary>
-        private DBText _topSecondDbText;
 
         /// <summary>
-        /// Маскировка фона верхнего второго текста (номер листа)
-        /// </summary>
-        private Wipeout _topSecondTextMask;
-
-        /// <summary>
-        /// Нижний текст (адрес узла)
+        /// Нижний текст 
         /// </summary>
         private DBText _bottomDbText;
 
         /// <summary>
-        /// Маскировка нижнего текста (адрес узла)
+        /// Маскировка нижнего текста
         /// </summary>
         private Wipeout _bottomTextMask;
 
@@ -104,6 +85,35 @@ namespace mpESKD.Functions.mpFragmentMarker
         }
 
         /// <summary>
+        /// Главная полилиния примитива
+        /// </summary>
+        private Polyline _mainPolyline;
+
+        /// <inheritdoc />
+        public override IEnumerable<Entity> Entities
+        {
+            get
+            {
+                var entities = new List<Entity>
+                {
+                    _topFirstTextMask,
+                    _bottomTextMask,
+                    _mainPolyline,
+                    _leaderLine,
+                    _shelfLine,
+                    _topFirstDbText,
+                    _bottomDbText
+                };
+                foreach (var e in entities)
+                {
+                    SetImmutablePropertiesToNestedEntity(e);
+                }
+
+                return entities;
+            }
+        }
+
+        /// <summary>
         /// Возвращает локализованное описание для типа <see cref="FragmentMarker"/>
         /// </summary>
         public static IIntellectualEntityDescriptor GetDescriptor()
@@ -127,6 +137,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20;
+        public double MinLeaderLength => 10;
 
         /// <summary>
         /// Радиус скругления
@@ -135,13 +146,16 @@ namespace mpESKD.Functions.mpFragmentMarker
         [SaveToXData]
         public int Radius { get; set; } = 5;
 
+        /// <summary>
+        /// Точка выноски
+        /// </summary>
         [SaveToXData]
-        public Point3d FramePoint { get; set; }
+        public Point3d LeaderPoint { get; set; }
 
         /// <summary>
-        /// Точка рамки в внутренней системе координат блока
+        /// Точка выноски в внутренней системе координат блока
         /// </summary>
-        private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
+        private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
 
         /// <summary>
         /// Состояние Jig при создании узловой выноски
@@ -224,6 +238,8 @@ namespace mpESKD.Functions.mpFragmentMarker
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
 
+        private Point3d _leaderFirstPoint;
+
         #endregion
 
         #region Geometry
@@ -234,45 +250,13 @@ namespace mpESKD.Functions.mpFragmentMarker
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2);
 
-        /// <summary>
-        /// Главная полилиния примитива
-        /// </summary>
-        private Polyline _mainPolyline;
-
-        /// <inheritdoc />
-        public override IEnumerable<Entity> Entities
-        {
-            get
-            {
-                var entities = new List<Entity>
-                {
-                    _topFirstTextMask,
-                    _topSecondTextMask,
-                    _bottomTextMask,
-                    _mainPolyline,
-                    _framePolyline,
-                    _frameCircle,
-                    _leaderLine,
-                    _shelfLine,
-                    _topFirstDbText,
-                    _topSecondDbText,
-                    _bottomDbText
-                };
-                foreach (var e in entities)
-                {
-                    SetImmutablePropertiesToNestedEntity(e);
-                }
-
-                return entities;
-            }
-        }
 
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
             yield return InsertionPoint;
             yield return EndPoint;
-            yield return EndPoint;
+            yield return LeaderPoint;
         }
 
         /// <inheritdoc />
@@ -282,22 +266,63 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
-                if (EndPointOCS.Equals(Point3d.Origin))
+
+                //// Задание первой точки (точки вставки). Она же точка начала отсчета
+                if (JigState == FragmentMarkerJigState.InsertionPoint)
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
+                    Debug.Print("FragmentMarkerJigState.InsertionPoint");
                 }
-                else if (length < MinDistanceBetweenPoints * scale)
+                else if (JigState == FragmentMarkerJigState.EndPoint)
                 {
-                    // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                    Debug.Print("FragmentMarkerJigState.EndPoint");
+                    if (length < MinDistanceBetweenPoints * scale)
+                    {
+                        // Задание второй точки - случай когда расстояние между точками меньше минимального
+                        MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                        Debug.Print("length < MinDistanceBetweenPoints * scale");
+                    }
+                    else
+                    {
+                        // Задание второй точки
+                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
+                        _leaderFirstPoint = pts[3].ToPoint3d();
+                        FillMainPolylineWithPoints(pts, bulges);
+                        //Debug.Print("JigState == FragmentMarkerJigState.EndPoint else");
+                        Debug.Print(JigState.ToString());
+                    }
+
+                }
+                else if (JigState == FragmentMarkerJigState.LeaderPoint)
+                {
+                    //Debug.Print(" FragmentMarkerJigState.LeaderPoint");
+                    Debug.Print((JigState == FragmentMarkerJigState.EndPoint).ToString());
+                    // TODO вот тут и происходит указание точки выноски
+                    CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+
                 }
                 else
                 {
-                    // Задание второй точки
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
-                    FillMainPolylineWithPoints(pts, bulges);
-                    CreateEntities(EndPointOCS, pts[3].ToPoint3d(), scale);
+                    Debug.Print(length.ToString());
+                    if (length > MinDistanceBetweenPoints * scale)
+                    {
+                        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
+                        _leaderFirstPoint = pts[3].ToPoint3d();
+                        FillMainPolylineWithPoints(pts, bulges);
+                        CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                        Debug.Print("else length < MinDistanceBetweenPoints * scale");
+                        // Задание второй точки - случай когда расстояние между точками меньше минимального
+
+                    }
+                    // TODO continue here
+                    else
+                    {
+                        MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+
+                        Debug.Print(" only else");
+                    }
+
                 }
             }
             catch (Exception exception)
@@ -316,6 +341,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             if (variant == UpdateVariant.SetInsertionPoint)
             {
+                Debug.Print("variant == UpdateVariant.SetInsertionPoint");
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
@@ -324,10 +350,11 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
+                //CreateEntities(pts[3].ToPoint3d(), InsertionPoint, scale);
             }
             else if (variant == UpdateVariant.SetEndPointMinLength) //// изменение вершин полилинии
             {
+                Debug.Print("variant == UpdateVariant.SetEndPointMinLength");
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
@@ -335,9 +362,9 @@ namespace mpESKD.Functions.mpFragmentMarker
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                CreateEntities(InsertionPoint, pts[3].ToPoint3d(), scale);
-                //CreateEntities(pts[2].ToPoint3d(), EndPointOCS, scale, true);
+                _leaderFirstPoint = pts[3].ToPoint3d();
+                //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+                //CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
             }
         }
 
@@ -372,6 +399,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - lengthRadius);
             var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+            _leaderFirstPoint = p3;
             pts.Add(p3.ToPoint2d());
             bulges.Add(0.4141);
 
@@ -413,12 +441,18 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             //if (!drawLeader)
             //    return;
-
-            //var leaderLine = new Line(insertionPoint, leaderPoint);
-            //var pts = new Point3dCollection();
+            _leaderFirstPoint = insertionPoint;
+            var leaderLine = new Line(_leaderFirstPoint, leaderPoint);
+            if (leaderLine.Length < MinLeaderLength * scale)
+            {
+                leaderLine = new Line();
+                _shelfLine = new Line();
+            }
+            var pts = new Point3dCollection();
             //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-            //_leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+            _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
 
+            //Debug.Print(_leaderLine.Length.ToString());
             // Если drawLeader == false, то дальше код не выполнится
 
             //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
@@ -444,6 +478,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 topFirstTextLength = _topFirstDbText.GetLength();
             }
 
+            if (NodeNumber != null && NodeNumber == "") _topFirstDbText = null;
 
             if (!string.IsNullOrEmpty(NodeAddress))
             {
@@ -453,6 +488,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 bottomTextHeight = _bottomDbText.GetHeight();
             }
 
+            if (NodeAddress != null && NodeAddress == "") _bottomDbText = null;
             var topTextLength = topFirstTextLength + topSecondTextLength;
             var largestTextLength = Math.Max(topTextLength, bottomTextLength);
             var shelfLength = textIndent + largestTextLength + shelfLedge;
@@ -467,11 +503,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                 if (_topFirstDbText != null)
                 {
                     _topFirstDbText.Position = nodeNumberPosition;
-                }
-
-                if (_topSecondDbText != null)
-                {
-                    _topSecondDbText.Position = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
                 }
 
                 if (_bottomDbText != null)
@@ -494,12 +525,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                                                (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
                 }
 
-                if (_topSecondDbText != null)
-                {
-                    _topSecondDbText.Position = sheetNumberEndPoint -
-                                                (Vector3d.XAxis * topSecondTextLength);
-                }
-
                 if (_bottomDbText != null)
                 {
                     _bottomDbText.Position = leaderPoint -
@@ -517,7 +542,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 var offset = TextMaskOffset * scale;
                 _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset);
-                _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset);
                 _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
             }
 
@@ -527,13 +551,15 @@ namespace mpESKD.Functions.mpFragmentMarker
                 shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
                 _topFirstDbText?.TransformBy(backRotationMatrix);
                 _topFirstTextMask?.TransformBy(backRotationMatrix);
-                _topSecondDbText?.TransformBy(backRotationMatrix);
-                _topSecondTextMask?.TransformBy(backRotationMatrix);
                 _bottomDbText?.TransformBy(backRotationMatrix);
                 _bottomTextMask?.TransformBy(backRotationMatrix);
             }
 
-            _shelfLine = new Line(leaderPoint, shelfEndPoint);
+            if (leaderLine.Length > MinLeaderLength * scale | (_bottomDbText != null & _topFirstDbText != null))
+            {
+                _shelfLine = new Line(leaderPoint, shelfEndPoint);
+            }
+
         }
 
         private void SetNodeNumberOnCreation()
@@ -544,5 +570,16 @@ namespace mpESKD.Functions.mpFragmentMarker
             NodeNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
         }
         #endregion
+
+        private void SetTextPropsValue()
+        {
+            //if (!string.IsNullOrEmpty(NodeAddress))
+            //{
+            //    _bottomDbText = new DBText { TextString = NodeAddress };
+            //    _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            //    bottomTextLength = _bottomDbText.GetLength();
+            //    bottomTextHeight = _bottomDbText.GetHeight();
+            //}
+        }
     }
 }

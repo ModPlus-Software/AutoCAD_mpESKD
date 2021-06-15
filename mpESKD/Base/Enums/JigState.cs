@@ -16,8 +16,8 @@
         PromptNextPoint = 2,
 
         /// <summary>
-        /// Завершено
+        /// Условная дополнительная точка
         /// </summary>
-        Done = 3
+        CustomPoint = 3
     }
 }

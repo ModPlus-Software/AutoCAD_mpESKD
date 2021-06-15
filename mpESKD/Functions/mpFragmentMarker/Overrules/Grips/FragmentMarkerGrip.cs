@@ -9,11 +9,12 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using Base.Abstractions;
 
     /// <summary>
     /// Описание ручки линии обрыва
     /// </summary>
-    public class FragmentMarkerGrip : SmartEntityGripData
+    public class FragmentMarkerGrip : SmartEntityGripData, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FragmentMarkerGrip"/> class.
@@ -26,6 +27,24 @@
             GripName = gripName;
             GripType = GripType.Point;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
+        /// </summary>
+        /// <param name="fragmentMarker">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
+        /// <param name="gripType">Вид ручки</param>
+        /// <param name="gripName">Имя ручки</param>
+        /// <param name="gripPoint">Точка ручки</param>
+        //public FragmentMarkerGrip(            FragmentMarker fragmentMarker,
+        //    GripType gripType,
+        //    GripName gripName,
+        //    Point3d gripPoint)
+        //{
+        //    FragmentMarker = fragmentMarker;
+        //    GripName = gripName;
+        //    GripType = gripType;
+        //    GripPoint = gripPoint;
+        //}
 
         /// <summary>
         /// Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой
@@ -48,7 +67,7 @@
                     return Language.GetItem("gp1"); // stretch
                 }
 
-                case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
+                case GripName.LeaderGrip: return Language.GetItem("gp2"); // move
             }
 
             return base.GetTooltip();
@@ -59,6 +78,9 @@
 
         // временное значение последней ручки
         private Point3d _endGripTmp;
+
+        // временное значение последней ручки
+        private Point3d _leaderGripTmp;
 
         /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -83,6 +105,11 @@
                     {
                         _startGripTmp = FragmentMarker.InsertionPoint;
                         _endGripTmp = FragmentMarker.EndPoint;
+                    }
+
+                    if (GripName == GripName.LeaderGrip)
+                    {
+                        _leaderGripTmp = FragmentMarker.LeaderPoint;
                     }
                 }
 
@@ -122,6 +149,11 @@
                     {
                         FragmentMarker.EndPoint = GripPoint;
                     }
+
+                    if (_leaderGripTmp != null & GripName == GripName.LeaderGrip)
+                    {
+                        FragmentMarker.LeaderPoint = GripPoint;
+                    }
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);
@@ -131,5 +163,8 @@
                 ExceptionBox.Show(exception);
             }
         }
+
+        public bool HideTextBackground { get; set; }
+        public double TextMaskOffset { get; set; }
     }
 }

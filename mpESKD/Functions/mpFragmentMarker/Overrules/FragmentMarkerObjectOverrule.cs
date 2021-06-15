@@ -9,29 +9,29 @@
     /// <inheritdoc />
     public class FragmentMarkerObjectOverrule : ObjectOverrule
     {
-        private static FragmentMarkerObjectOverrule _breakLineObjectOverrule;
+        private static FragmentMarkerObjectOverrule _fragmentMarkerObjectOverrule;
 
         /// <summary>
         /// Singleton instance
         /// </summary>
         public static FragmentMarkerObjectOverrule Instance()
         {
-            if (_breakLineObjectOverrule != null)
+            if (_fragmentMarkerObjectOverrule != null)
             {
-                return _breakLineObjectOverrule;
+                return _fragmentMarkerObjectOverrule;
             }
 
-            _breakLineObjectOverrule = new FragmentMarkerObjectOverrule();
+            _fragmentMarkerObjectOverrule = new FragmentMarkerObjectOverrule();
 
             // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _breakLineObjectOverrule.SetXDataFilter(FragmentMarker.GetDescriptor().Name);
-            return _breakLineObjectOverrule;
+            _fragmentMarkerObjectOverrule.SetXDataFilter(FragmentMarker.GetDescriptor().Name);
+            return _fragmentMarkerObjectOverrule;
         }
 
         /// <inheritdoc />
         public override void Close(DBObject dbObject)
         {
-            Debug.Print(dbObject?.GetRXClass().Name);
+            //Debug.Print(dbObject?.GetRXClass().Name);
             if (IsApplicable(dbObject))
             {
                 EntityUtils.ObjectOverruleProcess(

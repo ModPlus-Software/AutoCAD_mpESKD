@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base
 {
+    using System;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
@@ -18,9 +19,13 @@
         /// </summary>
         private readonly SmartEntity _smartEntity;
 
+        private readonly Action<Point3d> _customPointAction;
+
         private readonly JigUtils.PointSampler _insertionPoint = new JigUtils.PointSampler(Point3d.Origin);
 
         private readonly JigUtils.PointSampler _nextPoint;
+
+        private readonly JigUtils.PointSampler _customPoint;
 
         /// <summary>
         /// Экземпляр <see cref="DefaultEntityJig"/>
@@ -29,14 +34,18 @@
         /// <param name="blockReference">Вставка блока, представляющая обрабатываемый интеллектуальный примитив</param>
         /// <param name="startValueForNextPoint">Начальное значение для второй точки. Для примитивов, использующих
         /// конечную точку (EndPoint) влияет на отрисовку при указании первой точки</param>
+        /// <param name="customPointAction">Метод задания пользовательской точки смарт-объекту</param>
         public DefaultEntityJig(
             SmartEntity smartEntity,
             BlockReference blockReference,
-            Point3d startValueForNextPoint)
+            Point3d startValueForNextPoint,
+            Action<Point3d> customPointAction = null)
             : base(blockReference)
         {
             _smartEntity = smartEntity;
+            _customPointAction = customPointAction;
             _nextPoint = new JigUtils.PointSampler(startValueForNextPoint);
+            _customPoint = new JigUtils.PointSampler(startValueForNextPoint);
         }
 
         /// <summary>
@@ -62,6 +71,12 @@
         /// </summary>
         public string PromptForNextPoint { get; set; } = Language.GetItem("msg2");
 
+        /// <summary>
+        /// Сообщение для указания пользовательской точки
+        /// Сообщение по умолчанию "Укажите конечную точку:"
+        /// </summary>
+        public string PromptForCustomPoint { get; set; } = Language.GetItem("msg2");
+
         /// <inheritdoc/>
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
@@ -86,6 +101,25 @@
                             {
                                 _smartEntity.EndPoint = value;
                             });
+                        }
+                    
+                    case JigState.CustomPoint:
+                        {
+                            if (_customPointAction != null)
+                            {
+                                var basePoint = _insertionPoint.Value;
+                                if (PreviousPoint != null)
+                                {
+                                    basePoint = PreviousPoint.Value;
+                                }
+                                
+                                return _customPoint.Acquire(prompts, $"\n{PromptForCustomPoint}", basePoint, value =>
+                                {
+                                    _customPointAction.Invoke(value);
+                                });
+                            }
+
+                            throw new ArgumentException("No CustomAction");
                         }
 
                     default:
