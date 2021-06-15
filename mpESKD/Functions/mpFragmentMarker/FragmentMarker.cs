@@ -1,11 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
 
-<<<<<<< Updated upstream
-using mpESKD.Functions.mpNodalLeader.Overrules;
-=======
-
->>>>>>> Stashed changes
-
 namespace mpESKD.Functions.mpFragmentMarker
 {
     using System;
