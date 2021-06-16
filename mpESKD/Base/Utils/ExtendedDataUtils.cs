@@ -14,7 +14,7 @@
         /// Добавление регистрации приложения в соответствующую таблицу чертежа
         /// </summary>
         /// <param name="descriptor">Дескриптор интеллектуального объекта</param>
-        public static void AddRegAppTableRecord(IIntellectualEntityDescriptor descriptor)
+        public static void AddRegAppTableRecord(ISmartEntityDescriptor descriptor)
         {
             AddRegAppTableRecord(descriptor.Name);
         }

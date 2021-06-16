@@ -10,10 +10,9 @@
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
+    using Grips;
     using ModPlusAPI.Windows;
     using mpAxis;
-    using Overrules;
-    using Overrules.Grips;
 
     /// <summary>
     /// Разрез
@@ -327,7 +326,7 @@
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="Section"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(Section));
         }

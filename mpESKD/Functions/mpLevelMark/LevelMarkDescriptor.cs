@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class LevelMarkDescriptor : IIntellectualEntityDescriptor
+    public class LevelMarkDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(LevelMark);

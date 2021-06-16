@@ -13,7 +13,7 @@
         private static TypeFactory _instance;
         private List<Type> _entityTypes;
         private List<ISmartEntityFunction> _smartEntityFunctions;
-        private Dictionary<Type, IIntellectualEntityDescriptor> _entityDescriptors;
+        private Dictionary<Type, ISmartEntityDescriptor> _entityDescriptors;
         private Dictionary<Type, IDoubleClickEditControl> _entityEditControls;
 
         /// <summary>
@@ -36,15 +36,15 @@
         /// Возвращает дескриптор для примитива по типу интеллектуального объекта
         /// </summary>
         /// <param name="entityType">Тип интеллектуального объекта</param>
-        public IIntellectualEntityDescriptor GetDescriptor(Type entityType)
+        public ISmartEntityDescriptor GetDescriptor(Type entityType)
         {
             if (_entityDescriptors == null)
             {
                 _entityDescriptors = typeof(TypeFactory).Assembly
                     .GetTypes()
-                    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IIntellectualEntityDescriptor)))
+                    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(ISmartEntityDescriptor)))
                     .Select(Activator.CreateInstance)
-                    .Cast<IIntellectualEntityDescriptor>()
+                    .Cast<ISmartEntityDescriptor>()
                     .ToDictionary(d => d.EntityType, d => d);
             }
 

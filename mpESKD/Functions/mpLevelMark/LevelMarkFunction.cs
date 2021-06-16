@@ -9,11 +9,11 @@
     using Base;
     using Base.Abstractions;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class LevelMarkFunction : ISmartEntityFunction
@@ -21,17 +21,9 @@
         /// <inheritdoc/>
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc/>
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), LevelMarkObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LevelMarkGripPointOverrule(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<LevelMark>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<LevelMark>(), true);
         }
 
         /// <inheritdoc/>

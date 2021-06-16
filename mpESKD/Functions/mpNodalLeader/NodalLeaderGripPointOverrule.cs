@@ -1,0 +1,127 @@
+﻿namespace mpESKD.Functions.mpNodalLeader
+{
+    using System;
+    using Autodesk.AutoCAD.DatabaseServices;
+    using Autodesk.AutoCAD.Geometry;
+    using Autodesk.AutoCAD.Runtime;
+    using Base;
+    using Base.Enums;
+    using Base.Overrules;
+    using Grips;
+    using ModPlusAPI.Windows;
+    using Exception = Autodesk.AutoCAD.Runtime.Exception;
+
+    /// <inheritdoc />
+    public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLeader>
+    {
+        private Point3d _initFramePoint;
+
+        /// <inheritdoc />
+        public override void GetGripPoints(
+            Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
+        {
+            try
+            {
+                if (IsApplicable(entity))
+                {
+                    // Удаляю все ручки - это удалит ручку вставки блока
+                    grips.Clear();
+
+                    var nodalLeader = EntityReaderService.Instance.GetFromEntity<NodalLeader>(entity);
+                    if (nodalLeader != null)
+                    {
+                        grips.Add(new NodalLeaderGrip(
+                            nodalLeader, GripType.BasePoint, GripName.InsertionPoint, nodalLeader.InsertionPoint));
+                        grips.Add(new NodalLeaderGrip(
+                            nodalLeader, GripType.Point, GripName.FramePoint, nodalLeader.FramePoint));
+                        grips.Add(new NodalLeaderGrip(
+                            nodalLeader, GripType.Point, GripName.LeaderPoint, nodalLeader.EndPoint));
+                        
+                        grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
+                        {
+                            GripPoint = nodalLeader.EndPoint +
+                                        (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
+                            GripType = GripType.TwoArrowsLeftRight
+                        });
+
+                        _initFramePoint = nodalLeader.FramePoint;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                    ExceptionBox.Show(exception);
+            }
+        }
+
+        /// <inheritdoc />
+        public override void MoveGripPointsAt(
+            Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+        {
+            try
+            {
+                if (IsApplicable(entity))
+                {
+                    foreach (var gripData in grips)
+                    {
+                        if (gripData is NodalLeaderGrip levelMarkGrip)
+                        {
+                            var gripPoint = levelMarkGrip.GripPoint;
+                            var nodalLeader = levelMarkGrip.NodalLeader;
+                            var scale = nodalLeader.GetFullScale();
+
+                            if (levelMarkGrip.GripName == GripName.InsertionPoint)
+                            {
+                                ((BlockReference)entity).Position = gripPoint + offset;
+                                nodalLeader.InsertionPoint = gripPoint + offset;
+                                nodalLeader.FramePoint = _initFramePoint + offset;
+                            }
+                            else if (levelMarkGrip.GripName == GripName.FramePoint)
+                            {
+                                if (nodalLeader.FrameType == FrameType.Rectangular)
+                                {
+                                    var currentPosition = gripPoint + offset;
+                                    var frameHeight = 
+                                        Math.Abs(currentPosition.Y - nodalLeader.InsertionPoint.Y) / scale;
+                                    var frameWidth = Math.Abs(currentPosition.X - nodalLeader.InsertionPoint.X) / scale;
+
+                                    if (!(frameHeight <= nodalLeader.MinDistanceBetweenPoints) &&
+                                        !(frameWidth <= nodalLeader.MinDistanceBetweenPoints))
+                                    {
+                                        nodalLeader.FramePoint = gripPoint + offset;
+                                    }
+                                }
+                                else
+                                {
+                                    nodalLeader.FramePoint = gripPoint + offset;
+                                }
+                            }
+                            else if (levelMarkGrip.GripName == GripName.LeaderPoint)
+                            {
+                                nodalLeader.EndPoint = gripPoint + offset;
+                            }
+
+                            // Вот тут происходит перерисовка примитивов внутри блока
+                            nodalLeader.UpdateEntities();
+                            nodalLeader.BlockRecord.UpdateAnonymousBlocks();
+                        }
+                        else
+                        {
+                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                        }
+                    }
+                }
+                else
+                {
+                    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                }
+            }
+            catch (Exception exception)
+            {
+                if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                    ExceptionBox.Show(exception);
+            }
+        }
+    }
+}

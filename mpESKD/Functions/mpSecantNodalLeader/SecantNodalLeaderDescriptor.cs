@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc/>
-    public class SecantNodalLeaderDescriptor : IIntellectualEntityDescriptor
+    public class SecantNodalLeaderDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(SecantNodalLeader);

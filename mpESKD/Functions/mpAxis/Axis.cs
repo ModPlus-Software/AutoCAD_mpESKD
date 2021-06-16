@@ -626,7 +626,7 @@ namespace mpESKD.Functions.mpAxis
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="Axis"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(Axis));
         }

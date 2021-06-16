@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class FragmentMarkerDescriptor : IIntellectualEntityDescriptor
+    public class FragmentMarkerDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(FragmentMarker);

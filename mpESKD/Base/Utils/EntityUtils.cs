@@ -3,12 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Windows;
     using Abstractions;
     using Autodesk.AutoCAD.Colors;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
-    using ModPlusAPI.Windows;
     using Overrules;
     using Overrules.Grips;
     using View;
@@ -53,108 +51,7 @@
             if (attachmentPoint.HasValue)
                 dbText.Justify = attachmentPoint.Value;
         }
-
-        /// <summary>
-        /// Обработка объекта в методе Close класса <see cref="ObjectOverrule"/>
-        /// </summary>
-        /// <param name="dbObject">Instance of <see cref="DBObject"/></param>
-        /// <param name="smartEntity">Метод получения объекта из блока</param>
-        public static void ObjectOverruleProcess(DBObject dbObject, Func<SmartEntity> smartEntity)
-        {
-            try
-            {
-                if (AcadUtils.Document == null)
-                    return;
-
-                if (dbObject == null)
-                    return;
-
-                if ((dbObject.IsNewObject && dbObject.Database == AcadUtils.Database) ||
-                    (dbObject.IsUndoing && dbObject.IsModifiedXData)) //// ||
-                    ////(dbObject.IsModified && AcadUtils.Database.TransactionManager.TopTransaction == null))
-                {
-                    var entity = smartEntity.Invoke();
-                    if (entity == null)
-                        return;
-
-                    entity.UpdateEntities();
-                    entity.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
-                }
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception exception)
-            {
-                if (exception.Message != "eWrongDatabase")
-                    throw;
-            }
-            catch (Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
-
-        /// <summary>
-        /// Обработка объекта в методе GetObjectSnapPoints класса <see cref="OsnapOverrule"/>
-        /// </summary>
-        /// <param name="entity">Instance of <see cref="Entity"/></param>
-        /// <param name="snapPoints">Коллекция точек для привязки</param>
-        public static void OsnapOverruleProcess(Entity entity, Point3dCollection snapPoints)
-        {
-            try
-            {
-                var intellectualEntity = EntityReaderService.Instance.GetFromEntity(entity);
-                if (intellectualEntity != null)
-                {
-                    foreach (var point3d in intellectualEntity.GetPointsForOsnap())
-                    {
-                        snapPoints.Add(point3d);
-                    }
-                }
-            }
-            catch (Autodesk.AutoCAD.Runtime.Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-        }
-
-        /// <summary>
-        /// Редактирование свойств для интеллектуального объекта в специальном окне. Применяется для интеллектуальных
-        /// объектов, содержащих текстовые значения
-        /// </summary>
-        /// <param name="blockReference">Блок, представляющий интеллектуальный объект</param>
-        /// <param name="getEditor">Метод получения редактора свойств для интеллектуального объекта</param>
-        [Obsolete]
-        public static void DoubleClickEdit(
-            BlockReference blockReference,
-            Func<SmartEntity, Window> getEditor)
-        {
-            BeditCommandWatcher.UseBedit = false;
-
-            var intellectualEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
-            if (intellectualEntity != null)
-            {
-                intellectualEntity.UpdateEntities();
-                var saveBack = false;
-
-                var sectionValueEditor = getEditor(intellectualEntity);
-                if (sectionValueEditor.ShowDialog() == true)
-                {
-                    saveBack = true;
-                }
-
-                if (saveBack)
-                {
-                    intellectualEntity.UpdateEntities();
-                    intellectualEntity.BlockRecord.UpdateAnonymousBlocks();
-                    using (var resBuf = intellectualEntity.GetDataForXData())
-                    {
-                        blockReference.XData = resBuf;
-                    }
-                }
-
-                intellectualEntity.Dispose();
-            }
-        }
-
+        
         /// <summary>
         /// Редактирование свойств для интеллектуального объекта в специальном окне. Применяется для интеллектуальных
         /// объектов, содержащих текстовые значения

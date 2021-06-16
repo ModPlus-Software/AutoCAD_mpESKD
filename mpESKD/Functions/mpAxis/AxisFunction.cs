@@ -9,10 +9,10 @@
     using Base;
     using Base.Abstractions;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class AxisFunction : ISmartEntityFunction
@@ -20,17 +20,15 @@
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new AxisGripPointOverrule(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<Axis>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<Axis>(), true);
         }
 
         /// <inheritdoc />
         public void Terminate()
         {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), AxisObjectOverrule.Instance());
+            
         }
 
         /// <inheritdoc />

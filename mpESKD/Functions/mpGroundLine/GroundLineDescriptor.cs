@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class GroundLineDescriptor : IIntellectualEntityDescriptor
+    public class GroundLineDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(GroundLine);

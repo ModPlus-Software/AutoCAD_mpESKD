@@ -4,10 +4,10 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Abstractions;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class WaterProofingFunction : ISmartEntityFunction
@@ -15,17 +15,9 @@
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc />
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WaterProofingObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LinearSmartEntityGripOverrule<WaterProofing>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<WaterProofing>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<WaterProofing>(), true);
         }
 
         /// <inheritdoc />

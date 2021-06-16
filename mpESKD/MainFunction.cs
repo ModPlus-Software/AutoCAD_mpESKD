@@ -93,9 +93,6 @@
         /// <inheritdoc />
         public void Terminate()
         {
-            TypeFactory.Instance.GetEntityFunctionTypes().ForEach(f => f.Terminate());
-
-            // remove context menu
             DetachCreateAnalogContextMenu();
         }
 

@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class WaterProofingDescriptor : IIntellectualEntityDescriptor
+    public class WaterProofingDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(WaterProofing);
