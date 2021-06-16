@@ -363,7 +363,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
                 FillMainPolylineWithPoints(pts, bulges);
                 _leaderFirstPoint = pts[3].ToPoint3d();
-                //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
                 //CreateEntities(pts[3].ToPoint3d(),InsertionPoint, scale);
             }
         }
