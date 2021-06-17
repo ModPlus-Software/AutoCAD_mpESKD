@@ -10,6 +10,7 @@ namespace mpESKD.Functions.mpFragmentMarker
     public partial class FragmentMarkerDoubleClickEditControl : IDoubleClickEditControl
     {
         private FragmentMarker _fragmentMarker;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="FragmentMarkerDoubleClickEditControl"/> class.
         /// </summary>
@@ -19,8 +20,10 @@ namespace mpESKD.Functions.mpFragmentMarker
             ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
         }
 
+        /// <inheritdoc/>
         public Type EntityType => typeof(FragmentMarker);
 
+        /// <inheritdoc/>
         public void Initialize(IWithDoubleClickEditor smartEntity)
         {
             if (!(smartEntity is FragmentMarker fragmentMarker))
@@ -28,14 +31,15 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             _fragmentMarker = fragmentMarker;
 
-            TbNodeNumber.Text = _fragmentMarker.NodeNumber;
-            TbNodeAddress.Text = _fragmentMarker.NodeAddress;
+            TbNodeNumber.Text = _fragmentMarker.MainText;
+            TbNodeAddress.Text = _fragmentMarker.SmallText;
         }
 
+        /// <inheritdoc/>
         public void OnAccept()
         {
-            _fragmentMarker.NodeNumber = TbNodeNumber.Text;
-            _fragmentMarker.NodeAddress = TbNodeAddress.Text;
+            _fragmentMarker.MainText = TbNodeNumber.Text;
+            _fragmentMarker.SmallText = TbNodeAddress.Text;
         }
     }
 }

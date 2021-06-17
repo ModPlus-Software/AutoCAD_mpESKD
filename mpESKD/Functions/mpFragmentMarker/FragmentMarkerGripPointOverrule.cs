@@ -4,10 +4,10 @@
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
+    using Base.Enums;
+    using Base.Overrules;
     using Grips;
     using ModPlusAPI.Windows;
-    using mpESKD.Base.Enums;
-    using mpESKD.Base.Overrules;
 
     /// <inheritdoc />
     public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<FragmentMarker>
@@ -71,8 +71,9 @@
                         grips.Add(gp);
 
                         // получаем ручку выноски
-                        if (!(!string.IsNullOrEmpty(fragmentMarker.NodeNumber) |
-                              !string.IsNullOrEmpty(fragmentMarker.NodeAddress))) return;
+                        if (!(!string.IsNullOrEmpty(fragmentMarker.MainText) |
+                              !string.IsNullOrEmpty(fragmentMarker.SmallText)))
+                            return;
                         gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
                         {
                             GripPoint = fragmentMarker.LeaderPoint
@@ -173,8 +174,7 @@
                                     fragmentMarker.EndPoint = fragmentMarkerGrip.GripPoint + offset;
                                 }
                             }
-
-                            //TODO удалять точку выноски
+                            
                             if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
                             {
                                 fragmentMarker.LeaderPoint = gripPoint + offset;

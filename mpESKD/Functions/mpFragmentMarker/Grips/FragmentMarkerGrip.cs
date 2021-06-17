@@ -3,19 +3,28 @@
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
-    using Base;
+    using Base.Abstractions;
     using Base.Enums;
     using Base.Overrules;
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Base.Abstractions;
 
     /// <summary>
     /// Описание ручки линии обрыва
     /// </summary>
-    public class FragmentMarkerGrip : SmartEntityGripData, ITextValueEntity, IWithDoubleClickEditor
+    public class FragmentMarkerGrip : SmartEntityGripData, IWithDoubleClickEditor
     {
+        
+        // Временное значение первой ручки
+        private Point3d _startGripTmp;
+
+        // временное значение последней ручки
+        private Point3d _endGripTmp;
+
+        // временное значение последней ручки
+        private Point3d _leaderGripTmp;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="FragmentMarkerGrip"/> class.
         /// </summary>
@@ -54,16 +63,7 @@
 
             return base.GetTooltip();
         }
-
-        // Временное значение первой ручки
-        private Point3d _startGripTmp;
-
-        // временное значение последней ручки
-        private Point3d _endGripTmp;
-
-        // временное значение последней ручки
-        private Point3d _leaderGripTmp;
-
+        
         /// <inheritdoc />
         public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
         {
@@ -145,8 +145,5 @@
                 ExceptionBox.Show(exception);
             }
         }
-
-        public bool HideTextBackground { get; set; }
-        public double TextMaskOffset { get; set; }
     }
 }

@@ -12,9 +12,9 @@
     public class FragmentMarkerShelfPositionGrip : SmartEntityGripData
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLevelShelfPositionGrip"/> class.
+        /// Initializes a new instance of the <see cref="FragmentMarkerShelfPositionGrip"/> class.
         /// </summary>
-        /// <param name="fragmentMarker">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
+        /// <param name="fragmentMarker">Экземпляр <see cref="mpFragmentMarker.FragmentMarker"/></param>
         public FragmentMarkerShelfPositionGrip(FragmentMarker fragmentMarker)
         {
             FragmentMarker = fragmentMarker;

@@ -192,7 +192,7 @@
             var allValues = new List<string>();
             AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<FragmentMarker>(typeof(FragmentMarker)).ForEach(a =>
             {
-                allValues.Add(a.NodeNumber);
+                allValues.Add(a.MainText);
             });
 
             return allValues.OrderBy(s => s, new OrdinalStringComparer()).LastOrDefault();
