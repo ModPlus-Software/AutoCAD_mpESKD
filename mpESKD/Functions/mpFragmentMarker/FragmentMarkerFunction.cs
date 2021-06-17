@@ -16,7 +16,6 @@
     using ModPlusAPI;
     using ModPlusAPI.IO;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class FragmentMarkerFunction : ISmartEntityFunction
@@ -24,7 +23,7 @@
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), FragmentMarkerGripPointOverrule.Instance(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new FragmentMarkerGripPointOverrule(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<FragmentMarker>(), true);
             Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<FragmentMarker>(), true);
         }
@@ -146,7 +145,6 @@
                         
                         // Тут не нужна привязка к предыдущей точке
                         entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
-                        
                         entityJig.JigState = JigState.CustomPoint;
                     }
                     else

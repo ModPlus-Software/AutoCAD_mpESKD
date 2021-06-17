@@ -1,47 +1,26 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Overrules
+﻿namespace mpESKD.Functions.mpFragmentMarker
 {
-    using System.Diagnostics;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
+    using mpESKD.Base.Enums;
+    using mpESKD.Base.Overrules;
 
     /// <inheritdoc />
-    public class FragmentMarkerGripPointOverrule : GripOverrule
+    public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<FragmentMarker>
     {
-        private static FragmentMarkerGripPointOverrule _fragmentMakerGripPointOverrule;
-
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static FragmentMarkerGripPointOverrule Instance()
-        {
-            if (_fragmentMakerGripPointOverrule != null)
-            {
-                return _fragmentMakerGripPointOverrule;
-            }
-
-            _fragmentMakerGripPointOverrule = new FragmentMarkerGripPointOverrule();
-
-            // Фильтр "отлова" примитива по расширенным данным. Работает лучше, чем проверка вручную!
-            _fragmentMakerGripPointOverrule.SetXDataFilter(FragmentMarker.GetDescriptor().Name);
-            return _fragmentMakerGripPointOverrule;
-        }
-
         /// <inheritdoc />
         public override void GetGripPoints(
             Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
         {
-            Debug.Print("FragmentMarkerGripPointOverrule");
             try
             {
                 // Проверка дополнительных условий
                 if (IsApplicable(entity))
                 {
-
                     // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
                     // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
                     var blkRef = (BlockReference)entity;
@@ -66,7 +45,7 @@
                     // т.е. правила построения графики внутри блока
                     // Информация собирается по XData и свойствам самого блока
                     var fragmentMarker = EntityReaderService.Instance.GetFromEntity<FragmentMarker>(entity);
-
+                    
                     // Паранойя программиста =)
                     if (fragmentMarker != null)
                     {
@@ -90,17 +69,21 @@
                             GripPoint = fragmentMarker.EndPoint
                         };
                         grips.Add(gp);
+
                         // получаем ручку выноски
-
-                        if (fragmentMarker.isHaveLeader)
+                        if (!(!string.IsNullOrEmpty(fragmentMarker.NodeNumber) |
+                              !string.IsNullOrEmpty(fragmentMarker.NodeAddress))) return;
+                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
                         {
-                            gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
-                            {
-                                GripPoint = fragmentMarker.LeaderPoint
-                            };
-                            grips.Add(gp);
-                        }
-
+                            GripPoint = fragmentMarker.LeaderPoint
+                        };
+                        grips.Add(gp);
+                        grips.Add(new FragmentMarkerShelfPositionGrip(fragmentMarker)
+                        {
+                            GripPoint = fragmentMarker.LeaderPoint +
+                                        (Vector3d.YAxis * ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) * fragmentMarker.GetFullScale())),
+                            GripType = GripType.TwoArrowsLeftRight
+                        });
                     }
                 }
             }
@@ -132,7 +115,6 @@
                             // Далее, в зависимости от имени ручки произвожу действия
                             if (fragmentMarkerGrip.GripName == GripName.StartGrip)
                             {
-                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
                                 // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                                 // Все точки всегда совпадают (+ ручка)
                                 ((BlockReference)entity).Position = gripPoint + offset;
@@ -177,9 +159,7 @@
 
                             if (fragmentMarkerGrip.GripName == GripName.EndGrip)
                             {
-                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
-                                
-                                 var newPt = fragmentMarkerGrip.GripPoint + offset;
+                                var newPt = fragmentMarkerGrip.GripPoint + offset;
                                 if (newPt.Equals(((BlockReference)entity).Position))
                                 {
                                     fragmentMarker.EndPoint = new Point3d(
@@ -197,8 +177,6 @@
                             //TODO удалять точку выноски
                             if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
                             {
-                                Debug.Print(fragmentMarkerGrip.GripName.ToString());
-
                                 fragmentMarker.LeaderPoint = gripPoint + offset;
                             }
 
@@ -222,12 +200,6 @@
                 if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
                     ExceptionBox.Show(exception);
             }
-        }
-
-        /// <inheritdoc />
-        public override bool IsApplicable(RXObject overruledSubject)
-        {
-            return ExtendedDataUtils.IsApplicable(overruledSubject, FragmentMarker.GetDescriptor().Name);
         }
     }
 }

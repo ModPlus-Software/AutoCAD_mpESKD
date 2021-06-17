@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Overrules.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
@@ -29,24 +29,6 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
-        /// </summary>
-        /// <param name="fragmentMarker">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
-        /// <param name="gripType">Вид ручки</param>
-        /// <param name="gripName">Имя ручки</param>
-        /// <param name="gripPoint">Точка ручки</param>
-        //public FragmentMarkerGrip(            FragmentMarker fragmentMarker,
-        //    GripType gripType,
-        //    GripName gripName,
-        //    Point3d gripPoint)
-        //{
-        //    FragmentMarker = fragmentMarker;
-        //    GripName = gripName;
-        //    GripType = gripType;
-        //    GripPoint = gripPoint;
-        //}
-
-        /// <summary>
         /// Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой
         /// </summary>
         public FragmentMarker FragmentMarker { get; }
@@ -63,9 +45,9 @@
             {
                 case GripName.StartGrip:
                 case GripName.EndGrip:
-                {
-                    return Language.GetItem("gp1"); // stretch
-                }
+                    {
+                        return Language.GetItem("gp1"); // stretch
+                    }
 
                 case GripName.LeaderGrip: return Language.GetItem("gp2"); // move
             }

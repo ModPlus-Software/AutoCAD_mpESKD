@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Overrules.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
 {
     using Autodesk.AutoCAD.DatabaseServices;
     using Base.Enums;
@@ -19,18 +19,18 @@
         {
             FragmentMarker = fragmentMarker;
         }
-        
+
         /// <summary>
         /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
         /// </summary>
         public FragmentMarker FragmentMarker { get; }
-        
+
         /// <inheritdoc />
         public override string GetTooltip()
         {
             return Language.GetItem("p78"); // "Положение полки";
         }
-        
+
         /// <inheritdoc />
         public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
         {
@@ -45,7 +45,7 @@
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(FragmentMarker.BlockId, OpenMode.ForWrite, true, true);
-                    
+
                     using (var resBuf = FragmentMarker.GetDataForXData())
                     {
                         blkRef.XData = resBuf;

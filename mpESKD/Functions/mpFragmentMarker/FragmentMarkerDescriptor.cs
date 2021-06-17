@@ -57,6 +57,6 @@
         };
 
         /// <inheritdoc />
-        public List<string> SubHelpImages => new List<string> { string.Empty};
+        public List<string> SubHelpImages => new List<string> { string.Empty };
     }
 }

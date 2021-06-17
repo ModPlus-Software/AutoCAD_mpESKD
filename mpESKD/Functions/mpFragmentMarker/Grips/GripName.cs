@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Overrules.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
 {
     /// <summary>
     /// Grip names

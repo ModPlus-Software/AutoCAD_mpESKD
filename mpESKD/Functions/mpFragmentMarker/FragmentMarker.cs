@@ -136,7 +136,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20;
-        
+
         /// <summary>
         /// Минимальная длина выноски, если меньше то выноски нет
         /// </summary>
@@ -251,6 +251,8 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         private Point3d _leaderFirstPoint;
 
+        public bool isHaveLeader { get; set; }
+
         #endregion
 
         #region Geometry
@@ -297,7 +299,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                     {
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
                         MakeSimplyEntity(scale);
-                        
+
                         Debug.Print("length < MinDistanceBetweenPoints * scale");
                     }
                     else
@@ -346,13 +348,13 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             List<double> bulges;
 
-            var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ? 
-                new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) : 
+            var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ?
+                new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
                 ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
 
             var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
             FillMainPolylineWithPoints(pts, bulges);
-            
+
             _leaderFirstPoint = pts[3].ToPoint3d();
             EndPoint = tmpEndPoint.TransformBy(BlockTransform);
         }
@@ -426,27 +428,20 @@ namespace mpESKD.Functions.mpFragmentMarker
             }
         }
 
-        public bool isHaveLeader { get; set; } = true;
-
         private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
         {
-            //if (!drawLeader)
-            //    return;
+            isHaveLeader = true;
             _leaderFirstPoint = insertionPoint;
             var leaderLine = new Line(_leaderFirstPoint, leaderPoint);
-            if (leaderLine.Length < MinLeaderLength * scale)
+            if (leaderLine.Length < MinLeaderLength * scale | (NodeNumber == null | NodeNumber == "") & (NodeAddress != null | NodeAddress == ""))
             {
                 leaderLine = new Line();
                 _shelfLine = new Line();
                 isHaveLeader = false;
             }
-            if (_bottomDbText == null & _topFirstDbText == null) _leaderLine = new Line();
-            var pts = new Point3dCollection();
-            //_frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-            _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
 
-            //Debug.Print(_leaderLine.Length.ToString());
-            // Если drawLeader == false, то дальше код не выполнится
+            var pts = new Point3dCollection();
+            _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
 
             //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
 
@@ -552,8 +547,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 _shelfLine = new Line(leaderPoint, shelfEndPoint);
             }
-
-            
         }
 
         private void SetNodeNumberOnCreation()
