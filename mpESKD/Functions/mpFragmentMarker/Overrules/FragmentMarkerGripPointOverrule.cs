@@ -91,11 +91,16 @@
                         };
                         grips.Add(gp);
                         // получаем ручку выноски
-                        gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
+
+                        if (fragmentMarker.isHaveLeader)
                         {
-                            GripPoint = fragmentMarker.LeaderPoint
-                        };
-                        grips.Add(gp);
+                            gp = new FragmentMarkerGrip(fragmentMarker, GripName.LeaderGrip)
+                            {
+                                GripPoint = fragmentMarker.LeaderPoint
+                            };
+                            grips.Add(gp);
+                        }
+
                     }
                 }
             }
@@ -189,6 +194,7 @@
                                 }
                             }
 
+                            //TODO удалять точку выноски
                             if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
                             {
                                 Debug.Print(fragmentMarkerGrip.GripName.ToString());
