@@ -140,7 +140,7 @@ namespace mpESKD.Functions.mpWaterProofing
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="WaterProofing"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(WaterProofing));
         }

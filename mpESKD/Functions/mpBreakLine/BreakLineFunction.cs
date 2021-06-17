@@ -7,11 +7,10 @@
     using Base;
     using Base.Abstractions;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
-    using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class BreakLineFunction : ISmartEntityFunction
@@ -19,17 +18,9 @@
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc />
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), BreakLineObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new BreakLineGripPointOverrule(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<BreakLine>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<BreakLine>(), true);
         }
 
         /// <inheritdoc />

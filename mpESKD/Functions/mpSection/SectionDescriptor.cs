@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class SectionDescriptor : IIntellectualEntityDescriptor
+    public class SectionDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(Section);

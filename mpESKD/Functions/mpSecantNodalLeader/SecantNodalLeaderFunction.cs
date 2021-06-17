@@ -9,12 +9,12 @@
     using Base;
     using Base.Abstractions;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.IO;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc/>
     public class SecantNodalLeaderFunction : ISmartEntityFunction
@@ -22,17 +22,9 @@
         /// <inheritdoc/>
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc/>
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), SecantNodalLeaderObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SecantNodalLeaderGripPointOverrule(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<SecantNodalLeader>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<SecantNodalLeader>(), true);
         }
 
         /// <inheritdoc/>

@@ -414,10 +414,10 @@
         /// <summary>
         /// Получить SplitButton (основная команда + все вложенные команды) для дескриптора функции
         /// </summary>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
         private static RibbonSplitButton GetBigSplitButton(
-            IIntellectualEntityDescriptor descriptor,
+            ISmartEntityDescriptor descriptor,
             Orientation orientation = Orientation.Vertical)
         {
             // Создаем SplitButton
@@ -449,10 +449,10 @@
         /// <summary>
         /// Получить SplitButton (основная команда + все вложенные команды) для дескриптора функции
         /// </summary>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
         private static RibbonSplitButton GetSmallSplitButton(
-            IIntellectualEntityDescriptor descriptor,
+            ISmartEntityDescriptor descriptor,
             Orientation orientation = Orientation.Vertical)
         {
             // Создаем SplitButton
@@ -485,9 +485,9 @@
         /// Получить кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
         /// </summary>
         /// <remarks>Для команды должно быть две иконки (16х16 и 32х32) в ресурсах!</remarks>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
-        private static RibbonButton GetButton(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        private static RibbonButton GetButton(ISmartEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
         {
             return RibbonHelpers.AddButton(
                 descriptor.Name,
@@ -504,9 +504,9 @@
         /// <summary>
         /// Получить большую кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
         /// </summary>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
-        private static RibbonButton GetBigButton(IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+        private static RibbonButton GetBigButton(ISmartEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
         {
             return RibbonHelpers.AddBigButton(
                 descriptor.Name,
@@ -522,8 +522,8 @@
         /// <summary>
         /// Получить маленькую кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
         /// </summary>
-        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
-        private static RibbonButton GetSmallButton(IIntellectualEntityDescriptor descriptor)
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
+        private static RibbonButton GetSmallButton(ISmartEntityDescriptor descriptor)
         {
             return RibbonHelpers.AddSmallButton(
                 descriptor.Name,
@@ -540,10 +540,10 @@
         /// </summary>
         /// <remarks>Для всех команд должно быть две иконки (16х16 и 32х32) в ресурсах!</remarks>
         /// <param name="descriptor">Дескриптор функции - класс, реализующий
-        /// интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
         private static List<RibbonButton> GetButtonsForSubFunctions(
-            IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+            ISmartEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
         {
             var buttons = new List<RibbonButton>();
 
@@ -568,10 +568,10 @@
         /// Получить список больших кнопок для вложенных команды по дескриптору
         /// </summary>
         /// <param name="descriptor">Дескриптор функции - класс, реализующий
-        /// интерфейс <see cref="IIntellectualEntityDescriptor"/></param>
+        /// интерфейс <see cref="ISmartEntityDescriptor"/></param>
         /// <param name="orientation">Ориентация кнопки</param>
         private static List<RibbonButton> GetBigButtonsForSubFunctions(
-            IIntellectualEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
+            ISmartEntityDescriptor descriptor, Orientation orientation = Orientation.Vertical)
         {
             var buttons = new List<RibbonButton>();
 

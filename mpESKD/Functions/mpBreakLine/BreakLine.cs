@@ -38,7 +38,7 @@ namespace mpESKD.Functions.mpBreakLine
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="BreakLine"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(BreakLine));
         }

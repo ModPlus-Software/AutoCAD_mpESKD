@@ -329,7 +329,7 @@ namespace mpESKD.Functions.mpWeldJoint
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="WeldJoint"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(WeldJoint));
         }

@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class BreakLineDescriptor : IIntellectualEntityDescriptor
+    public class BreakLineDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(BreakLine);

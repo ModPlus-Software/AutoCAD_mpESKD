@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    public class AxisDescriptor : IIntellectualEntityDescriptor
+    public class AxisDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(Axis);

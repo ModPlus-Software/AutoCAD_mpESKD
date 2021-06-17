@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc/>
-    public class WeldJointDescriptor : IIntellectualEntityDescriptor
+    public class WeldJointDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(WeldJoint);

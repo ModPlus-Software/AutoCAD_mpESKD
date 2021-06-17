@@ -9,12 +9,12 @@
     using Base;
     using Base.Abstractions;
     using Base.Enums;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.IO;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc/>
     public class NodalLeaderFunction : ISmartEntityFunction
@@ -22,17 +22,9 @@
         /// <inheritdoc/>
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc/>
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), NodalLeaderObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new NodalLeaderGripPointOverrule(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<NodalLeader>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<NodalLeader>(), true);
         }
 
         /// <inheritdoc/>

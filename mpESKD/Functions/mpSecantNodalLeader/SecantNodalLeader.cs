@@ -245,7 +245,7 @@
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="SecantNodalLeader"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(SecantNodalLeader));
         }

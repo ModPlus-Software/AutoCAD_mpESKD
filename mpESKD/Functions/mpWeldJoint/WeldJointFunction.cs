@@ -4,10 +4,10 @@
     using Autodesk.AutoCAD.Runtime;
     using Base;
     using Base.Abstractions;
+    using Base.Overrules;
     using Base.Styles;
     using Base.Utils;
     using ModPlusAPI.Windows;
-    using Overrules;
 
     /// <inheritdoc />
     public class WeldJointFunction : ISmartEntityFunction
@@ -15,17 +15,9 @@
         /// <inheritdoc />
         public void Initialize()
         {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointGripPointOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointOsnapOverrule.Instance(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointObjectOverrule.Instance(), true);
-        }
-
-        /// <inheritdoc />
-        public void Terminate()
-        {
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointGripPointOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointOsnapOverrule.Instance());
-            Overrule.RemoveOverrule(RXObject.GetClass(typeof(BlockReference)), WeldJointObjectOverrule.Instance());
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LinearSmartEntityGripOverrule<WeldJoint>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<WeldJoint>(), true);
+            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<WeldJoint>(), true);
         }
 
         /// <inheritdoc />

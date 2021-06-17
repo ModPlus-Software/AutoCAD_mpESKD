@@ -115,7 +115,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="FragmentMarker"/>
         /// </summary>
-        public static IIntellectualEntityDescriptor GetDescriptor()
+        public static ISmartEntityDescriptor GetDescriptor()
         {
             return TypeFactory.Instance.GetDescriptor(typeof(FragmentMarker));
         }
