@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.14.0.0</Version>
+    <Version>1.14.1.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
     <AssemblyName>$(RootNamespace)</AssemblyName>
   </PropertyGroup>
@@ -158,7 +158,9 @@
 
   <ItemGroup>
     <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
+    <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
     <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
+    <None Remove="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32_dark.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
     <None Remove="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
@@ -203,7 +205,9 @@
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
     <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
     <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
+    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
     <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
+    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
