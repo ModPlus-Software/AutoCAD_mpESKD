@@ -543,6 +543,10 @@
                     _bottomTextMask = _bottomMText.GetBackgroundMask(maskOffset);
                 }
             }
+            else
+            {
+                _bottomMText = null;
+            }
 
             _middleStrokes.Clear();
 

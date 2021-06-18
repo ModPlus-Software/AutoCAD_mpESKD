@@ -446,12 +446,20 @@ namespace mpESKD.Functions.mpNodalLeader
                 _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
                 topFirstTextLength = _topFirstDbText.GetLength();
             }
+            else
+            {
+                _topFirstDbText = null;
+            }
 
             if (!string.IsNullOrEmpty(SheetNumber))
             {
                 _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
                 _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
                 topSecondTextLength = _topSecondDbText.GetLength();
+            }
+            else
+            {
+                _topSecondDbText = null;
             }
 
             if (!string.IsNullOrEmpty(NodeAddress))
@@ -460,6 +468,10 @@ namespace mpESKD.Functions.mpNodalLeader
                 _bottomDbText.SetProperties(TextStyle, secondTextHeight);
                 bottomTextLength = _bottomDbText.GetLength();
                 bottomTextHeight = _bottomDbText.GetHeight();
+            }
+            else
+            {
+                _bottomDbText = null;
             }
 
             var topTextLength = topFirstTextLength + topSecondTextLength;

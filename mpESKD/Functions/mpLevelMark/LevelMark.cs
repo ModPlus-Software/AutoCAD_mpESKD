@@ -640,6 +640,10 @@ namespace mpESKD.Functions.mpLevelMark
                 else
                     _bottomDbText.Position += verV * _bottomDbText.GetHeight();
             }
+            else
+            {
+                _bottomDbText = null;
+            }
 
             if (isLeft)
             {

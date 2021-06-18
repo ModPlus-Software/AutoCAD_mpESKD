@@ -776,6 +776,10 @@ namespace mpESKD.Functions.mpAxis
                     _bottomFirstDBText.SetProperties(TextStyle, textHeight);
                     _bottomFirstDBText.Position = firstMarkerCenter;
                 }
+                else
+                {
+                    _bottomFirstDBText = null;
+                }
 
                 // Второй кружок первого маркера
                 if (FirstMarkerType == AxisMarkerType.Type2)
@@ -807,6 +811,10 @@ namespace mpESKD.Functions.mpAxis
                         _bottomSecondDBText.SetProperties(TextStyle, textHeight);
                         _bottomSecondDBText.Position = secondMarkerCenter;
                     }
+                    else
+                    {
+                        _bottomSecondDBText = null;
+                    }
 
                     // второй кружок второго маркера
                     if (SecondMarkerType == AxisMarkerType.Type2)
@@ -836,6 +844,10 @@ namespace mpESKD.Functions.mpAxis
                             _bottomThirdDBText = new DBText();
                             _bottomThirdDBText.SetProperties(TextStyle, textHeight);
                             _bottomThirdDBText.Position = thirdMarkerCenter;
+                        }
+                        else
+                        {
+                            _bottomThirdDBText = null;
                         }
 
                         // второй кружок третьего маркера
@@ -897,6 +909,10 @@ namespace mpESKD.Functions.mpAxis
                         _bottomOrientDBText = new DBText();
                         _bottomOrientDBText.SetProperties(TextStyle, textHeight);
                         _bottomOrientDBText.Position = bottomOrientMarkerCenter;
+                    }
+                    else
+                    {
+                        _bottomOrientDBText = null;
                     }
 
                     // type2
@@ -975,6 +991,10 @@ namespace mpESKD.Functions.mpAxis
                     _topFirstDBText.SetProperties(TextStyle, textHeight);
                     _topFirstDBText.Position = firstMarkerCenter;
                 }
+                else
+                {
+                    _topFirstDBText = null;
+                }
 
                 // Второй кружок первого маркера
                 if (FirstMarkerType == AxisMarkerType.Type2)
@@ -1006,6 +1026,10 @@ namespace mpESKD.Functions.mpAxis
                         _topSecondDBText.SetProperties(TextStyle, textHeight);
                         _topSecondDBText.Position = secondMarkerCenter;
                     }
+                    else
+                    {
+                        _topSecondDBText = null;
+                    }
 
                     // второй кружок второго маркера
                     if (SecondMarkerType == AxisMarkerType.Type2)
@@ -1035,6 +1059,10 @@ namespace mpESKD.Functions.mpAxis
                             _topThirdDBText = new DBText();
                             _topThirdDBText.SetProperties(TextStyle, textHeight);
                             _topThirdDBText.Position = thirdMarkerCenter;
+                        }
+                        else
+                        {
+                            _topThirdDBText = null;
                         }
 
                         // второй кружок третьего маркера
@@ -1097,6 +1125,10 @@ namespace mpESKD.Functions.mpAxis
                         _topOrientDBText = new DBText();
                         _topOrientDBText.SetProperties(TextStyle, textHeight);
                         _topOrientDBText.Position = topOrientMarkerCenter;
+                    }
+                    else
+                    {
+                        _topOrientDBText = null;
                     }
 
                     // type2
