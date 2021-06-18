@@ -284,6 +284,8 @@
 
   <ItemGroup>
     <Folder Include="Functions\mpSection\Overrules\" />
+    <Folder Include="Functions\mpViewLabel\Grips\" />
+    <Folder Include="Functions\mpViewLabel\Icons\" />
   </ItemGroup>
 
 </Project>
