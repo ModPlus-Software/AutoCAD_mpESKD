@@ -243,8 +243,6 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         private Point3d _leaderFirstPoint;
 
-        public bool isHaveLeader { get; set; }
-
         #endregion
 
         #region Geometry
@@ -277,17 +275,13 @@ namespace mpESKD.Functions.mpFragmentMarker
                 {
                     // Задание точки вставки (т.е. второй точки еще нет)
                     MakeSimplyEntity(scale);
-                    Debug.Print("FragmentMarkerJigState.InsertionPoint");
                 }
                 else if (JigState == FragmentMarkerJigState.EndPoint)
                 {
-                    Debug.Print("FragmentMarkerJigState.EndPoint");
                     if (length < MinDistanceBetweenPoints * scale)
                     {
                         // Задание второй точки - случай когда расстояние между точками меньше минимального
                         MakeSimplyEntity(scale);
-
-                        Debug.Print("length < MinDistanceBetweenPoints * scale");
                     }
                     else
                     {
@@ -295,7 +289,6 @@ namespace mpESKD.Functions.mpFragmentMarker
                         var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                         _leaderFirstPoint = pts[3].ToPoint3d();
                         FillMainPolylineWithPoints(pts, bulges);
-                        Debug.Print(JigState.ToString());
                     }
                 }
                 else if (JigState == FragmentMarkerJigState.LeaderPoint)
@@ -413,7 +406,6 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
         {
-            isHaveLeader = true;
             _leaderFirstPoint = insertionPoint;
             _leaderLine = new Line(_leaderFirstPoint, leaderPoint);
             if (_leaderLine.Length < MinLeaderLength * scale ||
@@ -421,7 +413,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             {
                 _leaderLine = null;
                 _shelfLine = null;
-                isHaveLeader = false;
             }
             
             //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
