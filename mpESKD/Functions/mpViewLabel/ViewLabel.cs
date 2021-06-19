@@ -30,7 +30,43 @@
         /// <summary>
         /// Средние штрихи - штрихи, создаваемые в средних точках
         /// </summary>
+
+        #region Entities
+
+        /// <summary>
+        /// Средние штрихи - штрихи, создаваемые в средних точках
+        /// </summary>
         private readonly List<Polyline> _middleStrokes = new List<Polyline>();
+
+        /// <summary>
+        /// Верхняя полка
+        /// </summary>
+        private Line _topShelfLine;
+
+        /// <summary>
+        /// Стрелка верхней полки
+        /// </summary>
+        private Polyline _topShelfArrow;
+
+        /// <summary>
+        /// Верхний штрих
+        /// </summary>
+        private Polyline _topStroke;
+
+        /// <summary>
+        /// Нижняя полка
+        /// </summary>
+        private Line _bottomShelfLine;
+
+        /// <summary>
+        /// Стрелка нижней полки
+        /// </summary>
+        private Polyline _bottomShelfArrow;
+
+        /// <summary>
+        /// Нижний штрих
+        /// </summary>
+        private Polyline _bottomStroke;
 
         #region Text entities
 
@@ -39,6 +75,8 @@
 
         private MText _bottomMText;
         private Wipeout _bottomTextMask;
+
+        #endregion
 
         #endregion
 
@@ -71,7 +109,7 @@
             _lastLetterValue = lastLetterValue;
         }
         
-        /// <summary>
+               /// <summary>
         /// Промежуточные точки
         /// </summary>
         [SaveToXData]
@@ -116,7 +154,56 @@
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 0.2;
 
-       /// <summary>
+        /// <summary>
+        /// Длина среднего штриха (половина длины полилинии на переломе)
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 1, "h42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
+        [SaveToXData]
+        public int MiddleStrokeLength { get; set; } = 8;
+
+        /// <summary>
+        /// Толщина штрихов
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p43", 0.5, 0, 2, descLocalKey: "d43", nameSymbol: "w")]
+        [SaveToXData]
+        public double StrokeWidth { get; set; } = 0.5;
+
+        /// <summary>
+        /// Длина верхнего и нижнего штриха
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", 10, 5, 10, descLocalKey: "d44", nameSymbol: "b")]
+        [SaveToXData]
+        public int StrokeLength { get; set; } = 10;
+
+        /// <summary>
+        /// Отступ полки по длине штриха в процентах
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", 80, 0, 100, descLocalKey: "d45", nameSymbol: "c")]
+        [SaveToXData]
+        public int ShelfOffset { get; set; } = 80;
+
+        /// <summary>
+        /// Длина полки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "d")]
+        [SaveToXData]
+        public int ShelfLength { get; set; } = 10;
+
+        /// <summary>
+        /// Длина стрелки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p47", 5, 1, 8, nameSymbol: "e")]
+        [SaveToXData]
+        public int ShelfArrowLength { get; set; } = 5;
+
+        /// <summary>
+        /// Толщина стрелки
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 7, "p48", 1.5, 0.1, 5, nameSymbol: "t")]
+        [SaveToXData]
+        public double ShelfArrowWidth { get; set; } = 1.5;
+
+        /// <summary>
         /// Высота текста
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
@@ -222,8 +309,20 @@
             {
                 var entities = new List<Entity>
                 {
+                    //_topTextMask,
+                    //_bottomTextMask,
+                    //_topMText,
+                    //_bottomMText
+
                     _topTextMask,
                     _bottomTextMask,
+                    
+                    _topShelfLine,
+                    _topShelfArrow,
+                    _topStroke,
+                    _bottomShelfLine,
+                    _bottomShelfArrow,
+                    _bottomStroke,
                     _topMText,
                     _bottomMText
                 };
@@ -317,7 +416,139 @@
         private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
         {
 
+            var strokesWidth = StrokeWidth * scale;
 
+            // top and bottom strokes
+            var topStrokeEndPoint = GetTopStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
+            var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
+
+            _topStroke = new Polyline(2);
+            _topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+
+            _bottomStroke = new Polyline(2);
+            _bottomStroke.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+
+            var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
+            var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
+
+            // shelf lines
+            var topShelfStartPoint = insertionPoint + (topStrokeNormalVector * GetShelfOffset() * scale);
+            var topShelfEndPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale);
+            TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
+            _topShelfLine = new Line
+            {
+                StartPoint = topShelfStartPoint,
+                EndPoint = topShelfEndPoint
+            };
+
+            var bottomShelfStartPoint = endPoint + (bottomStrokeNormalVector * GetShelfOffset() * scale);
+            var bottomShelfEndPoint = bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale);
+            BottomShelfEndPoint = bottomShelfEndPoint.TransformBy(BlockTransform);
+            _bottomShelfLine = new Line
+            {
+                StartPoint = bottomShelfStartPoint,
+                EndPoint = bottomShelfEndPoint
+            };
+
+
+            // text
+            var textContentsForTopText = GetTextContents(true);
+            var textContentsForBottomText = GetTextContents(false);
+            if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
+            {
+                var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
+                var textHeight = MainTextHeight * scale;
+                _topMText = new MText
+                {
+                    TextStyleId = textStyleId,
+                    Contents = textContentsForTopText,
+                    TextHeight = textHeight,
+                    Attachment = AttachmentPoint.MiddleCenter
+                };
+
+                _bottomMText = new MText
+                {
+                    TextStyleId = textStyleId,
+                    Contents = textContentsForBottomText,
+                    TextHeight = textHeight,
+                    Attachment = AttachmentPoint.MiddleCenter
+                };
+
+                // TextActualHeight = _topMText.ActualHeight;
+                // TextActualWidth = _topMText.ActualWidth;
+
+                var check = 1 / Math.Sqrt(2);
+
+                // top
+                var alongShelfTextOffset = _topMText.ActualWidth / 2;
+                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+                if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
+                {
+                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                    {
+                        alongShelfTextOffset = _topMText.ActualHeight / 2;
+                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    }
+
+                    var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
+                    _topMText.Location = topTextCenterPoint;
+                }
+                else
+                {
+                    var tempPoint = topShelfEndPoint +
+                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
+                    _topMText.Location = topTextCenterPoint;
+                }
+
+                TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
+
+                // bottom
+                alongShelfTextOffset = _bottomMText.ActualWidth / 2;
+                acrossShelfTextOffset = _bottomMText.ActualHeight / 2;
+                if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
+                {
+                    if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
+                        (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
+                    {
+                        alongShelfTextOffset = _topMText.ActualHeight / 2;
+                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                    }
+
+                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset);
+                    var bottomTextCenterPoint = tempPoint + (bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
+                    _bottomMText.Location = bottomTextCenterPoint;
+                }
+                else
+                {
+                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
+                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2)));
+                    var bottomTextCenterPoint =
+                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2))));
+                    _bottomMText.Location = bottomTextCenterPoint;
+                }
+
+                BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
+                
+                if (HideTextBackground)
+                {
+                    var maskOffset = TextMaskOffset * scale;
+                    _topTextMask = _topMText.GetBackgroundMask(maskOffset);
+                    _bottomTextMask = _bottomMText.GetBackgroundMask(maskOffset);
+                }
+            }
+            else
+            {
+                _bottomMText = null;
+            }
+
+            _middleStrokes.Clear();
+
+            
         }
 
         /// <summary>
@@ -335,9 +566,31 @@
             return true;
         }
 
-       
+      
+        private double GetShelfOffset()
+        {
+            return StrokeLength * ShelfOffset / 100.0;
+        }
 
+        private Point3d GetBottomStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
+        {
+            if (MiddlePoints.Any())
+            {
+                return endPoint + ((endPoint - middlePoints.Last()).GetNormal() * StrokeLength * scale);
+            }
 
+            return endPoint + ((endPoint - insertionPoint).GetNormal() * StrokeLength * scale);
+        }
+
+        private Point3d GetTopStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
+        {
+            if (MiddlePoints.Any())
+            {
+                return insertionPoint + ((insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale);
+            }
+
+            return insertionPoint + ((insertionPoint - endPoint).GetNormal() * StrokeLength * scale);
+        }
 
         private void SetFirstTextOnCreation()
         {

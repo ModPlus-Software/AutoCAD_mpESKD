@@ -71,7 +71,7 @@
             CreateViewLabel(true);
         }
 
-    
+
         private static void CreateViewLabel(bool isSimple)
         {
 #if !DEBUG
@@ -90,11 +90,14 @@
                 var style = StyleManager.GetCurrentStyle(typeof(ViewLabel));
                 var viewLabelLastLetterValue = string.Empty;
                 var viewLabelLastIntegerValue = string.Empty;
+                //TODO check increment
                 FindLastViewLabelValues(ref viewLabelLastLetterValue, ref viewLabelLastIntegerValue);
                 var viewLabel = new ViewLabel(viewLabelLastIntegerValue, viewLabelLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(viewLabel);
                 viewLabel.ApplyStyle(style, true);
+
+                InsertSectionWithJig(isSimple, viewLabel, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -104,6 +107,62 @@
             {
                 Overrule.Overruling = true;
             }
+        }
+
+        private static void InsertSectionWithJig(bool isSimple, ViewLabel viewLabel, BlockReference blockReference)
+        {
+            var nextPointPrompt = Language.GetItem("msg5");
+            var entityJig = new DefaultEntityJig(
+                viewLabel,
+                blockReference,
+                new Point3d(20, 0, 0));
+
+            var status = AcadUtils.Editor.Drag(entityJig).Status;
+            if (status == PromptStatus.OK)
+            {
+                if (isSimple)
+                {
+                    if (entityJig.JigState == JigState.PromptInsertPoint)
+                    {
+                        entityJig.JigState = JigState.PromptNextPoint;
+                        entityJig.PromptForNextPoint = nextPointPrompt;
+                    }
+                }
+            }
+            else
+            {
+                if (viewLabel.MiddlePoints.Any())
+                {
+                    viewLabel.EndPoint = viewLabel.MiddlePoints.Last();
+                    viewLabel.MiddlePoints.RemoveAt(viewLabel.MiddlePoints.Count - 1);
+                    viewLabel.UpdateEntities();
+                    viewLabel.BlockRecord.UpdateAnonymousBlocks();
+                }
+                else
+                {
+                    // if no middle points - remove entity
+                    using (AcadUtils.Document.LockDocument())
+                    {
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
+                        {
+                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                            obj.Erase(true);
+                            tr.Commit();
+                        }
+                    }
+                }
+            }
+
+            if (viewLabel.BlockId.IsErased)
+                return;
+
+            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+            {
+                var ent = tr.GetObject(viewLabel.BlockId, OpenMode.ForWrite, true, true);
+                ent.XData = viewLabel.GetDataForXData();
+                tr.Commit();
+            }
+
         }
 
         /// <summary>

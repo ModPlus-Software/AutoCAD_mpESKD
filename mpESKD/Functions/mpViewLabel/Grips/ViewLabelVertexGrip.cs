@@ -10,7 +10,7 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using Section = mpSection.Section;
+    using ViewLabel = mpViewLabel.ViewLabel;
 
     /// <summary>
     /// Ручка вершин
@@ -20,13 +20,13 @@
         private readonly List<Point3d> _points;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SectionVertexGrip"/> class.
+        /// Initializes a new instance of the <see cref="ViewLabelVertexGrip"/> class.
         /// </summary>
-        /// <param name="section">Экземпляр класса <see cref="mpSection.Section"/></param>
+        /// <param name="viewLabel">Экземпляр класса <see cref="mpViewLabel.ViewLabel"/></param>
         /// <param name="index">Индекс ручки</param>
-        public ViewLabelVertexGrip(ViewLabel section, int index)
+        public ViewLabelVertexGrip(ViewLabel viewLabel, int index)
         {
-            Section = section;
+            ViewLabel = viewLabel;
             GripIndex = index;
             GripType = GripType.Point;
             
@@ -34,15 +34,15 @@
              * Это создаст кэш точек разреза. Если в методе WorldDraw брать точки из самого разреза (Section),
              * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
              * MoveGripPointsAt происходит вызов метода UpdateEntities */
-            _points = new List<Point3d> { Section.InsertionPoint };
-            _points.AddRange(Section.MiddlePoints);
-            _points.Add(Section.EndPoint);
+            _points = new List<Point3d> { ViewLabel.InsertionPoint };
+            _points.AddRange(ViewLabel.MiddlePoints);
+            _points.Add(ViewLabel.EndPoint);
         }
 
         /// <summary>
-        /// Экземпляр класса <see cref="mpSection.Section"/>
+        /// Экземпляр класса <see cref="mpViewLabel.ViewLabel"/>
         /// </summary>
-        public ViewLabel Section { get; }
+        public ViewLabel ViewLabel { get; }
 
         /// <summary>
         /// Индекс ручки
@@ -76,8 +76,8 @@
                 {
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var blkRef = tr.GetObject(Section.BlockId, OpenMode.ForWrite, true, true);
-                        using (var resBuf = Section.GetDataForXData())
+                        var blkRef = tr.GetObject(ViewLabel.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = ViewLabel.GetDataForXData())
                         {
                             blkRef.XData = resBuf;
                         }
@@ -85,7 +85,7 @@
                         tr.Commit();
                     }
 
-                    Section.Dispose();
+                    ViewLabel.Dispose();
                 }
 
                 // При отмене перемещения возвращаем временные значения
@@ -95,15 +95,15 @@
                     {
                         if (GripIndex == 0)
                         {
-                            Section.InsertionPoint = _gripTmp;
+                            ViewLabel.InsertionPoint = _gripTmp;
                         }
-                        else if (GripIndex == Section.MiddlePoints.Count + 1)
+                        else if (GripIndex == ViewLabel.MiddlePoints.Count + 1)
                         {
-                            Section.EndPoint = _gripTmp;
+                            ViewLabel.EndPoint = _gripTmp;
                         }
                         else
                         {
-                            Section.MiddlePoints[GripIndex - 1] = _gripTmp;
+                            ViewLabel.MiddlePoints[GripIndex - 1] = _gripTmp;
                         }
                     }
                 }

@@ -12,7 +12,7 @@
     using ModPlusAPI.Windows;
 
     /// <inheritdoc />
-    public class ViewLabelGripPointOverrule : BaseSmartEntityGripOverrule<mpSection.Section>
+    public class ViewLabelGripPointOverrule : BaseSmartEntityGripOverrule<ViewLabel>
     {
         /// <inheritdoc />
         public override void GetGripPoints(
@@ -25,30 +25,26 @@
                     // Удаляю все ручки - это удалит ручку вставки блока
                     grips.Clear();
 
-                    var section = EntityReaderService.Instance.GetFromEntity<ViewLabel>(entity);
-                    if (section != null)
+                    var viewLabel = EntityReaderService.Instance.GetFromEntity<ViewLabel>(entity);
+                    if (viewLabel != null)
                     {
                         // insertion (start) grip
-                        var vertexGrip = new ViewLabelVertexGrip(section, 0)
+                        var vertexGrip = new ViewLabelVertexGrip(viewLabel, 0)
                         {
-                            GripPoint = section.InsertionPoint
+                            GripPoint = viewLabel.InsertionPoint
                         };
                         grips.Add(vertexGrip);
 
                         // middle points
-                        for (var index = 0; index < section.MiddlePoints.Count; index++)
+                        for (var index = 0; index < viewLabel.MiddlePoints.Count; index++)
                         {
-                            vertexGrip = new ViewLabelVertexGrip(section, index + 1)
+                            vertexGrip = new ViewLabelVertexGrip(viewLabel, index + 1)
                             {
-                                GripPoint = section.MiddlePoints[index]
+                                GripPoint = viewLabel.MiddlePoints[index]
                             };
                             grips.Add(vertexGrip);
 
                         }
-
-
-                     
-                      
                     }
                 }
             }
@@ -71,7 +67,7 @@
                     {
                         if (gripData is ViewLabelVertexGrip vertexGrip)
                         {
-                            var section = vertexGrip.Section;
+                            var section = vertexGrip.ViewLabel;
 
                             if (vertexGrip.GripIndex == 0)
                             {
