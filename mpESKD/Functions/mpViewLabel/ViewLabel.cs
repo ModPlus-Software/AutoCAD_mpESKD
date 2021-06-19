@@ -10,7 +10,7 @@
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
-    using Grips;
+    //using Grips;
     using ModPlusAPI.Windows;
     using mpAxis;
 
