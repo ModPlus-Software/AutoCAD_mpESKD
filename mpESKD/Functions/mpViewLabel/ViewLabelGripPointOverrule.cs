@@ -34,6 +34,7 @@
                             GripPoint = viewLabel.InsertionPoint
                         };
                         grips.Add(vertexGrip);
+                        AcadUtils.WriteMessageInDebug("viewLabel != null");
 
                         // middle points
                         for (var index = 0; index < viewLabel.MiddlePoints.Count; index++)
@@ -71,15 +72,18 @@
 
                             if (vertexGrip.GripIndex == 0)
                             {
+                                AcadUtils.WriteMessageInDebug("vertexGrip.GripIndex == 0");
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
                                 section.InsertionPoint = vertexGrip.GripPoint + offset;
                             }
                             else if (vertexGrip.GripIndex == section.MiddlePoints.Count + 1)
                             {
                                 section.EndPoint = vertexGrip.GripPoint + offset;
+                                AcadUtils.WriteMessageInDebug("vertexGrip.GripIndex == section.MiddlePoints.Count + 1");
                             }
                             else
                             {
+                                AcadUtils.WriteMessageInDebug("else");
                                 section.MiddlePoints[vertexGrip.GripIndex - 1] =
                                     vertexGrip.GripPoint + offset;
                             }
@@ -88,8 +92,6 @@
                             section.UpdateEntities();
                             section.BlockRecord.UpdateAnonymousBlocks();
                         }
-            
-                       
                     }
                 }
                 else

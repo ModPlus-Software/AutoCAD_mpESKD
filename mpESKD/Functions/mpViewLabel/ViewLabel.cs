@@ -24,7 +24,7 @@
         private readonly string _lastIntegerValue = string.Empty;
 
         private readonly string _lastLetterValue = string.Empty;
-        
+
         #region Entities
 
         /// <summary>
@@ -81,7 +81,7 @@
         #endregion
 
         #endregion
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewLabel"/> class.
         /// </summary>
@@ -93,7 +93,7 @@
         /// Initializes a new instance of the <see cref="ViewLabel"/> class.
         /// </summary>
         /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        public ViewLabel(ObjectId objectId) 
+        public ViewLabel(ObjectId objectId)
             : base(objectId)
         {
         }
@@ -108,8 +108,8 @@
             _lastIntegerValue = lastIntegerValue;
             _lastLetterValue = lastLetterValue;
         }
-        
-               /// <summary>
+
+        /// <summary>
         /// Промежуточные точки
         /// </summary>
         [SaveToXData]
@@ -137,7 +137,7 @@
         /// </summary>
         [SaveToXData]
         public Point3d BottomDesignationPoint { get; private set; } = Point3d.Origin;
-        
+
         /// <inheritdoc />
         /// В примитиве не используется!
         public override string LineType { get; set; }
@@ -216,7 +216,7 @@
         [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
-        
+
         /// <inheritdoc/>
         [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
         [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
@@ -301,7 +301,7 @@
         /// </summary>
         [SaveToXData]
         public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
-        
+
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -316,7 +316,7 @@
 
                     _topTextMask,
                     _bottomTextMask,
-                    
+
                     _topShelfLine,
                     _topShelfArrow,
                     _topStroke,
@@ -335,7 +335,7 @@
                 return entities;
             }
         }
-        
+
         /// <summary>
         /// Возвращает локализованное описание для типа <see cref="ViewLabel"/>
         /// </summary>
@@ -347,7 +347,10 @@
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
-            yield return InsertionPoint;
+            foreach (var middlePoint in MiddlePoints)
+            {
+                yield return middlePoint;
+            }
         }
 
         /// <inheritdoc />
@@ -355,17 +358,11 @@
         {
             try
             {
-                var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
-                }
-                else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
-                {
-                    // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
                 }
                 else
                 {
@@ -392,66 +389,18 @@
 
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
-            if (variant == UpdateVariant.SetInsertionPoint)
-            {
                 /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X, InsertionPointOCS.Y - (MinDistanceBetweenPoints * scale), InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-            }
-            else if (variant == UpdateVariant.SetEndPointMinLength)
-            {
-                /* Изменение базовых примитивов в момент указания второй точки
-                * при условии что расстояние от второй точки до первой больше минимального допустимого
-                */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-            }
+
+
         }
 
         private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
         {
-
-            var strokesWidth = StrokeWidth * scale;
-
-            // top and bottom strokes
-            var topStrokeEndPoint = GetTopStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
-            var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
-
-            _topStroke = new Polyline(2);
-            _topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-
-            _bottomStroke = new Polyline(2);
-            _bottomStroke.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-
-            var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
-            var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
-
-            // shelf lines
-            var topShelfStartPoint = insertionPoint + (topStrokeNormalVector * GetShelfOffset() * scale);
-            var topShelfEndPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale);
-            TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
-            _topShelfLine = new Line
-            {
-                StartPoint = topShelfStartPoint,
-                EndPoint = topShelfEndPoint
-            };
-
-            var bottomShelfStartPoint = endPoint + (bottomStrokeNormalVector * GetShelfOffset() * scale);
-            var bottomShelfEndPoint = bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale);
-            BottomShelfEndPoint = bottomShelfEndPoint.TransformBy(BlockTransform);
-            _bottomShelfLine = new Line
-            {
-                StartPoint = bottomShelfStartPoint,
-                EndPoint = bottomShelfEndPoint
-            };
-
 
             // text
             var textContentsForTopText = GetTextContents(true);
@@ -476,64 +425,14 @@
                     Attachment = AttachmentPoint.MiddleCenter
                 };
 
-                // TextActualHeight = _topMText.ActualHeight;
-                // TextActualWidth = _topMText.ActualWidth;
-
                 var check = 1 / Math.Sqrt(2);
 
                 // top
-                var alongShelfTextOffset = _topMText.ActualWidth / 2;
-                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
-                if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
-                {
-                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
-                    {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
-                    }
 
-                    var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _topMText.Location = topTextCenterPoint;
-                }
-                else
-                {
-                    var tempPoint = topShelfEndPoint +
-                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
-                    _topMText.Location = topTextCenterPoint;
-                }
-
-                TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
-
-                // bottom
-                alongShelfTextOffset = _bottomMText.ActualWidth / 2;
-                acrossShelfTextOffset = _bottomMText.ActualHeight / 2;
-                if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
-                {
-                    if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
-                        (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
-                    {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
-                    }
-
-                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset);
-                    var bottomTextCenterPoint = tempPoint + (bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _bottomMText.Location = bottomTextCenterPoint;
-                }
-                else
-                {
-                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
-                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2)));
-                    var bottomTextCenterPoint =
-                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2))));
-                    _bottomMText.Location = bottomTextCenterPoint;
-                }
+                _topMText.Location = insertionPoint;
 
                 BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
-                
+
                 if (HideTextBackground)
                 {
                     var maskOffset = TextMaskOffset * scale;
@@ -547,8 +446,6 @@
             }
 
             _middleStrokes.Clear();
-
-            
         }
 
         /// <summary>
@@ -566,7 +463,7 @@
             return true;
         }
 
-      
+
         private double GetShelfOffset()
         {
             return StrokeLength * ShelfOffset / 100.0;
