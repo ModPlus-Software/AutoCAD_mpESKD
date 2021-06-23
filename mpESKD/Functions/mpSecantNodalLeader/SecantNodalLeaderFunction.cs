@@ -169,7 +169,7 @@
         /// </summary>
         private static string FindLastNodeNumber()
         {
-            if (!MainSettings.Instance.NodalLeaderContinueNodeNumber)
+            if (!MainSettings.Instance.SecantNodalLeaderContinueNodeNumber)
                 return string.Empty;
 
             var allValues = new List<string>();
