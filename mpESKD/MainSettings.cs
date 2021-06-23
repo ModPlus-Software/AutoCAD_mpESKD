@@ -293,7 +293,7 @@
         #region FragmentMarker
 
         /// <summary>
-        /// Продолжать нумерацию узла при создании новой узловой выноски
+        /// Продолжать нумерацию фрагмента при создании нового фрагмента
         /// </summary>
         public bool FragmentMarkerContinueNodeNumber
         {

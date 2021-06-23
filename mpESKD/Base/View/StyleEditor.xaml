@@ -410,6 +410,18 @@
                             </StackPanel>
                         </Border>
                     </TabItem>
+
+                    <!-- Fragment Marker -->
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h145}">
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h149}"
+                                          IsChecked="{Binding Path=FragmentMarkerContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h150}"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
                 </TabControl>
             </Grid>
         </TabItem>
