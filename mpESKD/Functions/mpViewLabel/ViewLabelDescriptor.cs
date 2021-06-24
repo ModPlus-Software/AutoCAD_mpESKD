@@ -15,16 +15,16 @@
         public string Name => "mpViewLabel";
 
         /// <inheritdoc />
-        // Разрез
-        public string LName => Language.GetItem("h79");
+        // Вид
+        public string LName => Language.GetItem("h153");
 
         /// <inheritdoc />
-        // Создание обозначения разреза (сечения) по ГОСТ 2.305-68
-        public string Description => Language.GetItem("h80");
+        // Создание обозначения вида (разреза)
+        public string Description => Language.GetItem("h154");
 
         /// <inheritdoc />
-        // Создание интеллектуального объекта на основе анонимного блока, описывающего разрез (сечение) по ГОСТ 2.305-68
-        public string FullDescription => Language.GetItem("h81");
+        // Создание интеллектуального объекта вида или разреза на основе анонимного блока
+        public string FullDescription => Language.GetItem("h155");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;

@@ -14,8 +14,8 @@
     /// <summary>
     /// Разрез
     /// </summary>
-    [SmartEntityDisplayNameKey("h79")]
-    [SystemStyleDescriptionKey("h96")]
+    [SmartEntityDisplayNameKey("h151")]
+    [SystemStyleDescriptionKey("h152")]
     public class ViewLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         private readonly string _lastIntegerValue = string.Empty;
@@ -29,8 +29,8 @@
 
         #region Text entities
 
-        private MText _topMText;
-        private Wipeout _topTextMask;
+        private MText _mText;
+        private Wipeout _mTextMask;
 
         #endregion
 
@@ -136,11 +136,11 @@
             [EnumPropertyDisplayValueKey("amt5")]
             View
         }
-        
+
         /// <summary>
         /// Тип вида (разрез или вид)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p54", ViewLabelType.View, descLocalKey: "d54")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p103", ViewLabelType.View, descLocalKey: "d86")]
         [SaveToXData]
         public ViewLabelType ViewType { get; set; }
 
@@ -151,8 +151,8 @@
             {
                 var entities = new List<Entity>
                 {
-                    _topTextMask,
-                    _topMText,
+                    _mTextMask,
+                    _mText,
                 };
                 //entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
@@ -184,16 +184,8 @@
             try
             {
                 var scale = GetScale();
-                if (EndPointOCS.Equals(Point3d.Origin))
-                {
-                    // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                    MakeSimplyEntity(scale);
-                }
-                else
-                {
-                    // Задание любой другой точки
-                    CreateEntities(InsertionPointOCS, EndPointOCS, scale);
-                }
+                CreateEntities(InsertionPointOCS, EndPointOCS, scale);
+
             }
             catch (Exception exception)
             {
@@ -201,25 +193,15 @@
             }
         }
 
-        private void MakeSimplyEntity(double scale)
-        {
-            /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
-             * Примерно аналогично созданию, только точки не создаются, а меняются
-            */
-            var tmpEndPoint = new Point3d(
-                InsertionPointOCS.X, InsertionPointOCS.Y - scale, InsertionPointOCS.Z);
-            CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
-        }
-
         private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
         {
             // text
-            var textContentsForTopText = GetTextContents(true);
-            var textContentsForBottomText = GetTextContents(false);
-            if (string.IsNullOrEmpty(textContentsForTopText) || string.IsNullOrEmpty(textContentsForBottomText)) return;
+            var textContentsForTopText = GetTextContents();
+            if (string.IsNullOrEmpty(textContentsForTopText)) 
+                return;
             var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
             var textHeight = MainTextHeight * scale;
-            _topMText = new MText
+            _mText = new MText
             {
                 TextStyleId = textStyleId,
                 Contents = textContentsForTopText,
@@ -227,11 +209,11 @@
                 Attachment = AttachmentPoint.MiddleCenter
             };
 
-            _topMText.Location = insertionPoint;
+            _mText.Location = insertionPoint;
 
             if (!HideTextBackground) return;
             var maskOffset = TextMaskOffset * scale;
-            _topTextMask = _topMText.GetBackgroundMask(maskOffset);
+            _mTextMask = _mText.GetBackgroundMask(maskOffset);
         }
 
         /// <summary>
@@ -251,7 +233,7 @@
 
         private void SetFirstTextOnCreation()
         {
-            if (!IsValueCreated) 
+            if (!IsValueCreated)
                 return;
             var setStandard = true;
             if (!string.IsNullOrEmpty(_lastIntegerValue))
@@ -282,9 +264,8 @@
         /// <summary>
         /// Содержимое для MText в зависимости от значений
         /// </summary>
-        /// <param name="isForTopText">True - содержимое для верхнего текста. False - содержимое для нижнего текста</param>
         /// <returns></returns>
-        private string GetTextContents(bool isForTopText)
+        private string GetTextContents()
         {
             SetFirstTextOnCreation();
 
@@ -294,7 +275,7 @@
             }
 
             var prefixAndDesignation = DesignationPrefix + Designation;
-            
+
             if (ViewType == ViewLabelType.Section)
             {
                 prefixAndDesignation = $"{prefixAndDesignation} - {prefixAndDesignation}";

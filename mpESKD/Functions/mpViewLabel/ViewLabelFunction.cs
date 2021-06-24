@@ -66,12 +66,11 @@
         /// <summary>
         /// Команда создания обозначения разреза
         /// </summary>
-        [CommandMethod("ModPlus", "Lbel", CommandFlags.Modal)]
+        [CommandMethod("ModPlus", "mpViewLabel", CommandFlags.Modal)]
         public void CreateViewLabelCommand()
         {
             CreateViewLabel();
         }
-
 
         private static void CreateViewLabel()
         {

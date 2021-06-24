@@ -377,18 +377,12 @@
                     </TabItem>
 
                     <!-- ViewLabel -->
-                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h79}">
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h151}">
                         <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
                             <StackPanel Orientation="Vertical">
-                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h86}"
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h156}"
                                           IsChecked="{Binding Path=ViewLabelSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h87}"/>
-                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h88}"
-                                          IsChecked="{Binding Path=SectionShowHelpLineOnSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h89}"/>
-                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h90}"
-                                          IsChecked="{Binding Path=SectionDependentTextMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h97}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h157}"/>
                             </StackPanel>
                         </Border>
                     </TabItem>
