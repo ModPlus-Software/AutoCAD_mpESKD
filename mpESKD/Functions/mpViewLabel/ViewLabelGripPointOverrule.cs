@@ -34,7 +34,6 @@
                             GripPoint = viewLabel.InsertionPoint
                         };
                         grips.Add(vertexGrip);
-                        AcadUtils.WriteMessageInDebug("viewLabel != null");
                     }
                 }
             }
@@ -55,21 +54,18 @@
                 {
                     foreach (var gripData in grips)
                     {
-                        if (gripData is ViewLabelVertexGrip vertexGrip)
+                        if (!(gripData is ViewLabelVertexGrip vertexGrip)) continue;
+                        var viewLabel = vertexGrip.ViewLabel;
+
+                        if (vertexGrip.GripIndex == 0)
                         {
-                            var viewLabel = vertexGrip.ViewLabel;
-
-                            if (vertexGrip.GripIndex == 0)
-                            {
-                                AcadUtils.WriteMessageInDebug("vertexGrip.GripIndex == 0");
-                                ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                                viewLabel.InsertionPoint = vertexGrip.GripPoint + offset;
-                            }
-
-                            // Вот тут происходит перерисовка примитивов внутри блока
-                            viewLabel.UpdateEntities();
-                            viewLabel.BlockRecord.UpdateAnonymousBlocks();
+                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
+                            viewLabel.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
+
+                        // Вот тут происходит перерисовка примитивов внутри блока
+                        viewLabel.UpdateEntities();
+                        viewLabel.BlockRecord.UpdateAnonymousBlocks();
                     }
                 }
                 else

@@ -107,25 +107,5 @@
                     ExceptionBox.Show(exception);
             }
         }
-
-        /// <inheritdoc />
-        public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
-        {
-            if (GripIndex > 0 && MainSettings.Instance.SectionShowHelpLineOnSelection)
-            {
-                var backupColor = worldDraw.SubEntityTraits.Color;
-                var backupFillType = worldDraw.SubEntityTraits.FillType;
-
-                worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
-                worldDraw.SubEntityTraits.Color = 40;
-                worldDraw.Geometry.WorldLine(_points[GripIndex - 1], _points[GripIndex]);
-
-                // restore
-                worldDraw.SubEntityTraits.Color = backupColor;
-                worldDraw.SubEntityTraits.FillType = backupFillType;
-            }
-
-            return base.WorldDraw(worldDraw, entityId, type, imageGripPoint, dGripSize);
-        }
     }
 }

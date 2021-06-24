@@ -51,6 +51,7 @@
                 var blockReference = MainFunction.CreateBlock(viewLabel);
 
                 viewLabel.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+                InsertSectionWithJig(viewLabel, blockReference);
             }
             catch (System.Exception exception)
             {

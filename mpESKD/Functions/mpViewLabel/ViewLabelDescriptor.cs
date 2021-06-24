@@ -32,28 +32,19 @@
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
-            "mpSectionBroken",
-            "mpSectionFromPolyline"
+            
         };
 
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            // Ломаный разрез
-            Language.GetItem("h82"),
-
-            // Разрез из полилинии
-            Language.GetItem("h83")
+            
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            // Отрисовка обозначения ломаного разреза (сечения) по ГОСТ 2.305-68
-            Language.GetItem("h84"),
 
-            // Конвертирование выбранной полилинии в обозначение разреза
-            Language.GetItem("h85")
         };
 
         /// <inheritdoc />
