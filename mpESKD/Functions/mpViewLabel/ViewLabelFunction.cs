@@ -68,11 +68,11 @@
         [CommandMethod("ModPlus", "Lbel", CommandFlags.Modal)]
         public void CreateViewLabelCommand()
         {
-            CreateViewLabel(true);
+            CreateViewLabel();
         }
 
 
-        private static void CreateViewLabel(bool isSimple)
+        private static void CreateViewLabel()
         {
 #if !DEBUG
             Statistic.SendCommandStarting(Section.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
@@ -90,14 +90,14 @@
                 var style = StyleManager.GetCurrentStyle(typeof(ViewLabel));
                 var viewLabelLastLetterValue = string.Empty;
                 var viewLabelLastIntegerValue = string.Empty;
-                //TODO check increment
+
                 FindLastViewLabelValues(ref viewLabelLastLetterValue, ref viewLabelLastIntegerValue);
                 var viewLabel = new ViewLabel(viewLabelLastIntegerValue, viewLabelLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(viewLabel);
                 viewLabel.ApplyStyle(style, true);
 
-                InsertSectionWithJig(isSimple, viewLabel, blockReference);
+                InsertSectionWithJig(viewLabel, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -109,7 +109,7 @@
             }
         }
 
-        private static void InsertSectionWithJig(bool isSimple, ViewLabel viewLabel, BlockReference blockReference)
+        private static void InsertSectionWithJig(ViewLabel viewLabel, BlockReference blockReference)
         {
             var nextPointPrompt = Language.GetItem("msg5");
             var entityJig = new DefaultEntityJig(
@@ -120,36 +120,10 @@
             var status = AcadUtils.Editor.Drag(entityJig).Status;
             if (status == PromptStatus.OK)
             {
-                if (isSimple)
+                if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
-                    if (entityJig.JigState == JigState.PromptInsertPoint)
-                    {
-                        entityJig.JigState = JigState.PromptNextPoint;
-                        entityJig.PromptForNextPoint = nextPointPrompt;
-                    }
-                }
-            }
-            else
-            {
-                if (viewLabel.MiddlePoints.Any())
-                {
-                    viewLabel.EndPoint = viewLabel.MiddlePoints.Last();
-                    viewLabel.MiddlePoints.RemoveAt(viewLabel.MiddlePoints.Count - 1);
-                    viewLabel.UpdateEntities();
-                    viewLabel.BlockRecord.UpdateAnonymousBlocks();
-                }
-                else
-                {
-                    // if no middle points - remove entity
-                    using (AcadUtils.Document.LockDocument())
-                    {
-                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                        {
-                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                            obj.Erase(true);
-                            tr.Commit();
-                        }
-                    }
+                    entityJig.JigState = JigState.PromptNextPoint;
+                    entityJig.PromptForNextPoint = nextPointPrompt;
                 }
             }
 
@@ -162,30 +136,27 @@
                 ent.XData = viewLabel.GetDataForXData();
                 tr.Commit();
             }
-
         }
 
         /// <summary>
         /// Поиск последних цифровых и буквенных значений разрезов на текущем виде
         /// </summary>
-        private static void FindLastViewLabelValues(ref string sectionLastLetterValue, ref string sectionLastIntegerValue)
+        private static void FindLastViewLabelValues(ref string viewLabelLastLetterValue, ref string viewLabelLastIntegerValue)
         {
-            if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
+            if (!MainSettings.Instance.ViewLabelSaveLastTextAndContinueNew)
+                return;
+            var viewLabels = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<ViewLabel>(typeof(ViewLabel));
+            if (!viewLabels.Any())
+                return;
+            viewLabels.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
+            var valueDesignation = viewLabels.Last().Designation;
+            if (int.TryParse(valueDesignation, out var i))
             {
-                var sections = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<ViewLabel>(typeof(Section));
-                if (sections.Any())
-                {
-                    sections.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
-                    var v = sections.Last().Designation;
-                    if (int.TryParse(v, out var i))
-                    {
-                        sectionLastIntegerValue = i.ToString();
-                    }
-                    else
-                    {
-                        sectionLastLetterValue = v;
-                    }
-                }
+                viewLabelLastIntegerValue = i.ToString();
+            }
+            else
+            {
+                viewLabelLastLetterValue = valueDesignation;
             }
         }
     }

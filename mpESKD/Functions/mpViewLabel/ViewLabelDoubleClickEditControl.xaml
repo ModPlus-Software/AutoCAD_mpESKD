@@ -55,11 +55,6 @@
                      MaxLength="5"
                      mps:TextFieldAssist.ClearTextButton="True"
                      mps:TextFieldAssist.SelectAllOnFocus="True"/>
-
-            <CheckBox Grid.Row="3"
-                      Grid.Column="0"
-                      Content="{Binding Source={StaticResource Lang}, XPath=h93}"
-                      Name="ChkRestoreTextPosition"/>
         </Grid>
     </mps:Card>
 </UserControl>

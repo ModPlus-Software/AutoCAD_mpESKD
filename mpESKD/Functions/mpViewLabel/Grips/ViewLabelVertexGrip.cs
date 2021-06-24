@@ -35,7 +35,6 @@
              * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
              * MoveGripPointsAt происходит вызов метода UpdateEntities */
             _points = new List<Point3d> { ViewLabel.InsertionPoint };
-            _points.AddRange(ViewLabel.MiddlePoints);
             _points.Add(ViewLabel.EndPoint);
         }
 
@@ -96,14 +95,6 @@
                         if (GripIndex == 0)
                         {
                             ViewLabel.InsertionPoint = _gripTmp;
-                        }
-                        else if (GripIndex == ViewLabel.MiddlePoints.Count + 1)
-                        {
-                            ViewLabel.EndPoint = _gripTmp;
-                        }
-                        else
-                        {
-                            ViewLabel.MiddlePoints[GripIndex - 1] = _gripTmp;
                         }
                     }
                 }

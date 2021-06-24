@@ -35,17 +35,6 @@
                         };
                         grips.Add(vertexGrip);
                         AcadUtils.WriteMessageInDebug("viewLabel != null");
-
-                        // middle points
-                        for (var index = 0; index < viewLabel.MiddlePoints.Count; index++)
-                        {
-                            vertexGrip = new ViewLabelVertexGrip(viewLabel, index + 1)
-                            {
-                                GripPoint = viewLabel.MiddlePoints[index]
-                            };
-                            grips.Add(vertexGrip);
-
-                        }
                     }
                 }
             }
@@ -68,29 +57,18 @@
                     {
                         if (gripData is ViewLabelVertexGrip vertexGrip)
                         {
-                            var section = vertexGrip.ViewLabel;
+                            var viewLabel = vertexGrip.ViewLabel;
 
                             if (vertexGrip.GripIndex == 0)
                             {
                                 AcadUtils.WriteMessageInDebug("vertexGrip.GripIndex == 0");
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                                section.InsertionPoint = vertexGrip.GripPoint + offset;
-                            }
-                            else if (vertexGrip.GripIndex == section.MiddlePoints.Count + 1)
-                            {
-                                section.EndPoint = vertexGrip.GripPoint + offset;
-                                AcadUtils.WriteMessageInDebug("vertexGrip.GripIndex == section.MiddlePoints.Count + 1");
-                            }
-                            else
-                            {
-                                AcadUtils.WriteMessageInDebug("else");
-                                section.MiddlePoints[vertexGrip.GripIndex - 1] =
-                                    vertexGrip.GripPoint + offset;
+                                viewLabel.InsertionPoint = vertexGrip.GripPoint + offset;
                             }
 
                             // Вот тут происходит перерисовка примитивов внутри блока
-                            section.UpdateEntities();
-                            section.BlockRecord.UpdateAnonymousBlocks();
+                            viewLabel.UpdateEntities();
+                            viewLabel.BlockRecord.UpdateAnonymousBlocks();
                         }
                     }
                 }
