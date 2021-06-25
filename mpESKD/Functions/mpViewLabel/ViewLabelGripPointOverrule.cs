@@ -1,13 +1,10 @@
 ﻿namespace mpESKD.Functions.mpViewLabel
 {
-    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Enums;
     using Base.Overrules;
-    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
 
@@ -54,7 +51,8 @@
                 {
                     foreach (var gripData in grips)
                     {
-                        if (!(gripData is ViewLabelVertexGrip vertexGrip)) continue;
+                        if (!(gripData is ViewLabelVertexGrip vertexGrip)) 
+                            continue;
                         var viewLabel = vertexGrip.ViewLabel;
 
                         if (vertexGrip.GripIndex == 0)

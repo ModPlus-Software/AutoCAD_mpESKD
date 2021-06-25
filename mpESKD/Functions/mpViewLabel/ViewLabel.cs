@@ -1,5 +1,7 @@
 ﻿namespace mpESKD.Functions.mpViewLabel
 {
+    using System;
+    using System.Collections.Generic;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
@@ -8,8 +10,6 @@
     using Base.Enums;
     using Base.Utils;
     using ModPlusAPI.Windows;
-    using System;
-    using System.Collections.Generic;
 
     /// <summary>
     /// Разрез
@@ -70,7 +70,7 @@
         public override string TextStyle { get; set; }
 
         /// <inheritdoc />
-        public override double MinDistanceBetweenPoints { get; }
+        public override double MinDistanceBetweenPoints => double.NaN;
 
         /// <summary>
         /// Высота текста
@@ -169,7 +169,6 @@
             {
                 var scale = GetScale();
                 CreateEntities(InsertionPointOCS, scale);
-
             }
             catch (Exception exception)
             {
@@ -190,12 +189,12 @@
                 TextStyleId = textStyleId,
                 Contents = textContents,
                 TextHeight = textHeight,
-                Attachment = AttachmentPoint.MiddleCenter
+                Attachment = AttachmentPoint.MiddleCenter,
+                Location = insertionPoint
             };
-
-            _mText.Location = insertionPoint;
-
-            if (!HideTextBackground) return;
+            
+            if (!HideTextBackground) 
+                return;
             var maskOffset = TextMaskOffset * scale;
             _mTextMask = _mText.GetBackgroundMask(maskOffset);
         }

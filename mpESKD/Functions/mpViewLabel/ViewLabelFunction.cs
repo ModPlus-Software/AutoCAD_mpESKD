@@ -1,5 +1,7 @@
 ﻿namespace mpESKD.Functions.mpViewLabel
 {
+    using System;
+    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -12,8 +14,6 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using System;
-    using System.Linq;
 
     /// <inheritdoc />
     public class ViewLabelFunction : ISmartEntityFunction
