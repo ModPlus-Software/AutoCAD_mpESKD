@@ -376,6 +376,17 @@
                         </Border>
                     </TabItem>
 
+                    <!-- ViewLabel -->
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h151}">
+                        <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h156}"
+                                          IsChecked="{Binding Path=ViewLabelSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h157}"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
+
                     <!-- Level Mark -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h105}">
                         <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">

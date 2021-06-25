@@ -236,6 +236,24 @@
 
         #endregion
 
+        #region ViewLabel
+
+        /// <summary>
+        /// Сохранять значения последних созданных разрезов и продолжать значения создаваемых разрезов
+        /// </summary>
+        public bool ViewLabelSaveLastTextAndContinueNew
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(ViewLabelSaveLastTextAndContinueNew)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(ViewLabelSaveLastTextAndContinueNew), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
         #region LevelMark
 
         /// <summary>
