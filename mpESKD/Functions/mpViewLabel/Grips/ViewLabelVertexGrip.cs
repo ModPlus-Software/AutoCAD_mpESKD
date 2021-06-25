@@ -8,7 +8,6 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
-    using ViewLabel = mpViewLabel.ViewLabel;
 
     /// <summary>
     /// Ручка вершин
