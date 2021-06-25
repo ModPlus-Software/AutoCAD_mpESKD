@@ -6,7 +6,7 @@
     using ModPlusAPI;
 
     /// <inheritdoc />
-    class ViewLabelDescriptor : ISmartEntityDescriptor
+    public class ViewLabelDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
         public Type EntityType => typeof(ViewLabel);
@@ -15,7 +15,7 @@
         public string Name => "mpViewLabel";
 
         /// <inheritdoc />
-        // Вид
+        // Обозначение вида
         public string LName => Language.GetItem("h153");
 
         /// <inheritdoc />
