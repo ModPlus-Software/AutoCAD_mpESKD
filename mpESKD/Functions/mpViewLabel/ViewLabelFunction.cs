@@ -1,8 +1,5 @@
 ﻿namespace mpESKD.Functions.mpViewLabel
 {
-    using System;
-    using System.Linq;
-    using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -15,6 +12,8 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using System;
+    using System.Linq;
 
     /// <inheritdoc />
     public class ViewLabelFunction : ISmartEntityFunction
@@ -31,7 +30,7 @@
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(Section.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(ViewLabel.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -51,7 +50,7 @@
                 var blockReference = MainFunction.CreateBlock(viewLabel);
 
                 viewLabel.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
-                InsertSectionWithJig(viewLabel, blockReference);
+                InsertLabelWithJig(viewLabel, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -69,13 +68,22 @@
         [CommandMethod("ModPlus", "mpViewLabel", CommandFlags.Modal)]
         public void CreateViewLabelCommand()
         {
-            CreateViewLabel();
+            CreateViewLabel(ViewLabelType.View);
         }
 
-        private static void CreateViewLabel()
+        /// <summary>
+        /// Команда создания обозначения разреза
+        /// </summary>
+        [CommandMethod("ModPlus", "mpSectionLabel", CommandFlags.Modal)]
+        public void CreateSectionCommand()
+        {
+            CreateViewLabel(ViewLabelType.Section);
+        }
+
+        private static void CreateViewLabel(ViewLabelType viewLabelType)
         {
 #if !DEBUG
-            Statistic.SendCommandStarting(Section.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
+            Statistic.SendCommandStarting(ViewLabel.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
             try
             {
@@ -96,8 +104,8 @@
 
                 var blockReference = MainFunction.CreateBlock(viewLabel);
                 viewLabel.ApplyStyle(style, true);
-
-                InsertSectionWithJig(viewLabel, blockReference);
+                viewLabel.ViewType = viewLabelType;
+                InsertLabelWithJig(viewLabel, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -109,7 +117,7 @@
             }
         }
 
-        private static void InsertSectionWithJig(ViewLabel viewLabel, BlockReference blockReference)
+        private static void InsertLabelWithJig(ViewLabel viewLabel, BlockReference blockReference)
         {
             var nextPointPrompt = Language.GetItem("msg5");
             var entityJig = new DefaultEntityJig(
@@ -118,14 +126,11 @@
                 new Point3d(20, 0, 0));
 
             var status = AcadUtils.Editor.Drag(entityJig).Status;
-            if (status == PromptStatus.OK)
-            {
-                if (entityJig.JigState == JigState.PromptInsertPoint)
-                {
-                    entityJig.JigState = JigState.PromptNextPoint;
-                    entityJig.PromptForNextPoint = nextPointPrompt;
-                }
-            }
+            if (status != PromptStatus.OK)
+                return;
+
+            entityJig.JigState = JigState.PromptNextPoint;
+            entityJig.PromptForNextPoint = nextPointPrompt;
 
             if (viewLabel.BlockId.IsErased)
                 return;

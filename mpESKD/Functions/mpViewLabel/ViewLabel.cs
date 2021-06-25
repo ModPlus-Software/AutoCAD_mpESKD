@@ -22,11 +22,6 @@
 
         private readonly string _lastLetterValue = string.Empty;
 
-        ///// <summary>
-        ///// Средние штрихи - штрихи, создаваемые в средних точках
-        ///// </summary>
-        //private readonly List<Polyline> _middleStrokes = new List<Polyline>();
-
         #region Text entities
 
         private MText _mText;
@@ -126,17 +121,6 @@
         [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
 
-        public enum ViewLabelType
-        {
-            /// <summary>Разрез</summary>
-            [EnumPropertyDisplayValueKey("amt4")]
-            Section,
-
-            /// <summary>Вид</summary>
-            [EnumPropertyDisplayValueKey("amt5")]
-            View
-        }
-
         /// <summary>
         /// Тип вида (разрез или вид)
         /// </summary>
@@ -154,7 +138,7 @@
                     _mTextMask,
                     _mText,
                 };
-                //entities.AddRange(_middleStrokes);
+
                 foreach (var e in entities)
                 {
                     SetImmutablePropertiesToNestedEntity(e);
@@ -184,7 +168,7 @@
             try
             {
                 var scale = GetScale();
-                CreateEntities(InsertionPointOCS, EndPointOCS, scale);
+                CreateEntities(InsertionPointOCS, scale);
 
             }
             catch (Exception exception)
@@ -193,18 +177,18 @@
             }
         }
 
-        private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
+        private void CreateEntities(Point3d insertionPoint, double scale)
         {
             // text
-            var textContentsForTopText = GetTextContents();
-            if (string.IsNullOrEmpty(textContentsForTopText)) 
+            var textContents = GetTextContents();
+            if (string.IsNullOrEmpty(textContents)) 
                 return;
             var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
             var textHeight = MainTextHeight * scale;
             _mText = new MText
             {
                 TextStyleId = textStyleId,
-                Contents = textContentsForTopText,
+                Contents = textContents,
                 TextHeight = textHeight,
                 Attachment = AttachmentPoint.MiddleCenter
             };
@@ -278,7 +262,7 @@
 
             if (ViewType == ViewLabelType.Section)
             {
-                prefixAndDesignation = $"{prefixAndDesignation} - {prefixAndDesignation}";
+                prefixAndDesignation = $"{prefixAndDesignation}-{prefixAndDesignation}";
             }
 
             if (!string.IsNullOrEmpty(SheetNumber))

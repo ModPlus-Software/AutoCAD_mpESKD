@@ -1,9 +1,7 @@
 ﻿namespace mpESKD.Functions.mpViewLabel.Grips
 {
-    using System.Collections.Generic;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
-    using Autodesk.AutoCAD.GraphicsInterface;
     using Autodesk.AutoCAD.Runtime;
     using Base.Enums;
     using Base.Overrules;
@@ -17,8 +15,6 @@
     /// </summary>
     public class ViewLabelVertexGrip : SmartEntityGripData
     {
-        private readonly List<Point3d> _points;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewLabelVertexGrip"/> class.
         /// </summary>
@@ -29,13 +25,6 @@
             ViewLabel = viewLabel;
             GripIndex = index;
             GripType = GripType.Point;
-            
-            /* При инициализации ручки нужно собрать все точки разреза и поместить их в поле _points.
-             * Это создаст кэш точек разреза. Если в методе WorldDraw брать точки из самого разреза (Section),
-             * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
-             * MoveGripPointsAt происходит вызов метода UpdateEntities */
-            _points = new List<Point3d> { ViewLabel.InsertionPoint };
-            _points.Add(ViewLabel.EndPoint);
         }
 
         /// <summary>
@@ -51,7 +40,7 @@
         /// <inheritdoc />
         public override string GetTooltip()
         {
-            return Language.GetItem("gp1"); // stretch
+            return Language.GetItem("gp2"); // move
         }
 
         // Временное значение ручки
