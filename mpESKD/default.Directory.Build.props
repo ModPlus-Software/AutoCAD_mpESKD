@@ -62,10 +62,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyName>$(AssemblyName)_$(Description)</AssemblyName>
+    <AssemblyName>mpESKD_$(Description)</AssemblyName>
   </PropertyGroup>
 
-  <!--<PropertyGroup>
+  <!--<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <OutputPath>$(AppData)\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
   </PropertyGroup>-->
 

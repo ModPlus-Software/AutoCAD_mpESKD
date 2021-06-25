@@ -3,7 +3,6 @@
   <PropertyGroup>
     <Version>1.14.1.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
-    <AssemblyName>$(RootNamespace)</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup>
