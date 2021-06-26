@@ -242,14 +242,6 @@
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="SecantNodalLeader"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(SecantNodalLeader));
-        }
-
         /// <inheritdoc/>
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {

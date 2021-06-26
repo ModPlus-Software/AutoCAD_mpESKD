@@ -136,14 +136,6 @@ namespace mpESKD.Functions.mpWaterProofing
                 return entities;
             }
         }
-        
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="WaterProofing"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(WaterProofing));
-        }
 
         /// <inheritdoc />
         public void RebasePoints()

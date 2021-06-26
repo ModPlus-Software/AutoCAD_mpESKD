@@ -35,6 +35,11 @@ namespace mpESKD.Base.View
         public StyleEditor()
         {
             InitializeComponent();
+            foreach (var previewImageResourceDictionary in TypeFactory.Instance.GetPreviewImageResourceDictionaries())
+            {
+                Resources.MergedDictionaries.Add(previewImageResourceDictionary);
+            }
+            
             Title = ModPlusAPI.Language.GetItem("tab4");
             Loaded += StyleEditor_OnLoaded;
             ContentRendered += StyleEditor_ContentRendered;
@@ -631,18 +636,17 @@ namespace mpESKD.Base.View
             }
             else
             {
+                switch (Resources[$"Image{entityTypeName}"])
                 {
-                    if (Resources[$"Image{entityTypeName}"] is Canvas imgResource)
-                    {
-                        VbImage.Child = imgResource;
-                    }
-                }
-
-                {
-                    if (Resources[$"Image{entityTypeName}"] is Viewbox imgResource)
-                    {
-                        VbImage.Child = imgResource;
-                    }
+                    case Canvas canvas:
+                        VbImage.Child = canvas;
+                        return;
+                    case Viewbox viewBox:
+                        VbImage.Child = viewBox;
+                        return;
+                    default:
+                        VbImage.Child = null;
+                        break;
                 }
             }
         }

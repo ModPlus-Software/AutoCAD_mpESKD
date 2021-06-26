@@ -31,18 +31,18 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                FragmentMarker.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<FragmentMarker>();
+            
             try
             {
                 Overrule.Overruling = false;
+                
                 /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(FragmentMarker.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<FragmentMarker>();
+                
                 var lastNodeNumber = FindLastNodeNumber();
                 var fragmentMarker = new FragmentMarker(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(fragmentMarker);
@@ -69,18 +69,18 @@
 
         private static void CreateFragmentMarker()
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                FragmentMarker.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<FragmentMarker>();
+            
             try
             {
                 Overrule.Overruling = false;
+                
                 /* Регистрация ЕСКД приложения должна запускаться при запуске
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(FragmentMarker.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<FragmentMarker>();
+                
                 var style = StyleManager.GetCurrentStyle(typeof(FragmentMarker));
                 var lastNodeNumber = FindLastNodeNumber();
                 var fragmentMarker = new FragmentMarker(lastNodeNumber);

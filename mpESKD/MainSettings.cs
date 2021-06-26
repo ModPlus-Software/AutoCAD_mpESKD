@@ -8,7 +8,7 @@
     /// <summary>
     /// Main plugin settings
     /// </summary>
-    public class MainSettings : VmBase
+    public class MainSettings : ObservableObject
     {
         private const string PName = "mpESKD";
         private static MainSettings _instance;

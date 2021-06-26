@@ -18,7 +18,7 @@
     /// <summary>
     /// Контекст поиска по значениям
     /// </summary>
-    public class SearchEntitiesByValuesViewModel : VmBase
+    public class SearchEntitiesByValuesViewModel : ObservableObject
     {
         private string _searchValue;
         private string _noFoundMessage;

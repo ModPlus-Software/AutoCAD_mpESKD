@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.14.1.0</Version>
+    <Version>1.15.2.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
   </PropertyGroup>
 
@@ -69,6 +69,10 @@
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
+    <Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16.png" />
+    <Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
+    <Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
+    <Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
     <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
@@ -111,9 +115,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Update="Base\View\Images\WeldJoint.xaml">
+    <Page Update="Functions\mpViewLabel\ViewLabel.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Functions\mpWeldJoint\WeldJoint.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Functions\mpAxis\Axis.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
@@ -123,7 +134,6 @@
 
   <ItemGroup>
     <Folder Include="Functions\mpSection\Overrules\" />
-    <Folder Include="Functions\mpViewLabel\Icons\" />
   </ItemGroup>
 
 </Project>

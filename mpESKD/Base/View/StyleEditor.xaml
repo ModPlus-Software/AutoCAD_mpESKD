@@ -8,6 +8,7 @@
                    xmlns:mpEskd="clr-namespace:mpESKD"
                    xmlns:apiConverters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
                    xmlns:enums="clr-namespace:mpESKD.Base.Enums"
+                   xmlns:windows="clr-namespace:ModPlusAPI.Windows;assembly=ModPlusAPI"
                    mc:Ignorable="d" SizeToContent="WidthAndHeight" 
                    ResizeMode="CanResizeWithGrip"
                    MinHeight="410" MinWidth="580"
@@ -16,19 +17,8 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+                <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
                 <ResourceDictionary Source="../Controls/ControlStylesForEditor.xaml"/>
-                <!-- IMAGES -->
-                <ResourceDictionary Source="Images/BreakLine.xaml"/>
-                <ResourceDictionary Source="Images/Axis.xaml"/>
-                <ResourceDictionary Source="Images/GroundLine.xaml"/>
-                <ResourceDictionary Source="Images/Section.xaml"/>
-                <ResourceDictionary Source="Images/LevelMark.xaml"/>
-                <ResourceDictionary Source="Images/WaterProofing.xaml"/>
-                <ResourceDictionary Source="Images/NodalLeader.xaml"/>
-                <ResourceDictionary Source="Images/SecantNodalLeader.xaml"/>
-                <ResourceDictionary Source="Images/WeldJoint.xaml"/>
-                <ResourceDictionary Source="Images/FragmentMarker.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

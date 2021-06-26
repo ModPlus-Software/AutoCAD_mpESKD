@@ -30,9 +30,8 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(Section.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<Section>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -41,7 +40,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<Section>();
 
                 var sectionLastLetterValue = string.Empty;
                 var sectionLastIntegerValue = string.Empty;
@@ -88,9 +87,8 @@
         [CommandMethod("ModPlus", "mpSectionFromPolyline", CommandFlags.Modal)]
         public void CreateSectionFromPolylineCommand()
         {
-#if !DEBUG
-            Statistic.SendCommandStarting("mpSectionFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<Section>();
+            
             try
             {
                 // Выберите полилинию:
@@ -112,7 +110,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<Section>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;
@@ -182,9 +180,8 @@
 
         private static void CreateSection(bool isSimple)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(Section.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<Section>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -193,7 +190,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Section.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<Section>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(Section));
                 var sectionLastLetterValue = string.Empty;

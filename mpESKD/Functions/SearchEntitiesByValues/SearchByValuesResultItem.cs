@@ -14,7 +14,7 @@
     /// <summary>
     /// Результат поиска по значению
     /// </summary>
-    public class SearchByValuesResultItem : VmBase
+    public class SearchByValuesResultItem : ObservableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SearchByValuesResultItem"/> class.

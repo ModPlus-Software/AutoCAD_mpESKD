@@ -11,7 +11,7 @@
     /// <summary>
     /// Свойство интеллектуального объекта
     /// </summary>
-    public class SmartEntityProperty : VmBase
+    public class SmartEntityProperty : ObservableObject
     {
         private object _value;
         private double _doubleValue;

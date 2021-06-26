@@ -23,10 +23,7 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WeldJoint>();
 
             try
             {
@@ -36,7 +33,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<WeldJoint>();
 
                 var waterProofing = new WeldJoint();
                 var blockReference = MainFunction.CreateBlock(waterProofing);
@@ -61,10 +58,8 @@
         [CommandMethod("ModPlus", "mpWeldJoint", CommandFlags.Modal)]
         public void CreateWeldJointCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                WeldJoint.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WeldJoint>();
+            
             CreateWeldJoint();
         }
 
@@ -74,15 +69,14 @@
         [CommandMethod("ModPlus", "mpWeldJointFromPolyline", CommandFlags.Modal)]
         public void CreateWeldJointFromPolylineCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                "mpWeldJointFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WeldJoint>();
+            
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе
              * При инициализации плагина регистрации нет!
              */
-            ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
+            ExtendedDataUtils.AddRegAppTableRecord<WeldJoint>();
+            
             LinearEntityUtils.CreateFromPolyline<WeldJoint>();
         }
 
@@ -96,7 +90,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(WeldJoint.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<WeldJoint>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(WeldJoint));
                 var waterProofing = new WeldJoint();

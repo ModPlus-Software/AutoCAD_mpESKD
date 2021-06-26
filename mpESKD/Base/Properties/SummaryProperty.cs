@@ -13,7 +13,7 @@
     /// <summary>
     /// Суммарное свойство
     /// </summary>
-    public class SummaryProperty : VmBase
+    public class SummaryProperty : ObservableObject
     {
         private bool _isDifferentOrUndefined;
 

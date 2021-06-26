@@ -12,7 +12,7 @@
     /// <summary>
     /// Стиль интеллектуального объекта
     /// </summary>
-    public class SmartEntityStyle : VmBase
+    public class SmartEntityStyle : ObservableObject
     {
         private string _name;
         private string _description;

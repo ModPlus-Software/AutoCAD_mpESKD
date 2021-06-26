@@ -23,10 +23,7 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WaterProofing>();
 
             try
             {
@@ -36,7 +33,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(WaterProofing.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<WaterProofing>();
 
                 var waterProofing = new WaterProofing();
                 var blockReference = MainFunction.CreateBlock(waterProofing);
@@ -61,10 +58,8 @@
         [CommandMethod("ModPlus", "mpWaterProofing", CommandFlags.Modal)]
         public void CreateWaterProofingCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                WaterProofing.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WaterProofing>();
+            
             CreateWaterProofing();
         }
 
@@ -74,15 +69,14 @@
         [CommandMethod("ModPlus", "mpWaterProofingFromPolyline", CommandFlags.Modal)]
         public void CreateWaterProofingFromPolylineCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                "mpWaterProofingFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<WaterProofing>();
+            
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе
              * При инициализации плагина регистрации нет!
              */
-            ExtendedDataUtils.AddRegAppTableRecord(WaterProofing.GetDescriptor());
+            ExtendedDataUtils.AddRegAppTableRecord<WaterProofing>();
+            
             LinearEntityUtils.CreateFromPolyline<WaterProofing>();
         }
 
@@ -96,7 +90,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(WaterProofing.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<WaterProofing>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(WaterProofing));
                 var waterProofing = new WaterProofing();

@@ -30,10 +30,8 @@
         /// <inheritdoc/>
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<SecantNodalLeader>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -42,7 +40,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(SecantNodalLeader.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<SecantNodalLeader>();
+                
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new SecantNodalLeader(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(nodalLeader);
@@ -71,10 +70,8 @@
         
         private static void CreateSecantNodalLeader()
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                SecantNodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<SecantNodalLeader>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -83,7 +80,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(SecantNodalLeader.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<SecantNodalLeader>();
+                
                 var style = StyleManager.GetCurrentStyle(typeof(SecantNodalLeader));
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new SecantNodalLeader(lastNodeNumber);

@@ -23,10 +23,7 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                GroundLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<GroundLine>();
 
             try
             {
@@ -36,7 +33,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<GroundLine>();
 
                 var groundLine = new GroundLine();
                 var blockReference = MainFunction.CreateBlock(groundLine);
@@ -61,10 +58,8 @@
         [CommandMethod("ModPlus", "mpGroundLine", CommandFlags.Modal)]
         public void CreateGroundLineCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                GroundLine.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<GroundLine>();
+            
             CreateGroundLine();
         }
 
@@ -74,16 +69,14 @@
         [CommandMethod("ModPlus", "mpGroundLineFromPolyline", CommandFlags.Modal)]
         public void CreateGroundLineFromPolylineCommand()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                "mpGroundLineFromPolyline", ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<GroundLine>();
+            
             /* Регистрация ЕСКД приложения должна запускаться при запуске
              * функции, т.к. регистрация происходит в текущем документе
              * При инициализации плагина регистрации нет!
              */
+            ExtendedDataUtils.AddRegAppTableRecord<GroundLine>();
             
-            ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
             LinearEntityUtils.CreateFromPolyline<GroundLine>();
         }
 
@@ -97,7 +90,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(GroundLine.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<GroundLine>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(GroundLine));
                 var groundLine = new GroundLine();

@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Base.Utils
 {
     using System.Linq;
-    using Abstractions;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Runtime;
 
@@ -13,10 +12,11 @@
         /// <summary>
         /// Добавление регистрации приложения в соответствующую таблицу чертежа
         /// </summary>
-        /// <param name="descriptor">Дескриптор интеллектуального объекта</param>
-        public static void AddRegAppTableRecord(ISmartEntityDescriptor descriptor)
+        /// <typeparam name="T">Тип, унаследованный от <see cref="SmartEntity"/></typeparam>
+        public static void AddRegAppTableRecord<T>() 
+            where T : SmartEntity
         {
-            AddRegAppTableRecord(descriptor.Name);
+            AddRegAppTableRecord(SmartEntityUtils.GetDescriptor<T>().Name);
         }
         
         /// <summary>

@@ -9,6 +9,10 @@
     public partial class ViewLabelDoubleClickEditControl : IDoubleClickEditControl
     {
         private ViewLabel _viewLabel;
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewLabelDoubleClickEditControl"/> class.
+        /// </summary>
         public ViewLabelDoubleClickEditControl()
         {
             InitializeComponent();

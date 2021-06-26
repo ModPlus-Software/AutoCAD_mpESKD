@@ -259,14 +259,6 @@ namespace mpESKD.Functions.mpNodalLeader
         [SaveToXData]
         [ValueToSearchBy]
         public string NodeAddress { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="NodalLeader"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(NodalLeader));
-        }
 
         /// <inheritdoc/>
         public override IEnumerable<Point3d> GetPointsForOsnap()

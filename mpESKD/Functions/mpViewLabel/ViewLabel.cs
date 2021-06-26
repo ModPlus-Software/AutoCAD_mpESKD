@@ -148,14 +148,6 @@
             }
         }
 
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="ViewLabel"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(ViewLabel));
-        }
-
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {

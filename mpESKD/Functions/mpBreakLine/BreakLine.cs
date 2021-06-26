@@ -6,7 +6,6 @@ namespace mpESKD.Functions.mpBreakLine
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
-    using Base.Abstractions;
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
@@ -34,15 +33,7 @@ namespace mpESKD.Functions.mpBreakLine
             : base(blockId)
         {
         }
-
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="BreakLine"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(BreakLine));
-        }
-
+        
         #region Properties
 
         /// <inheritdoc />

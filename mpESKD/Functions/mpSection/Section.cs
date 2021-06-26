@@ -322,14 +322,6 @@
                 return entities;
             }
         }
-        
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="Section"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(Section));
-        }
 
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()

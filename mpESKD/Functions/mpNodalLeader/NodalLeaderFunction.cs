@@ -30,9 +30,8 @@
         /// <inheritdoc/>
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(NodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<NodalLeader>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -41,7 +40,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<NodalLeader>();
+                
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new NodalLeader(lastNodeNumber);
                 var blockReference = MainFunction.CreateBlock(nodalLeader);
@@ -70,9 +70,8 @@
 
         private static void CreateNodalLeader()
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(NodalLeader.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<NodalLeader>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -81,7 +80,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(NodalLeader.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<NodalLeader>();
+                
                 var style = StyleManager.GetCurrentStyle(typeof(NodalLeader));
                 var lastNodeNumber = FindLastNodeNumber();
                 var nodalLeader = new NodalLeader(lastNodeNumber);

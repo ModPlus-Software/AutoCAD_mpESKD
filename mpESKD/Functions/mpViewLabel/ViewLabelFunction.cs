@@ -29,9 +29,8 @@
         /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(ViewLabel.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<ViewLabel>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -40,7 +39,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(ViewLabel.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<ViewLabel>();
 
                 var viewLabelLastLetterValue = string.Empty;
                 var viewLabelLastIntegerValue = string.Empty;
@@ -82,9 +81,8 @@
 
         private static void CreateViewLabel(ViewLabelType viewLabelType)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(ViewLabel.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<ViewLabel>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -93,7 +91,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(ViewLabel.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<ViewLabel>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(ViewLabel));
                 var viewLabelLastLetterValue = string.Empty;

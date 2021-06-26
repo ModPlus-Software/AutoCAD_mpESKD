@@ -6,7 +6,9 @@
     using System.Windows.Controls;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.Windows;
+    using Base;
     using Base.Abstractions;
+    using Base.Utils;
     using Functions.mpAxis;
     using Functions.mpBreakLine;
     using Functions.mpFragmentMarker;
@@ -14,6 +16,7 @@
     using Functions.mpLevelMark;
     using Functions.mpNodalLeader;
     using Functions.mpSecantNodalLeader;
+    using Functions.mpViewLabel;
     using Functions.mpWaterProofing;
     using Functions.mpWeldJoint;
     using ModPlus.Helpers;
@@ -184,16 +187,9 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpAxis
-            var ribbonButton = GetBigButton(Axis.GetDescriptor());
-            if (ribbonButton != null)
-            {
-                ribRowPanel.Items.Add(ribbonButton);
-            }
+            ribRowPanel.Items.Add(GetBigButton(GetDescriptor<Axis>()));
 
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -205,25 +201,14 @@
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
             var ribRowPanel = new RibbonRowPanel();
-            
-            // mpNodalLeader
-            var ribbonButton = GetBigButton(NodalLeader.GetDescriptor());
-            if (ribbonButton != null)
-            {
-                ribRowPanel.Items.Add(ribbonButton);
-            }
-            
-            // mpSecantNodalLeader
-            ribbonButton = GetSmallButton(SecantNodalLeader.GetDescriptor());
-            if (ribbonButton != null)
-            {
-                ribRowPanel.Items.Add(ribbonButton);
-            }
 
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            // mpNodalLeader
+            ribRowPanel.Items.Add(GetBigButton(GetDescriptor<NodalLeader>()));
+
+            // mpSecantNodalLeader
+            ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<SecantNodalLeader>()));
+
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -237,12 +222,9 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpLevelMark
-            ribRowPanel.Items.Add(GetBigSplitButton(LevelMark.GetDescriptor()));
+            ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<LevelMark>()));
 
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -260,30 +242,24 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpBreakLine
-            ribRowPanel.Items.Add(GetBigSplitButton(BreakLine.GetDescriptor()));
-            
+            ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<BreakLine>()));
+
             // mpWeldJoint
-            ribRowPanel.Items.Add(GetBigSplitButton(WeldJoint.GetDescriptor()));
-            
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<WeldJoint>()));
+
+            ribSourcePanel.Items.Add(ribRowPanel);
 
             ribRowPanel = new RibbonRowPanel();
 
             // mpGroundLine
-            ribRowPanel.Items.Add(GetSmallSplitButton(GroundLine.GetDescriptor()));
-            
+            ribRowPanel.Items.Add(GetSmallSplitButton(GetDescriptor<GroundLine>()));
+
             ribRowPanel.Items.Add(new RibbonRowBreak());
 
             // mpWaterProofing
-            ribRowPanel.Items.Add(GetSmallSplitButton(WaterProofing.GetDescriptor()));
+            ribRowPanel.Items.Add(GetSmallSplitButton(GetDescriptor<WaterProofing>()));
 
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -299,12 +275,21 @@
             var ribRowPanel = new RibbonRowPanel();
 
             // mpSection
-            ribRowPanel.Items.Add(GetBigSplitButton(Functions.mpSection.Section.GetDescriptor()));
+            ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<Functions.mpSection.Section>()));
+            
+            ribSourcePanel.Items.Add(ribRowPanel);
 
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribRowPanel = new RibbonRowPanel();
+
+            // mpViewLabel
+            ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<ViewLabel>()));
+
+            ribRowPanel.Items.Add(new RibbonRowBreak());
+
+            // mpSectionLabel
+            ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<ViewLabel>(), 0));
+
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -316,18 +301,11 @@
             var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
             var ribRowPanel = new RibbonRowPanel();
-            
+
             // mpFragmentMarker
-            var ribbonButton = GetBigButton(FragmentMarker.GetDescriptor());
-            if (ribbonButton != null)
-            {
-                ribRowPanel.Items.Add(ribbonButton);
-            }
-            
-            if (ribRowPanel.Items.Any())
-            {
-                ribSourcePanel.Items.Add(ribRowPanel);
-            }
+            ribRowPanel.Items.Add(GetBigButton(GetDescriptor<FragmentMarker>()));
+
+            ribSourcePanel.Items.Add(ribRowPanel);
         }
 
         /// <summary>
@@ -335,17 +313,8 @@
         /// </summary>
         private static void AddToolsPanel(RibbonTab ribbonTab)
         {
-            // create the panel source
-            var ribSourcePanel = new RibbonPanelSource
-            {
-                Title = Language.GetItem("tab9")
-            };
-
-            // now the panel
-            var ribPanel = new RibbonPanel
-            {
-                Source = ribSourcePanel
-            };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab9") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribbonTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
@@ -378,17 +347,8 @@
         /// </summary>
         private static void AddSettingsPanel(RibbonTab ribTab)
         {
-            // create the panel source
-            var ribSourcePanel = new RibbonPanelSource
-            {
-                Title = Language.GetItem("tab2")
-            };
-
-            // now the panel
-            var ribPanel = new RibbonPanel
-            {
-                Source = ribSourcePanel
-            };
+            var ribSourcePanel = new RibbonPanelSource { Title = Language.GetItem("tab2") };
+            var ribPanel = new RibbonPanel { Source = ribSourcePanel };
             ribTab.Panels.Add(ribPanel);
 
             var ribRowPanel = new RibbonRowPanel();
@@ -432,7 +392,7 @@
                 ResizeStyle = RibbonItemResizeStyles.NoResize,
                 ListStyle = RibbonSplitButtonListStyle.List
             };
-            
+
             var ribBtn = GetBigButton(descriptor, orientation);
             if (ribBtn != null)
             {
@@ -445,7 +405,7 @@
 
             return risSplitBtn;
         }
-        
+
         /// <summary>
         /// Получить SplitButton (основная команда + все вложенные команды) для дескриптора функции
         /// </summary>
@@ -467,7 +427,7 @@
                 ResizeStyle = RibbonItemResizeStyles.NoResize,
                 ListStyle = RibbonSplitButtonListStyle.List
             };
-            
+
             var ribBtn = GetButton(descriptor, orientation);
             if (ribBtn != null)
             {
@@ -480,7 +440,7 @@
 
             return risSplitBtn;
         }
-        
+
         /// <summary>
         /// Получить кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
         /// </summary>
@@ -518,7 +478,7 @@
                 GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
                 "help/mpeskd");
         }
-        
+
         /// <summary>
         /// Получить маленькую кнопку по дескриптору функции. Возвращает кнопку для основной функции в дескрипторе
         /// </summary>
@@ -534,7 +494,24 @@
                 GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
                 "help/mpeskd");
         }
-        
+
+        /// <summary>
+        /// Получить маленькую кнопку по дескриптору функции для вложенной функции
+        /// </summary>
+        /// <param name="descriptor">Дескриптор функции - класс, реализующий интерфейс <see cref="ISmartEntityDescriptor"/></param>
+        /// <param name="subFunctionIndex">Индекс вложенной функции</param>
+        private static RibbonButton GetSmallButton(ISmartEntityDescriptor descriptor, int subFunctionIndex)
+        {
+            return RibbonHelpers.AddSmallButton(
+                descriptor.SubFunctionsNames[subFunctionIndex],
+                descriptor.SubFunctionsLNames[subFunctionIndex],
+                GetSmallIconForFunction(descriptor.Name, descriptor.SubFunctionsNames[subFunctionIndex]),
+                descriptor.SubDescriptions[subFunctionIndex],
+                descriptor.SubFullDescriptions[subFunctionIndex],
+                GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[subFunctionIndex]),
+                "help/mpeskd");
+        }
+
         /// <summary>
         /// Получить список кнопок для вложенных команды по дескриптору
         /// </summary>
@@ -635,6 +612,12 @@
             var nearestDelta = lName.Select((c, i) => new { index = i, value = c }).Where(w => w.value == ' ')
                 .OrderBy(x => Math.Abs(x.index - center)).First().index;
             return lName.Substring(0, nearestDelta) + Environment.NewLine + lName.Substring(nearestDelta + 1);
+        }
+
+        private static ISmartEntityDescriptor GetDescriptor<T>()
+            where T : SmartEntity
+        {
+            return SmartEntityUtils.GetDescriptor<T>();
         }
     }
 }

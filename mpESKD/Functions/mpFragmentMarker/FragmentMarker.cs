@@ -23,8 +23,13 @@ namespace mpESKD.Functions.mpFragmentMarker
     {
         private readonly string _lastNodeNumber;
         private string _cachedNodeNumber;
-
+        
         #region Entities
+        
+        /// <summary>
+        /// Главная полилиния примитива
+        /// </summary>
+        private Polyline _mainPolyline;
 
         /// <summary>
         /// Линия выноски
@@ -83,11 +88,6 @@ namespace mpESKD.Functions.mpFragmentMarker
             _lastNodeNumber = lastNodeNumber;
         }
 
-        /// <summary>
-        /// Главная полилиния примитива
-        /// </summary>
-        private Polyline _mainPolyline;
-
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -110,14 +110,6 @@ namespace mpESKD.Functions.mpFragmentMarker
 
                 return entities;
             }
-        }
-
-        /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="FragmentMarker"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(FragmentMarker));
         }
 
         #region Properties

@@ -26,18 +26,9 @@
         }
 
         /// <inheritdoc />
-        public void Terminate()
-        {
-            
-        }
-
-        /// <inheritdoc />
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<Axis>();
 
             try
             {
@@ -47,7 +38,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<Axis>();
 
                 var axisLastHorizontalValue = string.Empty;
                 var axisLastVerticalValue = string.Empty;
@@ -85,10 +76,8 @@
 
         private static void CreateAxis()
         {
-#if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(
-                Axis.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<Axis>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -97,7 +86,7 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(Axis.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<Axis>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(Axis));
 

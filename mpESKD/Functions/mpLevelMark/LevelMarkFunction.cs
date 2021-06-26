@@ -29,10 +29,8 @@
         /// <inheritdoc/>
         public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<LevelMark>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -41,7 +39,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<LevelMark>();
+                
                 var levelMark = new LevelMark();
 
                 var blockReference = MainFunction.CreateBlock(levelMark);
@@ -104,7 +103,7 @@
 
                 var availTypedValues = new TypedValue[1];
                 availTypedValues.SetValue(
-                    new TypedValue((int)DxfCode.ExtendedDataRegAppName, LevelMark.GetDescriptor().Name), 0);
+                    new TypedValue((int)DxfCode.ExtendedDataRegAppName, SmartEntityUtils.GetDescriptor<LevelMark>().Name), 0);
 
                 var filter = new SelectionFilter(availTypedValues);
 
@@ -187,10 +186,8 @@
 
         private static void CreateLevelMark()
         {
-#if !DEBUG
-            Statistic.SendCommandStarting(
-                LevelMark.GetDescriptor().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-#endif
+            SmartEntityUtils.SendStatistic<LevelMark>();
+            
             try
             {
                 Overrule.Overruling = false;
@@ -199,7 +196,8 @@
                  * функции, т.к. регистрация происходит в текущем документе
                  * При инициализации плагина регистрации нет!
                  */
-                ExtendedDataUtils.AddRegAppTableRecord(LevelMark.GetDescriptor());
+                ExtendedDataUtils.AddRegAppTableRecord<LevelMark>();
+                
                 var style = StyleManager.GetCurrentStyle(typeof(LevelMark));
                 var levelMark = new LevelMark();
 

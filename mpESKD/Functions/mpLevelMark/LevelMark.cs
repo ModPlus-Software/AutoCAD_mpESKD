@@ -36,14 +36,6 @@ namespace mpESKD.Functions.mpLevelMark
         }
 
         /// <summary>
-        /// Возвращает локализованное описание для типа <see cref="LevelMark"/>
-        /// </summary>
-        public static ISmartEntityDescriptor GetDescriptor()
-        {
-            return TypeFactory.Instance.GetDescriptor(typeof(LevelMark));
-        }
-
-        /// <summary>
         /// Точка уровня (точка объекта измерения)
         /// </summary>
         [SaveToXData]

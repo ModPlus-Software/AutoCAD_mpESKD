@@ -3,6 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
+    using System.Resources;
+    using System.Windows;
     using Abstractions;
 
     /// <summary>
@@ -90,6 +93,46 @@
             }
 
             return _entityEditControls[entityType];
+        }
+
+        /// <summary>
+        /// Возвращает ресурсы изображений предварительного просмотра для редактора стилей
+        /// </summary>
+        public IEnumerable<ResourceDictionary> GetPreviewImageResourceDictionaries()
+        {
+            var resourcePaths = GetResourcePaths(Assembly.GetExecutingAssembly()).ToList();
+            foreach (var commandName in GetEntityCommandNames())
+            {
+                if (resourcePaths.Contains($"Functions/{commandName}/{commandName.Substring(2)}.baml".ToLowerInvariant()))
+                {
+                    yield return new ResourceDictionary
+                    {
+                        Source = new Uri(
+                            $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Functions/{commandName}/{commandName.Substring(2)}.xaml")
+                    };
+                }
+            }
+        }
+
+        private static IEnumerable<object> GetResourcePaths(Assembly assembly)
+        {
+            var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            var resourceName = assembly.GetName().Name + ".g";
+            var resourceManager = new ResourceManager(resourceName, assembly);
+
+            try
+            {
+                var resourceSet = resourceManager.GetResourceSet(culture, true, true);
+
+                foreach (System.Collections.DictionaryEntry resource in resourceSet)
+                {
+                    yield return resource.Key;
+                }
+            }
+            finally
+            {
+                resourceManager.ReleaseAllResources();
+            }
         }
     }
 }

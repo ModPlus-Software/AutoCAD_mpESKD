@@ -3,6 +3,7 @@
     using System;
     using System.Windows;
     using Base;
+    using Base.Utils;
     using ModPlusAPI;
 
     /// <summary>
@@ -20,18 +21,24 @@
             Closed += OnClosed;
             ChkAlignArrowPoints.IsChecked =
                 !bool.TryParse(
-                    UserConfigFile.GetValue(LevelMark.GetDescriptor().Name, ChkAlignArrowPoints.Name), out var b) || b;
+                    UserConfigFile.GetValue(SmartEntityUtils.GetDescriptor<LevelMark>().Name, ChkAlignArrowPoints.Name), out var b) || b;
             ChkAlignBasePoints.IsChecked =
                 !bool.TryParse(
-                    UserConfigFile.GetValue(LevelMark.GetDescriptor().Name, ChkAlignBasePoints.Name), out b) || b;
+                    UserConfigFile.GetValue(SmartEntityUtils.GetDescriptor<LevelMark>().Name, ChkAlignBasePoints.Name), out b) || b;
         }
 
         private void OnClosed(object sender, EventArgs e)
         {
             UserConfigFile.SetValue(
-                LevelMark.GetDescriptor().Name, ChkAlignArrowPoints.Name, ChkAlignArrowPoints.IsChecked.ToString(), true);
+                SmartEntityUtils.GetDescriptor<LevelMark>().Name,
+                ChkAlignArrowPoints.Name,
+                ChkAlignArrowPoints.IsChecked.ToString(),
+                true);
             UserConfigFile.SetValue(
-                LevelMark.GetDescriptor().Name, ChkAlignBasePoints.Name, ChkAlignBasePoints.IsChecked.ToString(), true);
+                SmartEntityUtils.GetDescriptor<LevelMark>().Name,
+                ChkAlignBasePoints.Name,
+                ChkAlignBasePoints.IsChecked.ToString(),
+                true);
         }
 
         private void BtAccept_OnClick(object sender, RoutedEventArgs e)
