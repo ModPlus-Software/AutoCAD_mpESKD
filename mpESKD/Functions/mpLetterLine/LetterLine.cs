@@ -285,6 +285,43 @@ namespace mpESKD.Functions.mpLetterLine
             }
         }
 
+        //private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
+        //{
+        //    var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
+        //    _mainPolyline = new Polyline(points.Count);
+        //    AcadUtils.WriteMessageInDebug($"Количество точек {points.Count}");
+        //    SetImmutablePropertiesToNestedEntity(_mainPolyline);
+        //    for (var i = 0; i < points.Count; i++)
+        //    {
+        //        _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+        //        var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
+
+        //        //_texts.AddRange(CreateMTextsOnMainPolylineSegment(currentPoint, previousPoint, _scale));
+
+        //    }
+
+        //    _texts.Clear();
+        //    _mTextMasks.Clear();
+        //    _segmentsCount = 0;
+        //    if (!(_mainPolyline.Length >= MinDistanceBetweenPoints)) return;
+
+        //    if (!LineGeneration)
+        //    {
+        //        for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
+        //        {
+        //            var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
+        //            var currentPoint = _mainPolyline.GetPoint3dAt(i);
+
+        //            var segmentLength = currentPoint.DistanceTo(previousPoint);
+        //            AcadUtils.WriteMessageInDebug($"Длина полилинии {segmentLength}");
+        //            var vec = (currentPoint - previousPoint).GetNormal();
+        //            AcadUtils.WriteMessageInDebug($"Длина полилинии {vec}");
+        //            var sumTextDistanceAtsegment = 0.0;
+
+        //        }
+        //    }
+        //}
+
         private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
         {
             var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
@@ -320,7 +357,7 @@ namespace mpESKD.Functions.mpLetterLine
                     AcadUtils.WriteMessageInDebug($"Текст должен находится на длине полилинии {offset / 2 + i * MTextOffset} \n");
                     var location = _mainPolyline.GetPointAtDist(offset / 2 + i * MTextOffset);
                     var segmentParameterAtPoint = _mainPolyline.GetParameterAtPoint(location);
-                    AcadUtils.WriteMessageInDebug($"точка {location} номер сегмента {segmentParameterAtPoint} \n ");
+
                     var previousPoint = new Point3d();
                     var currentPoint = new Point3d();
                     if (segmentParameterAtPoint < 1)
@@ -330,8 +367,8 @@ namespace mpESKD.Functions.mpLetterLine
                     }
                     else
                     {
-                        previousPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint - 1);
-                        currentPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint);
+                        previousPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint);
+                        currentPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint + 1);
                     }
 
                     var segmentVector = currentPoint - previousPoint;
@@ -343,7 +380,7 @@ namespace mpESKD.Functions.mpLetterLine
                     {
                         angle = 0;
                     }
-
+                    AcadUtils.WriteMessageInDebug($"точка {location} номер сегмента {segmentParameterAtPoint} \n угол {angle * 180 / Math.PI}");
                     var mText = new MText
                     {
                         TextStyleId = textStyleId,
