@@ -60,7 +60,7 @@
         {
             SmartEntityUtils.SendStatistic<LetterLine>();
             
-            CreateGroundLine();
+            CreateLetterLine();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@
             LinearEntityUtils.CreateFromPolyline<LetterLine>();
         }
 
-        private void CreateGroundLine()
+        private void CreateLetterLine()
         {
             try
             {
