@@ -141,7 +141,7 @@ namespace mpESKD.Functions.mpLetterLine
         public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
-        /// Обозначение разреза
+        /// Большой Текст
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
@@ -171,8 +171,10 @@ namespace mpESKD.Functions.mpLetterLine
         [SaveToXData]
         public LetterLineType LetterLineType { get; set; }
 
+        //TODO visibility
         /// <inheritdoc/>
         [EntityProperty(PropertiesCategory.Content, 10, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset)}, new[] { nameof(Space), nameof(FirstStrokeOffset)})]
         [SaveToXData]
         public bool LineGeneration { get; set; }
 
@@ -354,12 +356,13 @@ namespace mpESKD.Functions.mpLetterLine
 
                 for (int i = 0; i <= MTextsQty; i++)
                 {
-                    AcadUtils.WriteMessageInDebug($"Текст должен находится на длине полилинии {offset / 2 + i * MTextOffset} \n");
-                    var location = _mainPolyline.GetPointAtDist(offset / 2 + i * MTextOffset);
+                    var distAtPline = offset / 2 + i * MTextOffset;
+                    AcadUtils.WriteMessageInDebug($"Текст должен находится на длине полилинии {distAtPline} \n");
+                    var location = _mainPolyline.GetPointAtDist(distAtPline);
                     var segmentParameterAtPoint = _mainPolyline.GetParameterAtPoint(location);
 
-                    var previousPoint = new Point3d();
-                    var currentPoint = new Point3d();
+                    Point3d previousPoint;
+                    Point3d currentPoint;
                     if (segmentParameterAtPoint < 1)
                     {
                         previousPoint = _mainPolyline.GetPoint3dAt(0);
@@ -372,43 +375,14 @@ namespace mpESKD.Functions.mpLetterLine
                     }
 
                     var segmentVector = currentPoint - previousPoint;
-                    var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-                    var textHeight = MainTextHeight * _scale;
-
-                    var angle = Math.Atan2(segmentVector.Y, segmentVector.X);
-                    if (IsTextAlwaysHorizontal)
-                    {
-                        angle = 0;
-                    }
-                    AcadUtils.WriteMessageInDebug($"точка {location} номер сегмента {segmentParameterAtPoint} \n угол {angle * 180 / Math.PI}");
-                    var mText = new MText
-                    {
-                        TextStyleId = textStyleId,
-                        Contents = GetTextContents(),
-                        TextHeight = textHeight,
-                        Attachment = AttachmentPoint.MiddleCenter,
-                        Location = location,
-                        Rotation = angle
-                    };
-
+                    var mText = GetMTextAtPolylineDist(distAtPline, segmentVector);
+                    //AcadUtils.WriteMessageInDebug($"точка {location} номер сегмента {segmentParameterAtPoint} \n угол {angle * 180 / Math.PI}");
                     SetImmutablePropertiesToNestedEntity(mText);
 
-                    if (HideTextBackground)
-                    {
-                        var maskOffset = TextMaskOffset * _scale;
-                        _mTextMasks.Add(mText.GetBackgroundMask(maskOffset));
-                    }
+                    HideMtextBackgoud(mText);
+
                     _texts.Add(mText);
                 }
-
-                //for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
-                //{
-                //    var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
-                //    var currentPoint = _mainPolyline.GetPoint3dAt(i);
-                //    var segmentVector = currentPoint - previousPoint;
-                //    var segmentLength = segmentVector.Length;
-
-                //}
             }
         }
 
@@ -421,7 +395,6 @@ namespace mpESKD.Functions.mpLetterLine
             var segmentLength = segmentVector.Length;
 
             var distanceAtSegmentStart = _mainPolyline.GetDistAtPoint(previousPoint);
-            double curdistance = 0;
             var overflowIndex = 0;
 
             AcadUtils.WriteMessageInDebug($"длина сегмента {segmentVector.Length}");
@@ -429,7 +402,6 @@ namespace mpESKD.Functions.mpLetterLine
             AcadUtils.WriteMessageInDebug($"количество сегментов {_segmentsCount}");
 
             // Индекс штриха. Возможные значения - 0, 1, 2
-            var strokeIndex = 0;
             var sumDistanceAtSegment = 0.0;
             while (true)
             {
@@ -462,27 +434,7 @@ namespace mpESKD.Functions.mpLetterLine
                     break;
                 }
 
-                var firstStrokePoint = _mainPolyline.GetPointAtDist(distanceAtSegmentStart + sumDistanceAtSegment);
-
-                var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-                var textHeight = MainTextHeight * scale;
-
-                var angle = Math.Atan2(segmentVector.Y, segmentVector.X);
-                if (IsTextAlwaysHorizontal)
-                {
-                    angle = 0;
-                }
-
-                var mText = new MText
-                {
-                    TextStyleId = textStyleId,
-                    Contents = GetTextContents(),
-                    TextHeight = textHeight,
-                    Attachment = AttachmentPoint.MiddleCenter,
-                    Location = firstStrokePoint,
-                    Rotation = angle
-                };
-
+                var mText = GetMTextAtPolylineDist(distanceAtSegmentStart + sumDistanceAtSegment, segmentVector);
                 AcadUtils.WriteMessageInDebug($"суммированная длина сегмента {sumDistanceAtSegment}");
                 SetImmutablePropertiesToNestedEntity(mText);
 
@@ -490,11 +442,7 @@ namespace mpESKD.Functions.mpLetterLine
 
                 segmentMTextsDependencies.Add(mText);
 
-                if (HideTextBackground)
-                {
-                    var maskOffset = TextMaskOffset * scale;
-                    _mTextMasks.Add(mText.GetBackgroundMask(maskOffset));
-                }
+                HideMtextBackgoud(mText);
 
                 if (overflowIndex >= 1000)
                 {
@@ -506,30 +454,40 @@ namespace mpESKD.Functions.mpLetterLine
             return segmentMTextsDependencies;
         }
 
-        //private MText GetMTextAtPolylineDist(double polylineDist)
-        //{
+        private MText GetMTextAtPolylineDist(double polylineDist, Vector3d segmentVector)
+        {
+            var firstStrokePoint = _mainPolyline.GetPointAtDist(polylineDist);
 
-        //    var firstStrokePoint = _mainPolyline.GetPointAtDist(polylineDist);
+            var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
+            var textHeight = MainTextHeight * _scale;
 
-        //    var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-        //    var textHeight = MainTextHeight * _scale;
+            var angle = Math.Atan2(segmentVector.Y, segmentVector.X);
+            if (IsTextAlwaysHorizontal)
+            {
+                angle = 0;
+            }
 
-        //    var angle = Math.Atan2(segmentVector.Y, segmentVector.X);
-        //    if (IsTextAlwaysHorizontal)
-        //    {
-        //        angle = 0;
-        //    }
+            var mText = new MText
+            {
+                TextStyleId = textStyleId,
+                Contents = GetTextContents(),
+                TextHeight = textHeight,
+                Attachment = AttachmentPoint.MiddleCenter,
+                Location = firstStrokePoint,
+                Rotation = angle
+            };
 
-        //    var mText = new MText
-        //    {
-        //        TextStyleId = textStyleId,
-        //        Contents = GetTextContents(),
-        //        TextHeight = textHeight,
-        //        Attachment = AttachmentPoint.MiddleCenter,
-        //        Location = firstStrokePoint,
-        //        Rotation = angle
-        //    };
-        //}
+            return mText;
+        }
+
+        private void HideMtextBackgoud(MText mText)
+        {
+            if (HideTextBackground)
+            {
+                var maskOffset = TextMaskOffset * _scale;
+                _mTextMasks.Add(mText.GetBackgroundMask(maskOffset));
+            }
+        }
 
         /// <summary>
         /// Содержимое для MText в зависимости от значений
@@ -537,7 +495,6 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private string GetTextContents()
         {
-
             var prefixAndDesignation = MainText;
 
             if (!string.IsNullOrEmpty(SmallText))
