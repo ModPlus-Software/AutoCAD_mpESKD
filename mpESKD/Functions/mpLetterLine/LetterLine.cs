@@ -44,21 +44,6 @@ namespace mpESKD.Functions.mpLetterLine
 
         private readonly List<Wipeout> _mTextMasks = new List<Wipeout>();
 
-        /// <summary>
-        /// Маскировка фона верхнего текста 
-        /// </summary>
-        private Wipeout _topFirstTextMask;
-
-        /// <summary>
-        /// Нижний текст 
-        /// </summary>
-        private DBText _bottomDbText;
-
-        /// <summary>
-        /// Маскировка нижнего текста
-        /// </summary>
-        private Wipeout _bottomTextMask;
-
         #endregion
 
         #region Properties
@@ -160,23 +145,54 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Текст всегда горизонтально
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 4, "p84", false, descLocalKey: "d84")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p84", false, descLocalKey: "d84")]
         [SaveToXData]
         public bool IsTextAlwaysHorizontal { get; set; }
 
         /// <summary>
         /// Тип вида (разрез или вид)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p103", LetterLineType.Standart, descLocalKey: "d86")]
+        [EntityProperty(PropertiesCategory.Content, 10, "p103", LetterLineType.Standart, descLocalKey: "d86")]
         [SaveToXData]
         public LetterLineType LetterLineType { get; set; }
 
-        //TODO visibility
-        /// <inheritdoc/>
-        [EntityProperty(PropertiesCategory.Content, 10, "p85", false, descLocalKey: "d85")]
-        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset)}, new[] { nameof(Space), nameof(FirstStrokeOffset)})]
+
+        /// <summary>
+        /// Формула для создания линии
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 11, "p53", "", propertyScope: PropertyScope.Palette,
+            descLocalKey: "d53")]
+        [RegexInputRestriction("[-0-9]")]
         [SaveToXData]
-        public bool LineGeneration { get; set; }
+        public string StrokeFormula { get; set; } = "";
+        
+        /// <summary>
+        /// Генерация типа линий по всей полилинии
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Content, 12, "p85", false, descLocalKey: "d85")]
+        [PropertyVisibilityDependency(new[] { nameof(SpaceAndFirstStrokeOffsetVisibilility) })]
+        [SaveToXData]
+        public bool LineGeneration
+        {
+            get => LineGeneration;
+
+            set
+            {
+                if (value)
+                {
+                    SpaceAndFirstStrokeOffsetVisibilility = false;
+                }
+                else
+                {
+                    SpaceAndFirstStrokeOffsetVisibilility = true;
+                }
+            }
+        }
+
+        [EntityProperty(PropertiesCategory.Content, 12, "", "", propertyScope: PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(new[] {nameof(Space), nameof(FirstStrokeOffset) })]
+        [SaveToXData]
+        public bool SpaceAndFirstStrokeOffsetVisibilility { get; private set; }
 
         private int _segmentsCount = 0;
         private double _scale;
@@ -350,11 +366,11 @@ namespace mpESKD.Functions.mpLetterLine
             }
             else
             {
-                int MTextsQty = (int)(_mainPolyline.Length / MTextOffset);
-                var offset = _mainPolyline.Length - MTextsQty * MTextOffset;
-                AcadUtils.WriteMessageInDebug($"Длина полилинии {_mainPolyline.Length} - Расстояние между текстами {MTextOffset}, текстов поместится {MTextsQty} отступы с двух сторон {offset / 2}");
+                int mTextsQty = (int)(_mainPolyline.Length / MTextOffset);
+                var offset = _mainPolyline.Length - mTextsQty * MTextOffset;
+                AcadUtils.WriteMessageInDebug($"Длина полилинии {_mainPolyline.Length} - Расстояние между текстами {MTextOffset}, текстов поместится {mTextsQty} отступы с двух сторон {offset / 2}");
 
-                for (int i = 0; i <= MTextsQty; i++)
+                for (int i = 0; i <= mTextsQty; i++)
                 {
                     var distAtPline = offset / 2 + i * MTextOffset;
                     AcadUtils.WriteMessageInDebug($"Текст должен находится на длине полилинии {distAtPline} \n");
