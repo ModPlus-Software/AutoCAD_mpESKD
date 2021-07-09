@@ -6,12 +6,14 @@ namespace mpESKD.Base.View
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
+    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
     using System.Windows.Data;
     using System.Windows.Input;
     using System.Windows.Media;
+    using Attributes;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Windows;
@@ -392,6 +394,9 @@ namespace mpESKD.Base.View
                             tb.Style = Resources["PropertyValueTextBoxForStyleEditor"] as Style;
                             SetDescription(tb, propertyDescription);
                             BindingOperations.SetBinding(tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(property));
+                            
+                            if (property.RegexInputRestrictionAttribute != null)
+                                SetInputRestriction(tb, property.RegexInputRestrictionAttribute);
 
                             propertiesGrid.Children.Add(tb);
                         }
@@ -557,6 +562,45 @@ namespace mpESKD.Base.View
         private void _OnLostFocus(object sender, RoutedEventArgs e)
         {
             ShowDescription(string.Empty);
+        }
+        
+        private void SetInputRestriction(TextBox tb, RegexInputRestrictionAttribute regexInputRestrictionAttribute)
+        {
+            tb.SetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty, regexInputRestrictionAttribute.Pattern);
+            tb.PreviewTextInput += TbOnPreviewTextInput;
+            DataObject.AddPastingHandler(tb, TbOnPasting);
+        }
+
+        private void TbOnPasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.GetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty) is string pattern)
+            {
+                if (e.DataObject.GetDataPresent(typeof(string)))
+                {
+                    var text = (string)e.DataObject.GetData(typeof(string));
+                    if (!IsAllowedText(text, pattern))
+                        e.CancelCommand();
+                }
+                else
+                {
+                    e.CancelCommand();
+                }
+            }
+        }
+
+        private void TbOnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.GetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty) is string pattern)
+            {
+                e.Handled = !IsAllowedText(e.Text, pattern);
+            }
+        }
+        
+        private bool IsAllowedText(string text, string pattern)
+        {
+            return new Regex(pattern).IsMatch(text);
         }
 
         /// <summary>

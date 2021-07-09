@@ -92,6 +92,7 @@ namespace mpESKD.Base.Properties
                 EntityType = entityType;
                 foreach (var propertyInfo in entityType.GetProperties().Where(x => x.GetCustomAttribute<EntityPropertyAttribute>() != null))
                 {
+                    var regexInputRestrictionAttribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                     var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                     if (attribute != null)
                     {
@@ -101,7 +102,8 @@ namespace mpESKD.Base.Properties
                                 attribute,
                                 entityType,
                                 StyleManager.GetStyleNameByGuid(entityType, _intellectualEntity.StyleGuid),
-                                _blkRefObjectId);
+                                _blkRefObjectId,
+                                regexInputRestrictionAttribute);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -111,7 +113,8 @@ namespace mpESKD.Base.Properties
                                 attribute, 
                                 entityType,
                                 blockReference.Layer,
-                                _blkRefObjectId);
+                                _blkRefObjectId,
+                                regexInputRestrictionAttribute);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -121,7 +124,8 @@ namespace mpESKD.Base.Properties
                                 attribute,
                                 entityType,
                                 blockReference.Linetype,
-                                _blkRefObjectId);
+                                _blkRefObjectId,
+                                regexInputRestrictionAttribute);
                             property.PropertyChanged += Property_PropertyChanged;
                             Properties.Add(property);
                         }
@@ -134,7 +138,8 @@ namespace mpESKD.Base.Properties
                                     attribute, 
                                     entityType, 
                                     value,
-                                    _blkRefObjectId);
+                                    _blkRefObjectId,
+                                    regexInputRestrictionAttribute);
                                 property.PropertyChanged += Property_PropertyChanged;
                                 Properties.Add(property);
                             }

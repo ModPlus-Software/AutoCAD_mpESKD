@@ -111,6 +111,7 @@
         {
             foreach (var propertyInfo in entityType.GetProperties())
             {
+                var regexInputRestrictionAttribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                 if (attribute != null && attribute.Name != "Style")
                 {
@@ -125,7 +126,8 @@
                             attribute, 
                             entityType,
                             AcadUtils.AnnotationScaleFromString(attribute.DefaultValue.ToString()),
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                     else if (attribute.Name == "LayerName")
                     {
@@ -135,7 +137,8 @@
                             AcadUtils.Layers.Contains(attribute.DefaultValue.ToString())
                                 ? attribute.DefaultValue
                                 : Language.GetItem("defl"),
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                     else
                     {
@@ -143,7 +146,8 @@
                             attribute,
                             entityType,
                             attribute.DefaultValue,
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                 }
             }
@@ -160,6 +164,7 @@
             var entityType = entity.GetType();
             foreach (var propertyInfo in entityType.GetProperties())
             {
+                var regexInputRestrictionAttribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                 if (attribute != null && attribute.Name != "Style")
                 {
@@ -174,7 +179,8 @@
                             attribute, 
                             entityType,
                             blockReference.Layer,
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                     else if (attribute.Name == "LineType")
                     {
@@ -182,7 +188,8 @@
                             attribute,
                             entityType,
                             blockReference.Linetype,
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                     else
                     {
@@ -190,7 +197,8 @@
                             attribute,
                             entityType,
                             propertyInfo.GetValue(entity),
-                            ObjectId.Null));
+                            ObjectId.Null,
+                            regexInputRestrictionAttribute));
                     }
                 }
             }
@@ -258,6 +266,7 @@
                     // get properties from file
                     foreach (var propertyInfo in entityType.GetProperties())
                     {
+                        var regexInputRestrictionAttribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                         var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                         if (attribute != null)
                         {
@@ -272,7 +281,8 @@
                                         attribute, 
                                         entityType,
                                         AcadUtils.AnnotationScaleFromString(xmlValue),
-                                        ObjectId.Null));
+                                        ObjectId.Null,
+                                        regexInputRestrictionAttribute));
                                 }
                                 else
                                 {
@@ -282,7 +292,8 @@
                                             attribute,
                                             entityType,
                                             xmlProperty.Attribute("Value").Value,
-                                            ObjectId.Null));
+                                            ObjectId.Null,
+                                            regexInputRestrictionAttribute));
                                     }
                                     else if (valueType == typeof(int))
                                     {
@@ -290,7 +301,8 @@
                                             attribute, 
                                             entityType,
                                             int.TryParse(xmlValue, out var i) ? i : attribute.DefaultValue,
-                                            ObjectId.Null));
+                                            ObjectId.Null,
+                                            regexInputRestrictionAttribute));
                                     }
                                     else if (valueType == typeof(double))
                                     {
@@ -298,7 +310,8 @@
                                             attribute, 
                                             entityType,
                                             double.TryParse(xmlValue, out var d) ? d : attribute.DefaultValue,
-                                            ObjectId.Null));
+                                            ObjectId.Null,
+                                            regexInputRestrictionAttribute));
                                     }
                                     else if (valueType == typeof(bool))
                                     {
@@ -306,7 +319,8 @@
                                             attribute, 
                                             entityType,
                                             bool.TryParse(xmlValue, out var b) ? b : attribute.DefaultValue,
-                                            ObjectId.Null));
+                                            ObjectId.Null,
+                                            regexInputRestrictionAttribute));
                                     }
                                     else if (valueType.IsEnum)
                                     {
@@ -316,7 +330,8 @@
                                                 attribute,
                                                 entityType,
                                                 Enum.Parse(attribute.DefaultValue.GetType(), xmlValue),
-                                                ObjectId.Null));
+                                                ObjectId.Null,
+                                                regexInputRestrictionAttribute));
                                         }
                                         catch
                                         {
@@ -324,7 +339,8 @@
                                                 attribute, 
                                                 entityType,
                                                 attribute.DefaultValue,
-                                                ObjectId.Null));
+                                                ObjectId.Null,
+                                                regexInputRestrictionAttribute));
                                         }
                                     }
                                 }
@@ -350,6 +366,7 @@
         {
             foreach (var propertyInfo in entityType.GetProperties())
             {
+                var regexInputRestrictionAttribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                 var attribute = propertyInfo.GetCustomAttribute<EntityPropertyAttribute>();
                 if (attribute != null && attribute.Name != "Style")
                 {
@@ -365,7 +382,8 @@
                         attribute,
                         entityType,
                         attribute.DefaultValue,
-                        ObjectId.Null));
+                        ObjectId.Null,
+                        regexInputRestrictionAttribute));
                     }
                 }
             }

@@ -24,14 +24,17 @@
         /// <param name="entityType">Тип интеллектуального объекта</param>
         /// <param name="value">Значение свойства</param>
         /// <param name="ownerObjectId">Идентификатор блока</param>
+        /// <param name="regexInputRestrictionAttribute">Экземпляр атрибута <see cref="Attributes.RegexInputRestrictionAttribute"/></param>
         public SmartEntityProperty(
             EntityPropertyAttribute attribute,
             Type entityType,
             object value,
-            ObjectId ownerObjectId)
+            ObjectId ownerObjectId,
+            RegexInputRestrictionAttribute regexInputRestrictionAttribute)
         {
             EntityType = entityType;
             OwnerObjectId = ownerObjectId;
+            RegexInputRestrictionAttribute = regexInputRestrictionAttribute;
             Category = attribute.Category;
             OrderIndex = attribute.OrderIndex;
             Name = attribute.Name;
@@ -84,6 +87,15 @@
         /// При работе со стилями свойство равно ObjectId.Null
         /// </summary>
         public ObjectId OwnerObjectId { get; }
+
+        /// <summary>
+        /// Экземпляр атрибута <see cref="Attributes.RegexInputRestrictionAttribute"/>
+        /// <para>
+        /// Данное свойство используется для "прокидывания" атрибута <see cref="Attributes.RegexInputRestrictionAttribute"/>
+        /// в окно редактора стилей
+        /// </para>
+        /// </summary> 
+        public RegexInputRestrictionAttribute RegexInputRestrictionAttribute { get; }
 
         /// <summary>
         /// Категория свойства

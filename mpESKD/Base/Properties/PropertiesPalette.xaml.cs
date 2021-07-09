@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
@@ -22,6 +23,7 @@
     using ModPlusStyle.Transitions;
     using Styles;
     using Utils;
+    using View;
     using Visibility = System.Windows.Visibility;
 
     /// <summary>
@@ -160,8 +162,11 @@
             foreach (var entityGroup in entityGroups)
             {
                 // Тип примитива может содержать атрибуты указывающие зависимость видимости свойств
-                // Собираю их в список для последующей работы
                 var visibilityDependencyAttributes = GetVisibilityDependencyAttributes(entityGroup.Key);
+
+                // и атрибуты, задающие ограничение на ввод для текстовых свойств
+                var regexInputRestrictionAttributes = GetRegexInputRestrictionAttributes(entityGroup.Key);
+
                 var allEntitySummaryProperties = entityGroup.Select(g => g).ToList();
 
                 var c = entityGroup.SelectMany(sp => sp.EntityPropertyDataCollection).Select(p => p.OwnerObjectId).Distinct().Count();
@@ -392,10 +397,10 @@
                                         };
                                         Grid.SetColumn(tb, 2);
                                         Grid.SetRow(tb, j);
-                                        
+
                                         SetDescription(tb, propertyDescription);
                                         SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
-                                        tb.Text = summaryProperty.IntValue.HasValue 
+                                        tb.Text = summaryProperty.IntValue.HasValue
                                             ? summaryProperty.IntValue.ToString()
                                             : different;
 
@@ -542,6 +547,9 @@
                                         tb, TextBox.TextProperty, CreateTwoWayBindingForProperty(summaryProperty));
                                     tb.IsReadOnly = entityProperty.IsReadOnly;
 
+                                    if (regexInputRestrictionAttributes.ContainsKey(summaryProperty.PropertyName))
+                                        SetInputRestriction(tb, regexInputRestrictionAttributes[summaryProperty.PropertyName]);
+
                                     grid.Children.Add(tb);
                                 }
                                 catch (Exception exception)
@@ -643,6 +651,21 @@
             foreach (var propertyInfo in entityType.GetProperties())
             {
                 var attribute = propertyInfo.GetCustomAttribute<PropertyVisibilityDependencyAttribute>();
+                if (attribute != null)
+                {
+                    dictionary.Add(propertyInfo.Name, attribute);
+                }
+            }
+
+            return dictionary;
+        }
+
+        private Dictionary<string, RegexInputRestrictionAttribute> GetRegexInputRestrictionAttributes(Type entityType)
+        {
+            var dictionary = new Dictionary<string, RegexInputRestrictionAttribute>();
+            foreach (var propertyInfo in entityType.GetProperties())
+            {
+                var attribute = propertyInfo.GetCustomAttribute<RegexInputRestrictionAttribute>();
                 if (attribute != null)
                 {
                     dictionary.Add(propertyInfo.Name, attribute);
@@ -856,7 +879,7 @@
 
         private void LmSettings_OnClick(object sender, RoutedEventArgs e)
         {
-            var lmSetting = new View.PaletteSettings();
+            var lmSetting = new PaletteSettings();
             lmSetting.ShowDialog();
 
             if (MainSettings.Instance.AddToMpPalette)
@@ -881,6 +904,45 @@
                 if (child is Expander expander)
                     expander.IsExpanded = false;
             }
+        }
+
+        private void SetInputRestriction(TextBox tb, RegexInputRestrictionAttribute regexInputRestrictionAttribute)
+        {
+            tb.SetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty, regexInputRestrictionAttribute.Pattern);
+            tb.PreviewTextInput += TbOnPreviewTextInput;
+            DataObject.AddPastingHandler(tb, TbOnPasting);
+        }
+
+        private void TbOnPasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.GetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty) is string pattern)
+            {
+                if (e.DataObject.GetDataPresent(typeof(string)))
+                {
+                    var text = (string)e.DataObject.GetData(typeof(string));
+                    if (!IsAllowedText(text, pattern))
+                        e.CancelCommand();
+                }
+                else
+                {
+                    e.CancelCommand();
+                }
+            }
+        }
+
+        private void TbOnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (sender is TextBox tb &&
+                tb.GetValue(TextBoxAttachedProperties.InputRestrictionRegexPatternProperty) is string pattern)
+            {
+                e.Handled = !IsAllowedText(e.Text, pattern);
+            }
+        }
+
+        private bool IsAllowedText(string text, string pattern)
+        {
+            return new Regex(pattern).IsMatch(text);
         }
     }
 }
