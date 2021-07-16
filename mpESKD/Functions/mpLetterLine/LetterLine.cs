@@ -385,31 +385,31 @@ namespace mpESKD.Functions.mpLetterLine
                 {
                     for (var i = 0; i < strokeSpaceParams.Count; i++)
                     {
-                        if (i % 2 == 0)
+                        if (i % 2 != 0) continue;
+                        var curLength = strokeSpaceParams.Take(i).Sum();
+                        var curElemLength = strokeSpaceParams[i];
+                        Point3d curPoint;
+                        Point3d curNextPt;
+
+                        if (i != 0)
                         {
-                            var curLength = strokeSpaceParams.Take(i).Sum();
-                            var curElemLength = strokeSpaceParams[i];
-                            Point3d curPoint;
-                            Point3d curNextPt;
-
-                            if (i != 0)
-                            {
-                                curPoint = previousPoint + (normal * curLength) * i * round;
-                                curNextPt = previousPoint + normal * (curLength + curElemLength) * i * round;
-                            }
-                            else
-                            {
-                                curPoint = previousPoint + (normal * curLength)*round;
-                                curNextPt = previousPoint + normal * (curLength + curElemLength) * round;
-                            }
-
-
-                            Line line = new Line(curPoint, curNextPt);
-                            _lines.Add(line);
+                            curPoint = previousPoint + (normal * curLength) * i * round;
+                            curNextPt = previousPoint + normal * (curLength + curElemLength) * i * round;
                         }
+                        else
+                        {
+                            curPoint = previousPoint + (normal * curLength)*round;
+                            curNextPt = previousPoint + normal * (curLength + curElemLength) * round;
+                        }
+
+
+                        Line line = new Line(curPoint, curNextPt);
+                        _lines.Add(line);
+                        
                     }
 
-                    sumLengthOfLines = +strokesLength;
+                    round++;
+                    sumLengthOfLines += strokesLength;
                 }
 
 
