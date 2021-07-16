@@ -327,9 +327,21 @@ namespace mpESKD.Functions.mpLetterLine
         {
             _texts.Clear();
             _mTextMasks.Clear();
+            _lines.Clear();
+            var points = Get3dPoints(insertionPoint, middlePoints, endPoint);
+            
+            if (!LineGeneration)
+            {
+                _texts.AddRange(CreateMTextsByPoints(points));
+            }
+            else
+            {
+                CreateMtextOnWholeLenghtOfPolyline();
+            }
+
             if (LetterLineType == LetterLineType.Standart)
             {
-                var points = Get3dPoints(insertionPoint, middlePoints, endPoint);
+                
                 _mainPolyline = new Polyline(points.Count);
                 SetImmutablePropertiesToNestedEntity(_mainPolyline);
                 for (var i = 0; i < points.Count; i++)
@@ -340,35 +352,28 @@ namespace mpESKD.Functions.mpLetterLine
                 _segmentsCount = 0;
                 if (!(_mainPolyline.Length >= MinDistanceBetweenPoints)) return;
 
-                if (!LineGeneration)
-                {
-                    _texts.AddRange(CreateMTextsByPoints(points));
-                }
-                else
-                {
-                    CreateMtextOnWholeLenghtOfPolyline();
-                }
             }
+
             else
             {
-                var points = Get3dPoints(insertionPoint, middlePoints, endPoint);
-                _texts.AddRange(CreateMTextsByPoints(points));
+               
                 _textPoints.Add(endPoint);
+                
                 for (int i = 1; i < _textPoints.Count; i++)
                 {
+
                     var previousPoint = _textPoints[i - 1];
                     var currentPoint = _textPoints[i];
-                    CreateLinesBeetwin2Points(previousPoint, currentPoint);
+                    _lines.AddRange(CreateLinesBeetwin2Points(previousPoint, currentPoint));
                 }
-
             }
         }
 
 
-        private void CreateLinesBeetwin2Points(Point3d previousPoint, Point3d currentPoint)
+        private List<Line> CreateLinesBeetwin2Points(Point3d previousPoint, Point3d currentPoint)
         {
+            List<Line> lines = new List<Line>();
             var segmentVector = currentPoint - previousPoint;
-
 
             //TODO find to create lines
 
@@ -398,23 +403,22 @@ namespace mpESKD.Functions.mpLetterLine
                         }
                         else
                         {
-                            curPoint = previousPoint + (normal * curLength)*round;
-                            curNextPt = previousPoint + normal * (curLength + curElemLength) * round;
+                            curPoint = previousPoint + (normal * curLength);
+                            curNextPt = previousPoint + normal * (curLength + curElemLength);
                         }
 
-
                         Line line = new Line(curPoint, curNextPt);
-                        _lines.Add(line);
-                        
+                        lines.Add(line);
                     }
 
+                    previousPoint += strokesLength * normal;
                     round++;
                     sumLengthOfLines += strokesLength;
                 }
 
 
-
-                var rounds = segmentVector.Length / strokesLength;
+                
+                //var rounds = segmentVector.Length / strokesLength;
 
                 //if (rounds < 1)
                 //{
@@ -455,6 +459,8 @@ namespace mpESKD.Functions.mpLetterLine
                 //}
 
             }
+
+            return lines;
         }
 
         private void CreateLines(Point3d previousPoint, Point3d currentPoint, Vector3d segmentVector)
