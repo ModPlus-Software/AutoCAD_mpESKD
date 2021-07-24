@@ -14,7 +14,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -29,7 +29,7 @@
         <Button Grid.Row="1"
                 HorizontalAlignment="Center"
                 IsDefault="True"
-                Content="{Binding Source={StaticResource Lang}, XPath=accept}"
+                Content="{Binding Source={StaticResource LangCommon}, XPath=accept}"
                 Name="BtAccept"
                 Click="BtAccept_OnClick"></Button>
     </Grid>

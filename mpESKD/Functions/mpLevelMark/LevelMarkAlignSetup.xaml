@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common"/>
         </ResourceDictionary>
     </Window.Resources>
     <StackPanel Orientation="Vertical">
@@ -22,7 +23,7 @@
         <CheckBox Name="ChkAlignBasePoints"
                   Content="{Binding Source={StaticResource Lang}, XPath=h112}"
                   Checked="ChkAlignOption_OnChecked" Unchecked="ChkAlignOption_OnUnchecked"/>
-        <Button Name="BtAccept" Content="{Binding Source={StaticResource Lang}, XPath=next}"
+        <Button Name="BtAccept" Content="{Binding Source={StaticResource LangCommon}, XPath=continue}"
                 IsEnabled="False"
                 HorizontalAlignment="Center" Click="BtAccept_OnClick"/>
     </StackPanel>

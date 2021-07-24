@@ -127,7 +127,7 @@
     <When Condition="'$(Configuration)'=='A2022' or '$(Configuration)'=='Debug'">
       <ItemGroup>
         <PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
-        <PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="6.4.0" />
+        <PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="6.4.0" ExcludeAssets="runtime" />
       </ItemGroup>
     </When>
   </Choose>

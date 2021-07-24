@@ -12,6 +12,7 @@
                 <ResourceDictionary Source="../Controls/ControlStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -28,7 +29,7 @@
             <RowDefinition Height="Auto" MinHeight="60"></RowDefinition>
         </Grid.RowDefinitions>
         <Button Grid.Row="0" Visibility="Hidden" MinWidth="0" 
-                Content="{Binding Source={StaticResource Lang}, XPath=collapse}" 
+                Content="{Binding Source={StaticResource LangCommon}, XPath=collapse}" 
                 HorizontalAlignment="Left" VerticalAlignment="Center"
                 Name="BtCollapseAll" Click="BtCollapseAll_OnClick"
                 Margin="2" Style="{DynamicResource ModPlusFlatButton}"/>
