@@ -576,6 +576,7 @@ namespace mpESKD.Functions.mpLetterLine
                 Point3d curPoint;
                 Point3d curNextPt;
 
+
                 if (i != 0)
                 {
                     curPoint = segmentStartPoint + (normal * curLength) * i * round;
