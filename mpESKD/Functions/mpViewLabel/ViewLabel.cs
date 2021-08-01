@@ -124,7 +124,7 @@
         /// <summary>
         /// Тип вида (разрез или вид)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p103", ViewLabelType.View, descLocalKey: "d86")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p103", ViewLabelType.View, descLocalKey: "d103")]
         [SaveToXData]
         public ViewLabelType ViewType { get; set; }
 
