@@ -228,6 +228,9 @@ namespace mpESKD.Functions.mpLetterLine
         /// </summary>
         private List<Point3d> _textPoints = new List<Point3d>();
 
+        private Vector3d _normal;
+        private List<double> _strokeSpaceParams;
+
         /// <inheritdoc />
         public void RebasePoints()
         {
@@ -325,15 +328,11 @@ namespace mpESKD.Functions.mpLetterLine
             if (LetterLineType == LetterLineType.Composite)
             {
                 _textPoints.Add(endPoint);
-                var strokeSpaceParams = GetStrokesData();
-                if (strokeSpaceParams != null)
+                _strokeSpaceParams = GetStrokesData();
+                if (_strokeSpaceParams == null) return;
+                for (int i = 1; i < points.Count; i++)
                 {
-                    for (int i = 1; i < _textPoints.Count; i++)
-                    {
-                        var previousPoint = _textPoints[i - 1];
-                        var currentPoint = _textPoints[i];
-                        _lines.AddRange(CreateLinesBeetwin2Points(previousPoint, currentPoint));
-                    }
+                    _lines.AddRange(CreateLinesBeetwin2Points(points[i - 1], points[i]));
                 }
             }
             else
@@ -353,19 +352,75 @@ namespace mpESKD.Functions.mpLetterLine
 
         private List<Line> CreateLinesBeetwin2Points(Point3d previousPoint, Point3d currentPoint)
         {
-            /*var lines = new List<Line>();
+            var lines = new List<Line>();
+            // 1. По двум точкам находим вектор, потом нормаль
             var segmentVector = currentPoint - previousPoint;
-
-            //TODO find to create lines
-            var strokeSpaceParams = GetStrokesData();
-            var strokesLength = strokeSpaceParams.Sum();
             var vectorLength = segmentVector.Length;
-            var normal = segmentVector.GetNormal();
+            _normal = segmentVector.GetNormal();
+
+            var offsetDistance = (_texts[0].ActualWidth / 2) + TextMaskOffset;
+
+            // 2. находим ближающую точку расположения мтекста
+            // длина от первой точки до первого мтекста и строим от нее составные линии 
+            var lengthOfPartSegment = (_texts[0].Location - previousPoint).Length - offsetDistance;
+            var strokesLength = _strokeSpaceParams.Sum();
+
+            int rounds = (int) (lengthOfPartSegment / strokesLength);
+
+            AcadUtils.WriteMessageInDebug($"{rounds} линий должно быть в длине {lengthOfPartSegment} ");
+
+            var nextPoint = new Vector3d();
+            var firstPoint = previousPoint;
+            for (int i = 0; i < rounds; i++)
+            {
+                firstPoint += nextPoint;
+                AcadUtils.WriteMessageInDebug($"начальная точка {firstPoint}");
+                _lines.AddRange(CreateAllLinesInStrokes(firstPoint));
+                nextPoint = (_normal * strokesLength);
+            }
+
+            var pointAfterRounds = previousPoint + _normal * (strokesLength * rounds);
+            var finalLength = lengthOfPartSegment - strokesLength * rounds;
+            _lines.AddRange(CreateLinesFromLength(finalLength, pointAfterRounds));
+
+            // тут надо пройтись по точкам мтекста
+            /*for (int i = 1; i < _texts.Count; i++)
+            {
+                var prevTextPoint = _texts[i - 1].Location + (_normal * offsetDistance);
+                var curTextPoint = _texts[i - 1].Location;
+                lengthOfPartSegment = (prevTextPoint - curTextPoint).Length - offsetDistance;
+
+                var roundsOf = lengthOfPartSegment / strokesLength;
+
+                nextPoint = new Vector3d();
+
+                for (int i1 = 0; i1 < roundsOf; i1++)
+                {
+                    prevTextPoint += nextPoint;
+                    AcadUtils.WriteMessageInDebug($"начальная точка {previousPoint}");
+                    _lines.AddRange(CreateAllLinesInStrokes(previousPoint));
+                    nextPoint = (_normal * strokesLength);
+                }
+
+                var length = lengthOfPartSegment - strokesLength * rounds;
+            }*/
+
+/*
+            // 3. при первом построении от начальной точки до мтекста строим линию, длина этой линии
+            // до границы Wipeout мтекста, для этого узнаем расстояние до мтекста и отнимаем половину границы и оффсета,
+            // затем строим составную линию, для построения составной линии определенной длиниы,
+            // сначала длину сегмента делим на длину составной линии, если целое число строим столько целых
+            // составных линий, для отстатка строим пока длина составной линии не достигнет длины остатка,
+            // последнюю часть если линия обрезаем, если пробел ?
+
+            Point3d lastPoint = default(Point3d);
+            Point3d prevSumOfStrokes = default(Point3d);
             var sumLengthOfLines = 0.0;
             if (strokeSpaceParams != null)
             {
-                AcadUtils.WriteMessageInDebug(
-                    $"в длину  {vectorLength} поместится {(int) (vectorLength / strokesLength)} и не полностью {vectorLength % strokesLength} ");
+                string str =
+                    $"в длину  {vectorLength} поместится {(int)(vectorLength / strokesLength)} и не полностью {vectorLength % strokesLength} ";
+                AcadUtils.WriteMessageInDebug(str);
                 int round = 1;
                 while (sumLengthOfLines < vectorLength)
                 {
@@ -395,104 +450,10 @@ namespace mpESKD.Functions.mpLetterLine
                     previousPoint += strokesLength * normal;
                     round++;
                     sumLengthOfLines += strokesLength;
-                }*/
+                }
 
-                List<Line> lines = new List<Line>();
-                var strokeSpaceParams = GetStrokesData();
-                var strokesLength = strokeSpaceParams.Sum();
-                // TODO find to create lines
-                // 1. По двум точкам находим вектор, потом нормаль
-                var segmentVector = currentPoint - previousPoint;
-                var normal = segmentVector.GetNormal();
-                // 2. находим ближающую точку расположения мтекста
-                var offsetDistance = (_texts[0].ActualWidth / 2) + TextMaskOffset;
-                var vectorLength = (_texts[0].Location - previousPoint).Length - offsetDistance;
-                var roundsOfStrokes = (int)(vectorLength / strokesLength);
-    
-        
-                // 3. при первом построении от начальной точки до мтекста строим линию, длина этой линии
-                // до границы Wipeout мтекста, для этого узнаем расстояние до мтекста и отнимаем половину границы и оффсета,
-                // затем строим составную линию, для построения составной линии определенной длиниы,
-                // сначала длину сегмента делим на длину составной линии, если целое число строим столько целых
-                // составных линий, для отстатка строим пока длина составной линии не достигнет длины остатка,
-                // последнюю часть если линия обрезаем, если пробел ? 
-                //    
-    
-                var sumLengthOfLines = 0.0;
-                if (strokeSpaceParams != null)
-                {
-                    string str =
-                        $"в длину  {vectorLength} поместится {(int) (vectorLength / strokesLength)} и не полностью {vectorLength % strokesLength} ";
-                    AcadUtils.WriteMessageInDebug(str);
-                    int round = 1;
-                    Point3d lastPoint = default(Point3d);
-                    Point3d prevSumOfStrokes = default(Point3d);
-    
-                    for (int j = 0; j < roundsOfStrokes; j++)
-                    {
-                        for (var i = 0; i < strokeSpaceParams.Count; i++)
-                        {
-                            var curLength = strokeSpaceParams.Take(i+1).Sum();
-                            if (i % 2 != 0)
-                            {
-                                previousPoint += (normal * curLength * (j + 1));
-                                continue;
-                            }
-                            
-                            var curElemLength = strokeSpaceParams[i];
-                            Point3d curPoint;
-                            Point3d curNextPt;
-    
-                            if (i == 0)
-                            {
-                                curPoint = previousPoint + (normal * curLength * (j + 1));
-                                curNextPt = previousPoint + (normal * (curLength + curElemLength) * (j + 1));
-                            }
-                            else
-                            {
-                                curPoint = prevSumOfStrokes + normal * curLength * (j + 1);
-                                curNextPt = prevSumOfStrokes + (normal * (curLength + curElemLength) * (j + 1));
-                            }
-    
-                            Line line = new Line(curPoint, curNextPt);
-                            lines.Add(line);
-                            previousPoint = curNextPt;
-                        }
-                    }
-    
-    /*
-                    while (sumLengthOfLines < vectorLength)
-                    {
-                        for (var i = 0; i < strokeSpaceParams.Count; i++)
-                        {
-                            if (i % 2 != 0)
-                                continue;
-                            var curLength = strokeSpaceParams.Take(i).Sum();
-                            var curElemLength = strokeSpaceParams[i];
-                            Point3d curPoint;
-                            Point3d curNextPt;
-    
-                            if (i != 0)
-                            {
-                                curPoint = prevSumOfStrokes + normal * curLength;
-                                curNextPt = prevSumOfStrokes + (normal * (curLength + curElemLength));
-                            }
-                            else
-                            {
-                                curPoint = previousPoint + (normal * curLength);
-                                curNextPt = previousPoint + (normal * (curLength + curElemLength));
-                            }
-    
-                            Line line = new Line(curPoint, curNextPt);
-                            lines.Add(line);
-                        }
-    
-                        prevSumOfStrokes += strokesLength * normal;
-                        round++;
-                        sumLengthOfLines += strokesLength;
-                        lastPoint = previousPoint + (normal * sumLengthOfLines);
-                        AcadUtils.WriteMessageInDebug($"последняя точка {lastPoint}, предыдущая точка {previousPoint}");
-                    }
+                lines = new List<Line>();
+                strokeSpaceParams = GetStrokesData();
 
 
                 var lastPartOfSegment = currentPoint - lastPoint;
@@ -509,9 +470,9 @@ namespace mpESKD.Functions.mpLetterLine
                 {
                     AcadUtils.WriteMessageInDebug(
                         $"С предыдущией точки {previousPoint} проложить линии длиной {lastPartOfSegment2.Length}");
-                }*/
+                }
 
-                /*var rounds = segmentVector.Length / strokesLength;
+                var rounds = segmentVector.Length / strokesLength;
 
                 if (rounds < 1)
                 {
@@ -521,7 +482,8 @@ namespace mpESKD.Functions.mpLetterLine
                     while (lineSum <= vectorLength)
                     {
                         lineSum = +strokeSpaceParams[j];
-                        AcadUtils.WriteMessageInDebug($"длина вектора { vectorLength}, длина суммированая {lineSum} ");
+                        AcadUtils.WriteMessageInDebug(
+                            $"длина вектора {vectorLength}, длина суммированая {lineSum} ");
                         j++;
                         elementOfStrokeParam = j;
                     }
@@ -533,106 +495,103 @@ namespace mpESKD.Functions.mpLetterLine
 
                     // реальная длина последней части
                     double realLastPartLength = strokeSpaceParams[elementOfStrokeParam - 1];
-                    AcadUtils.WriteMessageInDebug($"длина вектора { vectorLength}, необходимая длина последней части {neededLengthOfLastPart},  реальная длина последней части {realLastPartLength}");
-
-
-                }*/
+                    AcadUtils.WriteMessageInDebug(
+                        $"длина вектора {vectorLength}, необходимая длина последней части {neededLengthOfLastPart},  реальная длина последней части {realLastPartLength}");
+                }
+                
                 // если длина сегмента больше длины составной линии, то линия должна повторятся
-                /*else
-                {
-                    int i = 0;
-                    while (i <= rounds)
-                    {
-                        for (int k = 0; k < strokeSpaceParams; k++)
-                        {
-                            if ()
-                        }
-                        i++;
-                    }
-                }*/
-            }
+            }*/
 
             return lines;
         }
 
-        private List<Line> CreateSegmentFromCompositeLines(double lengthOfSegment, Point3d segmentStartPoint,
-            Point3d segmentEndPoint)
+        // TODO  сделать метод возвращающий список линий от заданных точек в котором полностью повторяются коллекция штрихов
+        /// <summary>
+        /// создает список линий из коллекции штрихов, длина линий это нечетные номера, проходимся
+        /// по коллекции и создаем по одной линии на каждый нечетную цифру, потом этот метод будет
+        /// повтортся в зависимости от длины заданных точек
+        /// </summary>
+        /// <param name="previousPoint">предыдущая точка</param>
+        /// <param name="normal"> нормаль </param>
+        /// <returns>возращаест список линий</returns>
+        private List<Line> CreateAllLinesInStrokes(Point3d previousPoint)
         {
             var lines = new List<Line>();
-            var segmentVector = segmentEndPoint - segmentStartPoint;
-            var strokeSpaceParams = GetStrokesData();
-            var strokesLength = strokeSpaceParams.Sum();
-            var segmentVectorLength = segmentVector.Length;
-            var normal = segmentVector.GetNormal();
-            var sumLengthOfLines = 0.0;
 
-            var roundsOfWholeLines = segmentVectorLength / strokesLength;
-
-            for (var i = 1; i < strokeSpaceParams.Count; i++)
+            for (var i = 0; i <= _strokeSpaceParams.Count; i++)
             {
-                if (i % 2 != 0) continue;
-                var curLength = strokeSpaceParams.Take(i).Sum();
-                var curElemLength = strokeSpaceParams[i];
-                Point3d curPoint;
-                Point3d curNextPt;
+                if (i % 2 == 0) continue;
 
+                var line = GetLinesFromStrokesFromIteration(previousPoint, i);
 
-                if (i != 0)
-                {
-                    curPoint = segmentStartPoint + (normal * curLength) * i * round;
-                    curNextPt = previousPoint + normal * (curLength + curElemLength) * i * round;
-                }
-                else
-                {
-                    curPoint = previousPoint + (normal * curLength);
-                    curNextPt = previousPoint + normal * (curLength + curElemLength);
-                }
-
-                Line line = new Line(curPoint, curNextPt);
                 lines.Add(line);
-                
+                AcadUtils.WriteMessageInDebug(
+                    $"линия #{lines.Count} длиной {line.Length} в точках{line.StartPoint} - {line.EndPoint} создана");
             }
 
-            previousPoint += strokesLength * normal;
-            round++;
-            sumLengthOfLines += strokesLength;
             return lines;
         }
-        
-// TODO  сделать метод возвращаюий список линий от заданных точек в котором полностью повторяются штрихи
-        private List<Line> CreateAllLinesInStrokes(Point3d previousPoint, Vector3d normal)
+
+        private Line GetLinesFromStrokesFromIteration(Point3d previousPoint, int i)
         {
-            var lines = new List<Line>();
-            var strokeSpaceParams = GetStrokesData();
-            for (var i = 1; i < strokeSpaceParams.Count; i++)
-            {
-                if (i % 2 != 0) continue;
-                var curLength = strokeSpaceParams.Take(i).Sum();
-                var curElemLength = strokeSpaceParams[i];
-                Point3d curPoint;
-                Point3d curNextPt;
-                
-                if (i != 0)
-                {
-                    curPoint = segmentStartPoint + (normal * curLength) * i * round;
-                    curNextPt = previousPoint + normal * (curLength + curElemLength) * i * round;
-                }
-                else
-                {
-                    curPoint = previousPoint + (normal * curLength);
-                    curNextPt = previousPoint + normal * (curLength + curElemLength);
-                }
-            }
+            var curLength = _strokeSpaceParams.Take(i - 1).Sum();
+            var curElemLength = _strokeSpaceParams[i - 1];
+            var line = GetLinesFromStrokes(previousPoint, curLength, curElemLength);
 
-            return lines;
+            return line;
         }
         
-        // TODO  сделать метод возвращаюий список линий  которые зависит от длины, которая меньши длины всех штрихов
         private List<Line> CreateLinesFromLength(double length, Point3d position)
         {
-            
+            var lines = new List<Line>();
+            var curLength = 0.0;
+            for (var i = 1; i <= _strokeSpaceParams.Count; i++)
+            {
+                var curElemLength = _strokeSpaceParams[i - 1];
+                if (i % 2 == 0)
+                {
+                    length -= curElemLength;
+                    continue;
+                }
+
+                if (curElemLength < length)
+                {
+                    var line = GetLinesFromStrokesFromIteration(position, i);
+                    lines.Add(line);
+                    AcadUtils.WriteMessageInDebug(
+                        $"добавлен отрезок длиной {line.Length} в точках{line.StartPoint} - {line.EndPoint} ");
+                }
+                else
+                {
+                    // TODO
+                    //var lastLength = Math.Abs(_strokeSpaceParams.Take(i - 2).Sum() - length);
+                    var newPosition = position + _normal * _strokeSpaceParams.Take(i - 1).Sum();
+                    var lastLength = length;
+
+                    var line = GetLinesFromStrokes(newPosition, curLength, lastLength);
+                    lines.Add(line);
+                    AcadUtils.WriteMessageInDebug(
+                        $"добавлен недостающий отрезок длиной {line.Length} в точках{line.StartPoint} - {line.EndPoint} ");
+                    break;
+                }
+                
+                length -= curElemLength;
+            }
+
+            return lines;
         }
-        
+
+        private Line GetLinesFromStrokes(Point3d previousPoint, double curLength, double curElemLength)
+        {
+            Point3d curPoint = previousPoint + (_normal * curLength);
+            Point3d curNextPt = previousPoint + _normal * (curLength + curElemLength);
+            Line line = new Line(curPoint, curNextPt);
+            return line;
+        }
+
+        // TODO  сделать метод возвращаюий список линий  которые зависит от длины, которая меньши длины всех штрихов, т.е. должен создать часть из всей колеекции штрихов
+
+
         private void CreateMtextOnWholeLenghtOfPolyline()
         {
             int mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
@@ -666,14 +625,13 @@ namespace mpESKD.Functions.mpLetterLine
                 SetImmutablePropertiesToNestedEntity(mText);
 
                 HideMtextBackground(mText);
-
                 _texts.Add(mText);
             }
         }
 
         private IEnumerable<MText> CreateMTextsByInsertionPoints(Point3dCollection points)
         {
-            var segmentMTextsDependencies = new List<MText>();
+            var mTexts = new List<MText>();
             for (int i = 1; i < points.Count; i++)
             {
                 var previousPoint = points[i - 1];
@@ -708,19 +666,58 @@ namespace mpESKD.Functions.mpLetterLine
                     }
 
                     var mText = GetMTextAtDist(textPt, angle);
-                    segmentMTextsDependencies.Add(mText);
+                    mTexts.Add(mText);
                     HideMtextBackground(mText);
                     sumTextDistanceAtSegment += step;
-
-                    _textPoints.Add(textPt);
 
                     k++;
                 }
             }
 
-            return segmentMTextsDependencies;
+            return mTexts;
         }
 
+        private List<Line> CreateSegmentFromCompositeLines(double lengthOfSegment, Point3d segmentStartPoint,
+            Point3d segmentEndPoint)
+        {
+            var lines = new List<Line>();
+            var segmentVector = segmentEndPoint - segmentStartPoint;
+            var strokesLength = _strokeSpaceParams.Sum();
+            var segmentVectorLength = segmentVector.Length;
+            var normal = segmentVector.GetNormal();
+            var sumLengthOfLines = 0.0;
+
+            var roundsOfWholeLines = segmentVectorLength / strokesLength;
+
+            for (var i = 1; i < _strokeSpaceParams.Count; i++)
+            {
+                if (i % 2 != 0) continue;
+                var curLength = _strokeSpaceParams.Take(i).Sum();
+                var curElemLength = _strokeSpaceParams[i];
+                Point3d curPoint;
+                Point3d curNextPt;
+
+
+                if (i != 0)
+                {
+                    curPoint = segmentStartPoint + (normal * curLength) * i;
+                    curNextPt = segmentStartPoint + normal * (curLength + curElemLength) * i;
+                }
+                else
+                {
+                    curPoint = segmentStartPoint + (normal * curLength);
+                    curNextPt = segmentStartPoint + normal * (curLength + curElemLength);
+                }
+
+                Line line = new Line(curPoint, curNextPt);
+                lines.Add(line);
+            }
+
+            //previousPoint += strokesLength * normal;
+
+            sumLengthOfLines += strokesLength;
+            return lines;
+        }
 
         private IEnumerable<MText> CreateMTextsOnMainPolylineSegment(
             Point3d currentPoint, Point3d previousPoint)
