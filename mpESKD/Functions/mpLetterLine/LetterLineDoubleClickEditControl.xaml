@@ -45,16 +45,6 @@
                      MaxLength="3"
                      mps:TextFieldAssist.ClearTextButton="True"
                      mps:TextFieldAssist.SelectAllOnFocus="True"/>
-
-            <TextBlock Grid.Row="2"
-                       Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p53}"/>
-            <TextBox Grid.Row="2"
-                     Grid.Column="1"
-                     Name="TbSheetNumber" 
-                     MaxLength="5"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
         </Grid>
     </mps:Card>
 </UserControl>
