@@ -416,11 +416,14 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private void CreateLinesByLineGeneration()
         {
-            int mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
+            int mTextsQty = (int)(_mainPolyline.Length / MTextOffset);
             var offset = _mainPolyline.Length - (mTextsQty * MTextOffset);
             var j = 0;
             var lastPoint = new Point3d();
             var segment = 0;
+            int direction = 0;
+            Point3d previousPoint;
+            Point3d currentPoint;
             
             for (int i = 0; i < mTextsQty; i++)
             {
@@ -429,10 +432,9 @@ namespace mpESKD.Functions.mpLetterLine
                 var location = _mainPolyline.GetPointAtDist(distAtPline);
                 var segmentParameterAtPoint = _mainPolyline.GetParameterAtPoint(location);
 
-                Point3d previousPoint;
-                Point3d currentPoint;
+               
 
-                if (segmentParameterAtPoint < 1)
+                if (segmentParameterAtPoint <= 1)
                 {
                     previousPoint = _mainPolyline.GetPoint3dAt(0);
                     currentPoint = _mainPolyline.GetPoint3dAt(1);
@@ -450,55 +452,76 @@ namespace mpESKD.Functions.mpLetterLine
                 var offsetPoint = normal * (_texts[0].ActualWidth / 2 + TextMaskOffset * _scale);
                 if (location == previousPoint)
                     continue;
+                
                 Point3d lastLocation = new Point3d();
+                
                 if (j == 0)
                 {
                     if (offset != 0)
                     {
                         CreateLinesBeetwin2Points(previousPoint, location);
                         segment++;
-                        AcadUtils.WriteMessageInDebug($" сегмент {segment} отрисован, это направление {j}  \n ");
+                        
                         Debug.Print($"previouspoint {previousPoint}, newpoint {location} ");
+                        AcadUtils.WriteMessageInDebug($"_____________________");
+                        AcadUtils.WriteMessageInDebug(
+                            $" сегмент {segment} отрисован, previouspoint {previousPoint}, newpoint {location} это направление {direction}  \n ");
+                        
+                        if ((currentPoint - location).Length > MTextOffset)
+                        {
+                            CreateLinesBeetwin2Points(location, location + normal * MTextOffset);
+                            segment++;
+                            AcadUtils.WriteMessageInDebug(
+                                $" сегмент {segment} отрисован, location {location}, location + normal * MTextOffset {location + normal * MTextOffset} это направление {direction}  \n ");
+
+                        }
+                        
+                        
                     }
                     else
                     {
                         var newPoint = previousPoint + normal * MTextOffset;
                         CreateLinesBeetwin2Points(previousPoint + offsetPoint, newPoint);
-                        
-                        Debug.Print($"previouspoint {previousPoint + offsetPoint}, newpoint {newPoint} ");
                         segment++;
-                        AcadUtils.WriteMessageInDebug($" сегмент {segment} отрисован \n ");
+                        Debug.Print($"previouspoint {previousPoint + offsetPoint}, newpoint {newPoint} ");
+                        AcadUtils.WriteMessageInDebug($"_____________________");
+                        AcadUtils.WriteMessageInDebug($" сегмент {segment} отрисован previouspoint {previousPoint + offsetPoint}, newpoint {newPoint} , это направление {direction} \n ");
                     }
                 }
+                
                 else 
                 {
                     //TODO 
-                    var locPointWithOffset = location + offsetPoint;
-                    var locPointWithMTextOffset = location + (normal * MTextOffset);
+                    var locPointWithOffset = location + offsetPoint - (normal * MTextOffset);
+                    var locPointWithMTextOffset = location;
                     var checkLength = (currentPoint - location).Length;
                     if (checkLength < MTextOffset)
                     {
-                        locPointWithMTextOffset = currentPoint + offsetPoint;
+                        locPointWithMTextOffset = currentPoint - offsetPoint;
                         CreateLinesBeetwin2Points(locPointWithOffset, locPointWithMTextOffset);
+                        AcadUtils.WriteMessageInDebug($"_________________");
+                        segment++;
+                        AcadUtils.WriteMessageInDebug($" в if locPointWithOffset {locPointWithOffset} locPointWithMTextOffset {locPointWithMTextOffset} сегмент {segment} отрисован , это направление {direction} \n ");
                     }
                     else
                     {
-                        CreateLinesBeetwin2Points(lastLocation, location);
-                        AcadUtils.WriteMessageInDebug(
-                            $"в else locPointWithOffset {locPointWithOffset} locPointWithMTextOffset {locPointWithMTextOffset}");
+                        
+                        CreateLinesBeetwin2Points(location - (normal * MTextOffset), location);
+                        AcadUtils.WriteMessageInDebug("________________________");
                         segment++;
-                        AcadUtils.WriteMessageInDebug($" сегмент {segment} отрисован \n ");
+                        AcadUtils.WriteMessageInDebug($"в else locPointWithOffset {lastLocation} locPointWithMTextOffset {location} сегмент {segment} отрисован , это направление {direction} \n ");
                     }
                 }
-
-                lastLocation = location;
+                
+               
                 j++;
-                if (previousPoint != lastPoint)
+                if ((currentPoint - location).Length < MTextOffset)
                 {
                     j = 0;
+                    direction++;
                     AcadUtils.WriteMessageInDebug("j обнулен");
                 }
-
+                
                 lastPoint = previousPoint;
             }
         }
