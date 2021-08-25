@@ -149,7 +149,7 @@
         /// <summary>
         /// Длина среднего штриха (половина длины полилинии на переломе)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "h42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
         [SaveToXData]
         public int MiddleStrokeLength { get; set; } = 8;
 
