@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mps="https://modplus.org/winfx/xaml/controls"
-                    xmlns:windows="clr-namespace:ModPlusAPI.Windows;assembly=ModPlusAPI">
+                    >
     <ResourceDictionary.MergedDictionaries>
-        <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
     

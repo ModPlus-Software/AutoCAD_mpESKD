@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:windows="clr-namespace:ModPlusAPI.Windows;assembly=ModPlusAPI">
+                    >
     <ResourceDictionary.MergedDictionaries>
-        <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <Canvas x:Key="ImageLevelMark" Width="190" Height="150">

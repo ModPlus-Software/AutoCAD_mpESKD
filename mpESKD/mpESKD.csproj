@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.15.5.0</Version>
+    <Version>1.15.6.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
   </PropertyGroup>
 
@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2021.2.0" ExcludeAssets="runtime" />
-    <PackageReference Include="ModPlusAPI" Version="7.9.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusAPI" Version="7.12.5" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusStyle" Version="4.1.0" ExcludeAssets="runtime" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
