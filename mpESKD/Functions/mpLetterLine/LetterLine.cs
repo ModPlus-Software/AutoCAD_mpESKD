@@ -71,20 +71,6 @@ namespace mpESKD.Functions.mpLetterLine
         /// <inheritdoc/>
         public override double MinDistanceBetweenPoints => 10.0;
 
-        /// <summary>
-        /// Расстояние между текстами
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 50, 10, 100, nameSymbol: "b")]
-        [SaveToXData]
-        public int MTextOffset { get; set; } = 50;
-
-        /// <summary>
-        /// Отступ группы штрихов
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", 25, 1, 50, nameSymbol: "c")]
-        [SaveToXData]
-        public int Space { get; set; } = 25;
-
         /// <inheritdoc />
         public override string LineType { get; set; }
 
@@ -96,6 +82,20 @@ namespace mpESKD.Functions.mpLetterLine
         [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
         [SaveToXData]
         public override string TextStyle { get; set; }
+
+        /// <summary>
+        /// Расстояние между штрихами
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 50, 10, 100, nameSymbol: "b")]
+        [SaveToXData]
+        public int MTextOffset { get; set; } = 50;
+
+        /// <summary>
+        /// Отступ группы штрихов
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", 25, 1, 50, nameSymbol: "c")]
+        [SaveToXData]
+        public int Space { get; set; } = 25;
 
         /// <summary>
         /// Высота текста
@@ -123,9 +123,9 @@ namespace mpESKD.Functions.mpLetterLine
         public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
-        /// Большой Текст
+        /// Основной текст
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p101", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string MainText { get; set; } = string.Empty;
@@ -133,8 +133,7 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Малый текст
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 8, "p53", "", propertyScope: PropertyScope.Palette,
-            descLocalKey: "d53")]
+        [EntityProperty(PropertiesCategory.Content, 7, "p102", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string SmallText { get; set; } = string.Empty;
@@ -142,7 +141,7 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Текст всегда горизонтально
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p84", false, descLocalKey: "d84")]
+        [EntityProperty(PropertiesCategory.Content, 8, "p84", false, descLocalKey: "d84")]
         [SaveToXData]
         public bool IsTextAlwaysHorizontal { get; set; }
 
@@ -151,7 +150,7 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Генерация типа линий по всей полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 10, "p85", false, descLocalKey: "d85")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p105", false, descLocalKey: "d87")]
         [PropertyVisibilityDependency(new[] {nameof(SpaceAndFirstStrokeOffsetVisibilility)})]
         [SaveToXData]
         public bool LineGeneration
@@ -172,15 +171,15 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Тип линии стандартная или составная
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p103", LetterLineType.Standart, descLocalKey: "d86")]
+        [EntityProperty(PropertiesCategory.Content, 11, "p106", LetterLineType.Standart, descLocalKey: "d88")]
         [SaveToXData]
         public LetterLineType LetterLineType { get; set; }
 
         /// <summary>
         /// Формула для создания линии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p53", "", propertyScope: PropertyScope.Palette,
-            descLocalKey: "d53")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p106", "", propertyScope: PropertyScope.Palette,
+            descLocalKey: "d89")]
         [RegexInputRestriction("[-0-9]")]
         [SaveToXData]
         public string StrokeFormula { get; set; } = string.Empty;
