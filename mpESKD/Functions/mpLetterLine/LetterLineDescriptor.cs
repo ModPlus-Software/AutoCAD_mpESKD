@@ -15,16 +15,16 @@
         public string Name => "mpLetterLine";
 
         /// <inheritdoc />
-        // "Линия грунта";
-        public string LName => Language.GetItem("h73"); //Todo correct
+        // "Буквенная линия";
+        public string LName => Language.GetItem("h161");
 
         /// <inheritdoc />
-        // "Отрисовка линии обозначения грунта";
-        public string Description => Language.GetItem("h74"); //Todo correct
+        // "Отрисовка обозначения буквенной линии";
+        public string Description => Language.GetItem("h163");
 
         /// <inheritdoc />
-        // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию грунта";
-        public string FullDescription => Language.GetItem("h75"); //Todo correct
+        // "Создание интеллектуального объекта на основе анонимного блока, описывающего буквенную линию";
+        public string FullDescription => Language.GetItem("h164");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -38,15 +38,15 @@
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            // "Линия грунта из полилинии"
-            Language.GetItem("h76") //Todo correct
+            // "Буквенная линия  из полилинии"
+            Language.GetItem("h165")
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            // "Конвертирование выбранной полилинии в линию обозначения грунта"
-            Language.GetItem("h77") //Todo correct
+            // "Конвертирование выбранной полилинии в буквенную линию"
+            Language.GetItem("h166")
         };
 
         /// <inheritdoc />

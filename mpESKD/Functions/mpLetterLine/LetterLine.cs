@@ -1,9 +1,8 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using System.Diagnostics;
-
 namespace mpESKD.Functions.mpLetterLine
 {
+    using System.Diagnostics;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -19,8 +18,8 @@ namespace mpESKD.Functions.mpLetterLine
     /// <summary>
     /// Буквенная линия
     /// </summary>
-    [SmartEntityDisplayNameKey("h73")]
-    [SystemStyleDescriptionKey("h78")]
+    [SmartEntityDisplayNameKey("h161")]
+    [SystemStyleDescriptionKey("h162")]
     public class LetterLine : SmartEntity, ILinearEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
@@ -72,6 +71,7 @@ namespace mpESKD.Functions.mpLetterLine
         public override double MinDistanceBetweenPoints => 10.0;
 
         /// <inheritdoc />
+        [EntityProperty(PropertiesCategory.General, 2, "p35", "Continuous", descLocalKey: "d35")]
         public override string LineType { get; set; }
 
         /// <inheritdoc />
@@ -357,8 +357,6 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private void CreateLinesByInsertionPoints(Point3dCollection points)
         {
-            var allVectorLength = 0.0;
-
             var mTextWidthWithOffset = (_texts[0].ActualWidth / 2 + TextMaskOffset * _scale);
             
             for (int i = 1; i < points.Count; i++)
@@ -368,7 +366,6 @@ namespace mpESKD.Functions.mpLetterLine
                 AcadUtils.WriteMessageInDebug($"предыдущая точка {previousPoint} текущая точка {currentPoint}");
                 var segmentVector = currentPoint - previousPoint;
                 
-
                 var normal = segmentVector.GetNormal();
 
                 var sumTextDistanceAtSegment = Space;
@@ -517,7 +514,6 @@ namespace mpESKD.Functions.mpLetterLine
                 }
                 else
                 {
-                    //TODO 
                     var locPointWithOffset = location + (normal * MTextOffset);
 
                     if (checkLength < MTextOffset)
@@ -569,14 +565,11 @@ namespace mpESKD.Functions.mpLetterLine
           // если длина сегмента больше длины составной линии, то линия должна повторятся
           }*/
 
-            // 1. По двум точкам находим вектор, потом нормаль
             var segmentVector = currentPoint - previousPoint;
             _normal = segmentVector.GetNormal();
 
             var offsetDistance = (_texts[0].ActualWidth / 2) + TextMaskOffset * _scale;
 
-            // 2. находим ближающую точку расположения мтекста
-            // длина от первой точки до первого мтекста и строим от нее составные линии 
             var lengthOfPartSegment = (currentPoint - previousPoint).Length - offsetDistance;
 
             _strokeSpaceParams = GetStrokesData();
@@ -586,14 +579,11 @@ namespace mpESKD.Functions.mpLetterLine
 
             int rounds = (int) (lengthOfPartSegment / strokesLength);
 
-            //AcadUtils.WriteMessageInDebug($"{rounds} линий должно быть в длине {lengthOfPartSegment} ");
-
             var nextPoint = new Vector3d();
             var firstPoint = previousPoint;
             for (int i = 0; i < rounds; i++)
             {
                 firstPoint += nextPoint;
-                //AcadUtils.WriteMessageInDebug($"начальная точка {firstPoint}");
                 CreateAllLinesInStrokes(firstPoint);
                 nextPoint = (_normal * strokesLength);
             }
@@ -710,7 +700,6 @@ namespace mpESKD.Functions.mpLetterLine
         private static Point3dCollection Get3dPoints(Point3d insertionPoint, List<Point3d> middlePoints,
             Point3d endPoint)
         {
-            // ReSharper disable once UseObjectOrCollectionInitializer
             var points = new Point3dCollection();
 
             points.Add(insertionPoint);
