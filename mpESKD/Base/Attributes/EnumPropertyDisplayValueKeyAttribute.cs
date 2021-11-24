@@ -7,6 +7,10 @@
     /// </summary>
     public class EnumPropertyDisplayValueKeyAttribute : Attribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumPropertyDisplayValueKeyAttribute"/> class.
+        /// </summary>
+        /// <param name="localizationKey">Ключ получения локализованного значения</param>
         public EnumPropertyDisplayValueKeyAttribute(string localizationKey)
         {
             LocalizationKey = localizationKey;

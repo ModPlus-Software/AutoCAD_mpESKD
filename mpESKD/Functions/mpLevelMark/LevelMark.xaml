@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:windows="clr-namespace:ModPlusAPI.Windows;assembly=ModPlusAPI">
+                    >
     <ResourceDictionary.MergedDictionaries>
-        <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
     <Canvas x:Key="ImageLevelMark" Width="190" Height="150">
@@ -63,5 +63,11 @@
         <TextBlock Foreground="{DynamicResource AccentColorBrush}" RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000" Canvas.Left="171.276" Canvas.Top="65.547" FontSize="15.00" FontFamily="ISOCPEUR">v</TextBlock>
         <TextBlock Foreground="{DynamicResource BlackBrush}" Canvas.Left="85.246" Canvas.Top="35.057" FontSize="27.00" FontFamily="ISOCPEUR">+0.000</TextBlock>
         <TextBlock Foreground="{DynamicResource BlackBrush}" Canvas.Left="84.519" Canvas.Top="64.211" FontSize="20.00" FontFamily="ISOCPEUR">note</TextBlock>
+        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data=" M 27.500,105.500 L 17.500,105.500"/>
+        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 74.500,66.500 L 17.500,66.500"/>
+        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 25.000,108.500 L 19.000,102.500"/>
+        <TextBlock Foreground="{DynamicResource AccentColorBrush}" RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000" Canvas.Left="5.277" Canvas.Top="91.931" FontSize="15.00" FontFamily="ISOCPEUR">o3</TextBlock>
+        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 22.000,110.000 L 22.000,62.000"/>
+        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Data="F1 M 25.000,69.500 L 19.000,63.500"/>
     </Canvas>
 </ResourceDictionary>

@@ -19,6 +19,10 @@ namespace mpESKD.Functions.mpLevelMark
     [SystemStyleDescriptionKey("h108")]
     public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWithDoubleClickEditor
     {
+        private bool _objectLine;
+        private int _objectLineOffset = 5;
+        private int _bottomShelfLength = 10;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LevelMark"/> class.
         /// </summary>
@@ -78,7 +82,9 @@ namespace mpESKD.Functions.mpLevelMark
                 var minDistance =
                     (int)Math.Round(Math.Max(MainTextHeight, SecondTextHeight) + TextVerticalOffset, MidpointRounding.AwayFromZero);
                 var distance = (int)(Math.Abs(p2.Y - p1.Y) / GetFullScale());
-                DistanceBetweenShelfs = distance < minDistance ? minDistance : distance;
+                var shelfOffset = distance < minDistance ? minDistance : distance;
+                if (shelfOffset != DistanceBetweenShelfs)
+                    DistanceBetweenShelfs = shelfOffset;
             }
         }
 
@@ -126,8 +132,6 @@ namespace mpESKD.Functions.mpLevelMark
         [SaveToXData]
         public override string TextStyle { get; set; } = "Standard";
 
-        private bool _objectLine;
-
         /// <summary>
         /// Линия объекта
         /// </summary>
@@ -148,8 +152,6 @@ namespace mpESKD.Functions.mpLevelMark
                     : EndPoint - (horV * BottomShelfLength * GetFullScale());
             }
         }
-
-        private int _objectLineOffset = 5;
 
         /// <summary>
         /// Отступ линии объекта
@@ -172,8 +174,6 @@ namespace mpESKD.Functions.mpLevelMark
                 }
             }
         }
-
-        private int _bottomShelfLength = 10;
 
         /// <summary>
         /// Длина нижней полки
@@ -203,12 +203,6 @@ namespace mpESKD.Functions.mpLevelMark
         [EntityProperty(PropertiesCategory.Geometry, 4, "p58", 2, 1, 5, descLocalKey: "d58", nameSymbol: "l3")]
         [SaveToXData]
         public int BottomShelfLedge { get; set; } = 2;
-
-        /// <summary>
-        /// Расстояние между полками
-        /// </summary>
-        [SaveToXData]
-        public int DistanceBetweenShelfs { get; set; } = 6;
 
         /// <summary>
         /// Находится ли отметка уровня в положении "Низ" (т.е. TopShelf находится ниже BottomShelf)
@@ -250,7 +244,14 @@ namespace mpESKD.Functions.mpLevelMark
         [EntityProperty(PropertiesCategory.Geometry, 9, "p63", 1, 0, 3, descLocalKey: "d63", nameSymbol: "l1")]
         [SaveToXData]
         public int ShelfLedge { get; set; } = 1;
-
+        
+        /// <summary>
+        /// Расстояние между полками
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 10, "p63-1", 6, 1, int.MaxValue, nameSymbol: "o3")]
+        [SaveToXData]
+        public int DistanceBetweenShelfs { get; set; } = 6;
+        
         /// <inheritdoc/>
         [EntityProperty(PropertiesCategory.Content, 2, "p85", false, descLocalKey: "d85")]
         [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]

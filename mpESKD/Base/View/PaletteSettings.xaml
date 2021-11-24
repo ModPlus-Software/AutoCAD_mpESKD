@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common"/>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -38,7 +39,7 @@
         <Button Name="BtClose"
                 Grid.Row="5"
                 HorizontalAlignment="Center"
-                Content="{Binding Source={StaticResource Lang}, XPath=close}"
+                Content="{Binding Source={StaticResource LangCommon}, XPath=close}"
                 Click="BtClose_OnClick"/>
     </Grid>
 </mps:ModPlusWindow>

@@ -111,9 +111,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 return entities;
             }
         }
-
-        #region Properties
-
+        
         /// <inheritdoc />
         /// В примитиве не используется!
         public override string LineType { get; set; }
@@ -128,12 +126,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <inheritdoc />
         public override double MinDistanceBetweenPoints => 20;
-
-        /// <summary>
-        /// Минимальная длина выноски, если меньше то выноски нет
-        /// </summary>
-        public double MinLeaderLength => 5;
-
+        
         /// <summary>
         /// Радиус скругления
         /// </summary>
@@ -154,7 +147,7 @@ namespace mpESKD.Functions.mpFragmentMarker
 
         /// <summary>
         /// Состояние Jig при создании узловой выноски
-        /// </summary
+        /// </summary>
         public FragmentMarkerJigState? JigState { get; set; }
 
         /// <summary>
@@ -184,6 +177,13 @@ namespace mpESKD.Functions.mpFragmentMarker
         [EntityProperty(PropertiesCategory.Geometry, 8, "p78", ShelfPosition.Right)]
         [SaveToXData]
         public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
+
+        /// <summary>
+        /// Выноска
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 9, "p104", true, descLocalKey: "d104")]
+        [SaveToXData]
+        public bool Leader { get; set; } = true;
 
         /// <summary>
         /// Высота текста
@@ -234,11 +234,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         public string SmallText { get; set; } = string.Empty;
 
         private Point3d _leaderFirstPoint;
-
-        #endregion
-
-        #region Geometry
-
+        
         /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
         public Point3d MiddlePoint =>
             new Point3d(
@@ -400,8 +396,7 @@ namespace mpESKD.Functions.mpFragmentMarker
         {
             _leaderFirstPoint = insertionPoint;
             _leaderLine = new Line(_leaderFirstPoint, leaderPoint);
-            if (_leaderLine.Length < MinLeaderLength * scale ||
-                (string.IsNullOrEmpty(MainText) && string.IsNullOrEmpty(SmallText)))
+            if (!Leader || (string.IsNullOrEmpty(MainText) && string.IsNullOrEmpty(SmallText)))
             {
                 _leaderLine = null;
                 _shelfLine = null;
@@ -512,8 +507,7 @@ namespace mpESKD.Functions.mpFragmentMarker
                 _bottomTextMask?.TransformBy(backRotationMatrix);
             }
 
-            if (_leaderLine != null && 
-                (_leaderLine.Length > MinLeaderLength * scale || (_bottomDbText != null && _topDbText != null)))
+            if (_leaderLine != null && (_bottomDbText != null || _topDbText != null))
             {
                 _shelfLine = new Line(leaderPoint, shelfEndPoint);
             }
@@ -526,7 +520,5 @@ namespace mpESKD.Functions.mpFragmentMarker
 
             MainText = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
         }
-        #endregion
-
     }
 }

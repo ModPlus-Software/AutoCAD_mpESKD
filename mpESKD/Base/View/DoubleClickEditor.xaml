@@ -4,7 +4,7 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:mps="https://modplus.org/winfx/xaml/controls"
-                   xmlns:windows="clr-namespace:ModPlusAPI.Windows;assembly=ModPlusAPI"
+                   
                    mc:Ignorable="d"
                    Width="400" Height="300" MinWidth="200" MinHeight="200"
                    ResizeMode="CanResizeWithGrip"
@@ -12,9 +12,9 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <windows:SharedResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -29,7 +29,7 @@
         <Button Grid.Row="1"
                 HorizontalAlignment="Center"
                 IsDefault="True"
-                Content="{Binding Source={StaticResource Lang}, XPath=accept}"
+                Content="{Binding Source={StaticResource LangCommon}, XPath=accept}"
                 Name="BtAccept"
                 Click="BtAccept_OnClick"></Button>
     </Grid>
