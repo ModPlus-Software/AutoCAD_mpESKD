@@ -150,7 +150,7 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Генерация типа линий по всей полилинии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p105", false, descLocalKey: "d87")]
+        [EntityProperty(PropertiesCategory.Content, 9, "p105", false, descLocalKey: "d105")]
         [PropertyVisibilityDependency(new[] {nameof(SpaceAndFirstStrokeOffsetVisibilility)})]
         [SaveToXData]
         public bool LineGeneration
@@ -171,20 +171,18 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Тип линии стандартная или составная
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p106", LetterLineType.Standart, descLocalKey: "d88")]
+        [EntityProperty(PropertiesCategory.Content, 11, "p106", LetterLineType.Standart, descLocalKey: "d106")]
         [SaveToXData]
         public LetterLineType LetterLineType { get; set; }
 
         /// <summary>
         /// Формула для создания линии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p106", "", propertyScope: PropertyScope.Palette,
-            descLocalKey: "d89")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p107", "", propertyScope: PropertyScope.Palette, descLocalKey: "p107")]
         [RegexInputRestriction("[-0-9]")]
         [SaveToXData]
         public string StrokeFormula { get; set; } = string.Empty;
-
-        private int _segmentsCount = 0;
+        
         private double _scale;
 
         #endregion
@@ -339,8 +337,6 @@ namespace mpESKD.Functions.mpLetterLine
                 
             }
         }
-
-
 
         private void CreateMainPolyline(Point3dCollection points)
         {
