@@ -29,16 +29,14 @@
             _letterLine = letterLine;
             
             TbDesignation.Text = _letterLine.MainText;
-            TbDesignationPrefix.Text = _letterLine.MainText;
-            //TbSheetNumber.Text = _letterLine.;
+            TbDesignationPrefix.Text = _letterLine.SmallText;
             TbDesignation.Focus();
         }
 
         public void OnAccept()
         {
             _letterLine.MainText = TbDesignation.Text;
-            //_letterLine.DesignationPrefix = TbDesignationPrefix.Text;
-            //_letterLine.SheetNumber = TbSheetNumber.Text;
+            _letterLine.SmallText = TbDesignationPrefix.Text;
         }
     }
 }

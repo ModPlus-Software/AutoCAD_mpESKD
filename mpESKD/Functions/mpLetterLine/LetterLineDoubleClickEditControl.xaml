@@ -28,7 +28,7 @@
             
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p51}"/>
+                       Text="{Binding Source={StaticResource Lang}, XPath=p101}"/>
             <TextBox Grid.Row="0"
                      Grid.Column="1"
                      Name="TbDesignation"
@@ -38,7 +38,7 @@
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p52}"/>
+                       Text="{Binding Source={StaticResource Lang}, XPath=p102}"/>
             <TextBox Grid.Row="1"
                      Grid.Column="1"
                      Name="TbDesignationPrefix"
