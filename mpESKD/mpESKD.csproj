@@ -20,9 +20,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" ExcludeAssets="runtime" />
-    <PackageReference Include="ModPlusAPI" Version="7.5.0" ExcludeAssets="runtime" />
-    <PackageReference Include="ModPlusStyle" Version="4.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusAPI" Version="7.14.1" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusStyle" Version="4.1.0" ExcludeAssets="runtime" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
