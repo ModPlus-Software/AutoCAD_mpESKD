@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpSection
+﻿namespace mpESKD.Functions.mpView
 {
     using System;
     using System.Collections.Generic;
@@ -9,10 +9,10 @@
     public class ViewDescriptor : ISmartEntityDescriptor
     {
         /// <inheritdoc/>
-        public Type EntityType => typeof(Section);
+        public Type EntityType => typeof(View);
 
         /// <inheritdoc />
-        public string Name => "mpSection";
+        public string Name => "mpView";
 
         /// <inheritdoc />
         // Разрез
