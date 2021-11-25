@@ -20,6 +20,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Functions\mpView\Overrules\**" />
+    <EmbeddedResource Remove="Functions\mpView\Overrules\**" />
+    <None Remove="Functions\mpView\Overrules\**" />
+    <Page Remove="Functions\mpView\Overrules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Functions\mpView\Icons\mpSectionBroken_32x32.png" />
     <None Remove="Functions\mpView\Icons\mpSectionBroken_32x32_dark.png" />
     <None Remove="Functions\mpView\Icons\mpSectionFromPolyline_32x32.png" />
@@ -154,7 +161,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Functions\mpView\Overrules\" />
     <Folder Include="Functions\mpSection\Overrules\" />
   </ItemGroup>
 
