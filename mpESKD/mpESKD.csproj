@@ -27,15 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Functions\mpView\Icons\mpSectionBroken_32x32.png" />
-    <None Remove="Functions\mpView\Icons\mpSectionBroken_32x32_dark.png" />
-    <None Remove="Functions\mpView\Icons\mpSectionFromPolyline_32x32.png" />
-    <None Remove="Functions\mpView\Icons\mpSectionFromPolyline_32x32_dark.png" />
-    <None Remove="Functions\mpView\Icons\mpSection_32x32.png" />
-    <None Remove="Functions\mpView\Icons\mpSection_32x32_dark.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusAPI" Version="7.14.1" ExcludeAssets="runtime" />
     <PackageReference Include="ModPlusStyle" Version="4.1.0" ExcludeAssets="runtime" />
@@ -79,12 +70,6 @@
     <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
     <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
     <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
-    <Resource Include="Functions\mpView\Icons\mpSectionBroken_32x32.png" />
-    <Resource Include="Functions\mpView\Icons\mpSectionBroken_32x32_dark.png" />
-    <Resource Include="Functions\mpView\Icons\mpSectionFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpView\Icons\mpSectionFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpView\Icons\mpSection_32x32.png" />
-    <Resource Include="Functions\mpView\Icons\mpSection_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
     <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
@@ -162,6 +147,7 @@
 
   <ItemGroup>
     <Folder Include="Functions\mpSection\Overrules\" />
+    <Folder Include="Functions\mpView\Icons\" />
   </ItemGroup>
 
 </Project>
