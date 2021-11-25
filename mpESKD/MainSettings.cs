@@ -326,5 +326,36 @@
 
         #endregion
 
+        #region View
+
+        /// <summary>
+        /// Продолжать нумерацию фрагмента при создании нового фрагмента
+        /// </summary>
+        public bool ViewContinueNodeNumber
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(ViewContinueNodeNumber)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(ViewContinueNodeNumber), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Зависимое перемещение текста
+        /// </summary>
+        public bool ViewDependentTextMovement
+        {
+            get => !bool.TryParse(
+                UserConfigFile.GetValue(PName, nameof(ViewDependentTextMovement)), out var b) || b; // true
+            set
+            {
+                UserConfigFile.SetValue(PName, nameof(ViewDependentTextMovement), value.ToString(), true);
+                OnPropertyChanged();
+            }
+        }
+        #endregion
+
     }
 }
