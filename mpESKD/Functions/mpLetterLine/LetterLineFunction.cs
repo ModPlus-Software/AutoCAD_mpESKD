@@ -56,7 +56,7 @@
         /// Команда создания буквенной линии
         /// </summary>
         [CommandMethod("ModPlus", "mpLetterLine", CommandFlags.Modal)]
-        public void CreateGroundLineCommand()
+        public void CreateLetterLineCommand()
         {
             SmartEntityUtils.SendStatistic<LetterLine>();
             
@@ -67,7 +67,7 @@
         /// Команда создания буквенной линии из полилинии
         /// </summary>
         [CommandMethod("ModPlus", "mpLetterLineFromPolyline", CommandFlags.Modal)]
-        public void CreateGroundLineFromPolylineCommand()
+        public void CreateLetterLineFromPolylineCommand()
         {
             SmartEntityUtils.SendStatistic<LetterLine>();
             

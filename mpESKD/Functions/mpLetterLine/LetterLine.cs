@@ -84,16 +84,16 @@ namespace mpESKD.Functions.mpLetterLine
         public override string TextStyle { get; set; }
 
         /// <summary>
-        /// Расстояние между штрихами
+        /// Расстояние между текстом
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p38", 50, 10, 100, nameSymbol: "b")]
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p106", 50, 10, 100, nameSymbol: "a")]
         [SaveToXData]
         public int MTextOffset { get; set; } = 50;
 
         /// <summary>
-        /// Отступ группы штрихов
+        /// Отступ первого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p40", 25, 1, 50, nameSymbol: "c")]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p108", 25, 1, 50, nameSymbol: "b")]
         [SaveToXData]
         public int Space { get; set; } = 25;
 
@@ -164,24 +164,24 @@ namespace mpESKD.Functions.mpLetterLine
         }
 
         [EntityProperty(PropertiesCategory.Content, 10, "", "", propertyScope: PropertyScope.Hidden)]
-        [PropertyVisibilityDependency(new[] {nameof(Space)})]
+        [PropertyVisibilityDependency(new[] { nameof(Space) })]
         [SaveToXData]
         public bool SpaceAndFirstStrokeOffsetVisibilility { get; private set; }
 
         /// <summary>
         /// Тип линии стандартная или составная
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p106", LetterLineType.Standart, descLocalKey: "d106")]
+        [EntityProperty(PropertiesCategory.Content, 11, "p35", LetterLineType.Standard, descLocalKey: "d35-1")]
         [SaveToXData]
         public LetterLineType LetterLineType { get; set; }
 
         /// <summary>
         /// Формула для создания линии
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p107", "", propertyScope: PropertyScope.Palette, descLocalKey: "p107")]
+        [EntityProperty(PropertiesCategory.Content, 12, "p107", "", descLocalKey: "d107")]
         [RegexInputRestriction("[-0-9]")]
         [SaveToXData]
-        public string StrokeFormula { get; set; } = string.Empty;
+        public string StrokeFormula { get; set; } = "10-5";
         
         private double _scale;
 
@@ -195,7 +195,7 @@ namespace mpESKD.Functions.mpLetterLine
             get
             {
                 var entities = new List<Entity>();
-                if (LetterLineType == LetterLineType.Standart)
+                if (LetterLineType == LetterLineType.Standard)
                 {
                     entities.Add(_mainPolyline);
                 }
@@ -327,14 +327,11 @@ namespace mpESKD.Functions.mpLetterLine
             }
             else
             {
-                //TODO переделать 
-                CreateMTextOnWholeLenghtOfPolyline();
+                CreateMTextOnWholeLengthOfPolyline();
                 if (LetterLineType == LetterLineType.Composite)
                 {
-                    
                     CreateLinesByLineGeneration(_mainPolyline.Length);
                 }
-                
             }
         }
 
@@ -357,9 +354,9 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private void CreateLinesByInsertionPoints(Point3dCollection points)
         {
-            var mTextWidthWithOffset = (_texts[0].ActualWidth / 2 + TextMaskOffset * _scale);
+            var mTextWidthWithOffset = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
             
-            for (int i = 1; i < points.Count; i++)
+            for (var i = 1; i < points.Count; i++)
             {
                 var previousPoint = points[i - 1];
                 var currentPoint = points[i];
@@ -375,45 +372,47 @@ namespace mpESKD.Functions.mpLetterLine
 
                 AcadUtils.WriteMessageInDebug(
                     $"длина сегмента {segmentVector.Length} в этом сегменте будет {qty} частей");
-                Point3d point = default(Point3d);
+                var point = default(Point3d);
 
                 var offsetPoint = normal * mTextWidthWithOffset;
                 while (k < qty)
                 {
-                    var location = previousPoint + normal * sumTextDistanceAtSegment;
+                    var location = previousPoint + (normal * sumTextDistanceAtSegment);
                     var checkLength = (currentPoint - location).Length;
                     if (Space > segmentVector.Length)
                     {
-                        CreateLinesBeetwin2Points(previousPoint, currentPoint);
+                        CreateLinesBetween2Points(previousPoint, currentPoint);
                     }
 
                     if (k == 0)
                     {
                         point = previousPoint + (normal * Space);
-                        CreateLinesBeetwin2Points(previousPoint, point);
+                        CreateLinesBetween2Points(previousPoint, point);
                         AcadUtils.WriteMessageInDebug($"текущая точка{previousPoint} point {point} в else while");
                         
                         if (checkLength < MTextOffset)
                         {
-                            CreateLinesBeetwin2Points(location + normal * mTextWidthWithOffset,
-                                currentPoint + normal * mTextWidthWithOffset);
+                            CreateLinesBetween2Points(
+                                location + (normal * mTextWidthWithOffset),
+                                currentPoint + (normal * mTextWidthWithOffset));
                         }
                     }
                     else
                     {
                         if (checkLength < MTextOffset)
                         {
-                            CreateLinesBeetwin2Points(location + normal * mTextWidthWithOffset,
-                                currentPoint + normal * mTextWidthWithOffset);
+                            CreateLinesBetween2Points(
+                                location + (normal * mTextWidthWithOffset),
+                                currentPoint + (normal * mTextWidthWithOffset));
                         }
 
                         AcadUtils.WriteMessageInDebug(
-                            $"point - normal * mTextWidthWithOffset{point - normal * mTextWidthWithOffset}  currentPoint{currentPoint} в else while");
+                            $"point - normal * mTextWidthWithOffset{point - (normal * mTextWidthWithOffset)}  currentPoint{currentPoint} в else while");
 
                         point = previousPoint + (normal * sumTextDistanceAtSegment);
                         var curPreviousPoint = point - (normal * MTextOffset) + offsetPoint;
 
-                        CreateLinesBeetwin2Points(curPreviousPoint, point);
+                        CreateLinesBetween2Points(curPreviousPoint, point);
                         AcadUtils.WriteMessageInDebug($"текущая точка{point}  в else while");
                     }
                     
@@ -422,7 +421,7 @@ namespace mpESKD.Functions.mpLetterLine
                 }
 
                 if (qty == 0)
-                    CreateLinesBeetwin2Points(previousPoint, currentPoint + offsetPoint);
+                    CreateLinesBetween2Points(previousPoint, currentPoint + offsetPoint);
             }
         }
 
@@ -433,23 +432,23 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private void CreateLinesByLineGeneration(double totalLengthOfPline)
         {
-            int mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
+            var mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
             var offset = _mainPolyline.Length - (mTextsQty * MTextOffset);
             
             var j = 0;
             var segment = 0;
-            int direction = 0;
-            Point3d previousPoint;
-            Point3d currentPoint;
-            
-            var mtextWidthWithOffset = (_texts[0].ActualWidth / 2 + TextMaskOffset * _scale);
-            for (int i = 0; i <= mTextsQty; i++)
+            var direction = 0;
+
+            var mTextWidthWithOffset = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
+            for (var i = 0; i <= mTextsQty; i++)
             {
                 var distAtPline = (offset / 2) + (i * MTextOffset);
 
                 var location = _mainPolyline.GetPointAtDist(distAtPline);
                 var segmentParameterAtPoint = _mainPolyline.GetParameterAtPoint(location);
 
+                Point3d previousPoint;
+                Point3d currentPoint;
                 if (segmentParameterAtPoint <= 1)
                 {
                     previousPoint = _mainPolyline.GetPoint3dAt(0);
@@ -462,7 +461,7 @@ namespace mpESKD.Functions.mpLetterLine
                 }
 
                 var normal = (currentPoint - previousPoint).GetNormal();
-                var offsetPoint = normal * mtextWidthWithOffset;
+                var offsetPoint = normal * mTextWidthWithOffset;
                 if (location == previousPoint)
                     continue;
 
@@ -472,7 +471,7 @@ namespace mpESKD.Functions.mpLetterLine
                 {
                     if (offset != 0)
                     {
-                        CreateLinesBeetwin2Points(previousPoint, location);
+                        CreateLinesBetween2Points(previousPoint, location);
                         segment++;
 
                         Debug.Print($"previouspoint {previousPoint}, newpoint {location} ");
@@ -483,27 +482,27 @@ namespace mpESKD.Functions.mpLetterLine
 
                         if (checkLength > MTextOffset)
                         {
-                            CreateLinesBeetwin2Points(location + offsetPoint, location + normal * MTextOffset);
+                            CreateLinesBetween2Points(location + offsetPoint, location + (normal * MTextOffset));
                             segment++;
                             AcadUtils.WriteMessageInDebug(
-                                $" посл сегмент в offset != 0 сегмент {segment} отрисован, location {location}, location + normal * MTextOffset {location + normal * MTextOffset} это направление {direction}  \n ");
+                                $" посл сегмент в offset != 0 сегмент {segment} отрисован, location {location}, location + normal * MTextOffset {location + (normal * MTextOffset)} это направление {direction}  \n ");
                             AcadUtils.WriteMessageInDebug("_____________________");
                         }
 
                         if (checkLength < MTextOffset)
                         {
-                            CreateLinesBeetwin2Points(location + offsetPoint, currentPoint + offsetPoint);
+                            CreateLinesBetween2Points(location + offsetPoint, currentPoint + offsetPoint);
                             segment++;
                             AcadUtils.WriteMessageInDebug(
-                                $" посл сегмент в offset != 0 сегмент {segment} отрисован, location {location}, location + normal * MTextOffset {location + normal * MTextOffset} это направление {direction}  \n ");
+                                $" посл сегмент в offset != 0 сегмент {segment} отрисован, location {location}, location + normal * MTextOffset {location + (normal * MTextOffset)} это направление {direction}  \n ");
                             AcadUtils.WriteMessageInDebug("_____________________");
                         }
                     }
                     else
                     {
-                        var newPoint = previousPoint + normal * MTextOffset;
+                        var newPoint = previousPoint + (normal * MTextOffset);
                         var newPrevPoint = previousPoint + offsetPoint;
-                        CreateLinesBeetwin2Points(newPrevPoint, newPoint);
+                        CreateLinesBetween2Points(newPrevPoint, newPoint);
                         segment++;
                         Debug.Print($"previouspoint {previousPoint + offsetPoint}, newpoint {newPoint} ");
 
@@ -518,7 +517,7 @@ namespace mpESKD.Functions.mpLetterLine
 
                     if (checkLength < MTextOffset)
                     {
-                        CreateLinesBeetwin2Points(location + offsetPoint, currentPoint + offsetPoint);
+                        CreateLinesBetween2Points(location + offsetPoint, currentPoint + offsetPoint);
 
                         segment++;
                         AcadUtils.WriteMessageInDebug(
@@ -527,7 +526,7 @@ namespace mpESKD.Functions.mpLetterLine
                     }
                     else
                     {
-                        CreateLinesBeetwin2Points(location + offsetPoint, locPointWithOffset);
+                        CreateLinesBetween2Points(location + offsetPoint, locPointWithOffset);
 
                         segment++;
                         AcadUtils.WriteMessageInDebug(
@@ -549,10 +548,7 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// создание линий между 2 точками
         /// </summary>
-        /// <param name="previousPoint"></param>
-        /// <param name="currentPoint"></param>
-        /// <returns></returns>
-        private void CreateLinesBeetwin2Points(Point3d previousPoint, Point3d currentPoint)
+        private void CreateLinesBetween2Points(Point3d previousPoint, Point3d currentPoint)
         {
             /*
           // 3. при первом построении от начальной точки до мтекста строим линию, длина этой линии
@@ -568,7 +564,7 @@ namespace mpESKD.Functions.mpLetterLine
             var segmentVector = currentPoint - previousPoint;
             _normal = segmentVector.GetNormal();
 
-            var offsetDistance = (_texts[0].ActualWidth / 2) + TextMaskOffset * _scale;
+            var offsetDistance = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
 
             var lengthOfPartSegment = (currentPoint - previousPoint).Length - offsetDistance;
 
@@ -577,35 +573,34 @@ namespace mpESKD.Functions.mpLetterLine
                 return;
             var strokesLength = _strokeSpaceParams.Sum();
 
-            int rounds = (int) (lengthOfPartSegment / strokesLength);
+            var rounds = (int) (lengthOfPartSegment / strokesLength);
 
-            var nextPoint = new Vector3d();
+            var nextPoint = default(Vector3d);
             var firstPoint = previousPoint;
-            for (int i = 0; i < rounds; i++)
+            for (var i = 0; i < rounds; i++)
             {
                 firstPoint += nextPoint;
                 CreateAllLinesInStrokes(firstPoint);
-                nextPoint = (_normal * strokesLength);
+                nextPoint = _normal * strokesLength;
             }
 
-            var pointAfterRounds = previousPoint + _normal * (strokesLength * rounds);
-            var finalLength = lengthOfPartSegment - strokesLength * rounds;
+            var pointAfterRounds = previousPoint + (_normal * (strokesLength * rounds));
+            var finalLength = lengthOfPartSegment - (strokesLength * rounds);
             CreateLinesFromLength(finalLength, pointAfterRounds);
         }
 
         /// <summary>
         /// создает список линий из коллекции штрихов, длина линий это нечетные номера, проходимся
         /// по коллекции и создаем по одной линии на каждый нечетную цифру, потом этот метод будет
-        /// повтортся в зависимости от длины заданных точек
+        /// повторяться в зависимости от длины заданных точек
         /// </summary>
         /// <param name="previousPoint">предыдущая точка</param>
-        /// <param name="normal"> нормаль </param>
-        /// <returns>возращаест список линий</returns>
         private void CreateAllLinesInStrokes(Point3d previousPoint)
         {
             for (var i = 0; i <= _strokeSpaceParams.Count; i++)
             {
-                if (i % 2 == 0) continue;
+                if (i % 2 == 0)
+                    continue;
 
                 var line = GetLinesFromStrokesFromIteration(previousPoint, i);
 
@@ -614,10 +609,8 @@ namespace mpESKD.Functions.mpLetterLine
         }
 
         /// <summary>
-        /// построение линий в зависимости от оставщейся длины участка
+        /// построение линий в зависимости от оставшейся длины участка
         /// </summary>
-        /// <param name="length"></param>
-        /// <param name="position"></param>
         private void CreateLinesFromLength(double length, Point3d position)
         {
             var curLength = 0.0;
@@ -626,7 +619,8 @@ namespace mpESKD.Functions.mpLetterLine
                 var curElemLength = _strokeSpaceParams[i - 1];
                 if (i % 2 == 0)
                 {
-                    if (length < curElemLength) break;
+                    if (length < curElemLength)
+                        break;
                     length -= curElemLength;
                     continue;
                 }
@@ -661,9 +655,9 @@ namespace mpESKD.Functions.mpLetterLine
 
         private Line GetLinesFromStrokes(Point3d previousPoint, double curLength, double curElemLength)
         {
-            Point3d curPoint = previousPoint + (_normal * curLength);
-            Point3d curNextPt = previousPoint + _normal * (curLength + curElemLength);
-            Line line = new Line(curPoint, curNextPt);
+            var curPoint = previousPoint + (_normal * curLength);
+            var curNextPt = previousPoint + (_normal * (curLength + curElemLength));
+            var line = new Line(curPoint, curNextPt);
 
             return line;
         }
@@ -713,12 +707,12 @@ namespace mpESKD.Functions.mpLetterLine
 
         #region Mtext creation methods
 
-        private void CreateMTextOnWholeLenghtOfPolyline()
+        private void CreateMTextOnWholeLengthOfPolyline()
         {
-            int mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
+            var mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
             var firstPointOffset = _mainPolyline.Length - (mTextsQty * MTextOffset);
 
-            for (int i = 0; i <= mTextsQty; i++)
+            for (var i = 0; i <= mTextsQty; i++)
             {
                 var distAtPline = (firstPointOffset / 2) + (i * MTextOffset);
                 AcadUtils.WriteMessageInDebug($"Текст должен находится на длине полилинии {distAtPline} \n");
@@ -737,9 +731,9 @@ namespace mpESKD.Functions.mpLetterLine
                 else
                 {
                     previousPoint = _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint);
-                    if (segmentParameterAtPoint < plineSegmentQty)
-                        currentPoint = _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint + 1);
-                    else currentPoint = _mainPolyline.GetPoint3dAt(plineSegmentQty);
+                    currentPoint = segmentParameterAtPoint < plineSegmentQty 
+                        ? _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint + 1) 
+                        : _mainPolyline.GetPoint3dAt(plineSegmentQty);
                 }
 
                 var segmentVector = currentPoint - previousPoint;
@@ -755,7 +749,7 @@ namespace mpESKD.Functions.mpLetterLine
         private IEnumerable<MText> CreateMTextsByInsertionPoints(Point3dCollection points)
         {
             var mTexts = new List<MText>();
-            for (int i = 1; i < points.Count; i++)
+            for (var i = 1; i < points.Count; i++)
             {
                 var previousPoint = points[i - 1];
                 var currentPoint = points[i];

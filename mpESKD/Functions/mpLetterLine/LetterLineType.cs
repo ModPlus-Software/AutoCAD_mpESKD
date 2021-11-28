@@ -10,13 +10,13 @@
         /// <summary>
         /// Стандартный
         /// </summary>
-        [EnumPropertyDisplayValueKey("vlt11")]
-        Standart,
+        [EnumPropertyDisplayValueKey("llt1")]
+        Standard,
 
         /// <summary>
         /// Составной
         /// </summary>
-        [EnumPropertyDisplayValueKey("vlt22")]
+        [EnumPropertyDisplayValueKey("llt2")]
         Composite
     }
 }

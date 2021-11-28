@@ -30,33 +30,33 @@
         public string ToolTipHelpImage => string.Empty;
 
         /// <inheritdoc />
-        public List<string> SubFunctionsNames => new List<string>
+        public List<string> SubFunctionsNames => new ()
         {
             "mpLetterLineFromPolyline"
         };
 
         /// <inheritdoc />
-        public List<string> SubFunctionsLNames => new List<string>
+        public List<string> SubFunctionsLNames => new ()
         {
             // "Буквенная линия  из полилинии"
             Language.GetItem("h165")
         };
 
         /// <inheritdoc />
-        public List<string> SubDescriptions => new List<string>
+        public List<string> SubDescriptions => new ()
         {
             // "Конвертирование выбранной полилинии в буквенную линию"
             Language.GetItem("h166")
         };
 
         /// <inheritdoc />
-        public List<string> SubFullDescriptions => new List<string>
+        public List<string> SubFullDescriptions => new ()
         {
             string.Empty
         };
 
         /// <inheritdoc />
-        public List<string> SubHelpImages => new List<string>
+        public List<string> SubHelpImages => new ()
         {
             string.Empty
         };

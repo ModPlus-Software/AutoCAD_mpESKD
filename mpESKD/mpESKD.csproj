@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.15.6.0</Version>
+    <Version>1.16.6.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
   </PropertyGroup>
 
@@ -17,7 +17,15 @@
     <Prefer32Bit>false</Prefer32Bit>
     <UseWpf>true</UseWpf>
     <MSBuildWarningsAsMessages>MSB3270</MSBuildWarningsAsMessages>
+			<LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
+    <None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
+    <None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
+    <None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
@@ -55,6 +63,10 @@
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16_dark.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
     <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
+    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
+    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
+    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
+    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
     <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />

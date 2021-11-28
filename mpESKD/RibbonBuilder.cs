@@ -13,6 +13,7 @@
     using Functions.mpBreakLine;
     using Functions.mpFragmentMarker;
     using Functions.mpGroundLine;
+    using Functions.mpLetterLine;
     using Functions.mpLevelMark;
     using Functions.mpNodalLeader;
     using Functions.mpSecantNodalLeader;
@@ -246,6 +247,9 @@
 
             // mpWeldJoint
             ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<WeldJoint>()));
+
+            // mpLetterLine
+            ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<LetterLine>()));
 
             ribSourcePanel.Items.Add(ribRowPanel);
 

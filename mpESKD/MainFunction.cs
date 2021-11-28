@@ -14,11 +14,7 @@
     using Autodesk.AutoCAD.Windows;
     using Base;
     using Base.Enums;
-    using Base.Styles;
     using Base.Utils;
-    using Functions.mpAxis;
-    using Functions.mpLevelMark;
-    using Functions.mpSection;
     using Functions.SearchEntities;
     using ModPlus;
     using ModPlusAPI;
