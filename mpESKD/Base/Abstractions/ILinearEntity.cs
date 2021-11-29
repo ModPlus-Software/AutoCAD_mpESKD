@@ -27,6 +27,11 @@
         List<Point3d> MiddlePoints { get; set; }
 
         /// <summary>
+        /// Длина линии
+        /// </summary>
+        double Length { get; }
+
+        /// <summary>
         /// Перестроение точек - помещение EndPoint в список
         /// </summary>
         void RebasePoints();

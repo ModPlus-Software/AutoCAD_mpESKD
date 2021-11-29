@@ -400,9 +400,17 @@
 
                                         SetDescription(tb, propertyDescription);
                                         SetVisibilityDependency(visibilityDependencyAttributes, allEntitySummaryProperties, summaryProperty.PropertyName, tb);
-                                        tb.Text = summaryProperty.IntValue.HasValue
-                                            ? summaryProperty.IntValue.ToString()
-                                            : different;
+                                        if (summaryProperty.IntValue.HasValue)
+                                        {
+                                            BindingOperations.SetBinding(
+                                                tb,
+                                                TextBox.TextProperty,
+                                                CreateOneWayBindingForPropertyForNumericValue(summaryProperty, true));
+                                        }
+                                        else
+                                        {
+                                            tb.Text = different;
+                                        }
 
                                         grid.Children.Add(tb);
                                     }
@@ -457,9 +465,17 @@
                                             allEntitySummaryProperties,
                                             summaryProperty.PropertyName,
                                             tb);
-                                        tb.Text = summaryProperty.DoubleValue.HasValue
-                                            ? summaryProperty.DoubleValue.ToString()
-                                            : different;
+                                        if (summaryProperty.DoubleValue.HasValue)
+                                        {
+                                            BindingOperations.SetBinding(
+                                               tb,
+                                               TextBox.TextProperty,
+                                               CreateOneWayBindingForPropertyForNumericValue(summaryProperty, false));
+                                        }
+                                        else
+                                        {
+                                            tb.Text = different;
+                                        }
 
                                         grid.Children.Add(tb);
                                     }
@@ -793,17 +809,35 @@
         /// </summary>
         /// <param name="summaryProperty">Суммарное свойство</param>
         /// <param name="isInteger">True - целое число. False - дробное число</param>
-        private Binding CreateTwoWayBindingForPropertyForNumericValue(
-            SummaryProperty summaryProperty, bool isInteger)
+        private Binding CreateTwoWayBindingForPropertyForNumericValue(SummaryProperty summaryProperty, bool isInteger)
         {
-            var binding = new Binding
+            return new Binding
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                 Source = summaryProperty,
                 Path = isInteger ? new PropertyPath("IntValue") : new PropertyPath("DoubleValue")
             };
-            return binding;
+        }
+
+        /// <summary>
+        /// Создание односторонней привязки числовых свойств. Используется, когда свойство только для чтения
+        /// По какой-то причине при привязке к типу object не работает. В связи с этим делаю такой вот
+        /// лайфхак - добавляю в класс <see cref="SmartEntityProperty"/> два свойства конкретного типа.
+        /// Это нужно, чтобы решить эту специфическую проблему в данном проекте и не менять из-за этого
+        /// библиотеку оформления
+        /// </summary>
+        /// <param name="summaryProperty">Суммарное свойство</param>
+        /// <param name="isInteger">True - целое число. False - дробное число</param>
+        private Binding CreateOneWayBindingForPropertyForNumericValue(SummaryProperty summaryProperty, bool isInteger)
+        {
+            return new Binding
+            {
+                Mode = BindingMode.OneWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                Source = summaryProperty,
+                Path = isInteger ? new PropertyPath("IntValue") : new PropertyPath("DoubleValue")
+            };
         }
 
         /// <summary>

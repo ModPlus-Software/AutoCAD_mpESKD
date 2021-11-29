@@ -17,7 +17,7 @@ namespace mpESKD.Functions.mpGroundLine
     /// </summary>
     [SmartEntityDisplayNameKey("h73")]
     [SystemStyleDescriptionKey("h78")]
-    public class GroundLine : SmartEntity, ILinearEntity
+    public class GroundLine : SmartLinearEntity
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GroundLine"/> class.
@@ -34,13 +34,7 @@ namespace mpESKD.Functions.mpGroundLine
             : base(objectId)
         {
         }
-
-        /// <summary>
-        /// Промежуточные точки
-        /// </summary>
-        [SaveToXData]
-        public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
+        
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -137,15 +131,6 @@ namespace mpESKD.Functions.mpGroundLine
             }
         }
         
-        /// <inheritdoc />
-        public void RebasePoints()
-        {
-            if (!MiddlePoints.Contains(EndPoint))
-            {
-                MiddlePoints.Add(EndPoint);
-            }
-        }
-
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {

@@ -40,6 +40,8 @@
         private void Property_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             OnPropertyChanged(nameof(SummaryValue));
+            OnPropertyChanged(nameof(DoubleValue));
+            OnPropertyChanged(nameof(IntValue));
         }
 
         /// <summary>

@@ -6,7 +6,6 @@ namespace mpESKD.Functions.mpWaterProofing
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
-    using Base.Abstractions;
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
@@ -17,7 +16,7 @@ namespace mpESKD.Functions.mpWaterProofing
     /// </summary>
     [SmartEntityDisplayNameKey("h114")]
     [SystemStyleDescriptionKey("h129")]
-    public class WaterProofing : SmartEntity, ILinearEntity
+    public class WaterProofing : SmartLinearEntity
     {
         #region Entities
 
@@ -54,10 +53,6 @@ namespace mpESKD.Functions.mpWaterProofing
         {
         }
         
-        /// <inheritdoc />
-        [SaveToXData]
-        public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -136,16 +131,7 @@ namespace mpESKD.Functions.mpWaterProofing
                 return entities;
             }
         }
-
-        /// <inheritdoc />
-        public void RebasePoints()
-        {
-            if (!MiddlePoints.Contains(EndPoint))
-            {
-                MiddlePoints.Add(EndPoint);
-            }
-        }
-
+        
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {

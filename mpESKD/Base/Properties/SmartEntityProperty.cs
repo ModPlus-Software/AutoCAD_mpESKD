@@ -209,5 +209,19 @@
         /// Свойство только для чтения. Используется только в палитре свойств
         /// </summary>
         public bool IsReadOnly { get; }
+
+        /// <summary>
+        /// Установить значение с учетом того, что value может быть <see cref="double"/> или <see cref="int"/>
+        /// </summary>
+        /// <param name="value">Значение для установки</param>
+        public void SetValue(object value)
+        {
+            if (value is double d)
+                DoubleValue = d;
+            else if (value is int i)
+                IntValue = i;
+            else
+                Value = value;
+        }
     }
 }

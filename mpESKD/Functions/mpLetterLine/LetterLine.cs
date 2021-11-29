@@ -20,7 +20,7 @@ namespace mpESKD.Functions.mpLetterLine
     /// </summary>
     [SmartEntityDisplayNameKey("h161")]
     [SystemStyleDescriptionKey("h162")]
-    public class LetterLine : SmartEntity, ILinearEntity, ITextValueEntity, IWithDoubleClickEditor
+    public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LetterLine"/> class.
@@ -32,9 +32,9 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Initializes a new instance of the <see cref="LetterLine"/> class.
         /// </summary>
-        /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        public LetterLine(ObjectId objectId)
-            : base(objectId)
+        /// <param name="blockId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+        public LetterLine(ObjectId blockId)
+            : base(blockId)
         {
         }
 
@@ -50,13 +50,7 @@ namespace mpESKD.Functions.mpLetterLine
         #endregion
 
         #region Properties
-
-        /// <summary>
-        /// Промежуточные точки
-        /// </summary>
-        [SaveToXData]
-        public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
+        
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -86,16 +80,54 @@ namespace mpESKD.Functions.mpLetterLine
         /// <summary>
         /// Расстояние между текстом
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p106", 50, 10, 100, nameSymbol: "a")]
+        [EntityProperty(PropertiesCategory.Geometry, 1, "p106", 50, 10, 100, nameSymbol: "a")]
         [SaveToXData]
         public int MTextOffset { get; set; } = 50;
 
         /// <summary>
         /// Отступ первого текста
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p108", 25, 1, 50, nameSymbol: "b")]
+        [EntityProperty(PropertiesCategory.Geometry, 2, "p108", 25, 1, 50, nameSymbol: "b")]
         [SaveToXData]
         public int Space { get; set; } = 25;
+
+        private bool _lineGeneration;
+
+        /// <summary>
+        /// Генерация типа линий по всей полилинии
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p105", false, descLocalKey: "d105")]
+        [PropertyVisibilityDependency(new[] { nameof(SpaceAndFirstStrokeOffsetVisibility) })]
+        [SaveToXData]
+        public bool LineGeneration
+        {
+            get => _lineGeneration;
+            set
+            {
+                _lineGeneration = value;
+                SpaceAndFirstStrokeOffsetVisibility = !_lineGeneration;
+            }
+        }
+
+        [EntityProperty(PropertiesCategory.Geometry, 4, "", "", propertyScope: PropertyScope.Hidden)]
+        [PropertyVisibilityDependency(new[] { nameof(Space) })]
+        [SaveToXData]
+        public bool SpaceAndFirstStrokeOffsetVisibility { get; private set; }
+
+        /// <summary>
+        /// Тип линии стандартная или составная
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p35", LetterLineType.Standard, descLocalKey: "d35-1")]
+        [SaveToXData]
+        public LetterLineType LetterLineType { get; set; }
+
+        /// <summary>
+        /// Формула для создания линии
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 6, "p107", "", descLocalKey: "d107")]
+        [RegexInputRestriction("[-0-9]")]
+        [SaveToXData]
+        public string StrokeFormula { get; set; } = "10-5";
 
         /// <summary>
         /// Высота текста
@@ -113,7 +145,7 @@ namespace mpESKD.Functions.mpLetterLine
 
         /// <inheritdoc/>
         [EntityProperty(PropertiesCategory.Content, 4, "p85", true, descLocalKey: "d85")]
-        [PropertyVisibilityDependency(new[] {nameof(TextMaskOffset)})]
+        [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
         [SaveToXData]
         public bool HideTextBackground { get; set; }
 
@@ -145,44 +177,6 @@ namespace mpESKD.Functions.mpLetterLine
         [SaveToXData]
         public bool IsTextAlwaysHorizontal { get; set; }
 
-        private bool _lineGeneration;
-
-        /// <summary>
-        /// Генерация типа линий по всей полилинии
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p105", false, descLocalKey: "d105")]
-        [PropertyVisibilityDependency(new[] {nameof(SpaceAndFirstStrokeOffsetVisibilility)})]
-        [SaveToXData]
-        public bool LineGeneration
-        {
-            get => _lineGeneration;
-            set
-            {
-                _lineGeneration = value;
-                SpaceAndFirstStrokeOffsetVisibilility = !_lineGeneration;
-            }
-        }
-
-        [EntityProperty(PropertiesCategory.Content, 10, "", "", propertyScope: PropertyScope.Hidden)]
-        [PropertyVisibilityDependency(new[] { nameof(Space) })]
-        [SaveToXData]
-        public bool SpaceAndFirstStrokeOffsetVisibilility { get; private set; }
-
-        /// <summary>
-        /// Тип линии стандартная или составная
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 11, "p35", LetterLineType.Standard, descLocalKey: "d35-1")]
-        [SaveToXData]
-        public LetterLineType LetterLineType { get; set; }
-
-        /// <summary>
-        /// Формула для создания линии
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 12, "p107", "", descLocalKey: "d107")]
-        [RegexInputRestriction("[-0-9]")]
-        [SaveToXData]
-        public string StrokeFormula { get; set; } = "10-5";
-        
         private double _scale;
 
         #endregion
@@ -232,16 +226,7 @@ namespace mpESKD.Functions.mpLetterLine
 
         private Vector3d _normal;
         private List<double> _strokeSpaceParams;
-
-        /// <inheritdoc />
-        public void RebasePoints()
-        {
-            if (!MiddlePoints.Contains(EndPoint))
-            {
-                MiddlePoints.Add(EndPoint);
-            }
-        }
-
+        
         /// <inheritdoc />
         public override IEnumerable<Point3d> GetPointsForOsnap()
         {
@@ -355,14 +340,14 @@ namespace mpESKD.Functions.mpLetterLine
         private void CreateLinesByInsertionPoints(Point3dCollection points)
         {
             var mTextWidthWithOffset = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
-            
+
             for (var i = 1; i < points.Count; i++)
             {
                 var previousPoint = points[i - 1];
                 var currentPoint = points[i];
                 AcadUtils.WriteMessageInDebug($"предыдущая точка {previousPoint} текущая точка {currentPoint}");
                 var segmentVector = currentPoint - previousPoint;
-                
+
                 var normal = segmentVector.GetNormal();
 
                 var sumTextDistanceAtSegment = Space;
@@ -389,7 +374,7 @@ namespace mpESKD.Functions.mpLetterLine
                         point = previousPoint + (normal * Space);
                         CreateLinesBetween2Points(previousPoint, point);
                         AcadUtils.WriteMessageInDebug($"текущая точка{previousPoint} point {point} в else while");
-                        
+
                         if (checkLength < MTextOffset)
                         {
                             CreateLinesBetween2Points(
@@ -415,7 +400,7 @@ namespace mpESKD.Functions.mpLetterLine
                         CreateLinesBetween2Points(curPreviousPoint, point);
                         AcadUtils.WriteMessageInDebug($"текущая точка{point}  в else while");
                     }
-                    
+
                     sumTextDistanceAtSegment += MTextOffset;
                     k++;
                 }
@@ -432,9 +417,9 @@ namespace mpESKD.Functions.mpLetterLine
         /// <returns></returns>
         private void CreateLinesByLineGeneration(double totalLengthOfPline)
         {
-            var mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
+            var mTextsQty = (int)(_mainPolyline.Length / MTextOffset);
             var offset = _mainPolyline.Length - (mTextsQty * MTextOffset);
-            
+
             var j = 0;
             var segment = 0;
             var direction = 0;
@@ -456,8 +441,8 @@ namespace mpESKD.Functions.mpLetterLine
                 }
                 else
                 {
-                    previousPoint = _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint);
-                    currentPoint = _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint + 1);
+                    previousPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint);
+                    currentPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint + 1);
                 }
 
                 var normal = (currentPoint - previousPoint).GetNormal();
@@ -573,7 +558,7 @@ namespace mpESKD.Functions.mpLetterLine
                 return;
             var strokesLength = _strokeSpaceParams.Sum();
 
-            var rounds = (int) (lengthOfPartSegment / strokesLength);
+            var rounds = (int)(lengthOfPartSegment / strokesLength);
 
             var nextPoint = default(Vector3d);
             var firstPoint = previousPoint;
@@ -670,7 +655,7 @@ namespace mpESKD.Functions.mpLetterLine
             }
 
             var formulaSplit = StrokeFormula.Split('-');
-            var strokes = formulaSplit.Select(s => string.IsNullOrEmpty(s) ? 0 : int.Parse(s)).Select(d => (double) d)
+            var strokes = formulaSplit.Select(s => string.IsNullOrEmpty(s) ? 0 : int.Parse(s)).Select(d => (double)d)
                 .ToList();
 
             if (strokes.Count == 1)
@@ -709,7 +694,7 @@ namespace mpESKD.Functions.mpLetterLine
 
         private void CreateMTextOnWholeLengthOfPolyline()
         {
-            var mTextsQty = (int) (_mainPolyline.Length / MTextOffset);
+            var mTextsQty = (int)(_mainPolyline.Length / MTextOffset);
             var firstPointOffset = _mainPolyline.Length - (mTextsQty * MTextOffset);
 
             for (var i = 0; i <= mTextsQty; i++)
@@ -730,9 +715,9 @@ namespace mpESKD.Functions.mpLetterLine
                 }
                 else
                 {
-                    previousPoint = _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint);
-                    currentPoint = segmentParameterAtPoint < plineSegmentQty 
-                        ? _mainPolyline.GetPoint3dAt((int) segmentParameterAtPoint + 1) 
+                    previousPoint = _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint);
+                    currentPoint = segmentParameterAtPoint < plineSegmentQty
+                        ? _mainPolyline.GetPoint3dAt((int)segmentParameterAtPoint + 1)
                         : _mainPolyline.GetPoint3dAt(plineSegmentQty);
                 }
 

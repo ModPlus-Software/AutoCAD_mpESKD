@@ -6,7 +6,6 @@ namespace mpESKD.Functions.mpWeldJoint
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Base;
-    using Base.Abstractions;
     using Base.Attributes;
     using Base.Enums;
     using Base.Utils;
@@ -17,7 +16,7 @@ namespace mpESKD.Functions.mpWeldJoint
     /// </summary>
     [SmartEntityDisplayNameKey("h139")]
     [SystemStyleDescriptionKey("h142")]
-    public class WeldJoint : SmartEntity, ILinearEntity
+    public class WeldJoint : SmartLinearEntity
     {
         private WeldJointType _weldJointType = WeldJointType.ButtFactorySolidVisible;
         
@@ -55,11 +54,7 @@ namespace mpESKD.Functions.mpWeldJoint
             : base(objectId)
         {
         }
-
-        /// <inheritdoc />
-        [SaveToXData]
-        public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
+        
         private List<Point3d> MiddlePointsOCS
         {
             get
@@ -336,16 +331,7 @@ namespace mpESKD.Functions.mpWeldJoint
                 yield return middlePoint;
             }
         }
-
-        /// <inheritdoc/>
-        public void RebasePoints()
-        {
-            if (!MiddlePoints.Contains(EndPoint))
-            {
-                MiddlePoints.Add(EndPoint);
-            }
-        }
-
+        
         /// <inheritdoc/>
         public override void UpdateEntities()
         {

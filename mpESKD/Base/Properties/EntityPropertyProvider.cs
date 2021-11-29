@@ -202,7 +202,7 @@ namespace mpESKD.Base.Properties
                                     }
                                     else
                                     {
-                                        property.Value = propertyInfo.GetValue(intellectualEntity);
+                                        property.SetValue(propertyInfo.GetValue(intellectualEntity));
                                     }
                                 }
                             }
