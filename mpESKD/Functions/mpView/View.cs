@@ -30,7 +30,7 @@
         /// <summary>
         /// Средние штрихи - штрихи, создаваемые в средних точках
         /// </summary>
-        private readonly List<Polyline> _middleStrokes = new List<Polyline>();
+        //private readonly List<Polyline> _middleStrokes = new List<Polyline>();
 
         /// <summary>
         /// Верхняя полка
@@ -50,17 +50,17 @@
         /// <summary>
         /// Нижняя полка
         /// </summary>
-        private Line _bottomShelfLine;
+        //private Line _bottomShelfLine;
 
         /// <summary>
         /// Стрелка нижней полки
         /// </summary>
-        private Polyline _bottomShelfArrow;
+        //private Polyline _bottomShelfArrow;
 
         /// <summary>
         /// Нижний штрих
         /// </summary>
-        private Polyline _bottomStroke;
+        //private Polyline _bottomStroke;
 
         #region Text entities
 
@@ -68,7 +68,7 @@
         private Wipeout _topTextMask;
 
         private MText _bottomMText;
-        private Wipeout _bottomTextMask;
+        //private Wipeout _bottomTextMask;
 
         #endregion
 
@@ -149,9 +149,9 @@
         /// <summary>
         /// Длина среднего штриха (половина длины полилинии на переломе)
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 1, "p42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
-        [SaveToXData]
-        public int MiddleStrokeLength { get; set; } = 8;
+        //[EntityProperty(PropertiesCategory.Geometry, 1, "p42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
+        //[SaveToXData]
+        //public int MiddleStrokeLength { get; set; } = 8;
 
         /// <summary>
         /// Толщина штрихов
@@ -288,8 +288,8 @@
         public Point3d BottomShelfEndPoint { get; private set; }
 
         /// <summary>
-        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="SectionReverseGrip.OnHotGrip"/>)
-        /// Используется для определения положения ручки (<see cref="SectionGripPointOverrule"/>)
+        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="ViewReverseGrip.OnHotGrip"/>)
+        /// Используется для определения положения ручки (<see cref="ViewGripPointOverrule"/>)
         /// </summary>
         [SaveToXData]
         public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
@@ -302,18 +302,18 @@
                 var entities = new List<Entity>
                 {
                     _topTextMask,
-                    _bottomTextMask,
+                  //  _bottomTextMask,
                     
                     _topShelfLine,
                     _topShelfArrow,
-                    _topStroke,
-                    _bottomShelfLine,
-                    _bottomShelfArrow,
-                    _bottomStroke,
-                    _topMText,
-                    _bottomMText
+                    //_topStroke,
+                    //_bottomShelfLine,
+                    //_bottomShelfArrow,
+                    //_bottomStroke,
+                    _topMText
+                    //_bottomMText
                 };
-                entities.AddRange(_middleStrokes);
+                //entities.AddRange(_middleStrokes);
                 foreach (var e in entities)
                 {
                     SetImmutablePropertiesToNestedEntity(e);
@@ -402,19 +402,13 @@
             var strokesWidth = StrokeWidth * scale;
 
             // top and bottom strokes
-            var topStrokeEndPoint = GetTopStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
-            var bottomStrokeEndPoint = GetBottomStrokeEndPoint(insertionPoint, endPoint, middlePoints, scale);
-
-            _topStroke = new Polyline(2);
-            _topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-
-            _bottomStroke = new Polyline(2);
-            _bottomStroke.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            _bottomStroke.AddVertexAt(1, bottomStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            var topStrokeEndPoint = insertionPoint + ((insertionPoint - TopShelfEndPoint).GetNormal() * scale);
+            
+            //_topStroke = new Polyline(2);
+            //_topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
+            //_topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
-            var bottomStrokeNormalVector = (bottomStrokeEndPoint - endPoint).GetNormal();
 
             // shelf lines
             var topShelfStartPoint = insertionPoint + (topStrokeNormalVector * GetShelfOffset() * scale);
@@ -426,31 +420,16 @@
                 EndPoint = topShelfEndPoint
             };
 
-            var bottomShelfStartPoint = endPoint + (bottomStrokeNormalVector * GetShelfOffset() * scale);
-            var bottomShelfEndPoint = bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfLength * scale);
-            BottomShelfEndPoint = bottomShelfEndPoint.TransformBy(BlockTransform);
-            _bottomShelfLine = new Line
-            {
-                StartPoint = bottomShelfStartPoint,
-                EndPoint = bottomShelfEndPoint
-            };
-
             // shelf arrows
             var topShelfArrowStartPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale);
             _topShelfArrow = new Polyline(2);
             _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
             _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ToPoint2d(), 0.0, 0.0, 0.0);
 
-            var bottomShelfArrowStartPoint =
-                bottomShelfStartPoint + (bottomStrokeNormalVector.GetPerpendicularVector().Negate() * ShelfArrowLength * scale);
-            _bottomShelfArrow = new Polyline(2);
-            _bottomShelfArrow.AddVertexAt(0, bottomShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _bottomShelfArrow.AddVertexAt(1, bottomShelfStartPoint.ToPoint2d(), 0.0, 0.0, 0.0);
-
             // text
             var textContentsForTopText = GetTextContents(true);
-            var textContentsForBottomText = GetTextContents(false);
-            if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
+            
+            if (!string.IsNullOrEmpty(textContentsForTopText))
             {
                 var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
                 var textHeight = MainTextHeight * scale;
@@ -462,13 +441,13 @@
                     Attachment = AttachmentPoint.MiddleCenter
                 };
 
-                _bottomMText = new MText
-                {
-                    TextStyleId = textStyleId,
-                    Contents = textContentsForBottomText,
-                    TextHeight = textHeight,
-                    Attachment = AttachmentPoint.MiddleCenter
-                };
+                //_bottomMText = new MText
+                //{
+                //    TextStyleId = textStyleId,
+                //    Contents = textContentsForBottomText,
+                //    TextHeight = textHeight,
+                //    Attachment = AttachmentPoint.MiddleCenter
+                //};
 
                 // TextActualHeight = _topMText.ActualHeight;
                 // TextActualWidth = _topMText.ActualWidth;
@@ -501,76 +480,14 @@
 
                 TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
 
-                // bottom
-                alongShelfTextOffset = _bottomMText.ActualWidth / 2;
-                acrossShelfTextOffset = _bottomMText.ActualHeight / 2;
-                if (double.IsNaN(AlongBottomShelfTextOffset) && double.IsNaN(AcrossBottomShelfTextOffset))
-                {
-                    if ((bottomStrokeNormalVector.X > check || bottomStrokeNormalVector.X < -check) &&
-                        (bottomStrokeNormalVector.Y < check || bottomStrokeNormalVector.Y > -check))
-                    {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
-                    }
-
-                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() * alongShelfTextOffset);
-                    var bottomTextCenterPoint = tempPoint + (bottomStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _bottomMText.Location = bottomTextCenterPoint;
-                }
-                else
-                {
-                    var tempPoint = bottomShelfEndPoint + ((bottomShelfStartPoint - bottomShelfEndPoint).GetNormal() *
-                                    (AlongBottomShelfTextOffset + (_bottomMText.ActualWidth / 2)));
-                    var bottomTextCenterPoint =
-                        tempPoint + (bottomStrokeNormalVector * ((2 * scale) + (AcrossBottomShelfTextOffset + (_bottomMText.ActualHeight / 2))));
-                    _bottomMText.Location = bottomTextCenterPoint;
-                }
-
-                BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
-                
                 if (HideTextBackground)
                 {
                     var maskOffset = TextMaskOffset * scale;
                     _topTextMask = _topMText.GetBackgroundMask(maskOffset);
-                    _bottomTextMask = _bottomMText.GetBackgroundMask(maskOffset);
+                    //_bottomTextMask = _bottomMText.GetBackgroundMask(maskOffset);
                 }
             }
-            else
-            {
-                _bottomMText = null;
-            }
-
-            _middleStrokes.Clear();
-
-            // middle strokes
-            if (MiddlePoints.Any())
-            {
-                var middleStrokeLength = MiddleStrokeLength * scale;
-
-                var points = new List<Point3d> { insertionPoint };
-                points.AddRange(middlePoints);
-                points.Add(endPoint);
-
-                for (var i = 1; i < points.Count - 1; i++)
-                {
-                    var previousPoint = points[i - 1];
-                    var currentPoint = points[i];
-                    var nextPoint = points[i + 1];
-
-                    var middleStrokePolyline = new Polyline(3);
-                    middleStrokePolyline.AddVertexAt(
-                        0,
-                        (currentPoint + ((previousPoint - currentPoint).GetNormal() * middleStrokeLength)).ToPoint2d(),
-                        0, strokesWidth, strokesWidth);
-                    middleStrokePolyline.AddVertexAt(1, currentPoint.ToPoint2d(), 0, strokesWidth, strokesWidth);
-                    middleStrokePolyline.AddVertexAt(
-                        2,
-                        (currentPoint + ((nextPoint - currentPoint).GetNormal() * middleStrokeLength)).ToPoint2d(),
-                        0, strokesWidth, strokesWidth);
-
-                    _middleStrokes.Add(middleStrokePolyline);
-                }
-            }
+            
         }
 
         /// <summary>

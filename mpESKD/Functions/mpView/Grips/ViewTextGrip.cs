@@ -20,8 +20,6 @@
             GripType = GripType.Point;
             CachedAlongTopShelfTextOffset = view.AlongTopShelfTextOffset;
             CachedAcrossTopShelfTextOffset = view.AcrossTopShelfTextOffset;
-            CachedAlongBottomShelfTextOffset = view.AlongBottomShelfTextOffset;
-            CachedAcrossBottomShelfTextOffset = view.AcrossBottomShelfTextOffset;
         }
 
         /// <summary>
@@ -37,10 +35,6 @@
         public double CachedAlongTopShelfTextOffset { get; }
 
         public double CachedAcrossTopShelfTextOffset { get; }
-
-        public double CachedAlongBottomShelfTextOffset { get; }
-
-        public double CachedAcrossBottomShelfTextOffset { get; }
 
         public override string GetTooltip()
         {
@@ -72,17 +66,8 @@
                 // При отмене перемещения возвращаем временные значения
                 if (newStatus == Status.GripAbort)
                 {
-                    if (Name == TextGripName.TopText)
-                    {
-                        View.AlongTopShelfTextOffset = CachedAlongTopShelfTextOffset;
-                        View.AcrossTopShelfTextOffset = CachedAcrossTopShelfTextOffset;
-                    }
-
-                    if (Name == TextGripName.BottomText)
-                    {
-                        View.AlongBottomShelfTextOffset = CachedAlongBottomShelfTextOffset;
-                        View.AcrossBottomShelfTextOffset = CachedAcrossBottomShelfTextOffset;
-                    }
+                    View.AlongTopShelfTextOffset = CachedAlongTopShelfTextOffset;
+                    View.AcrossTopShelfTextOffset = CachedAcrossTopShelfTextOffset;
                 }
 
                 base.OnGripStatusChanged(entityId, newStatus);

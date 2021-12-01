@@ -13,6 +13,6 @@
         /// <summary>
         /// Grip of bottom text
         /// </summary>
-        BottomText
+        //BottomText
     }
 }

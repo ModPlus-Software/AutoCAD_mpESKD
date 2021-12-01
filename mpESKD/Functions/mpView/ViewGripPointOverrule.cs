@@ -35,95 +35,95 @@
                         };
                         grips.Add(vertexGrip);
 
-                        // middle points
-                        for (var index = 0; index < view.MiddlePoints.Count; index++)
-                        {
-                            vertexGrip = new ViewVertexGrip(view, index + 1)
-                            {
-                                GripPoint = view.MiddlePoints[index]
-                            };
-                            grips.Add(vertexGrip);
+                        //// middle points
+                        //for (var index = 0; index < view.MiddlePoints.Count; index++)
+                        //{
+                        //    vertexGrip = new ViewVertexGrip(view, index + 1)
+                        //    {
+                        //        GripPoint = view.MiddlePoints[index]
+                        //    };
+                        //    grips.Add(vertexGrip);
 
-                            var removeVertexGrip = new ViewRemoveVertexGrip(view, index + 1)
-                            {
-                                GripPoint = view.MiddlePoints[index] - (Vector3d.YAxis * 20 * curViewUnitSize)
-                            };
-                            grips.Add(removeVertexGrip);
-                        }
+                        //    var removeVertexGrip = new ViewRemoveVertexGrip(view, index + 1)
+                        //    {
+                        //        GripPoint = view.MiddlePoints[index] - (Vector3d.YAxis * 20 * curViewUnitSize)
+                        //    };
+                        //    grips.Add(removeVertexGrip);
+                        //}
 
                         // end point
-                        vertexGrip = new ViewVertexGrip(view, view.MiddlePoints.Count + 1)
-                        {
-                            GripPoint = view.EndPoint
-                        };
-                        grips.Add(vertexGrip);
+                        //vertexGrip = new ViewVertexGrip(view, 1)
+                        //{
+                        //    GripPoint = view.InsertionPoint
+                        //};
+                        //grips.Add(vertexGrip);
 
-                        #region AddVertex grips
+                        //#region AddVertex grips
 
-                        // add vertex grips
-                        for (var i = 0; i < view.MiddlePoints.Count; i++)
-                        {
-                            if (i == 0)
-                            {
-                                var addVertexGrip = new ViewAddVertexGrip(
-                                    view,
-                                    view.InsertionPoint, view.MiddlePoints[i])
-                                {
-                                    GripPoint = GeometryUtils.GetMiddlePoint3d(view.InsertionPoint, view.MiddlePoints[i])
-                                };
-                                grips.Add(addVertexGrip);
-                            }
-                            else
-                            {
-                                var addVertexGrip = new ViewAddVertexGrip(
-                                    view,
-                                    view.MiddlePoints[i - 1], view.MiddlePoints[i])
-                                {
-                                    GripPoint = GeometryUtils.GetMiddlePoint3d(view.MiddlePoints[i - 1], view.MiddlePoints[i])
-                                };
-                                grips.Add(addVertexGrip);
-                            }
+                        //// add vertex grips
+                        //for (var i = 0; i < view.MiddlePoints.Count; i++)
+                        //{
+                        //    if (i == 0)
+                        //    {
+                        //        var addVertexGrip = new ViewAddVertexGrip(
+                        //            view,
+                        //            view.InsertionPoint, view.MiddlePoints[i])
+                        //        {
+                        //            GripPoint = GeometryUtils.GetMiddlePoint3d(view.InsertionPoint, view.MiddlePoints[i])
+                        //        };
+                        //        grips.Add(addVertexGrip);
+                        //    }
+                        //    else
+                        //    {
+                        //        var addVertexGrip = new ViewAddVertexGrip(
+                        //            view,
+                        //            view.MiddlePoints[i - 1], view.MiddlePoints[i])
+                        //        {
+                        //            GripPoint = GeometryUtils.GetMiddlePoint3d(view.MiddlePoints[i - 1], view.MiddlePoints[i])
+                        //        };
+                        //        grips.Add(addVertexGrip);
+                        //    }
 
-                            // last segment
-                            if (i == view.MiddlePoints.Count - 1)
-                            {
-                                var addVertexGrip = new ViewAddVertexGrip(
-                                    view,
-                                    view.MiddlePoints[i], view.EndPoint)
-                                {
-                                    GripPoint = GeometryUtils.GetMiddlePoint3d(view.MiddlePoints[i], view.EndPoint)
-                                };
-                                grips.Add(addVertexGrip);
-                            }
-                        }
+                        //    // last segment
+                        //    if (i == view.MiddlePoints.Count - 1)
+                        //    {
+                        //        var addVertexGrip = new ViewAddVertexGrip(
+                        //            view,
+                        //            view.MiddlePoints[i], view.EndPoint)
+                        //        {
+                        //            GripPoint = GeometryUtils.GetMiddlePoint3d(view.MiddlePoints[i], view.EndPoint)
+                        //        };
+                        //        grips.Add(addVertexGrip);
+                        //    }
+                        //}
 
-                        if (!view.MiddlePoints.Any())
-                        {
-                            var addVertexGrip = new ViewAddVertexGrip(view, view.InsertionPoint, view.EndPoint)
-                            {
-                                GripPoint = GeometryUtils.GetMiddlePoint3d(view.InsertionPoint, view.EndPoint)
-                            };
-                            grips.Add(addVertexGrip);
-                        }
+                        //if (!view.MiddlePoints.Any())
+                        //{
+                        //    var addVertexGrip = new ViewAddVertexGrip(view, view.InsertionPoint, view.EndPoint)
+                        //    {
+                        //        GripPoint = GeometryUtils.GetMiddlePoint3d(view.InsertionPoint, view.EndPoint)
+                        //    };
+                        //    grips.Add(addVertexGrip);
+                        //}
 
-                        #endregion
+                        //#endregion
 
                         #region Reverse Grips
 
-                        var reverseGrip = new ViewReverseGrip(view)
-                        {
-                            GripPoint = view.EntityDirection == EntityDirection.LeftToRight
-                                ? view.TopShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
-                                : view.TopShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
-                        };
-                        grips.Add(reverseGrip);
-                        reverseGrip = new ViewReverseGrip(view)
-                        {
-                            GripPoint = view.EntityDirection == EntityDirection.LeftToRight
-                                ? view.BottomShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
-                                : view.BottomShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
-                        };
-                        grips.Add(reverseGrip);
+                        //var reverseGrip = new ViewReverseGrip(view)
+                        //{
+                        //    GripPoint = view.EntityDirection == EntityDirection.LeftToRight
+                        //        ? view.TopShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
+                        //        : view.TopShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
+                        //};
+                        //grips.Add(reverseGrip);
+                        //reverseGrip = new ViewReverseGrip(view)
+                        //{
+                        //    GripPoint = view.EntityDirection == EntityDirection.LeftToRight
+                        //        ? view.BottomShelfEndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
+                        //        : view.BottomShelfEndPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
+                        //};
+                        //grips.Add(reverseGrip);
 
                         #endregion
 
@@ -139,15 +139,15 @@
                             grips.Add(textGrip);
                         }
 
-                        if (view.BottomDesignationPoint != Point3d.Origin && view.HasTextValue())
-                        {
-                            var textGrip = new ViewTextGrip(view)
-                            {
-                                GripPoint = view.BottomDesignationPoint,
-                                Name = TextGripName.BottomText
-                            };
-                            grips.Add(textGrip);
-                        }
+                        //if (view.BottomDesignationPoint != Point3d.Origin && view.HasTextValue())
+                        //{
+                        //    var textGrip = new ViewTextGrip(view)
+                        //    {
+                        //        GripPoint = view.BottomDesignationPoint,
+                        //        Name = TextGripName.BottomText
+                        //    };
+                        //    grips.Add(textGrip);
+                        //}
 
                         #endregion
                     }
@@ -222,76 +222,76 @@
                                     View.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
                                 }
 
-                                if (MainSettings.Instance.ViewDependentTextMovement)
-                                {
-                                    if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
-                                    {
-                                        View.AlongBottomShelfTextOffset = deltaX;
-                                    }
-                                    else
-                                    {
-                                        View.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
-                                    }
+                                //if (MainSettings.Instance.ViewDependentTextMovement)
+                                //{
+                                //    if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                                //    {
+                                //        View.AlongBottomShelfTextOffset = deltaX;
+                                //    }
+                                //    else
+                                //    {
+                                //        View.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                                //    }
 
-                                    if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
-                                    {
-                                        View.AcrossBottomShelfTextOffset = deltaY;
-                                    }
-                                    else
-                                    {
-                                        View.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
-                                    }
-                                }
+                                //    if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                                //    {
+                                //        View.AcrossBottomShelfTextOffset = deltaY;
+                                //    }
+                                //    else
+                                //    {
+                                //        View.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                                //    }
+                                //}
                             }
 
-                            if (textGrip.Name == TextGripName.BottomText)
-                            {
-                                var bottomStrokeVector = View.MiddlePoints.Any()
-                                    ? (View.EndPoint - View.MiddlePoints.Last()).GetNormal()
-                                    : (View.EndPoint - View.InsertionPoint).GetNormal();
-                                var bottomShelfVector = bottomStrokeVector.GetPerpendicularVector();
-                                var deltaY = bottomStrokeVector.DotProduct(offset) / View.BlockTransform.GetScale();
-                                var deltaX = bottomShelfVector.DotProduct(offset) / View.BlockTransform.GetScale();
+                            //if (textGrip.Name == TextGripName.BottomText)
+                            //{
+                            //    var bottomStrokeVector = View.MiddlePoints.Any()
+                            //        ? (View.EndPoint - View.MiddlePoints.Last()).GetNormal()
+                            //        : (View.EndPoint - View.InsertionPoint).GetNormal();
+                            //    var bottomShelfVector = bottomStrokeVector.GetPerpendicularVector();
+                            //    var deltaY = bottomStrokeVector.DotProduct(offset) / View.BlockTransform.GetScale();
+                            //    var deltaX = bottomShelfVector.DotProduct(offset) / View.BlockTransform.GetScale();
 
-                                if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
-                                {
-                                    View.AlongBottomShelfTextOffset = deltaX;
-                                }
-                                else
-                                {
-                                    View.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
-                                }
+                            //    if (double.IsNaN(textGrip.CachedAlongBottomShelfTextOffset))
+                            //    {
+                            //        View.AlongBottomShelfTextOffset = deltaX;
+                            //    }
+                            //    else
+                            //    {
+                            //        View.AlongBottomShelfTextOffset = textGrip.CachedAlongBottomShelfTextOffset + deltaX;
+                            //    }
 
-                                if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
-                                {
-                                    View.AcrossBottomShelfTextOffset = deltaY;
-                                }
-                                else
-                                {
-                                    View.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
-                                }
+                            //    if (double.IsNaN(textGrip.CachedAcrossBottomShelfTextOffset))
+                            //    {
+                            //        View.AcrossBottomShelfTextOffset = deltaY;
+                            //    }
+                            //    else
+                            //    {
+                            //        View.AcrossBottomShelfTextOffset = textGrip.CachedAcrossBottomShelfTextOffset + deltaY;
+                            //    }
 
-                                if (MainSettings.Instance.ViewDependentTextMovement)
-                                {
-                                    if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
-                                    {
-                                        View.AlongTopShelfTextOffset = deltaX;
-                                    }
-                                    else
-                                    {
-                                        View.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
-                                    }
+                            //    if (MainSettings.Instance.ViewDependentTextMovement)
+                            //    {
+                            //        if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                            //        {
+                            //            View.AlongTopShelfTextOffset = deltaX;
+                            //        }
+                            //        else
+                            //        {
+                            //            View.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+                            //        }
 
-                                    if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
-                                    {
-                                        View.AcrossTopShelfTextOffset = deltaY;
-                                    }
-                                    else
-                                    {
-                                        View.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
-                                    }
-                                }
-                            }
+                            //        if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
+                            //        {
+                            //            View.AcrossTopShelfTextOffset = deltaY;
+                            //        }
+                            //        else
+                            //        {
+                            //            View.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
+                            //        }
+                            //    }
+                            //}
 
                             View.UpdateEntities();
                             View.BlockRecord.UpdateAnonymousBlocks();

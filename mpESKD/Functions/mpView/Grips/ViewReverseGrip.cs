@@ -19,7 +19,7 @@
         public ViewReverseGrip(View view)
         {
             View = view;
-            GripType = GripType.TwoArrowsUpDown;
+            GripType = GripType.BasePoint;
         }
 
         /// <summary>
