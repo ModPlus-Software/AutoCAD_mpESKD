@@ -237,47 +237,9 @@
                             break;
                         }
                     }
-                    else
-                    {
-                        entityJig.JigState = JigState.PromptNextPoint;
-                        if (entityJig.PreviousPoint == null)
-                        {
-                            entityJig.PreviousPoint = View.MiddlePoints.Any()
-                                ? View.MiddlePoints.Last()
-                                : View.InsertionPoint;
-                        }
-                        else
-                        {
-                            View.RebasePoints();
-                            entityJig.PreviousPoint = View.MiddlePoints.Last();
-                        }
-                    }
-                }
-                else
-                {
-                    if (View.MiddlePoints.Any())
-                    {
-                        View.EndPoint = View.MiddlePoints.Last();
-                        View.MiddlePoints.RemoveAt(View.MiddlePoints.Count - 1);
-                        View.UpdateEntities();
-                        View.BlockRecord.UpdateAnonymousBlocks();
-                    }
-                    else
-                    {
-                        // if no middle points - remove entity
-                        using (AcadUtils.Document.LockDocument())
-                        {
-                            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                            {
-                                var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                                obj.Erase(true);
-                                tr.Commit();
-                            }
-                        }
-                    }
 
-                    break;
                 }
+               
             }
             while (true);
 

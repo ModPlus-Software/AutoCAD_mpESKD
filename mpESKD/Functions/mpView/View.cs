@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpView
+﻿using System.Diagnostics;
+
+namespace mpESKD.Functions.mpView
 {
     using System;
     using System.Collections.Generic;
@@ -28,11 +30,6 @@
         #region Entities
 
         /// <summary>
-        /// Средние штрихи - штрихи, создаваемые в средних точках
-        /// </summary>
-        //private readonly List<Polyline> _middleStrokes = new List<Polyline>();
-
-        /// <summary>
         /// Верхняя полка
         /// </summary>
         private Line _topShelfLine;
@@ -42,33 +39,10 @@
         /// </summary>
         private Polyline _topShelfArrow;
 
-        /// <summary>
-        /// Верхний штрих
-        /// </summary>
-        private Polyline _topStroke;
-
-        /// <summary>
-        /// Нижняя полка
-        /// </summary>
-        //private Line _bottomShelfLine;
-
-        /// <summary>
-        /// Стрелка нижней полки
-        /// </summary>
-        //private Polyline _bottomShelfArrow;
-
-        /// <summary>
-        /// Нижний штрих
-        /// </summary>
-        //private Polyline _bottomStroke;
-
         #region Text entities
 
         private MText _topMText;
         private Wipeout _topTextMask;
-
-        private MText _bottomMText;
-        //private Wipeout _bottomTextMask;
 
         #endregion
 
@@ -102,33 +76,11 @@
         }
         
         /// <summary>
-        /// Промежуточные точки
-        /// </summary>
-        [SaveToXData]
-        public List<Point3d> MiddlePoints { get; set; } = new List<Point3d>();
-
-        // ReSharper disable once InconsistentNaming
-        private List<Point3d> MiddlePointsOCS
-        {
-            get
-            {
-                var points = new List<Point3d>();
-                MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-                return points;
-            }
-        }
-
-        /// <summary>
         /// Точка вставки верхнего текста обозначения
         /// </summary>
         [SaveToXData]
         public Point3d TopDesignationPoint { get; private set; } = Point3d.Origin;
 
-        /// <summary>
-        /// Точка вставки нижнего текста обозначения
-        /// </summary>
-        [SaveToXData]
-        public Point3d BottomDesignationPoint { get; private set; } = Point3d.Origin;
         
         /// <inheritdoc />
         /// В примитиве не используется!
@@ -152,20 +104,6 @@
         //[EntityProperty(PropertiesCategory.Geometry, 1, "p42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
         //[SaveToXData]
         //public int MiddleStrokeLength { get; set; } = 8;
-
-        /// <summary>
-        /// Толщина штрихов
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 2, "p43", 0.5, 0, 2, descLocalKey: "d43", nameSymbol: "w")]
-        [SaveToXData]
-        public double StrokeWidth { get; set; } = 0.5;
-
-        /// <summary>
-        /// Длина верхнего и нижнего штриха
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", 10, 5, 10, descLocalKey: "d44", nameSymbol: "b")]
-        [SaveToXData]
-        public int StrokeLength { get; set; } = 10;
 
         /// <summary>
         /// Отступ полки по длине штриха в процентах
@@ -282,11 +220,10 @@
         public Point3d TopShelfEndPoint { get; private set; }
 
         /// <summary>
-        /// Конечная точка нижней полки
+        /// Точка выноски
         /// </summary>
         [SaveToXData]
-        public Point3d BottomShelfEndPoint { get; private set; }
-
+        public Point3d TextPoint { get; set; }
         /// <summary>
         /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="ViewReverseGrip.OnHotGrip"/>)
         /// Используется для определения положения ручки (<see cref="ViewGripPointOverrule"/>)
@@ -328,10 +265,6 @@
         {
             yield return InsertionPoint;
             yield return EndPoint;
-            foreach (var middlePoint in MiddlePoints)
-            {
-                yield return middlePoint;
-            }
         }
 
         /// <inheritdoc />
@@ -344,18 +277,18 @@
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint,scale);
                 }
-                else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
-                {
-                    // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
-                }
+                
                 else
                 {
                     // Задание любой другой точки
-                    CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS, scale);
+                    CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                 }
+
+                //// Задание первой точки (точки вставки). Она же точка начала отсчета
+
+
             }
             catch (Exception exception)
             {
@@ -363,17 +296,7 @@
             }
         }
 
-        /// <summary>
-        /// Перестроение точек - помещение EndPoint в список
-        /// </summary>
-        public void RebasePoints()
-        {
-            if (!MiddlePoints.Contains(EndPoint))
-            {
-                MiddlePoints.Add(EndPoint);
-            }
-        }
-
+        
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
             if (variant == UpdateVariant.SetInsertionPoint)
@@ -383,24 +306,22 @@
                 */
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X, InsertionPointOCS.Y - (MinDistanceBetweenPoints * scale), InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
             }
-            else if (variant == UpdateVariant.SetEndPointMinLength)
+            else
             {
                 /* Изменение базовых примитивов в момент указания второй точки
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                     InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                UpdateEntities();
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
         }
 
-        private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
+        private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
         {
-            var strokesWidth = StrokeWidth * scale;
-
             // top and bottom strokes
             var topStrokeEndPoint = insertionPoint + ((insertionPoint - TopShelfEndPoint).GetNormal() * scale);
             
@@ -411,7 +332,7 @@
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
 
             // shelf lines
-            var topShelfStartPoint = insertionPoint + (topStrokeNormalVector * GetShelfOffset() * scale);
+            var topShelfStartPoint = insertionPoint ;
             var topShelfEndPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale);
             TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
             _topShelfLine = new Line
@@ -468,14 +389,18 @@
 
                     var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
                     var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
-                    _topMText.Location = topTextCenterPoint;
+                    _topMText.Location = endPoint;
+                    AcadUtils.WriteMessageInDebug("if if ");
+                    Debug.Print("if if");
                 }
                 else
                 {
+                    Debug.Print("else");
+                    AcadUtils.WriteMessageInDebug("else ");
                     var tempPoint = topShelfEndPoint +
                                     ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
-                    _topMText.Location = topTextCenterPoint;
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
+                    _topMText.Location = endPoint;
                 }
 
                 TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
@@ -505,30 +430,7 @@
             return true;
         }
 
-        private double GetShelfOffset()
-        {
-            return StrokeLength * ShelfOffset / 100.0;
-        }
-
-        private Point3d GetBottomStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
-        {
-            if (MiddlePoints.Any())
-            {
-                return endPoint + ((endPoint - middlePoints.Last()).GetNormal() * StrokeLength * scale);
-            }
-
-            return endPoint + ((endPoint - insertionPoint).GetNormal() * StrokeLength * scale);
-        }
-
-        private Point3d GetTopStrokeEndPoint(Point3d insertionPoint, Point3d endPoint, List<Point3d> middlePoints, double scale)
-        {
-            if (MiddlePoints.Any())
-            {
-                return insertionPoint + ((insertionPoint - middlePoints.First()).GetNormal() * StrokeLength * scale);
-            }
-
-            return insertionPoint + ((insertionPoint - endPoint).GetNormal() * StrokeLength * scale);
-        }
+        
 
         private void SetFirstTextOnCreation()
         {

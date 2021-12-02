@@ -24,10 +24,10 @@
         /// </summary>
         /// <param name="view">Экземпляр класса <see cref="mpView.View"/></param>
         /// <param name="index">Индекс ручки</param>
-        public ViewVertexGrip(View view, int index)
+        public ViewVertexGrip(View view, GripName gripName)
         {
             View = view;
-            GripIndex = index;
+            GripName = gripName;
             GripType = GripType.Point;
             
             /* При инициализации ручки нужно собрать все точки разреза и поместить их в поле _points.
@@ -35,7 +35,6 @@
              * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
              * MoveGripPointsAt происходит вызов метода UpdateEntities */
             _points = new List<Point3d> { View.InsertionPoint };
-            _points.AddRange(View.MiddlePoints);
             _points.Add(View.EndPoint);
         }
 
@@ -47,7 +46,7 @@
         /// <summary>
         /// Индекс ручки
         /// </summary>
-        public int GripIndex { get; }
+        public GripName GripName { get; }
 
         /// <inheritdoc />
         public override string GetTooltip()
@@ -93,18 +92,11 @@
                 {
                     if (_gripTmp != null)
                     {
-                        if (GripIndex == 0)
+                        if (GripName == GripName.StartGrip)
                         {
                             View.InsertionPoint = _gripTmp;
                         }
-                        else if (GripIndex == View.MiddlePoints.Count + 1)
-                        {
-                            View.EndPoint = _gripTmp;
-                        }
-                        else
-                        {
-                            View.MiddlePoints[GripIndex - 1] = _gripTmp;
-                        }
+                        
                     }
                 }
 
@@ -118,23 +110,23 @@
         }
 
         /// <inheritdoc />
-        public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
-        {
-            if (GripIndex > 0 && MainSettings.Instance.SectionShowHelpLineOnSelection)
-            {
-                var backupColor = worldDraw.SubEntityTraits.Color;
-                var backupFillType = worldDraw.SubEntityTraits.FillType;
+        //public override bool WorldDraw(WorldDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, double dGripSize)
+        //{
+        //    if (GripIndex > 0 && MainSettings.Instance.SectionShowHelpLineOnSelection)
+        //    {
+        //        var backupColor = worldDraw.SubEntityTraits.Color;
+        //        var backupFillType = worldDraw.SubEntityTraits.FillType;
 
-                worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
-                worldDraw.SubEntityTraits.Color = 40;
-                worldDraw.Geometry.WorldLine(_points[GripIndex - 1], _points[GripIndex]);
+        //        worldDraw.SubEntityTraits.FillType = FillType.FillAlways;
+        //        worldDraw.SubEntityTraits.Color = 40;
+        //        worldDraw.Geometry.WorldLine(_points[GripIndex - 1], _points[GripIndex]);
 
-                // restore
-                worldDraw.SubEntityTraits.Color = backupColor;
-                worldDraw.SubEntityTraits.FillType = backupFillType;
-            }
+        //        // restore
+        //        worldDraw.SubEntityTraits.Color = backupColor;
+        //        worldDraw.SubEntityTraits.FillType = backupFillType;
+        //    }
 
-            return base.WorldDraw(worldDraw, entityId, type, imageGripPoint, dGripSize);
-        }
+        //    return base.WorldDraw(worldDraw, entityId, type, imageGripPoint, dGripSize);
+        //}
     }
 }

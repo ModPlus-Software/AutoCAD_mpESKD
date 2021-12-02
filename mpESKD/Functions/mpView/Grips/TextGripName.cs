@@ -8,11 +8,6 @@
         /// <summary>
         /// Grip of top text
         /// </summary>
-        TopText,
-
-        /// <summary>
-        /// Grip of bottom text
-        /// </summary>
-        //BottomText
+        TopText
     }
 }

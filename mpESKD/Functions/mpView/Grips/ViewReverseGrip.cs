@@ -35,7 +35,7 @@
                 Point3d newInsertionPoint = View.EndPoint;
                 View.EndPoint = View.InsertionPoint;
                 View.InsertionPoint = newInsertionPoint;
-                View.MiddlePoints.Reverse();
+                
 
                 // swap direction
                 View.EntityDirection = View.EntityDirection == EntityDirection.LeftToRight
