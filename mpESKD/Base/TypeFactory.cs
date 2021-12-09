@@ -22,17 +22,17 @@
         /// <summary>
         /// Singleton instance
         /// </summary>
-        public static TypeFactory Instance => _instance ?? (_instance = new TypeFactory());
+        public static TypeFactory Instance => _instance ??= new TypeFactory();
 
         /// <summary>
         /// Возвращает список типов интеллектуальных объектов
         /// </summary>
         public List<Type> GetEntityTypes()
         {
-            return _entityTypes ?? (_entityTypes = typeof(TypeFactory).Assembly
+            return _entityTypes ??= typeof(TypeFactory).Assembly
                 .GetTypes()
-                .Where(t => t.IsSubclassOf(typeof(SmartEntity)))
-                .ToList());
+                .Where(t => !t.IsAbstract && t.IsSubclassOf(typeof(SmartEntity)))
+                .ToList();
         }
 
         /// <summary>

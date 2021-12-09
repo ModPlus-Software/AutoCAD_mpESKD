@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <Version>1.17.7.0</Version>
+    <Version>1.17.8.0</Version>
     <RootNamespace>mpESKD</RootNamespace>
   </PropertyGroup>
 
