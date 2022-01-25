@@ -60,15 +60,20 @@
                 {
                     using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        var lt = tr.GetObject(Database.LayerTableId, OpenMode.ForRead) as LayerTable;
-                        if (lt != null)
+                        if (tr.GetObject(Database.LayerTableId, OpenMode.ForRead) is LayerTable lt)
                         {
                             foreach (var layerId in lt)
                             {
-                                var layer = tr.GetObject(layerId, OpenMode.ForRead) as LayerTableRecord;
-                                if (layer != null && !layer.IsErased && !layer.IsEraseStatusToggled)
+                                try
                                 {
-                                    layers.Add(layer.Name);
+                                    if (tr.GetObject(layerId, OpenMode.ForRead) is LayerTableRecord { IsErased: false, IsEraseStatusToggled: false } layer)
+                                    {
+                                        layers.Add(layer.Name);
+                                    }
+                                }
+                                catch
+                                {
+                                    // ignore
                                 }
                             }
                         }
@@ -144,7 +149,7 @@
         /// <param name="objectId">Идентификатор примитива</param>
         /// <param name="openErased">Открыть с меткой "Стерто"</param>
         /// <param name="forceOpenOnLockedLayer">Открыть объект на заблокированном слое</param>
-        public static T Read<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
+        public static T Read<T>(this ObjectId objectId, bool openErased = true, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
             return objectId.GetObject(0, openErased, forceOpenOnLockedLayer) as T;
@@ -157,7 +162,7 @@
         /// <param name="objectId">Идентификатор примитива</param>
         /// <param name="openErased">Открыть с меткой "Стерто"</param>
         /// <param name="forceOpenOnLockedLayer">Открыть объект на заблокированном слое</param>
-        public static T Write<T>(this ObjectId objectId, bool openErased = false, bool forceOpenOnLockedLayer = true)
+        public static T Write<T>(this ObjectId objectId, bool openErased = true, bool forceOpenOnLockedLayer = true)
             where T : DBObject
         {
             return objectId.GetObject(OpenMode.ForWrite, openErased, forceOpenOnLockedLayer) as T;

@@ -22,12 +22,9 @@
     {
         static StyleManager()
         {
-            if (EntityStyles == null)
-            {
-                EntityStyles = new List<SmartEntityStyle>();
-                CheckStyleFiles();
-                CreateSystemStyles();
-            }
+            EntityStyles = new List<SmartEntityStyle>();
+            CheckStyleFiles();
+            CreateSystemStyles();
         }
 
         /// <summary>

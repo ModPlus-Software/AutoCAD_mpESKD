@@ -655,8 +655,7 @@ namespace mpESKD.Functions.mpLetterLine
             }
 
             var formulaSplit = StrokeFormula.Split('-');
-            var strokes = formulaSplit.Select(s => string.IsNullOrEmpty(s) ? 0 : int.Parse(s)).Select(d => (double)d)
-                .ToList();
+            var strokes = formulaSplit.Select(s => double.TryParse(s, out var d) ? d : 0).ToList();
 
             if (strokes.Count == 1)
             {

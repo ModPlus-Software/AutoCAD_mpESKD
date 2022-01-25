@@ -1,151 +1,151 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
-  <PropertyGroup>
-    <Version>1.17.8.0</Version>
-    <RootNamespace>mpESKD</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Version>1.17.9.0</Version>
+		<RootNamespace>mpESKD</RootNamespace>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Company>modplus.org</Company>
-    <Authors>modplus.org</Authors>
-    <Product>ModPlus</Product>
-    <Copyright>Copyright © ModPlus</Copyright>
-    <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
-    <Platform>x64</Platform>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Optimize>false</Optimize>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseWpf>true</UseWpf>
-    <MSBuildWarningsAsMessages>MSB3270</MSBuildWarningsAsMessages>
-			<LangVersion>latest</LangVersion>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Company>modplus.org</Company>
+		<Authors>modplus.org</Authors>
+		<Product>ModPlus</Product>
+		<Copyright>Copyright © ModPlus</Copyright>
+		<CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
+		<Platform>x64</Platform>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<Optimize>false</Optimize>
+		<Prefer32Bit>false</Prefer32Bit>
+		<UseWpf>true</UseWpf>
+		<MSBuildWarningsAsMessages>MSB3270</MSBuildWarningsAsMessages>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
-    <None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
-    <None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
-    <None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
+		<None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
+		<None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
+		<None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
-    <PackageReference Include="ModPlusAPI" Version="7.14.1" ExcludeAssets="runtime" />
-    <PackageReference Include="ModPlusStyle" Version="4.1.0" ExcludeAssets="runtime" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusAPI" Version="7.14.1" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusStyle" Version="4.1.0" ExcludeAssets="runtime" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsFormsIntegration" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Windows.Forms" />
+		<Reference Include="WindowsFormsIntegration" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
-    <Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
-    <Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
-    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
-    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
-    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
-    <Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32_dark.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16_dark.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
-    <Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
-    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
-    <Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
-    <Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
-    <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
-    <Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
-    <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
-    <Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
-    <Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
-    <Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16.png" />
-    <Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
-    <Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
-    <Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16_dark.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16_dark.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
-    <Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
-    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32.png" />
-    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32_dark.png" />
-    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32.png" />
-    <Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32_dark.png" />
-    <Resource Include="Resources\mpESKD_32x32.png" />
-    <Resource Include="Resources\Properties_32x32.png" />
-    <Resource Include="Resources\Properties_32x32_dark.png" />
-    <Resource Include="Resources\SearchEntitiesByValues_32x32.png" />
-    <Resource Include="Resources\SearchEntitiesByValues_32x32_dark.png" />
-    <Resource Include="Resources\SearchEntities_32x32.png" />
-    <Resource Include="Resources\SearchEntities_32x32_dark.png" />
-    <Resource Include="Resources\StyleEditor_32x32.png" />
-    <Resource Include="Resources\StyleEditor_32x32_dark.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32_dark.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
+		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
+		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
+		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
+		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
+		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32_dark.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_16x16_dark.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLineFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_16x16_dark.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32.png" />
+		<Resource Include="Functions\mpGroundLine\Icons\mpGroundLine_32x32_dark.png" />
+		<Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
+		<Resource Include="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
+		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32.png" />
+		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
+		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
+		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
+		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
+		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
+		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
+		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32_dark.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
+		<Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
+		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16.png" />
+		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
+		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
+		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16_dark.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_16x16_dark.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32.png" />
+		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofing_32x32_dark.png" />
+		<Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpWeldJoint\Icons\mpWeldJointFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32.png" />
+		<Resource Include="Functions\mpWeldJoint\Icons\mpWeldJoint_32x32_dark.png" />
+		<Resource Include="Resources\mpESKD_32x32.png" />
+		<Resource Include="Resources\Properties_32x32.png" />
+		<Resource Include="Resources\Properties_32x32_dark.png" />
+		<Resource Include="Resources\SearchEntitiesByValues_32x32.png" />
+		<Resource Include="Resources\SearchEntitiesByValues_32x32_dark.png" />
+		<Resource Include="Resources\SearchEntities_32x32.png" />
+		<Resource Include="Resources\SearchEntities_32x32_dark.png" />
+		<Resource Include="Resources\StyleEditor_32x32.png" />
+		<Resource Include="Resources\StyleEditor_32x32_dark.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml.cs">
+			<SubType>Code</SubType>
+		</Compile>
+		<Compile Update="Properties\Settings.Designer.cs">
+			<DesignTimeSharedInput>True</DesignTimeSharedInput>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Settings.settings</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Update="Properties\Settings.settings">
+			<Generator>SettingsSingleFileGenerator</Generator>
+			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Page Update="Functions\mpViewLabel\ViewLabel.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Functions\mpWeldJoint\WeldJoint.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Functions\mpAxis\Axis.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
+	<ItemGroup>
+		<Page Update="Functions\mpViewLabel\ViewLabel.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Functions\mpWeldJoint\WeldJoint.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Functions\mpAxis\Axis.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Functions\mpSection\Overrules\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Functions\mpSection\Overrules\" />
+	</ItemGroup>
 
 </Project>

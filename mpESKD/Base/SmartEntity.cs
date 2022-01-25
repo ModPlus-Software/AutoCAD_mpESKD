@@ -112,7 +112,7 @@ namespace mpESKD.Base
         {
             get
             {
-                if (_scale != null)
+                if (_scale != null && AcadUtils.ObjectContextCollection.HasContext(_scale.Name))
                 {
                     return _scale;
                 }
@@ -313,13 +313,13 @@ namespace mpESKD.Base
             BlockTableRecord blockTableRecord;
             using (AcadUtils.Document.LockDocument())
             {
-                using (blockTableRecord = blockReference.BlockTableRecord.Open(OpenMode.ForWrite) as BlockTableRecord)
+                using (blockTableRecord = blockReference.BlockTableRecord.Open(OpenMode.ForWrite, true, true) as BlockTableRecord)
                 {
                     if (blockTableRecord != null)
                     {
                         foreach (var objectId in blockTableRecord)
                         {
-                            using (var ent = objectId.Open(OpenMode.ForWrite))
+                            using (var ent = objectId.Open(OpenMode.ForWrite, true, true))
                             {
                                 ent.Erase(true);
                             }
@@ -616,11 +616,18 @@ namespace mpESKD.Base
         {
             if (entity == null)
                 return;
-            entity.Layer = "0";
-            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-            entity.LineWeight = LineWeight.ByBlock;
-            entity.Linetype = "Continuous";
-            entity.LinetypeScale = 1.0;
+            try
+            {
+                entity.Layer = "0";
+                entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                entity.LineWeight = LineWeight.ByBlock;
+                entity.Linetype = "Continuous";
+                entity.LinetypeScale = 1.0;
+            }
+            catch
+            {
+                // ignore
+            }
         }
 
         /// <inheritdoc />
@@ -628,11 +635,18 @@ namespace mpESKD.Base
         {
             if (entity == null)
                 return;
-            entity.Layer = "0";
-            entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
-            entity.LineWeight = LineWeight.ByBlock;
-            entity.Linetype = "ByBlock";
-            entity.LinetypeScale = LineTypeScale;
+            try
+            {
+                entity.Layer = "0";
+                entity.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+                entity.LineWeight = LineWeight.ByBlock;
+                entity.Linetype = "ByBlock";
+                entity.LinetypeScale = LineTypeScale;
+            }
+            catch
+            {
+                // ignore
+            }
         }
 
         /// <inheritdoc/>
