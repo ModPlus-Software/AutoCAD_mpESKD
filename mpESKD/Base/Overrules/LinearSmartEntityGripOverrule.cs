@@ -204,14 +204,14 @@
                     var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
                     {
                         GripPoint = linearEntity.EndPoint +
-                                    ((linearEntity.EndPoint - linearEntity.MiddlePoints.Last()).GetNormal() * 20 * curViewUnitSize)
+                                    ((linearEntity.EndPoint - linearEntity.MiddlePoints.Last()).GetNormal() * 40 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
                     addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.InsertionPoint)
                     {
                         GripPoint = linearEntity.InsertionPoint +
-                                    ((linearEntity.InsertionPoint - linearEntity.MiddlePoints.First()).GetNormal() * 20 * curViewUnitSize)
+                                    ((linearEntity.InsertionPoint - linearEntity.MiddlePoints.First()).GetNormal() * 40 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
                 }
@@ -220,14 +220,14 @@
                     var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
                     {
                         GripPoint = linearEntity.EndPoint +
-                                    ((linearEntity.InsertionPoint - linearEntity.EndPoint).GetNormal() * 20 * curViewUnitSize)
+                                    ((linearEntity.InsertionPoint - linearEntity.EndPoint).GetNormal() * 40 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
                     addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.EndPoint)
                     {
                         GripPoint = linearEntity.InsertionPoint +
-                                    ((linearEntity.EndPoint - linearEntity.InsertionPoint).GetNormal() * 20 * curViewUnitSize)
+                                    ((linearEntity.EndPoint - linearEntity.InsertionPoint).GetNormal() * 40 * curViewUnitSize)
                     };
                     yield return addVertexGrip;
 
