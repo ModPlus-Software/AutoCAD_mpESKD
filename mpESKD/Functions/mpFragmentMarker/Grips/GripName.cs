@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips;
+
+/// <summary>
+/// Grip names
+/// </summary>
+public enum GripName
 {
     /// <summary>
-    /// Grip names
+    /// Start grip
     /// </summary>
-    public enum GripName
-    {
-        /// <summary>
-        /// Start grip
-        /// </summary>
-        StartGrip,
+    StartGrip,
 
-        /// <summary>
-        /// Middle grip
-        /// </summary>
-        MiddleGrip,
+    /// <summary>
+    /// Middle grip
+    /// </summary>
+    MiddleGrip,
 
-        /// <summary>
-        /// End grip
-        /// </summary>
-        EndGrip,
+    /// <summary>
+    /// End grip
+    /// </summary>
+    EndGrip,
 
-        /// <summary>
-        /// Leader grip
-        /// </summary>
-        LeaderGrip
-    }
+    /// <summary>
+    /// Leader grip
+    /// </summary>
+    LeaderGrip
 }

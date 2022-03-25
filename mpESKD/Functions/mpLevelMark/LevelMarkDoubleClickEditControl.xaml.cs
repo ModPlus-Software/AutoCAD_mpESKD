@@ -1,44 +1,43 @@
-﻿namespace mpESKD.Functions.mpLevelMark
+﻿namespace mpESKD.Functions.mpLevelMark;
+
+using System;
+using Base.Abstractions;
+
+/// <summary>
+/// Логика взаимодействия для LevelMarkDoubleClickEditControl.xaml
+/// </summary>
+public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
 {
-    using System;
-    using Base.Abstractions;
-
+    private LevelMark _levelMark;
+        
     /// <summary>
-    /// Логика взаимодействия для LevelMarkDoubleClickEditControl.xaml
+    /// Initializes a new instance of the <see cref="LevelMarkDoubleClickEditControl"/> class.
     /// </summary>
-    public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
+    public LevelMarkDoubleClickEditControl()
     {
-        private LevelMark _levelMark;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LevelMarkDoubleClickEditControl"/> class.
-        /// </summary>
-        public LevelMarkDoubleClickEditControl()
-        {
-            InitializeComponent();
-            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
-        }
+        InitializeComponent();
+        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+    }
 
-        /// <inheritdoc/>
-        public Type EntityType => typeof(LevelMark);
+    /// <inheritdoc/>
+    public Type EntityType => typeof(LevelMark);
         
-        /// <inheritdoc/>
-        public void Initialize(IWithDoubleClickEditor smartEntity)
-        {
-            if (!(smartEntity is LevelMark levelMark))
-                throw new ArgumentException("Wrong type of entity");
+    /// <inheritdoc/>
+    public void Initialize(IWithDoubleClickEditor smartEntity)
+    {
+        if (!(smartEntity is LevelMark levelMark))
+            throw new ArgumentException("Wrong type of entity");
 
-            _levelMark = levelMark;
+        _levelMark = levelMark;
             
-            TbOverrideValue.Text = _levelMark.OverrideValue;
-            TbNote.Text = _levelMark.Note;
-        }
+        TbOverrideValue.Text = _levelMark.OverrideValue;
+        TbNote.Text = _levelMark.Note;
+    }
 
-        /// <inheritdoc/>
-        public void OnAccept()
-        {
-            _levelMark.OverrideValue = TbOverrideValue.Text;
-            _levelMark.Note = TbNote.Text;
-        }
+    /// <inheritdoc/>
+    public void OnAccept()
+    {
+        _levelMark.OverrideValue = TbOverrideValue.Text;
+        _levelMark.Note = TbNote.Text;
     }
 }

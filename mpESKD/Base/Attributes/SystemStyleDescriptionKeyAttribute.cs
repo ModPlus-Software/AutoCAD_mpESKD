@@ -1,24 +1,23 @@
-﻿namespace mpESKD.Base.Attributes
+﻿namespace mpESKD.Base.Attributes;
+
+using System;
+
+/// <summary>
+/// Атрибут, указывающий ключ локализации для описания базового системного стиля интеллектуального объекта
+/// </summary>
+public class SystemStyleDescriptionKeyAttribute : Attribute
 {
-    using System;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SystemStyleDescriptionKeyAttribute"/> class.
+    /// </summary>
+    /// <param name="localizationKey">Ключ локализации (указывает имя узла в файле xml локализации)</param>
+    public SystemStyleDescriptionKeyAttribute(string localizationKey)
+    {
+        LocalizationKey = localizationKey;
+    }
 
     /// <summary>
-    /// Атрибут, указывающий ключ локализации для описания базового системного стиля интеллектуального объекта
+    /// Ключ локализации (указывает имя узла в файле xml локализации)
     /// </summary>
-    public class SystemStyleDescriptionKeyAttribute : Attribute
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SystemStyleDescriptionKeyAttribute"/> class.
-        /// </summary>
-        /// <param name="localizationKey">Ключ локализации (указывает имя узла в файле xml локализации)</param>
-        public SystemStyleDescriptionKeyAttribute(string localizationKey)
-        {
-            LocalizationKey = localizationKey;
-        }
-
-        /// <summary>
-        /// Ключ локализации (указывает имя узла в файле xml локализации)
-        /// </summary>
-        public string LocalizationKey { get; }
-    }
+    public string LocalizationKey { get; }
 }

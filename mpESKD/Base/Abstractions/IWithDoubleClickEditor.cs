@@ -1,9 +1,8 @@
-﻿namespace mpESKD.Base.Abstractions
+﻿namespace mpESKD.Base.Abstractions;
+
+/// <summary>
+/// Интеллектуальный объект с редактором по двойному клику
+/// </summary>
+public interface IWithDoubleClickEditor
 {
-    /// <summary>
-    /// Интеллектуальный объект с редактором по двойному клику
-    /// </summary>
-    public interface IWithDoubleClickEditor
-    {
-    }
 }

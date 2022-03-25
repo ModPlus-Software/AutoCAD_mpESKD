@@ -1,22 +1,21 @@
-﻿namespace mpESKD.Functions.mpLetterLine
+﻿namespace mpESKD.Functions.mpLetterLine;
+
+using mpESKD.Base.Attributes;
+
+/// <summary>
+/// Тип объекта <see cref="LetterLine"/>
+/// </summary>
+public enum LetterLineType
 {
-    using mpESKD.Base.Attributes;
+    /// <summary>
+    /// Стандартный
+    /// </summary>
+    [EnumPropertyDisplayValueKey("llt1")]
+    Standard,
 
     /// <summary>
-    /// Тип объекта <see cref="LetterLine"/>
+    /// Составной
     /// </summary>
-    public enum LetterLineType
-    {
-        /// <summary>
-        /// Стандартный
-        /// </summary>
-        [EnumPropertyDisplayValueKey("llt1")]
-        Standard,
-
-        /// <summary>
-        /// Составной
-        /// </summary>
-        [EnumPropertyDisplayValueKey("llt2")]
-        Composite
-    }
+    [EnumPropertyDisplayValueKey("llt2")]
+    Composite
 }

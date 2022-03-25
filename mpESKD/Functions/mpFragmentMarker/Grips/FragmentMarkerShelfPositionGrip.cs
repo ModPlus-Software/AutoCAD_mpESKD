@@ -1,61 +1,60 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips;
+
+using Autodesk.AutoCAD.DatabaseServices;
+using Base.Enums;
+using Base.Overrules;
+using Base.Utils;
+using ModPlusAPI;
+
+/// <summary>
+/// Ручка узловой выноски, меняющая положение полки
+/// </summary>
+public class FragmentMarkerShelfPositionGrip : SmartEntityGripData
 {
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Utils;
-    using ModPlusAPI;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FragmentMarkerShelfPositionGrip"/> class.
+    /// </summary>
+    /// <param name="fragmentMarker">Экземпляр <see cref="mpFragmentMarker.FragmentMarker"/></param>
+    public FragmentMarkerShelfPositionGrip(FragmentMarker fragmentMarker)
+    {
+        FragmentMarker = fragmentMarker;
+    }
 
     /// <summary>
-    /// Ручка узловой выноски, меняющая положение полки
+    /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
     /// </summary>
-    public class FragmentMarkerShelfPositionGrip : SmartEntityGripData
+    public FragmentMarker FragmentMarker { get; }
+
+    /// <inheritdoc />
+    public override string GetTooltip()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FragmentMarkerShelfPositionGrip"/> class.
-        /// </summary>
-        /// <param name="fragmentMarker">Экземпляр <see cref="mpFragmentMarker.FragmentMarker"/></param>
-        public FragmentMarkerShelfPositionGrip(FragmentMarker fragmentMarker)
-        {
-            FragmentMarker = fragmentMarker;
-        }
+        return Language.GetItem("p78"); // "Положение полки";
+    }
 
-        /// <summary>
-        /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
-        /// </summary>
-        public FragmentMarker FragmentMarker { get; }
-
-        /// <inheritdoc />
-        public override string GetTooltip()
+    /// <inheritdoc />
+    public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+    {
+        using (FragmentMarker)
         {
-            return Language.GetItem("p78"); // "Положение полки";
-        }
+            FragmentMarker.ShelfPosition = FragmentMarker.ShelfPosition == ShelfPosition.Left
+                ? ShelfPosition.Right
+                : ShelfPosition.Left;
 
-        /// <inheritdoc />
-        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
-        {
-            using (FragmentMarker)
+            FragmentMarker.UpdateEntities();
+            FragmentMarker.BlockRecord.UpdateAnonymousBlocks();
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                FragmentMarker.ShelfPosition = FragmentMarker.ShelfPosition == ShelfPosition.Left
-                    ? ShelfPosition.Right
-                    : ShelfPosition.Left;
+                var blkRef = tr.GetObject(FragmentMarker.BlockId, OpenMode.ForWrite, true, true);
 
-                FragmentMarker.UpdateEntities();
-                FragmentMarker.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                using (var resBuf = FragmentMarker.GetDataForXData())
                 {
-                    var blkRef = tr.GetObject(FragmentMarker.BlockId, OpenMode.ForWrite, true, true);
-
-                    using (var resBuf = FragmentMarker.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
+                    blkRef.XData = resBuf;
                 }
-            }
 
-            return ReturnValue.GetNewGripPoints;
+                tr.Commit();
+            }
         }
+
+        return ReturnValue.GetNewGripPoints;
     }
 }

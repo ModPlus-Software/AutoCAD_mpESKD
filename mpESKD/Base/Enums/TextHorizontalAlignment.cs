@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+using Attributes;
+
+/// <summary>
+/// Выравнивание текста по горизонтали
+/// </summary>
+public enum TextHorizontalAlignment
 {
-    using Attributes;
+    /// <summary>
+    /// Влево
+    /// </summary>
+    [EnumPropertyDisplayValueKey("tha1")]
+    Left = 0,
 
     /// <summary>
-    /// Выравнивание текста по горизонтали
+    /// По центру
     /// </summary>
-    public enum TextHorizontalAlignment
-    {
-        /// <summary>
-        /// Влево
-        /// </summary>
-        [EnumPropertyDisplayValueKey("tha1")]
-        Left = 0,
+    [EnumPropertyDisplayValueKey("tha2")]
+    Center = 1,
 
-        /// <summary>
-        /// По центру
-        /// </summary>
-        [EnumPropertyDisplayValueKey("tha2")]
-        Center = 1,
-
-        /// <summary>
-        /// Вправо
-        /// </summary>
-        [EnumPropertyDisplayValueKey("tha3")]
-        Right = 2
-    }
+    /// <summary>
+    /// Вправо
+    /// </summary>
+    [EnumPropertyDisplayValueKey("tha3")]
+    Right = 2
 }

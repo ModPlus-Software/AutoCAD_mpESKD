@@ -1,18 +1,17 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+/// <summary>
+/// Вариант обновления примитива
+/// </summary>
+public enum UpdateVariant
 {
     /// <summary>
-    /// Вариант обновления примитива
+    /// Указание точки вставки
     /// </summary>
-    public enum UpdateVariant
-    {
-        /// <summary>
-        /// Указание точки вставки
-        /// </summary>
-        SetInsertionPoint,
+    SetInsertionPoint,
 
-        /// <summary>
-        /// Указание конечной точки при наименьшем допустимом расстоянии
-        /// </summary>
-        SetEndPointMinLength
-    }
+    /// <summary>
+    /// Указание конечной точки при наименьшем допустимом расстоянии
+    /// </summary>
+    SetEndPointMinLength
 }

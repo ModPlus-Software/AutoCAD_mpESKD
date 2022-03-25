@@ -1,11 +1,10 @@
-﻿namespace mpESKD.Base.Attributes
-{
-    using System;
+﻿namespace mpESKD.Base.Attributes;
 
-    /// <summary>
-    /// Атрибут указывает, что свойство может использоваться для поиска по значению
-    /// </summary>
-    public class ValueToSearchByAttribute : Attribute
-    {
-    }
+using System;
+
+/// <summary>
+/// Атрибут указывает, что свойство может использоваться для поиска по значению
+/// </summary>
+public class ValueToSearchByAttribute : Attribute
+{
 }

@@ -1,25 +1,24 @@
-﻿namespace mpESKD.Functions.SearchEntitiesByValues
+﻿namespace mpESKD.Functions.SearchEntitiesByValues;
+
+using Autodesk.AutoCAD.Runtime;
+
+/// <summary>
+/// Команда поиска интеллектуальных объектов по значениям
+/// </summary>
+public static class SearchEntitiesByValuesCommand
 {
-    using Autodesk.AutoCAD.Runtime;
-
     /// <summary>
-    /// Команда поиска интеллектуальных объектов по значениям
+    /// Запуск команды
     /// </summary>
-    public static class SearchEntitiesByValuesCommand
+    [CommandMethod("ModPlus", "mpESKDSearchByValues", CommandFlags.Modal)]
+    public static void Start()
     {
-        /// <summary>
-        /// Запуск команды
-        /// </summary>
-        [CommandMethod("ModPlus", "mpESKDSearchByValues", CommandFlags.Modal)]
-        public static void Start()
+        var context = new SearchEntitiesByValuesViewModel();
+        var win = new SearchEntitiesByValuesWindow
         {
-            var context = new SearchEntitiesByValuesViewModel();
-            var win = new SearchEntitiesByValuesWindow
-            {
-                DataContext = context
-            };
+            DataContext = context
+        };
 
-            win.Show();
-        }
+        win.Show();
     }
 }

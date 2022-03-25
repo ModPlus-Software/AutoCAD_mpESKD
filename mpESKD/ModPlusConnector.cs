@@ -1,25 +1,25 @@
-﻿namespace mpESKD
+﻿namespace mpESKD;
+
+using System;
+using System.Collections.Generic;
+using ModPlusAPI.Abstractions;
+using ModPlusAPI.Enums;
+
+/// <inheritdoc/>
+public class ModPlusConnector : IModPlusPlugin
 {
-    using System;
-    using System.Collections.Generic;
-    using ModPlusAPI.Abstractions;
-    using ModPlusAPI.Enums;
+    private static ModPlusConnector _instance;
+
+    /// <summary>
+    /// Singleton instance
+    /// </summary>
+    public static ModPlusConnector Instance => _instance ?? (_instance = new ModPlusConnector());
 
     /// <inheritdoc/>
-    public class ModPlusConnector : IModPlusPlugin
-    {
-        private static ModPlusConnector _instance;
+    public SupportedProduct SupportedProduct => SupportedProduct.AutoCAD;
 
-        /// <summary>
-        /// Singleton instance
-        /// </summary>
-        public static ModPlusConnector Instance => _instance ?? (_instance = new ModPlusConnector());
-
-        /// <inheritdoc/>
-        public SupportedProduct SupportedProduct => SupportedProduct.AutoCAD;
-
-        /// <inheritdoc/>
-        public string Name => "mpESKD";
+    /// <inheritdoc/>
+    public string Name => "mpESKD";
 
 #if A2013
         /// <inheritdoc/>
@@ -49,58 +49,57 @@
         /// <inheritdoc/>
         public string AvailProductExternalVersion => "2021";
 #elif A2022
-        /// <inheritdoc/>
-        public string AvailProductExternalVersion => "2022";
+    /// <inheritdoc/>
+    public string AvailProductExternalVersion => "2022";
 #endif
 
-        /// <inheritdoc/>
-        public string FullClassName => string.Empty;
+    /// <inheritdoc/>
+    public string FullClassName => string.Empty;
 
-        /// <inheritdoc/>
-        public string AppFullClassName => string.Empty;
+    /// <inheritdoc/>
+    public string AppFullClassName => string.Empty;
 
-        /// <inheritdoc/>
-        public Guid AddInId => Guid.Empty;
+    /// <inheritdoc/>
+    public Guid AddInId => Guid.Empty;
 
-        public string ClassName => string.Empty;
+    public string ClassName => string.Empty;
 
-        /// <inheritdoc/>
-        public string LName => "ModPlus ЕСКД";
+    /// <inheritdoc/>
+    public string LName => "ModPlus ЕСКД";
 
-        /// <inheritdoc/>
-        public string Description => "Оформление чертежей по нормам ЕСКД";
+    /// <inheritdoc/>
+    public string Description => "Оформление чертежей по нормам ЕСКД";
 
-        /// <inheritdoc/>
-        public string Author => "Пекшев Александр aka Modis";
+    /// <inheritdoc/>
+    public string Author => "Пекшев Александр aka Modis";
 
-        /// <inheritdoc/>
-        public string Price => "0";
+    /// <inheritdoc/>
+    public string Price => "0";
 
-        /// <inheritdoc/>
-        public bool CanAddToRibbon => false;
+    /// <inheritdoc/>
+    public bool CanAddToRibbon => false;
 
-        /// <inheritdoc/>
-        public string FullDescription => "Сборник функций, создающий интеллектуальные объекты для оформления чертежей по нормам ЕСКД";
+    /// <inheritdoc/>
+    public string FullDescription => "Сборник функций, создающий интеллектуальные объекты для оформления чертежей по нормам ЕСКД";
 
-        /// <inheritdoc/>
-        public string ToolTipHelpImage => string.Empty;
+    /// <inheritdoc/>
+    public string ToolTipHelpImage => string.Empty;
 
-        /// <inheritdoc/>
-        public List<string> SubPluginsNames => new List<string>();
+    /// <inheritdoc/>
+    public List<string> SubPluginsNames => new List<string>();
 
-        /// <inheritdoc/>
-        public List<string> SubPluginsLNames => new List<string>();
+    /// <inheritdoc/>
+    public List<string> SubPluginsLNames => new List<string>();
 
-        /// <inheritdoc/>
-        public List<string> SubDescriptions => new List<string>();
+    /// <inheritdoc/>
+    public List<string> SubDescriptions => new List<string>();
 
-        /// <inheritdoc/>
-        public List<string> SubFullDescriptions => new List<string>();
+    /// <inheritdoc/>
+    public List<string> SubFullDescriptions => new List<string>();
 
-        /// <inheritdoc/>
-        public List<string> SubHelpImages => new List<string>();
+    /// <inheritdoc/>
+    public List<string> SubHelpImages => new List<string>();
 
-        /// <inheritdoc/>
-        public List<string> SubClassNames => new List<string>();
-    }
+    /// <inheritdoc/>
+    public List<string> SubClassNames => new List<string>();
 }

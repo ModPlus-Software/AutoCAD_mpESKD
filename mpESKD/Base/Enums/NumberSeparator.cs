@@ -1,22 +1,21 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+using Attributes;
+
+/// <summary>
+/// Разделитель целой и дробной части
+/// </summary>
+public enum NumberSeparator
 {
-    using Attributes;
+    /// <summary>
+    /// Точка
+    /// </summary>
+    [EnumPropertyDisplayValueKey("dot")]
+    Dot,
 
     /// <summary>
-    /// Разделитель целой и дробной части
+    /// Запятая
     /// </summary>
-    public enum NumberSeparator
-    {
-        /// <summary>
-        /// Точка
-        /// </summary>
-        [EnumPropertyDisplayValueKey("dot")]
-        Dot,
-
-        /// <summary>
-        /// Запятая
-        /// </summary>
-        [EnumPropertyDisplayValueKey("comma")]
-        Comma
-    }
+    [EnumPropertyDisplayValueKey("comma")]
+    Comma
 }

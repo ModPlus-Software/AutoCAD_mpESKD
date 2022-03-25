@@ -1,81 +1,80 @@
-﻿namespace mpESKD.Base.Properties
+﻿namespace mpESKD.Base.Properties;
+
+using System;
+using System.Windows.Forms;
+using System.Windows.Forms.Integration;
+using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.Windows;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
+
+public static class PropertiesPaletteFunction
 {
-    using System;
-    using System.Windows.Forms;
-    using System.Windows.Forms.Integration;
-    using Autodesk.AutoCAD.Runtime;
-    using Autodesk.AutoCAD.Windows;
-    using ModPlusAPI;
-    using ModPlusAPI.Windows;
+    private static PropertiesPalette _propertiesPalette;
 
-    public static class PropertiesPaletteFunction
+    public static PaletteSet PaletteSet { get; private set; }
+
+    [CommandMethod("ModPlus", "mpPropertiesPalette", CommandFlags.Modal)]
+    public static void Start()
     {
-        private static PropertiesPalette _propertiesPalette;
-
-        public static PaletteSet PaletteSet { get; private set; }
-
-        [CommandMethod("ModPlus", "mpPropertiesPalette", CommandFlags.Modal)]
-        public static void Start()
+        try
         {
-            try
+            if (!MainSettings.Instance.AddToMpPalette)
             {
-                if (!MainSettings.Instance.AddToMpPalette)
+                MainFunction.RemoveFromMpPalette(false);
+                if (PaletteSet != null)
                 {
-                    MainFunction.RemoveFromMpPalette(false);
-                    if (PaletteSet != null)
-                    {
-                        PaletteSet.Visible = true;
-                    }
-                    else
-                    {
-                        PaletteSet = new PaletteSet(
-                            Language.GetItem("h11"), // Свойства ЕСКД
-                            "mpPropertiesPalette",
-                            new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
-                        PaletteSet.Load += PaletteSet_Load;
-                        PaletteSet.Save += PaletteSet_Save;
-                        _propertiesPalette = new PropertiesPalette();
-                        var elementHost = new ElementHost
-                        {
-                            AutoSize = true,
-                            Dock = DockStyle.Fill,
-                            Child = _propertiesPalette
-                        };
-                        PaletteSet.Add(
-                            Language.GetItem("h11"), // Свойства ЕСКД
-                            elementHost);
-                        PaletteSet.Style = PaletteSetStyles.ShowCloseButton | 
-                                           PaletteSetStyles.ShowPropertiesMenu |
-                                           PaletteSetStyles.ShowAutoHideButton;
-                        PaletteSet.MinimumSize = new System.Drawing.Size(100, 300);
-                        PaletteSet.DockEnabled = DockSides.Right | DockSides.Left;
-                        PaletteSet.Visible = true;
-                    }
+                    PaletteSet.Visible = true;
                 }
                 else
                 {
-                    if (PaletteSet != null)
+                    PaletteSet = new PaletteSet(
+                        Language.GetItem("h11"), // Свойства ЕСКД
+                        "mpPropertiesPalette",
+                        new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
+                    PaletteSet.Load += PaletteSet_Load;
+                    PaletteSet.Save += PaletteSet_Save;
+                    _propertiesPalette = new PropertiesPalette();
+                    var elementHost = new ElementHost
                     {
-                        PaletteSet.Visible = false;
-                    }
-
-                    MainFunction.AddToMpPalette();
+                        AutoSize = true,
+                        Dock = DockStyle.Fill,
+                        Child = _propertiesPalette
+                    };
+                    PaletteSet.Add(
+                        Language.GetItem("h11"), // Свойства ЕСКД
+                        elementHost);
+                    PaletteSet.Style = PaletteSetStyles.ShowCloseButton | 
+                                       PaletteSetStyles.ShowPropertiesMenu |
+                                       PaletteSetStyles.ShowAutoHideButton;
+                    PaletteSet.MinimumSize = new System.Drawing.Size(100, 300);
+                    PaletteSet.DockEnabled = DockSides.Right | DockSides.Left;
+                    PaletteSet.Visible = true;
                 }
             }
-            catch (System.Exception exception)
+            else
             {
-                ExceptionBox.Show(exception);
+                if (PaletteSet != null)
+                {
+                    PaletteSet.Visible = false;
+                }
+
+                MainFunction.AddToMpPalette();
             }
         }
-
-        private static void PaletteSet_Load(object sender, PalettePersistEventArgs e)
+        catch (System.Exception exception)
         {
-            _ = (double)e.ConfigurationSection.ReadProperty("mpPropertiesPalette", 22.3);
+            ExceptionBox.Show(exception);
         }
+    }
 
-        private static void PaletteSet_Save(object sender, PalettePersistEventArgs e)
-        {
-            e.ConfigurationSection.WriteProperty("mpPropertiesPalette", 32.3);
-        }
+    private static void PaletteSet_Load(object sender, PalettePersistEventArgs e)
+    {
+        _ = (double)e.ConfigurationSection.ReadProperty("mpPropertiesPalette", 22.3);
+    }
+
+    private static void PaletteSet_Save(object sender, PalettePersistEventArgs e)
+    {
+        e.ConfigurationSection.WriteProperty("mpPropertiesPalette", 32.3);
     }
 }

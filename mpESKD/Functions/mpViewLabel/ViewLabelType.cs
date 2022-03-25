@@ -1,22 +1,21 @@
-﻿namespace mpESKD.Functions.mpViewLabel
+﻿namespace mpESKD.Functions.mpViewLabel;
+
+using Base.Attributes;
+
+/// <summary>
+/// Тип объекта <see cref="ViewLabel"/>
+/// </summary>
+public enum ViewLabelType
 {
-    using Base.Attributes;
+    /// <summary>
+    /// Разрез
+    /// </summary>
+    [EnumPropertyDisplayValueKey("vlt1")]
+    Section,
 
     /// <summary>
-    /// Тип объекта <see cref="ViewLabel"/>
+    /// Вид
     /// </summary>
-    public enum ViewLabelType
-    {
-        /// <summary>
-        /// Разрез
-        /// </summary>
-        [EnumPropertyDisplayValueKey("vlt1")]
-        Section,
-
-        /// <summary>
-        /// Вид
-        /// </summary>
-        [EnumPropertyDisplayValueKey("vlt2")]
-        View
-    }
+    [EnumPropertyDisplayValueKey("vlt2")]
+    View
 }

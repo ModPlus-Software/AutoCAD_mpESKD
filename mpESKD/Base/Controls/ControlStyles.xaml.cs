@@ -1,10 +1,9 @@
-﻿namespace mpESKD.Base.Controls
+﻿namespace mpESKD.Base.Controls;
+
+public partial class ControlStyles
 {
-    public partial class ControlStyles
+    public ControlStyles()
     {
-        public ControlStyles()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
