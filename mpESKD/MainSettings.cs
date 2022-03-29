@@ -16,7 +16,7 @@ public class MainSettings : ObservableObject
     /// <summary>
     /// Singleton
     /// </summary>
-    public static MainSettings Instance => _instance ?? (_instance = new MainSettings());
+    public static MainSettings Instance => _instance ??= new MainSettings();
 
     #region Main
 
