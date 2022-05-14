@@ -422,7 +422,7 @@ public class MainFunction : IExtensionApplication
                     {
                         blockReference.UpgradeOpen();
                         ie.UpdateEntities();
-                        ie.GetBlockTableRecordForUndo(blockReference).UpdateAnonymousBlocks();
+                        ie.GetBlockTableRecordForUndo(blockReference)?.UpdateAnonymousBlocks();
                     }
                 }
 

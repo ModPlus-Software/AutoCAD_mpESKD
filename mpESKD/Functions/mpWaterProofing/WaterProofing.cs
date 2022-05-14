@@ -212,7 +212,7 @@ public class WaterProofing : SmartLinearEntity
 
         // create strokes
         _strokes.Clear();
-        if (_mainPolyline.Length >= MinDistanceBetweenPoints)
+        if (_mainPolyline.Length >= MinDistanceBetweenPoints * scale)
         {
             for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
             {

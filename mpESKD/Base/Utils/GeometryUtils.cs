@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base.Utils;
 
+using System.Globalization;
 using Autodesk.AutoCAD.Geometry;
 
 /// <summary>
@@ -62,9 +63,9 @@ public static class GeometryUtils
             if (splitted.Length == 3)
             {
                 return new Point3d(
-                    double.Parse(splitted[0]),
-                    double.Parse(splitted[1]),
-                    double.Parse(splitted[2]));
+                    double.Parse(splitted[0].Replace(',', '.'), NumberStyles.Any),
+                    double.Parse(splitted[1].Replace(',', '.'), NumberStyles.Any),
+                    double.Parse(splitted[2].Replace(',', '.'), NumberStyles.Any));
             }
         }
 

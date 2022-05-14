@@ -43,9 +43,9 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     /// <summary>
     /// Список MText
     /// </summary>
-    private readonly List<MText> _texts = new List<MText>();
+    private readonly List<MText> _texts = new ();
 
-    private readonly List<Wipeout> _mTextMasks = new List<Wipeout>();
+    private readonly List<Wipeout> _mTextMasks = new ();
 
     #endregion
 
@@ -217,12 +217,12 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     /// <summary>
     /// Составные линии
     /// </summary>
-    private List<Line> _lines = new List<Line>();
+    private List<Line> _lines = new ();
 
     /// <summary>
     /// Точки мтекста
     /// </summary>
-    private List<Point3d> _textPoints = new List<Point3d>();
+    private List<Point3d> _textPoints = new ();
 
     private Vector3d _normal;
     private List<double> _strokeSpaceParams;
@@ -315,7 +315,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
             CreateMTextOnWholeLengthOfPolyline();
             if (LetterLineType == LetterLineType.Composite)
             {
-                CreateLinesByLineGeneration(_mainPolyline.Length);
+                CreateLinesByLineGeneration();
             }
         }
     }
@@ -413,9 +413,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     /// <summary>
     /// создание линий по всем вводимым точкам
     /// </summary>
-    /// <param name="points"></param>
-    /// <returns></returns>
-    private void CreateLinesByLineGeneration(double totalLengthOfPline)
+    private void CreateLinesByLineGeneration()
     {
         var mTextsQty = (int)(_mainPolyline.Length / MTextOffset);
         var offset = _mainPolyline.Length - (mTextsQty * MTextOffset);

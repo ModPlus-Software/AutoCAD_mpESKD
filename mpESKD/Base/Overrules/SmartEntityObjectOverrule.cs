@@ -48,7 +48,7 @@ public class SmartEntityObjectOverrule<TEntity> : ObjectOverrule
                         return;
 
                     smartEntity.UpdateEntities();
-                    smartEntity.GetBlockTableRecordForUndo((BlockReference)dbObject).UpdateAnonymousBlocks();
+                    smartEntity.GetBlockTableRecordForUndo((BlockReference)dbObject)?.UpdateAnonymousBlocks();
                 }
             }
             catch (Exception exception)

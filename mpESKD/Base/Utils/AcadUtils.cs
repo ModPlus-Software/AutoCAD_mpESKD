@@ -60,7 +60,7 @@ public static class AcadUtils
             {
                 using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    if (tr.GetObject(Database.LayerTableId, OpenMode.ForRead) is LayerTable lt)
+                    if (Database.LayerTableId.IsValid && tr.GetObject(Database.LayerTableId, OpenMode.ForRead) is LayerTable lt)
                     {
                         foreach (var layerId in lt)
                         {

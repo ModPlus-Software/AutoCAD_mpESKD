@@ -112,12 +112,21 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     {
         get
         {
-            if (_scale != null && AcadUtils.ObjectContextCollection.HasContext(_scale.Name))
+            try
             {
-                return _scale;
-            }
+                if (_scale != null && !_scale.IsTemporaryScale && AcadUtils.ObjectContextCollection.HasContext(_scale.Name))
+                {
+                    return _scale;
+                }
 
-            return new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
+                return new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
+            }
+            catch
+            {
+                // Иногда прилетает ошибка eWasErased при попытке получить имя масштаба _scale.Name
+                // Проверить масштаб на Erased не получается (нет свойств), поэтому try{} catch{}
+                return new AnnotationScale { Name = "1:1", DrawingUnits = 1, PaperUnits = 1 };
+            }
         }
 
         set
@@ -268,42 +277,52 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     public abstract IEnumerable<Point3d> GetPointsForOsnap();
 
     /// <inheritdoc />
+    [CanBeNull]
     public BlockTableRecord GetBlockTableRecordForUndo(BlockReference blockReference)
     {
-        BlockTableRecord blockTableRecord;
-        using (AcadUtils.Document.LockDocument())
+        try
         {
-            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+            BlockTableRecord blockTableRecord;
+            using (AcadUtils.Document.LockDocument())
             {
-                blockTableRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
-                using (var blockTable = AcadUtils.Database.BlockTableId.Write<BlockTable>())
+                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
-                    blockTable.Add(blockTableRecord);
-                    tr.AddNewlyCreatedDBObject(blockTableRecord, true);
+                    blockTableRecord = new BlockTableRecord { Name = "*U", BlockScaling = BlockScaling.Uniform };
+                    using (var blockTable = AcadUtils.Database.BlockTableId.Write<BlockTable>())
+                    {
+                        blockTable.Add(blockTableRecord);
+                        tr.AddNewlyCreatedDBObject(blockTableRecord, true);
+                    }
+
+                    blockReference.BlockTableRecord = blockTableRecord.Id;
+                    tr.Commit();
                 }
 
-                blockReference.BlockTableRecord = blockTableRecord.Id;
-                tr.Commit();
-            }
-
-            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-            {
-                blockTableRecord = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite, true, true);
-                blockTableRecord.BlockScaling = BlockScaling.Uniform;
-                var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
-                foreach (var entity in EntitiesToBeDrawn)
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var transformedCopy = entity.GetTransformedCopy(matrix3D);
-                    blockTableRecord.AppendEntity(transformedCopy);
-                    tr.AddNewlyCreatedDBObject(transformedCopy, true);
-                }
+                    blockTableRecord = (BlockTableRecord)tr.GetObject(blockReference.BlockTableRecord, OpenMode.ForWrite, true, true);
+                    blockTableRecord.BlockScaling = BlockScaling.Uniform;
+                    var matrix3D = Matrix3d.Displacement(-InsertionPoint.TransformBy(BlockTransform.Inverse()).GetAsVector());
+                    foreach (var entity in EntitiesToBeDrawn)
+                    {
+                        var transformedCopy = entity.GetTransformedCopy(matrix3D);
+                        blockTableRecord.AppendEntity(transformedCopy);
+                        tr.AddNewlyCreatedDBObject(transformedCopy, true);
+                    }
 
-                tr.Commit();
+                    tr.Commit();
+                }
             }
+
+            _blockRecord = blockTableRecord;
+            return blockTableRecord;
         }
-
-        _blockRecord = blockTableRecord;
-        return blockTableRecord;
+        catch
+        {
+            // Происходит ошибка NullReferenceException где-то внутри автокада при вызове метода StartTransaction
+            // Как воспроизвести и почему происходит - не ясно. Поэтому try{} catch{}
+            return null;
+        }
     }
 
 #pragma warning disable CS0618 // Тип или член устарел

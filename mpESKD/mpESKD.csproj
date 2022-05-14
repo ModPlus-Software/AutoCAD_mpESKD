@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.17.11.0</Version>
+		<Version>1.17.12.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 		<Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023</Configurations>
 		<Platforms>x64</Platforms>
