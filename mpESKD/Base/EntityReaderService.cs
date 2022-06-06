@@ -15,7 +15,7 @@ public class EntityReaderService
     /// <summary>
     /// Singleton instance
     /// </summary>
-    public static EntityReaderService Instance => _entityReaderService ?? (_entityReaderService = new EntityReaderService());
+    public static EntityReaderService Instance => _entityReaderService ??= new EntityReaderService();
 
     /// <summary>
     /// Распаковка интеллектуального объекта, приведенного к базовому типу <see cref="SmartEntity"/> из

@@ -16,7 +16,7 @@ using Base;
 using Base.Enums;
 using Base.Utils;
 using Functions.SearchEntities;
-using ModPlus;
+using ModPlus.Extensions;
 using ModPlusAPI;
 using mpESKD.Base.Properties;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
@@ -74,6 +74,7 @@ public class MainFunction : IExtensionApplication
         foreach (Document document in AcadUtils.Documents)
         {
             document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+            document.LayoutSwitched += DocumentOnLayoutSwitched;
         }
     }
 
@@ -140,7 +141,7 @@ public class MainFunction : IExtensionApplication
         if (_styleEditor == null)
         {
             _styleEditor = new StyleEditor();
-            _styleEditor.Closed += (sender, args) => _styleEditor = null;
+            _styleEditor.Closed += (_, _) => _styleEditor = null;
         }
 
         if (_styleEditor.IsLoaded)
@@ -262,7 +263,7 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static void AddToMpPalette()
     {
-        var mpPaletteSet = MpPalette.MpPaletteSet;
+        var mpPaletteSet = ModPlus.MpPalette.MpPaletteSet;
         if (mpPaletteSet != null)
         {
             var flag = false;
@@ -300,7 +301,7 @@ public class MainFunction : IExtensionApplication
     /// <param name="fromSettings">True - метод запущен из окна настроек палитры</param>
     public static void RemoveFromMpPalette(bool fromSettings)
     {
-        var mpPaletteSet = MpPalette.MpPaletteSet;
+        var mpPaletteSet = ModPlus.MpPalette.MpPaletteSet;
         if (mpPaletteSet != null)
         {
             var num = 0;
@@ -445,13 +446,15 @@ public class MainFunction : IExtensionApplication
 
         e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+        e.Document.LayoutSwitched -= DocumentOnLayoutSwitched;
+        e.Document.LayoutSwitched += DocumentOnLayoutSwitched;
     }
 
     private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
     {
         var psr = AcadUtils.Editor.SelectImplied();
         var detach = true;
-        if (psr.Value != null && psr.Value.Count == 1)
+        if (psr.Value is { Count: 1 })
         {
             using (AcadUtils.Document.LockDocument())
             {
@@ -483,7 +486,38 @@ public class MainFunction : IExtensionApplication
             DetachCreateAnalogContextMenu();
         }
     }
-        
+
+    private static void DocumentOnLayoutSwitched(object sender, LayoutSwitchedEventArgs e)
+    {
+        try
+        {
+            if (AcadUtils.IsInModel())
+                return;
+            using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
+            if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
+            {
+                foreach (var objectId in btr)
+                {
+                    if (tr.GetObject(objectId, OpenMode.ForRead) is not BlockReference blockReference || blockReference.XData == null) 
+                        continue;
+
+                    var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
+                    if (entity == null)
+                        continue;
+                    
+                    entity.UpdateEntities();
+                    entity.BlockRecord.UpdateAnonymousBlocks();
+                }
+            }
+
+            tr.Commit();
+        }
+        catch (System.Exception exception)
+        {
+            Debug.Print(exception.Message);
+        }
+    }
+
     private static void AttachCreateAnalogContextMenu()
     {
         if (_intellectualEntityContextMenu == null)

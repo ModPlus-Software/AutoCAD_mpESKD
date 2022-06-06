@@ -52,9 +52,7 @@ public static class SearchEntitiesCommand
             var entitiesToProceed = new List<string>();
             foreach (var item in settings.LbEntities.Items)
             {
-                if (item is ListBoxItem listBoxItem &&
-                    listBoxItem.Content is CheckBox checkBox &&
-                    checkBox.IsChecked == true)
+                if (item is ListBoxItem { Content: CheckBox { IsChecked: true } checkBox })
                 {
                     entitiesToProceed.Add($"mp{((Type)checkBox.Tag).Name}");
                 }

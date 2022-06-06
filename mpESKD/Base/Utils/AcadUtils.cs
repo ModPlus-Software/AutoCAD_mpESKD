@@ -545,4 +545,13 @@ public static class AcadUtils
 
         return defaultScale;
     }
+
+    /// <summary>
+    /// Находится ли текущий документ в пространстве модели
+    /// </summary>
+    public static bool IsInModel()
+    {
+        // https://spiderinnet1.typepad.com/blog/2014/05/autocad-net-detect-current-space-model-or-paper-and-viewport.html
+        return AcApp.DocumentManager.MdiActiveDocument.Database.TileMode;
+    }
 }

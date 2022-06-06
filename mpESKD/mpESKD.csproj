@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.17.12.0</Version>
+		<Version>1.17.13.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 		<Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023</Configurations>
 		<Platforms>x64</Platforms>
@@ -11,6 +11,8 @@
 		<Company>modplus.org</Company>
 		<Authors>modplus.org</Authors>
 		<Product>ModPlus</Product>
+		<AssemblyTitle>Plugin for ModPlus software for AutoCAD</AssemblyTitle>
+		<Description>$(AssemblyTitle)</Description>
 		<Copyright>Copyright © ModPlus</Copyright>
 		<CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
 		<Platform>x64</Platform>
@@ -22,17 +24,135 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32.png" />
-		<None Remove="Functions\mpLetterLine\Icons\mpLetterLineFromPolyline_32x32_dark.png" />
-		<None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32.png" />
-		<None Remove="Functions\mpLetterLine\Icons\mpLetterLine_32x32_dark.png" />
+	<PropertyGroup Condition="'$(Configuration)' == 'A2013'">
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2013</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2014'">
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2014</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2015'">
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2015</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2016'">
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2016</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2017'">
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2017</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2018'">
+		<TargetFramework>net46</TargetFramework>
+		<ExternalVersion>2018</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2019'">
+		<TargetFramework>net47</TargetFramework>
+		<ExternalVersion>2019</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2020'">
+		<TargetFramework>net47</TargetFramework>
+		<ExternalVersion>2020</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2021'">
+		<TargetFramework>net47</TargetFramework>
+		<ExternalVersion>2021</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2022'">
+		<TargetFramework>net48</TargetFramework>
+		<ExternalVersion>2022</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'A2023'">
+		<TargetFramework>net48</TargetFramework>
+		<ExternalVersion>2023</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net48</TargetFramework>
+		<ExternalVersion>2023</ExternalVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' != 'Debug'">
+		<DefineConstants>A$(ExternalVersion)</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<AssemblyName>mpESKD_$(ExternalVersion)</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<OutputPath>E:\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='A2013'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2013" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2013" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2014'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2014" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2014" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2015'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2015" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2015" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2016'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2017'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2017" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2017" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2018'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2018" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2018" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2019'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2019" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2019" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2020'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2020" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2020" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2021'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2021" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2021" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2022'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='A2023'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<PackageReference Include="ModPlus.AutoCAD.API.2023" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2021.3.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusAPI" Version="8.6.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusStyle" Version="4.2.0" ExcludeAssets="runtime" />
+		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusAPI" Version="9.3.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusStyle" Version="4.3.0" ExcludeAssets="runtime" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -144,10 +264,6 @@
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
 		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Functions\mpSection\Overrules\" />
 	</ItemGroup>
 
 </Project>

@@ -59,12 +59,12 @@ public class TypeFactory
     /// </summary>
     public List<ISmartEntityFunction> GetEntityFunctionTypes()
     {
-        return _smartEntityFunctions ?? (_smartEntityFunctions = typeof(TypeFactory).Assembly
+        return _smartEntityFunctions ??= typeof(TypeFactory).Assembly
             .GetTypes()
             .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(ISmartEntityFunction)))
             .Select(Activator.CreateInstance)
             .Cast<ISmartEntityFunction>()
-            .ToList());
+            .ToList();
     }
 
     /// <summary>
