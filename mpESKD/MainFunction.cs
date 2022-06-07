@@ -493,7 +493,11 @@ public class MainFunction : IExtensionApplication
         {
             if (AcadUtils.IsInModel())
                 return;
+            
+            var hasSmartEntities = false;
+            
             using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
+            
             if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
             {
                 foreach (var objectId in btr)
@@ -504,13 +508,17 @@ public class MainFunction : IExtensionApplication
                     var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
                     if (entity == null)
                         continue;
-                    
+
+                    hasSmartEntities = true;
                     entity.UpdateEntities();
                     entity.BlockRecord.UpdateAnonymousBlocks();
                 }
             }
 
             tr.Commit();
+
+            if (hasSmartEntities)
+                AcadUtils.Editor.Regen();
         }
         catch (System.Exception exception)
         {
