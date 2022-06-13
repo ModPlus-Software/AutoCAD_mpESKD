@@ -16,7 +16,6 @@ using Base;
 using Base.Enums;
 using Base.Utils;
 using Functions.SearchEntities;
-using ModPlus.Extensions;
 using ModPlusAPI;
 using mpESKD.Base.Properties;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
@@ -494,31 +493,26 @@ public class MainFunction : IExtensionApplication
             if (AcadUtils.IsInModel())
                 return;
             
-            var hasSmartEntities = false;
-            
             using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
             
             if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
             {
                 foreach (var objectId in btr)
                 {
-                    if (tr.GetObject(objectId, OpenMode.ForRead) is not BlockReference blockReference || blockReference.XData == null) 
+                    if (tr.GetObject(objectId, OpenMode.ForWrite) is not BlockReference blockReference || blockReference.XData == null) 
                         continue;
 
                     var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
                     if (entity == null)
                         continue;
 
-                    hasSmartEntities = true;
                     entity.UpdateEntities();
                     entity.BlockRecord.UpdateAnonymousBlocks();
+                    blockReference.RecordGraphicsModified(true);
                 }
             }
 
             tr.Commit();
-
-            if (hasSmartEntities)
-                AcadUtils.Editor.Regen();
         }
         catch (System.Exception exception)
         {

@@ -24,8 +24,7 @@ public abstract class SmartEntityGripData : GripData
     public GripType GripType { get; set; }
 
     /// <inheritdoc />
-    public override bool ViewportDraw(
-        ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, int gripSizeInPixels)
+    public override bool ViewportDraw(ViewportDraw worldDraw, ObjectId entityId, DrawType type, Point3d? imageGripPoint, int gripSizeInPixels)
     {
         var ecs = GetECS(entityId);
         var numPixelsInUnitSquare = worldDraw.Viewport.GetNumPixelsInUnitSquare(GripPoint);
