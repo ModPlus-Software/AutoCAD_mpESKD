@@ -387,10 +387,8 @@ namespace mpESKD.Functions.mpView
                         acrossShelfTextOffset = _topMText.ActualWidth / 2;
                     }
 
-                    var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
                     _topMText.Location = endPoint;
-                    AcadUtils.WriteMessageInDebug("if if ");
+                    AcadUtils.WriteMessageInDebug("if double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset) ");
                     Debug.Print("if if");
                 }
                 else

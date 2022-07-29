@@ -106,6 +106,7 @@ namespace mpESKD.Functions.mpView
                             var view = textGrip.View;
                             if (textGrip.Name == TextGripName.TopText)
                             {
+                                base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                                 Debug.Print("textGrip.Name == TextGripName.TopText");
                                 AcadUtils.Editor.WriteMessage("textGrip.Name == TextGripName.TopText");
                             }
