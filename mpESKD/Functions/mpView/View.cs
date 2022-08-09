@@ -324,10 +324,6 @@ namespace mpESKD.Functions.mpView
         {
             // top and bottom strokes
             var topStrokeEndPoint = insertionPoint + ((insertionPoint - TopShelfEndPoint).GetNormal() * scale);
-            
-            //_topStroke = new Polyline(2);
-            //_topStroke.AddVertexAt(0, topStrokeEndPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
-            //_topStroke.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, strokesWidth, strokesWidth);
 
             var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
 
