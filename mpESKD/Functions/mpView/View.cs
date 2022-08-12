@@ -254,10 +254,11 @@ namespace mpESKD.Functions.mpView
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                     MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
+
                 else
                 {
                     // Задание любой другой точки
-                    AcadUtils.Editor.WriteMessage($"При изменении TextPoint {TextPoint} \n");
+                    AcadUtils.Editor.WriteMessage($"если не новый textpoint {TextPoint} \n");
                     CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                 }
 
@@ -359,17 +360,19 @@ namespace mpESKD.Functions.mpView
                     TextPoint = topTextCenterPoint;
 
                     //var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
-                    _mText.Location = TextPoint;
+                    _mText.Location = topTextCenterPoint;
                     
                     AcadUtils.WriteMessageInDebug($"topTextCenterPoint - {tempPoint} \n");
                 }
-                //else
-                //{
-                //    AcadUtils.WriteMessageInDebug("else ");
-                //    var tempPoint = topShelfEndPoint + ((insertionPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
-                //    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
-                //    _mText.Location = tmpEndPoint;
-                //}
+                else
+                {
+                        AcadUtils.Editor.WriteMessage($"------ else in text location {TextPoint} ----\n");
+                    var tempPoint = topShelfEndPoint + ((insertionPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    _mText.Location = topTextCenterPoint;
+
+                        AcadUtils.Editor.WriteMessage($"-----------------------------------------------\n");
+                }
 
                 TextDesignationPoint = _mText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
 
