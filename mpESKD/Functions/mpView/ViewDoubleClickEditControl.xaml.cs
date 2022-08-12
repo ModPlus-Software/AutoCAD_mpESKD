@@ -45,9 +45,9 @@
 
             if (ChkRestoreTextPosition.IsChecked.HasValue && ChkRestoreTextPosition.IsChecked.Value)
             {
-                _view.AlongBottomShelfTextOffset = double.NaN;
+                
                 _view.AlongTopShelfTextOffset = double.NaN;
-                _view.AcrossBottomShelfTextOffset = double.NaN;
+                
                 _view.AcrossTopShelfTextOffset = double.NaN;
             }
         }

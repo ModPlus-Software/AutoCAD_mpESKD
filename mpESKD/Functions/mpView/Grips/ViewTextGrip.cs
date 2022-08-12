@@ -23,7 +23,7 @@
         }
 
         /// <summary>
-        /// Экземпляр класса Section
+        /// Экземпляр класса View
         /// </summary>
         public View View { get; }
 
@@ -46,7 +46,7 @@
             try
             {
                 // При удачном перемещении ручки записываем новые значения в расширенные данные
-                // По этим данным я потом получаю экземпляр класса section
+                // По этим данным я потом получаю экземпляр класса view
                 if (newStatus == Status.GripEnd)
                 {
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

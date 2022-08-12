@@ -31,7 +31,7 @@ namespace mpESKD.Functions.mpView
                     if (view != null)
                     {
                         // insertion (start) grip
-                        var vertexGrip = new ViewVertexGrip(view, GripName.StartGrip)
+                        var vertexGrip = new ViewVertexGrip(view, 0)
                         {
                             GripPoint = view.InsertionPoint
                         };
@@ -39,11 +39,11 @@ namespace mpESKD.Functions.mpView
 
                         #region Text grips
 
-                        if (view.TopDesignationPoint != Point3d.Origin && view.HasTextValue())
+                        if (view.TextDesignationPoint != Point3d.Origin && view.HasTextValue())
                         {
                             var textGrip = new ViewTextGrip(view)
                             {
-                                GripPoint = view.TopDesignationPoint,
+                                GripPoint = view.TextDesignationPoint,
                                 Name = TextGripName.TopText
                             };
                             grips.Add(textGrip);
@@ -54,16 +54,6 @@ namespace mpESKD.Functions.mpView
                             GripPoint = view.TopShelfEndPoint
                         };
                         grips.Add(vertexGrip);
-
-                        //if (view.BottomDesignationPoint != Point3d.Origin && view.HasTextValue())
-                        //{
-                        //    var textGrip = new ViewTextGrip(view)
-                        //    {
-                        //        GripPoint = view.BottomDesignationPoint,
-                        //        Name = TextGripName.BottomText
-                        //    };
-                        //    grips.Add(textGrip);
-                        //}
 
                         #endregion
                     }
@@ -94,9 +84,15 @@ namespace mpESKD.Functions.mpView
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
 
-                                //view.InsertionPoint = vertexGrip.GripPoint + offset;
+                                AcadUtils.Editor.WriteMessage("двигаем весь блок");
                             }
-
+                            else if (vertexGrip.GripName == GripName.EndGrip)
+                            {
+                                view.EndPoint = vertexGrip.GripPoint + offset;
+                                
+                                //view.EndPoint = vertexGrip.GripPoint + offset;
+                                AcadUtils.Editor.WriteMessage("двигаем конечный грип");
+                            }
                             // Вот тут происходит перерисовка примитивов внутри блока
                             view.UpdateEntities();
                             view.BlockRecord.UpdateAnonymousBlocks();
@@ -104,12 +100,19 @@ namespace mpESKD.Functions.mpView
                         else if (gripData is ViewTextGrip textGrip)
                         {
                             var view = textGrip.View;
-                            if (textGrip.Name == TextGripName.TopText)
-                            {
-                                base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-                                Debug.Print("textGrip.Name == TextGripName.TopText");
-                                AcadUtils.Editor.WriteMessage("textGrip.Name == TextGripName.TopText");
-                            }
+                            //if (textGrip.Name == TextGripName.TopText)
+                            //{
+                            //    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                            //    Debug.Print("textGrip.Name == TextGripName.TopText");
+                            //    AcadUtils.Editor.WriteMessage("textGrip.Name == TextGripName.TopText");
+                            //}
+                            
+                            //TODO изменить текст
+                            view.TextPoint = view.TextPoint + offset;
+
+                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                            
+                            AcadUtils.Editor.WriteMessage($" в overrule {textGrip.Name}  тянем через грип текста \n");
 
                             view.UpdateEntities();
                             view.BlockRecord.UpdateAnonymousBlocks();

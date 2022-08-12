@@ -26,28 +26,28 @@ namespace mpESKD.Functions.mpView
         private readonly string _lastIntegerValue = string.Empty;
 
         private readonly string _lastLetterValue = string.Empty;
-        
+
         #region Entities
 
         /// <summary>
         /// Верхняя полка
         /// </summary>
-        private Line _topShelfLine;
+        private Line _shelfLine;
 
         /// <summary>
         /// Стрелка верхней полки
         /// </summary>
-        private Polyline _topShelfArrow;
+        private Polyline _shelfArrow;
 
         #region Text entities
 
-        private MText _topMText;
-        private Wipeout _topTextMask;
+        private MText _mText;
+        private Wipeout _textMask;
 
         #endregion
 
         #endregion
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="View"/> class.
         /// </summary>
@@ -59,7 +59,7 @@ namespace mpESKD.Functions.mpView
         /// Initializes a new instance of the <see cref="View"/> class.
         /// </summary>
         /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-        public View(ObjectId objectId) 
+        public View(ObjectId objectId)
             : base(objectId)
         {
         }
@@ -74,14 +74,14 @@ namespace mpESKD.Functions.mpView
             _lastIntegerValue = lastIntegerValue;
             _lastLetterValue = lastLetterValue;
         }
-        
+
         /// <summary>
         /// Точка вставки верхнего текста обозначения
         /// </summary>
         [SaveToXData]
-        public Point3d TopDesignationPoint { get; private set; } = Point3d.Origin;
+        public Point3d TextDesignationPoint { get; private set; } = Point3d.Origin;
 
-        
+
         /// <inheritdoc />
         /// В примитиве не используется!
         public override string LineType { get; set; }
@@ -105,12 +105,6 @@ namespace mpESKD.Functions.mpView
         //[SaveToXData]
         //public int MiddleStrokeLength { get; set; } = 8;
 
-        /// <summary>
-        /// Отступ полки по длине штриха в процентах
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", 80, 0, 100, descLocalKey: "d45", nameSymbol: "c")]
-        [SaveToXData]
-        public int ShelfOffset { get; set; } = 80;
 
         /// <summary>
         /// Длина полки
@@ -146,7 +140,7 @@ namespace mpESKD.Functions.mpView
         [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
         [SaveToXData]
         public double SecondTextHeight { get; set; } = 2.5;
-        
+
         /// <inheritdoc/>
         [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
         [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
@@ -202,18 +196,6 @@ namespace mpESKD.Functions.mpView
         public double AcrossTopShelfTextOffset { get; set; } = double.NaN;
 
         /// <summary>
-        /// Отступ средней точки нижнего текста вдоль нижней полки
-        /// </summary>
-        [SaveToXData]
-        public double AlongBottomShelfTextOffset { get; set; } = double.NaN;
-
-        /// <summary>
-        /// Отступ средней точки нижнего текста от нижней полки (вдоль верхнего штриха)
-        /// </summary>
-        [SaveToXData]
-        public double AcrossBottomShelfTextOffset { get; set; } = double.NaN;
-
-        /// <summary>
         /// Конечная точка верхней полки
         /// </summary>
         [SaveToXData]
@@ -230,7 +212,7 @@ namespace mpESKD.Functions.mpView
         /// </summary>
         [SaveToXData]
         public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
-        
+
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
         {
@@ -238,19 +220,12 @@ namespace mpESKD.Functions.mpView
             {
                 var entities = new List<Entity>
                 {
-                    _topTextMask,
-                  //  _bottomTextMask,
-                    
-                    _topShelfLine,
-                    _topShelfArrow,
-                    //_topStroke,
-                    //_bottomShelfLine,
-                    //_bottomShelfArrow,
-                    //_bottomStroke,
-                    _topMText
-                    //_bottomMText
+                    _textMask,
+                    _shelfLine,
+                    _shelfArrow,
+                    _mText
                 };
-                //entities.AddRange(_middleStrokes);
+
                 foreach (var e in entities)
                 {
                     SetImmutablePropertiesToNestedEntity(e);
@@ -272,23 +247,21 @@ namespace mpESKD.Functions.mpView
         {
             try
             {
-                var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+
                 var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint,scale);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
                 }
-                
                 else
                 {
                     // Задание любой другой точки
+                    AcadUtils.Editor.WriteMessage($"При изменении TextPoint {TextPoint} \n");
                     CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                 }
 
                 //// Задание первой точки (точки вставки). Она же точка начала отсчета
-
-
             }
             catch (Exception exception)
             {
@@ -296,7 +269,7 @@ namespace mpESKD.Functions.mpView
             }
         }
 
-        
+
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
             if (variant == UpdateVariant.SetInsertionPoint)
@@ -305,8 +278,10 @@ namespace mpESKD.Functions.mpView
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
                 var tmpEndPoint = new Point3d(
-                    InsertionPointOCS.X, InsertionPointOCS.Y - (MinDistanceBetweenPoints * scale), InsertionPointOCS.Z);
+                    InsertionPointOCS.X, InsertionPointOCS.Y + (ShelfLength * scale), InsertionPointOCS.Z);
+                AcadUtils.Editor.WriteMessage("первая точка не задана");
                 CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
+
             }
             else
             {
@@ -314,7 +289,7 @@ namespace mpESKD.Functions.mpView
                 * при условии что расстояние от второй точки до первой больше минимального допустимого
                 */
                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                    InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+                    InsertionPoint, EndPoint, InsertionPointOCS, ShelfLength * scale);
                 UpdateEntities();
                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
             }
@@ -322,35 +297,37 @@ namespace mpESKD.Functions.mpView
 
         private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
         {
-            // top and bottom strokes
-            var topStrokeEndPoint = insertionPoint + ((insertionPoint - TopShelfEndPoint).GetNormal() * scale);
 
-            var topStrokeNormalVector = (topStrokeEndPoint - insertionPoint).GetNormal();
+            var topStrokeNormalVector = (endPoint - insertionPoint).GetNormal();
 
-            // shelf lines
-            var topShelfStartPoint = insertionPoint ;
-            var topShelfEndPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfLength * scale);
+            // shelf line линия стрелки
+
+            var topShelfEndPoint = insertionPoint + (topStrokeNormalVector * ShelfLength * scale);
             TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
-            _topShelfLine = new Line
+
+            var topStrokeArrowEndPoint = (endPoint - insertionPoint).GetNormal();
+            var tmpEndPoint = insertionPoint + (topStrokeArrowEndPoint * ShelfLength * scale);
+
+            _shelfLine = new Line
             {
-                StartPoint = topShelfStartPoint,
-                EndPoint = topShelfEndPoint
+                StartPoint = insertionPoint,
+                EndPoint = tmpEndPoint
             };
 
-            // shelf arrows
-            var topShelfArrowStartPoint = topShelfStartPoint + (topStrokeNormalVector.GetPerpendicularVector() * ShelfArrowLength * scale);
-            _topShelfArrow = new Polyline(2);
-            _topShelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
-            _topShelfArrow.AddVertexAt(1, topShelfStartPoint.ToPoint2d(), 0.0, 0.0, 0.0);
+            // shelf arrow
+            var topShelfArrowStartPoint = insertionPoint + (topStrokeArrowEndPoint * ShelfArrowLength * scale);
+            _shelfArrow = new Polyline(2);
+            _shelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+            _shelfArrow.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, 0.0, 0.0);
 
             // text
             var textContentsForTopText = GetTextContents(true);
-            
+
             if (!string.IsNullOrEmpty(textContentsForTopText))
             {
                 var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
                 var textHeight = MainTextHeight * scale;
-                _topMText = new MText
+                _mText = new MText
                 {
                     TextStyleId = textStyleId,
                     Contents = textContentsForTopText,
@@ -358,55 +335,51 @@ namespace mpESKD.Functions.mpView
                     Attachment = AttachmentPoint.MiddleCenter
                 };
 
-                //_bottomMText = new MText
-                //{
-                //    TextStyleId = textStyleId,
-                //    Contents = textContentsForBottomText,
-                //    TextHeight = textHeight,
-                //    Attachment = AttachmentPoint.MiddleCenter
-                //};
-
-                // TextActualHeight = _topMText.ActualHeight;
-                // TextActualWidth = _topMText.ActualWidth;
-
                 var check = 1 / Math.Sqrt(2);
 
-                // top
-                var alongShelfTextOffset = _topMText.ActualWidth / 2;
-                var acrossShelfTextOffset = _topMText.ActualHeight / 2;
+                // text
+                var alongShelfTextOffset = _mText.ActualWidth / 2;
+                var acrossShelfTextOffset = _mText.ActualHeight / 2;
                 if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
                 {
-                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
-                    {
-                        alongShelfTextOffset = _topMText.ActualHeight / 2;
-                        acrossShelfTextOffset = _topMText.ActualWidth / 2;
-                    }
+                    //if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                    //    (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                    //{
+                    //    alongShelfTextOffset = _mText.ActualHeight / 2;
+                    //    acrossShelfTextOffset = _mText.ActualWidth / 2;
+                    //}
 
-                    _topMText.Location = endPoint;
-                    AcadUtils.WriteMessageInDebug("if double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset) ");
-                    Debug.Print("if if");
-                }
-                else
-                {
-                    Debug.Print("else");
-                    AcadUtils.WriteMessageInDebug("else ");
-                    var tempPoint = topShelfEndPoint +
-                                    ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
-                    _topMText.Location = endPoint;
-                }
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset * 2);
+                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
+                    var topTextCenterPoint = tempPoint + (normalPerpenducular * scale * acrossShelfTextOffset * 2);
 
-                TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
+                    //var textPerpendicularVector = (AlongTopShelfTextOffset * topStrokeNormalVector);
+                    //var tempPoint = topShelfEndPoint - textPerpendicularVector * alongShelfTextOffset;
+
+                    TextPoint = topTextCenterPoint;
+
+                    //var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    _mText.Location = TextPoint;
+                    
+                    AcadUtils.WriteMessageInDebug($"topTextCenterPoint - {tempPoint} \n");
+                }
+                //else
+                //{
+                //    AcadUtils.WriteMessageInDebug("else ");
+                //    var tempPoint = topShelfEndPoint + ((insertionPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
+                //    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                //    _mText.Location = tmpEndPoint;
+                //}
+
+                TextDesignationPoint = _mText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
 
                 if (HideTextBackground)
                 {
                     var maskOffset = TextMaskOffset * scale;
-                    _topTextMask = _topMText.GetBackgroundMask(maskOffset);
-                    //_bottomTextMask = _bottomMText.GetBackgroundMask(maskOffset);
+                    _textMask = _mText.GetBackgroundMask(maskOffset);
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -424,7 +397,7 @@ namespace mpESKD.Functions.mpView
             return true;
         }
 
-        
+
 
         private void SetFirstTextOnCreation()
         {

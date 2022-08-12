@@ -23,7 +23,7 @@
         }
 
         /// <summary>
-        /// Экземпляр класса <see cref="mpSection.Section"/>
+        /// Экземпляр класса <see cref="mpView.View"/>
         /// </summary>
         public View View { get; }
 
@@ -44,13 +44,7 @@
                 View.BlockTransform = View.BlockTransform.Inverse();
 
                 // swap text offsets
-                var tmp = View.AcrossBottomShelfTextOffset;
-                View.AcrossBottomShelfTextOffset = View.AcrossTopShelfTextOffset;
-                View.AcrossTopShelfTextOffset = tmp;
-                tmp = View.AlongBottomShelfTextOffset;
-                View.AlongBottomShelfTextOffset = View.AlongTopShelfTextOffset;
-                View.AlongTopShelfTextOffset = tmp;
-
+                
                 View.UpdateEntities();
                 View.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
