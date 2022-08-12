@@ -361,17 +361,18 @@ namespace mpESKD.Functions.mpView
 
                     //var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
                     _mText.Location = topTextCenterPoint;
-                    
+
                     AcadUtils.WriteMessageInDebug($"topTextCenterPoint - {tempPoint} \n");
                 }
                 else
                 {
-                        AcadUtils.Editor.WriteMessage($"------ else in text location {TextPoint} ----\n");
-                    var tempPoint = topShelfEndPoint + ((insertionPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * (scale + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    AcadUtils.Editor.WriteMessage($"else in text location {TextPoint} \n");
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector  * (_mText.ActualWidth / 2));
+                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
+                    var topTextCenterPoint =  tempPoint + (normalPerpenducular * ((scale * 2) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
                     _mText.Location = topTextCenterPoint;
 
-                        AcadUtils.Editor.WriteMessage($"-----------------------------------------------\n");
+                    AcadUtils.Editor.WriteMessage($"-----------------------------------------------\n");
                 }
 
                 TextDesignationPoint = _mText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
