@@ -80,8 +80,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2023</ExternalVersion>
+		<TargetFramework>net45</TargetFramework>
+		<ExternalVersion>2016</ExternalVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -145,13 +145,13 @@
 		<PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageReference Include="ModPlus.AutoCAD.API.2023" Version="1.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusAPI" Version="9.3.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusAPI" Version="9.8.0" ExcludeAssets="runtime" />
 		<PackageReference Include="ModPlusStyle" Version="4.3.0" ExcludeAssets="runtime" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
