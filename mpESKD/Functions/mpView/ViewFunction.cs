@@ -89,12 +89,12 @@
                 var ViewLastLetterValue = string.Empty;
                 var ViewLastIntegerValue = string.Empty;
                 FindLastViewValues(ref ViewLastLetterValue, ref ViewLastIntegerValue);
-                var View = new View(ViewLastIntegerValue, ViewLastLetterValue);
+                var view = new View(ViewLastIntegerValue, ViewLastLetterValue);
 
-                var blockReference = MainFunction.CreateBlock(View);
-                View.ApplyStyle(style, true);
+                var blockReference = MainFunction.CreateBlock(view);
+                view.ApplyStyle(style, true);
 
-                InsertViewWithJig(isSimple, View, blockReference);
+                InsertViewWithJig(isSimple, view, blockReference);
             }
             catch (System.Exception exception)
             {
@@ -106,11 +106,11 @@
             }
         }
 
-        private static void InsertViewWithJig(bool isSimple, View View, BlockReference blockReference)
+        private static void InsertViewWithJig(bool isSimple, View view, BlockReference blockReference)
         {
             var nextPointPrompt = Language.GetItem("msg5");
             var entityJig = new DefaultEntityJig(
-                View,
+                view,
                 blockReference,
                 new Point3d(20, 0, 0));
             do
@@ -130,18 +130,31 @@
                             break;
                         }
                     }
+                }
+                else
+                {
+                    using (AcadUtils.Document.LockDocument())
+                    {
+                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
+                        {
+                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                            obj.Erase(true);
+                            tr.Commit();
+                        }
+                    }
 
+                    break;
                 }
                
             }
             while (true);
 
-            if (!View.BlockId.IsErased)
+            if (!view.BlockId.IsErased)
             {
                 using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
                 {
-                    var ent = tr.GetObject(View.BlockId, OpenMode.ForWrite, true, true);
-                    ent.XData = View.GetDataForXData();
+                    var ent = tr.GetObject(view.BlockId, OpenMode.ForWrite, true, true);
+                    ent.XData = view.GetDataForXData();
                     tr.Commit();
                 }
             }

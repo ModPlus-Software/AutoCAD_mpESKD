@@ -265,10 +265,8 @@ namespace mpESKD.Functions.mpView
                  * Примерно аналогично созданию, только точки не создаются, а меняются
                 */
                 var tmpEndPoint = new Point3d(
-                    InsertionPointOCS.X, InsertionPointOCS.Y + (ShelfLength * scale), InsertionPointOCS.Z);
-                AcadUtils.Editor.WriteMessage("первая точка не задана");
+                    InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
-
             }
             else
             {
@@ -287,7 +285,7 @@ namespace mpESKD.Functions.mpView
 
             var topStrokeNormalVector = (endPoint - insertionPoint).GetNormal();
 
-            // shelf line линия стрелки
+            // shelf line
             var topShelfEndPoint = insertionPoint + (topStrokeNormalVector * ShelfLength * scale);
             TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
 
@@ -329,25 +327,22 @@ namespace mpESKD.Functions.mpView
 
                 if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
                 {
-                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
-                    {
-                        alongShelfTextOffset = _mText.ActualHeight / 2;
-                        acrossShelfTextOffset = _mText.ActualWidth / 2;
-                    }
+                    //if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                    //    (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                    //{
+                    //    alongShelfTextOffset = _mText.ActualHeight / 2;
+                    //    acrossShelfTextOffset = _mText.ActualWidth / 2;
+                    //}
 
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset * 2);
-                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
-                    var topTextCenterPoint = tempPoint + (normalPerpenducular * scale * acrossShelfTextOffset * 2);
-
-                    //var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
-                    //var topTextCenterPoint = tempPoint - (topStrokeNormalVector * (scale * 2 + acrossShelfTextOffset));
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * (2*scale + acrossShelfTextOffset));
                     _mText.Location = topTextCenterPoint;
                 }
                 else
                 {
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    //AcadUtils.Editor.WriteMessage();
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth/2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((2*scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight/2))));
                     _mText.Location = topTextCenterPoint;
                 }
 
