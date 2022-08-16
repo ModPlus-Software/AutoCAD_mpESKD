@@ -1,18 +1,17 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+/// <summary>
+/// Тип стиля
+/// </summary>
+public enum StyleType
 {
     /// <summary>
-    /// Тип стиля
+    /// Системный стиль
     /// </summary>
-    public enum StyleType
-    {
-        /// <summary>
-        /// Системный стиль
-        /// </summary>
-        System,
+    System,
 
-        /// <summary>
-        /// Пользовательский стиль
-        /// </summary>
-        User
-    }
+    /// <summary>
+    /// Пользовательский стиль
+    /// </summary>
+    User
 }

@@ -1,55 +1,54 @@
-﻿namespace mpESKD.Functions.mpSection
+﻿namespace mpESKD.Functions.mpSection;
+
+using System;
+using Base.Abstractions;
+
+/// <summary>
+/// Логика взаимодействия для SectionDoubleClickEditControl.xaml
+/// </summary>
+public partial class SectionDoubleClickEditControl : IDoubleClickEditControl
 {
-    using System;
-    using Base.Abstractions;
-
+    private Section _section;
+        
     /// <summary>
-    /// Логика взаимодействия для SectionDoubleClickEditControl.xaml
+    /// Initializes a new instance of the <see cref="SectionDoubleClickEditControl"/> class.
     /// </summary>
-    public partial class SectionDoubleClickEditControl : IDoubleClickEditControl
+    public SectionDoubleClickEditControl()
     {
-        private Section _section;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SectionDoubleClickEditControl"/> class.
-        /// </summary>
-        public SectionDoubleClickEditControl()
-        {
-            InitializeComponent();
-            ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
-        }
+        InitializeComponent();
+        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+    }
 
-        /// <inheritdoc/>
-        public Type EntityType => typeof(Section);
+    /// <inheritdoc/>
+    public Type EntityType => typeof(Section);
         
-        /// <inheritdoc/>
-        public void Initialize(IWithDoubleClickEditor smartEntity)
-        {
-            if (!(smartEntity is Section section))
-                throw new ArgumentException("Wrong type of entity");
+    /// <inheritdoc/>
+    public void Initialize(IWithDoubleClickEditor smartEntity)
+    {
+        if (!(smartEntity is Section section))
+            throw new ArgumentException("Wrong type of entity");
 
-            _section = section;
+        _section = section;
             
-            TbDesignation.Text = _section.Designation;
-            TbDesignationPrefix.Text = _section.DesignationPrefix;
-            TbSheetNumber.Text = _section.SheetNumber;
-            TbDesignation.Focus();
-        }
+        TbDesignation.Text = _section.Designation;
+        TbDesignationPrefix.Text = _section.DesignationPrefix;
+        TbSheetNumber.Text = _section.SheetNumber;
+        TbDesignation.Focus();
+    }
 
-        /// <inheritdoc/>
-        public void OnAccept()
+    /// <inheritdoc/>
+    public void OnAccept()
+    {
+        _section.Designation = TbDesignation.Text;
+        _section.DesignationPrefix = TbDesignationPrefix.Text;
+        _section.SheetNumber = TbSheetNumber.Text;
+
+        if (ChkRestoreTextPosition.IsChecked.HasValue && ChkRestoreTextPosition.IsChecked.Value)
         {
-            _section.Designation = TbDesignation.Text;
-            _section.DesignationPrefix = TbDesignationPrefix.Text;
-            _section.SheetNumber = TbSheetNumber.Text;
-
-            if (ChkRestoreTextPosition.IsChecked.HasValue && ChkRestoreTextPosition.IsChecked.Value)
-            {
-                _section.AlongBottomShelfTextOffset = double.NaN;
-                _section.AlongTopShelfTextOffset = double.NaN;
-                _section.AcrossBottomShelfTextOffset = double.NaN;
-                _section.AcrossTopShelfTextOffset = double.NaN;
-            }
+            _section.AlongBottomShelfTextOffset = double.NaN;
+            _section.AlongTopShelfTextOffset = double.NaN;
+            _section.AcrossBottomShelfTextOffset = double.NaN;
+            _section.AcrossTopShelfTextOffset = double.NaN;
         }
     }
 }

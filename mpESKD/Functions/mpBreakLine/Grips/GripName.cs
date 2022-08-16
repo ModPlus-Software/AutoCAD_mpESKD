@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Functions.mpBreakLine.Grips
+﻿namespace mpESKD.Functions.mpBreakLine.Grips;
+
+/// <summary>
+/// Grip names
+/// </summary>
+public enum GripName
 {
     /// <summary>
-    /// Grip names
+    /// Start grip
     /// </summary>
-    public enum GripName
-    {
-        /// <summary>
-        /// Start grip
-        /// </summary>
-        StartGrip,
+    StartGrip,
 
-        /// <summary>
-        /// Middle grip
-        /// </summary>
-        MiddleGrip,
+    /// <summary>
+    /// Middle grip
+    /// </summary>
+    MiddleGrip,
 
-        /// <summary>
-        /// End grip
-        /// </summary>
-        EndGrip
-    }
+    /// <summary>
+    /// End grip
+    /// </summary>
+    EndGrip
 }

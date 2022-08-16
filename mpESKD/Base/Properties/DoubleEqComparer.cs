@@ -1,42 +1,41 @@
-﻿namespace mpESKD.Base.Properties
+﻿namespace mpESKD.Base.Properties;
+
+using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// Объект для сравнения значений типа Double
+/// </summary>
+public class DoubleEqComparer : IEqualityComparer<double>
 {
-    using System;
-    using System.Collections.Generic;
+    private readonly double _precisions;
 
     /// <summary>
-    /// Объект для сравнения значений типа Double
+    /// Создание объекта с точностью сравнения 0,000001
     /// </summary>
-    public class DoubleEqComparer : IEqualityComparer<double>
+    public DoubleEqComparer()
     {
-        private readonly double _precisions;
+        _precisions = 0.000001;
+    }
 
-        /// <summary>
-        /// Создание объекта с точностью сравнения 0,000001
-        /// </summary>
-        public DoubleEqComparer()
-        {
-            _precisions = 0.000001;
-        }
+    /// <summary>
+    /// Создание объекта с заданной точностью сравнения
+    /// </summary>
+    /// <param name="precisions">Точность сравнения</param>
+    public DoubleEqComparer(double precisions)
+    {
+        _precisions = precisions;
+    }
 
-        /// <summary>
-        /// Создание объекта с заданной точностью сравнения
-        /// </summary>
-        /// <param name="precisions">Точность сравнения</param>
-        public DoubleEqComparer(double precisions)
-        {
-            _precisions = precisions;
-        }
+    /// <inheritdoc />
+    public bool Equals(double x, double y)
+    {
+        return Math.Abs(x - y) <= _precisions;
+    }
 
-        /// <inheritdoc />
-        public bool Equals(double x, double y)
-        {
-            return Math.Abs(x - y) <= _precisions;
-        }
-
-        /// <inheritdoc />
-        public int GetHashCode(double obj)
-        {
-            return obj.GetHashCode();
-        }
+    /// <inheritdoc />
+    public int GetHashCode(double obj)
+    {
+        return obj.GetHashCode();
     }
 }

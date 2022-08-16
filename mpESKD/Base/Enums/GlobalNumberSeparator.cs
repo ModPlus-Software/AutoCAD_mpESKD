@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+/// <summary>
+/// Глобальное значение разделителя целой и дробной части
+/// </summary>
+public enum GlobalNumberSeparator
 {
     /// <summary>
-    /// Глобальное значение разделителя целой и дробной части
+    /// Из настроек ModPlus
     /// </summary>
-    public enum GlobalNumberSeparator
-    {
-        /// <summary>
-        /// Из настроек ModPlus
-        /// </summary>
-        FromModPlusSettings,
+    FromModPlusSettings,
 
-        /// <summary>
-        /// Из стиля
-        /// </summary>
-        FromStyle,
+    /// <summary>
+    /// Из стиля
+    /// </summary>
+    FromStyle,
 
-        /// <summary>
-        /// Точка
-        /// </summary>
-        Dot,
+    /// <summary>
+    /// Точка
+    /// </summary>
+    Dot,
 
-        /// <summary>
-        /// Запятая
-        /// </summary>
-        Comma
-    }
+    /// <summary>
+    /// Запятая
+    /// </summary>
+    Comma
 }

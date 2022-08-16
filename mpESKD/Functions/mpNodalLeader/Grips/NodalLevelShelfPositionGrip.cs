@@ -1,61 +1,60 @@
-﻿namespace mpESKD.Functions.mpNodalLeader.Grips
+﻿namespace mpESKD.Functions.mpNodalLeader.Grips;
+
+using Autodesk.AutoCAD.DatabaseServices;
+using Base.Enums;
+using Base.Overrules;
+using Base.Utils;
+using ModPlusAPI;
+
+/// <summary>
+/// Ручка узловой выноски, меняющая положение полки
+/// </summary>
+public class NodalLevelShelfPositionGrip : SmartEntityGripData
 {
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Utils;
-    using ModPlusAPI;
-
     /// <summary>
-    /// Ручка узловой выноски, меняющая положение полки
+    /// Initializes a new instance of the <see cref="NodalLevelShelfPositionGrip"/> class.
     /// </summary>
-    public class NodalLevelShelfPositionGrip : SmartEntityGripData
+    /// <param name="nodalLeader">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
+    public NodalLevelShelfPositionGrip(NodalLeader nodalLeader)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NodalLevelShelfPositionGrip"/> class.
-        /// </summary>
-        /// <param name="nodalLeader">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
-        public NodalLevelShelfPositionGrip(NodalLeader nodalLeader)
-        {
-            NodalLeader = nodalLeader;
-        }
+        NodalLeader = nodalLeader;
+    }
         
-        /// <summary>
-        /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
-        /// </summary>
-        public NodalLeader NodalLeader { get; }
+    /// <summary>
+    /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
+    /// </summary>
+    public NodalLeader NodalLeader { get; }
         
-        /// <inheritdoc />
-        public override string GetTooltip()
-        {
-            return Language.GetItem("p78"); // "Положение полки";
-        }
+    /// <inheritdoc />
+    public override string GetTooltip()
+    {
+        return Language.GetItem("p78"); // "Положение полки";
+    }
         
-        /// <inheritdoc />
-        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+    /// <inheritdoc />
+    public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+    {
+        using (NodalLeader)
         {
-            using (NodalLeader)
+            NodalLeader.ShelfPosition = NodalLeader.ShelfPosition == ShelfPosition.Left
+                ? ShelfPosition.Right
+                : ShelfPosition.Left;
+
+            NodalLeader.UpdateEntities();
+            NodalLeader.BlockRecord.UpdateAnonymousBlocks();
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                NodalLeader.ShelfPosition = NodalLeader.ShelfPosition == ShelfPosition.Left
-                    ? ShelfPosition.Right
-                    : ShelfPosition.Left;
-
-                NodalLeader.UpdateEntities();
-                NodalLeader.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(NodalLeader.BlockId, OpenMode.ForWrite, true, true);
+                var blkRef = tr.GetObject(NodalLeader.BlockId, OpenMode.ForWrite, true, true);
                     
-                    using (var resBuf = NodalLeader.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
+                using (var resBuf = NodalLeader.GetDataForXData())
+                {
+                    blkRef.XData = resBuf;
                 }
-            }
 
-            return ReturnValue.GetNewGripPoints;
+                tr.Commit();
+            }
         }
+
+        return ReturnValue.GetNewGripPoints;
     }
 }

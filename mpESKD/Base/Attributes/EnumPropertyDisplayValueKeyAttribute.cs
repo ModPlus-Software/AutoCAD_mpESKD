@@ -1,24 +1,23 @@
-﻿namespace mpESKD.Base.Attributes
+﻿namespace mpESKD.Base.Attributes;
+
+using System;
+
+/// <summary>
+/// Атрибут, указывающий ключ локализации для поля перечислителя, используемого в свойствах примитива
+/// </summary>
+public class EnumPropertyDisplayValueKeyAttribute : Attribute
 {
-    using System;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EnumPropertyDisplayValueKeyAttribute"/> class.
+    /// </summary>
+    /// <param name="localizationKey">Ключ получения локализованного значения</param>
+    public EnumPropertyDisplayValueKeyAttribute(string localizationKey)
+    {
+        LocalizationKey = localizationKey;
+    }
 
     /// <summary>
-    /// Атрибут, указывающий ключ локализации для поля перечислителя, используемого в свойствах примитива
+    /// Ключ получения локализованного значения
     /// </summary>
-    public class EnumPropertyDisplayValueKeyAttribute : Attribute
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EnumPropertyDisplayValueKeyAttribute"/> class.
-        /// </summary>
-        /// <param name="localizationKey">Ключ получения локализованного значения</param>
-        public EnumPropertyDisplayValueKeyAttribute(string localizationKey)
-        {
-            LocalizationKey = localizationKey;
-        }
-
-        /// <summary>
-        /// Ключ получения локализованного значения
-        /// </summary>
-        public string LocalizationKey { get; }
-    }
+    public string LocalizationKey { get; }
 }

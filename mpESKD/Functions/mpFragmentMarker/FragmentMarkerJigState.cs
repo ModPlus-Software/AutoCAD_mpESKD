@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker
+﻿namespace mpESKD.Functions.mpFragmentMarker;
+
+/// <summary>
+/// Состояние Jig при создании узловой выноски
+/// </summary>
+public enum FragmentMarkerJigState
 {
     /// <summary>
-    /// Состояние Jig при создании узловой выноски
+    /// Производится указание точки вставки (точки начала отсчета)
     /// </summary>
-    public enum FragmentMarkerJigState
-    {
-        /// <summary>
-        /// Производится указание точки вставки (точки начала отсчета)
-        /// </summary>
-        InsertionPoint,
+    InsertionPoint,
 
-        /// <summary>
-        /// Происходит указание точки рамки
-        /// </summary>
-        EndPoint,
+    /// <summary>
+    /// Происходит указание точки рамки
+    /// </summary>
+    EndPoint,
 
-        /// <summary>
-        /// Указание конечной точки (точка выноски)
-        /// </summary>
-        LeaderPoint
-    }
+    /// <summary>
+    /// Указание конечной точки (точка выноски)
+    /// </summary>
+    LeaderPoint
 }

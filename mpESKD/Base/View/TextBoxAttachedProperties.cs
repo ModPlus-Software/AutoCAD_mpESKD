@@ -1,38 +1,37 @@
-﻿namespace mpESKD.Base.View
+﻿namespace mpESKD.Base.View;
+
+using System.Windows;
+using System.Windows.Controls;
+
+/// <summary>
+/// Присоединяемые свойства для <see cref="TextBox"/>
+/// </summary>
+public class TextBoxAttachedProperties
 {
-    using System.Windows;
-    using System.Windows.Controls;
+    /// <summary>
+    /// Паттерн, ограничивающий ввод значения в <see cref="TextBox"/> с использованием Regex
+    /// </summary>
+    public static readonly DependencyProperty InputRestrictionRegexPatternProperty = DependencyProperty.RegisterAttached(
+        "InputRestrictionRegexPattern", typeof(string), typeof(TextBoxAttachedProperties), new PropertyMetadata(default(string)));
 
     /// <summary>
-    /// Присоединяемые свойства для <see cref="TextBox"/>
+    /// Set <see cref="InputRestrictionRegexPatternProperty"/>
     /// </summary>
-    public class TextBoxAttachedProperties
+    /// <param name="element"><see cref="DependencyObject"/></param>
+    /// <param name="value">Value</param>
+    [AttachedPropertyBrowsableForType(typeof(TextBox))]
+    public static void SetInputRestrictionRegexPattern(DependencyObject element, string value)
     {
-        /// <summary>
-        /// Паттерн, ограничивающий ввод значения в <see cref="TextBox"/> с использованием Regex
-        /// </summary>
-        public static readonly DependencyProperty InputRestrictionRegexPatternProperty = DependencyProperty.RegisterAttached(
-            "InputRestrictionRegexPattern", typeof(string), typeof(TextBoxAttachedProperties), new PropertyMetadata(default(string)));
+        element.SetValue(InputRestrictionRegexPatternProperty, value);
+    }
 
-        /// <summary>
-        /// Set <see cref="InputRestrictionRegexPatternProperty"/>
-        /// </summary>
-        /// <param name="element"><see cref="DependencyObject"/></param>
-        /// <param name="value">Value</param>
-        [AttachedPropertyBrowsableForType(typeof(TextBox))]
-        public static void SetInputRestrictionRegexPattern(DependencyObject element, string value)
-        {
-            element.SetValue(InputRestrictionRegexPatternProperty, value);
-        }
-
-        /// <summary>
-        /// Get <see cref="InputRestrictionRegexPatternProperty"/>
-        /// </summary>
-        /// <param name="element"><see cref="DependencyObject"/></param>
-        [AttachedPropertyBrowsableForType(typeof(TextBox))]
-        public static string GetInputRestrictionRegexPattern(DependencyObject element)
-        {
-            return (string)element.GetValue(InputRestrictionRegexPatternProperty);
-        }
+    /// <summary>
+    /// Get <see cref="InputRestrictionRegexPatternProperty"/>
+    /// </summary>
+    /// <param name="element"><see cref="DependencyObject"/></param>
+    [AttachedPropertyBrowsableForType(typeof(TextBox))]
+    public static string GetInputRestrictionRegexPattern(DependencyObject element)
+    {
+        return (string)element.GetValue(InputRestrictionRegexPatternProperty);
     }
 }

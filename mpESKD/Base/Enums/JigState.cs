@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+/// <summary>
+/// Статус выполнения <see cref="Autodesk.AutoCAD.EditorInput.EntityJig"/>
+/// </summary>
+public enum JigState
 {
     /// <summary>
-    /// Статус выполнения <see cref="Autodesk.AutoCAD.EditorInput.EntityJig"/>
+    /// Запрос точки вставки
     /// </summary>
-    public enum JigState
-    {
-        /// <summary>
-        /// Запрос точки вставки
-        /// </summary>
-        PromptInsertPoint = 1,
+    PromptInsertPoint = 1,
 
-        /// <summary>
-        /// Запрос последующей точки
-        /// </summary>
-        PromptNextPoint = 2,
+    /// <summary>
+    /// Запрос последующей точки
+    /// </summary>
+    PromptNextPoint = 2,
 
-        /// <summary>
-        /// Условная дополнительная точка
-        /// </summary>
-        CustomPoint = 3
-    }
+    /// <summary>
+    /// Условная дополнительная точка
+    /// </summary>
+    CustomPoint = 3
 }

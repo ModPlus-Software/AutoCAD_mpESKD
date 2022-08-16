@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Functions.mpGroundLine
+﻿namespace mpESKD.Functions.mpGroundLine;
+
+using Base.Attributes;
+
+/// <summary>
+/// Отступ первого штриха в объекте GroundLine
+/// </summary>
+public enum GroundLineFirstStrokeOffset
 {
-    using Base.Attributes;
+    /// <summary>
+    /// По расстоянию между штрихами
+    /// </summary>
+    [EnumPropertyDisplayValueKey("glfst1")]
+    ByStrokeOffset,
 
     /// <summary>
-    /// Отступ первого штриха в объекте GroundLine
+    /// Половина расстояния между группами штрихов
     /// </summary>
-    public enum GroundLineFirstStrokeOffset
-    {
-        /// <summary>
-        /// По расстоянию между штрихами
-        /// </summary>
-        [EnumPropertyDisplayValueKey("glfst1")]
-        ByStrokeOffset,
+    [EnumPropertyDisplayValueKey("glfst2")]
+    ByHalfSpace,
 
-        /// <summary>
-        /// Половина расстояния между группами штрихов
-        /// </summary>
-        [EnumPropertyDisplayValueKey("glfst2")]
-        ByHalfSpace,
-
-        /// <summary>
-        /// Расстояние между группами штрихов
-        /// </summary>
-        [EnumPropertyDisplayValueKey("glfst3")]
-        BySpace
-    }
+    /// <summary>
+    /// Расстояние между группами штрихов
+    /// </summary>
+    [EnumPropertyDisplayValueKey("glfst3")]
+    BySpace
 }

@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Functions.mpNodalLeader.Grips
+﻿namespace mpESKD.Functions.mpNodalLeader.Grips;
+
+/// <summary>
+/// Имя ручки объекта <see cref="NodalLeader"/>
+/// </summary>
+public enum GripName
 {
     /// <summary>
-    /// Имя ручки объекта <see cref="NodalLeader"/>
+    /// Точка вставки
     /// </summary>
-    public enum GripName
-    {
-        /// <summary>
-        /// Точка вставки
-        /// </summary>
-        InsertionPoint,
+    InsertionPoint,
         
-        /// <summary>
-        /// Точка рамки 
-        /// </summary>
-        FramePoint,
+    /// <summary>
+    /// Точка рамки 
+    /// </summary>
+    FramePoint,
         
-        /// <summary>
-        /// Точка выноски
-        /// </summary>
-        LeaderPoint
-    }
+    /// <summary>
+    /// Точка выноски
+    /// </summary>
+    LeaderPoint
 }

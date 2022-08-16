@@ -1,149 +1,148 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker.Grips
+﻿namespace mpESKD.Functions.mpFragmentMarker.Grips;
+
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
+using Base.Abstractions;
+using Base.Enums;
+using Base.Overrules;
+using Base.Utils;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
+
+/// <summary>
+/// Описание ручки линии обрыва
+/// </summary>
+public class FragmentMarkerGrip : SmartEntityGripData, IWithDoubleClickEditor
 {
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.Geometry;
-    using Autodesk.AutoCAD.Runtime;
-    using Base.Abstractions;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Utils;
-    using ModPlusAPI;
-    using ModPlusAPI.Windows;
+        
+    // Временное значение первой ручки
+    private Point3d _startGripTmp;
+
+    // временное значение последней ручки
+    private Point3d _endGripTmp;
+
+    // временное значение последней ручки
+    private Point3d _leaderGripTmp;
+        
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FragmentMarkerGrip"/> class.
+    /// </summary>
+    /// <param name="fragmentMarker">Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой</param>
+    /// <param name="gripName">Имя ручки</param>
+    public FragmentMarkerGrip(FragmentMarker fragmentMarker, GripName gripName)
+    {
+        FragmentMarker = fragmentMarker;
+        GripName = gripName;
+        GripType = GripType.Point;
+    }
 
     /// <summary>
-    /// Описание ручки линии обрыва
+    /// Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой
     /// </summary>
-    public class FragmentMarkerGrip : SmartEntityGripData, IWithDoubleClickEditor
+    public FragmentMarker FragmentMarker { get; }
+
+    /// <summary>
+    /// Имя ручки
+    /// </summary>
+    public GripName GripName { get; }
+
+    /// <inheritdoc />
+    public override string GetTooltip()
     {
-        
-        // Временное значение первой ручки
-        private Point3d _startGripTmp;
-
-        // временное значение последней ручки
-        private Point3d _endGripTmp;
-
-        // временное значение последней ручки
-        private Point3d _leaderGripTmp;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FragmentMarkerGrip"/> class.
-        /// </summary>
-        /// <param name="fragmentMarker">Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой</param>
-        /// <param name="gripName">Имя ручки</param>
-        public FragmentMarkerGrip(FragmentMarker fragmentMarker, GripName gripName)
+        switch (GripName)
         {
-            FragmentMarker = fragmentMarker;
-            GripName = gripName;
-            GripType = GripType.Point;
+            case GripName.StartGrip:
+            case GripName.EndGrip:
+            {
+                return Language.GetItem("gp1"); // stretch
+            }
+
+            case GripName.LeaderGrip: return Language.GetItem("gp2"); // move
         }
 
-        /// <summary>
-        /// Экземпляр класса <see cref="mpFragmentMarker.FragmentMarker"/>, связанный с этой ручкой
-        /// </summary>
-        public FragmentMarker FragmentMarker { get; }
-
-        /// <summary>
-        /// Имя ручки
-        /// </summary>
-        public GripName GripName { get; }
-
-        /// <inheritdoc />
-        public override string GetTooltip()
-        {
-            switch (GripName)
-            {
-                case GripName.StartGrip:
-                case GripName.EndGrip:
-                    {
-                        return Language.GetItem("gp1"); // stretch
-                    }
-
-                case GripName.LeaderGrip: return Language.GetItem("gp2"); // move
-            }
-
-            return base.GetTooltip();
-        }
+        return base.GetTooltip();
+    }
         
-        /// <inheritdoc />
-        public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
+    /// <inheritdoc />
+    public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
+    {
+        try
         {
-            try
+            // При начале перемещения запоминаем первоначальное положение ручки
+            // Запоминаем начальные значения
+            if (newStatus == Status.GripStart)
             {
-                // При начале перемещения запоминаем первоначальное положение ручки
-                // Запоминаем начальные значения
-                if (newStatus == Status.GripStart)
+                if (GripName == GripName.StartGrip)
                 {
-                    if (GripName == GripName.StartGrip)
-                    {
-                        _startGripTmp = GripPoint;
-                    }
-
-                    if (GripName == GripName.EndGrip)
-                    {
-                        _endGripTmp = GripPoint;
-                    }
-
-                    if (GripName == GripName.MiddleGrip)
-                    {
-                        _startGripTmp = FragmentMarker.InsertionPoint;
-                        _endGripTmp = FragmentMarker.EndPoint;
-                    }
-
-                    if (GripName == GripName.LeaderGrip)
-                    {
-                        _leaderGripTmp = FragmentMarker.LeaderPoint;
-                    }
+                    _startGripTmp = GripPoint;
                 }
 
-                // При удачном перемещении ручки записываем новые значения в расширенные данные
-                // По этим данным я потом получаю экземпляр класса FragmentMarker
-                if (newStatus == Status.GripEnd)
+                if (GripName == GripName.EndGrip)
                 {
-                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                    {
-                        var blkRef = tr.GetObject(FragmentMarker.BlockId, OpenMode.ForWrite, true, true);
-                        using (var resBuf = FragmentMarker.GetDataForXData())
-                        {
-                            blkRef.XData = resBuf;
-                        }
-
-                        tr.Commit();
-                    }
-
-                    FragmentMarker.Dispose();
+                    _endGripTmp = GripPoint;
                 }
 
-                // При отмене перемещения возвращаем временные значения
-                if (newStatus == Status.GripAbort)
+                if (GripName == GripName.MiddleGrip)
                 {
-                    if (_startGripTmp != null & GripName == GripName.StartGrip)
-                    {
-                        FragmentMarker.InsertionPoint = GripPoint;
-                    }
-
-                    if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
-                    {
-                        FragmentMarker.InsertionPoint = _startGripTmp;
-                        FragmentMarker.EndPoint = _endGripTmp;
-                    }
-
-                    if (_endGripTmp != null & GripName == GripName.EndGrip)
-                    {
-                        FragmentMarker.EndPoint = GripPoint;
-                    }
-
-                    if (_leaderGripTmp != null & GripName == GripName.LeaderGrip)
-                    {
-                        FragmentMarker.LeaderPoint = GripPoint;
-                    }
+                    _startGripTmp = FragmentMarker.InsertionPoint;
+                    _endGripTmp = FragmentMarker.EndPoint;
                 }
 
-                base.OnGripStatusChanged(entityId, newStatus);
+                if (GripName == GripName.LeaderGrip)
+                {
+                    _leaderGripTmp = FragmentMarker.LeaderPoint;
+                }
             }
-            catch (Exception exception)
+
+            // При удачном перемещении ручки записываем новые значения в расширенные данные
+            // По этим данным я потом получаю экземпляр класса FragmentMarker
+            if (newStatus == Status.GripEnd)
             {
-                ExceptionBox.Show(exception);
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(FragmentMarker.BlockId, OpenMode.ForWrite, true, true);
+                    using (var resBuf = FragmentMarker.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+
+                FragmentMarker.Dispose();
             }
+
+            // При отмене перемещения возвращаем временные значения
+            if (newStatus == Status.GripAbort)
+            {
+                if (_startGripTmp != null & GripName == GripName.StartGrip)
+                {
+                    FragmentMarker.InsertionPoint = GripPoint;
+                }
+
+                if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
+                {
+                    FragmentMarker.InsertionPoint = _startGripTmp;
+                    FragmentMarker.EndPoint = _endGripTmp;
+                }
+
+                if (_endGripTmp != null & GripName == GripName.EndGrip)
+                {
+                    FragmentMarker.EndPoint = GripPoint;
+                }
+
+                if (_leaderGripTmp != null & GripName == GripName.LeaderGrip)
+                {
+                    FragmentMarker.LeaderPoint = GripPoint;
+                }
+            }
+
+            base.OnGripStatusChanged(entityId, newStatus);
+        }
+        catch (Exception exception)
+        {
+            ExceptionBox.Show(exception);
         }
     }
 }

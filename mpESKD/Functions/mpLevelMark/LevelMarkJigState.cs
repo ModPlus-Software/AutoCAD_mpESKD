@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Functions.mpLevelMark
+﻿namespace mpESKD.Functions.mpLevelMark;
+
+/// <summary>
+/// Состояние Jig при создании высотной отметки
+/// </summary>
+public enum LevelMarkJigState
 {
     /// <summary>
-    /// Состояние Jig при создании высотной отметки
+    /// Производится указание точки вставки (точки начала отсчета)
     /// </summary>
-    public enum LevelMarkJigState
-    {
-        /// <summary>
-        /// Производится указание точки вставки (точки начала отсчета)
-        /// </summary>
-        InsertionPoint,
+    InsertionPoint,
 
-        /// <summary>
-        /// Происходит указание точки объекта (точки уровня)
-        /// </summary>
-        ObjectPoint,
+    /// <summary>
+    /// Происходит указание точки объекта (точки уровня)
+    /// </summary>
+    ObjectPoint,
 
-        /// <summary>
-        /// Указание конечной точки (точка начала стрелки)
-        /// </summary>
-        EndPoint
-    }
+    /// <summary>
+    /// Указание конечной точки (точка начала стрелки)
+    /// </summary>
+    EndPoint
 }

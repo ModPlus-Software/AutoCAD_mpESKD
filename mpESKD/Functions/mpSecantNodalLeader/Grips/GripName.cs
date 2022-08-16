@@ -1,18 +1,17 @@
-﻿namespace mpESKD.Functions.mpSecantNodalLeader.Grips
+﻿namespace mpESKD.Functions.mpSecantNodalLeader.Grips;
+
+/// <summary>
+/// Имя ручки объекта <see cref="SecantNodalLeader"/>
+/// </summary>
+public enum GripName
 {
     /// <summary>
-    /// Имя ручки объекта <see cref="SecantNodalLeader"/>
+    /// Точка вставки
     /// </summary>
-    public enum GripName
-    {
-        /// <summary>
-        /// Точка вставки
-        /// </summary>
-        InsertionPoint,
+    InsertionPoint,
 
-        /// <summary>
-        /// Точка выноски
-        /// </summary>
-        LeaderPoint
-    }
+    /// <summary>
+    /// Точка выноски
+    /// </summary>
+    LeaderPoint
 }

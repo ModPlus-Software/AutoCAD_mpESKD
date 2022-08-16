@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Functions.mpWaterProofing
+﻿namespace mpESKD.Functions.mpWaterProofing;
+
+using Base.Attributes;
+
+/// <summary>
+/// Отступ первого штриха линии гидроизоляции
+/// </summary>
+public enum WaterProofingFirstStrokeOffset
 {
-    using Base.Attributes;
+    /// <summary>
+    /// Расстояние между штрихами
+    /// </summary>
+    [EnumPropertyDisplayValueKey("glfst1")]
+    ByStrokeOffset,
 
     /// <summary>
-    /// Отступ первого штриха линии гидроизоляции
+    /// Половина расстояния между штрихами
     /// </summary>
-    public enum WaterProofingFirstStrokeOffset
-    {
-        /// <summary>
-        /// Расстояние между штрихами
-        /// </summary>
-        [EnumPropertyDisplayValueKey("glfst1")]
-        ByStrokeOffset,
+    [EnumPropertyDisplayValueKey("wpfst1")]
+    ByHalfStrokeOffset,
 
-        /// <summary>
-        /// Половина расстояния между штрихами
-        /// </summary>
-        [EnumPropertyDisplayValueKey("wpfst1")]
-        ByHalfStrokeOffset,
-
-        /// <summary>
-        /// Без отступа
-        /// </summary>
-        [EnumPropertyDisplayValueKey("wpfst2")]
-        NoOffset
-    }
+    /// <summary>
+    /// Без отступа
+    /// </summary>
+    [EnumPropertyDisplayValueKey("wpfst2")]
+    NoOffset
 }

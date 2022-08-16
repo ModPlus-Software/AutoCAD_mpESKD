@@ -1,23 +1,22 @@
-﻿namespace mpESKD.Base.Enums
+﻿namespace mpESKD.Base.Enums;
+
+/// <summary>
+/// Область видимости свойства
+/// </summary>
+public enum PropertyScope
 {
     /// <summary>
-    /// Область видимости свойства
+    /// Скрытое свойство. Нужно для работы привязок, но не должно отображаться
     /// </summary>
-    public enum PropertyScope
-    {
-        /// <summary>
-        /// Скрытое свойство. Нужно для работы привязок, но не должно отображаться
-        /// </summary>
-        Hidden,
+    Hidden,
 
-        /// <summary>
-        /// Только на палитре
-        /// </summary>
-        Palette,
+    /// <summary>
+    /// Только на палитре
+    /// </summary>
+    Palette,
 
-        /// <summary>
-        /// На палитре и в редакторе стилей
-        /// </summary>
-        PaletteAndStyleEditor
-    }
+    /// <summary>
+    /// На палитре и в редакторе стилей
+    /// </summary>
+    PaletteAndStyleEditor
 }

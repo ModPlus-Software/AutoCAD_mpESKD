@@ -1,22 +1,21 @@
-﻿namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpAxis;
+
+using Base.Attributes;
+
+/// <summary>
+/// Позиция маркеров оси
+/// </summary>
+public enum AxisMarkersPosition
 {
-    using Base.Attributes;
+    /// <summary>С обеих сторон</summary>
+    [EnumPropertyDisplayValueKey("amt1")]
+    Both,
 
-    /// <summary>
-    /// Позиция маркеров оси
-    /// </summary>
-    public enum AxisMarkersPosition
-    {
-        /// <summary>С обеих сторон</summary>
-        [EnumPropertyDisplayValueKey("amt1")]
-        Both,
+    /// <summary>Сверху</summary>
+    [EnumPropertyDisplayValueKey("amt2")]
+    Top,
 
-        /// <summary>Сверху</summary>
-        [EnumPropertyDisplayValueKey("amt2")]
-        Top,
-
-        /// <summary>Снизу</summary>
-        [EnumPropertyDisplayValueKey("amt3")]
-        Bottom
-    }
+    /// <summary>Снизу</summary>
+    [EnumPropertyDisplayValueKey("amt3")]
+    Bottom
 }

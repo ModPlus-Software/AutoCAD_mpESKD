@@ -1,57 +1,56 @@
-﻿namespace mpESKD.Base.Overrules.Grips
+﻿namespace mpESKD.Base.Overrules.Grips;
+
+using Abstractions;
+using Autodesk.AutoCAD.DatabaseServices;
+using Enums;
+using Utils;
+
+/// <summary>
+/// Ручка реверса линейного интеллектуального объекта
+/// </summary>
+public class LinearEntityReverseGrip : SmartEntityGripData
 {
-    using Abstractions;
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Enums;
-    using Utils;
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LinearEntityReverseGrip"/> class.
+    /// </summary>
+    /// <param name="smartEntity">Instance of <see cref="SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
+    public LinearEntityReverseGrip(SmartEntity smartEntity)
+    {
+        SmartEntity = smartEntity;
+        GripType = GripType.TwoArrowsUpDown;
+    }
 
     /// <summary>
-    /// Ручка реверса линейного интеллектуального объекта
+    /// Экземпляр интеллектуального объекта
     /// </summary>
-    public class LinearEntityReverseGrip : SmartEntityGripData
+    public SmartEntity SmartEntity { get; }
+
+    /// <inheritdoc />
+    public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LinearEntityReverseGrip"/> class.
-        /// </summary>
-        /// <param name="smartEntity">Instance of <see cref="SmartEntity"/> that implement <see cref="ILinearEntity"/></param>
-        public LinearEntityReverseGrip(SmartEntity smartEntity)
+        using (SmartEntity)
         {
-            SmartEntity = smartEntity;
-            GripType = GripType.TwoArrowsUpDown;
-        }
+            var newInsertionPoint = SmartEntity.EndPoint;
+            SmartEntity.EndPoint = SmartEntity.InsertionPoint;
+            SmartEntity.InsertionPoint = newInsertionPoint;
+            ((ILinearEntity)SmartEntity).MiddlePoints.Reverse();
+            SmartEntity.BlockTransform = SmartEntity.BlockTransform.Inverse();
 
-        /// <summary>
-        /// Экземпляр интеллектуального объекта
-        /// </summary>
-        public SmartEntity SmartEntity { get; }
-
-        /// <inheritdoc />
-        public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
-        {
-            using (SmartEntity)
+            SmartEntity.UpdateEntities();
+            SmartEntity.BlockRecord.UpdateAnonymousBlocks();
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                var newInsertionPoint = SmartEntity.EndPoint;
-                SmartEntity.EndPoint = SmartEntity.InsertionPoint;
-                SmartEntity.InsertionPoint = newInsertionPoint;
-                ((ILinearEntity)SmartEntity).MiddlePoints.Reverse();
-                SmartEntity.BlockTransform = SmartEntity.BlockTransform.Inverse();
-
-                SmartEntity.UpdateEntities();
-                SmartEntity.BlockRecord.UpdateAnonymousBlocks();
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
+                ((BlockReference)blkRef).Position = newInsertionPoint;
+                using (var resBuf = SmartEntity.GetDataForXData())
                 {
-                    var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
-                    ((BlockReference)blkRef).Position = newInsertionPoint;
-                    using (var resBuf = SmartEntity.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
+                    blkRef.XData = resBuf;
                 }
-            }
 
-            return ReturnValue.GetNewGripPoints;
+                tr.Commit();
+            }
         }
+
+        return ReturnValue.GetNewGripPoints;
     }
 }

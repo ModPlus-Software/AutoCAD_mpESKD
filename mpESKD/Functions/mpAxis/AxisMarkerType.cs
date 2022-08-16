@@ -1,22 +1,21 @@
-﻿namespace mpESKD.Functions.mpAxis
+﻿namespace mpESKD.Functions.mpAxis;
+
+using Base.Attributes;
+
+/// <summary>
+/// Типы маркеров оси
+/// </summary>
+public enum AxisMarkerType
 {
-    using Base.Attributes;
+    /// <summary>
+    /// Тип 1
+    /// </summary>
+    [EnumPropertyDisplayValueKey("type1")]
+    Type1 = 0,
 
     /// <summary>
-    /// Типы маркеров оси
+    /// Тип 2
     /// </summary>
-    public enum AxisMarkerType
-    {
-        /// <summary>
-        /// Тип 1
-        /// </summary>
-        [EnumPropertyDisplayValueKey("type1")]
-        Type1 = 0,
-
-        /// <summary>
-        /// Тип 2
-        /// </summary>
-        [EnumPropertyDisplayValueKey("type2")]
-        Type2 = 1
-    }
+    [EnumPropertyDisplayValueKey("type2")]
+    Type2 = 1
 }

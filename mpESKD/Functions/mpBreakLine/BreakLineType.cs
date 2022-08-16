@@ -1,28 +1,27 @@
-﻿namespace mpESKD.Functions.mpBreakLine
+﻿namespace mpESKD.Functions.mpBreakLine;
+
+using Base.Attributes;
+
+/// <summary>
+/// Тип линии: линейный, криволинейный, цилиндрический
+/// </summary>
+public enum BreakLineType
 {
-    using Base.Attributes;
+    /// <summary>
+    /// Линейный
+    /// </summary>
+    [EnumPropertyDisplayValueKey("blt1")]
+    Linear = 1,
 
     /// <summary>
-    /// Тип линии: линейный, криволинейный, цилиндрический
+    /// Криволинейный
     /// </summary>
-    public enum BreakLineType
-    {
-        /// <summary>
-        /// Линейный
-        /// </summary>
-        [EnumPropertyDisplayValueKey("blt1")]
-        Linear = 1,
+    [EnumPropertyDisplayValueKey("blt2")]
+    Curvilinear = 2,
 
-        /// <summary>
-        /// Криволинейный
-        /// </summary>
-        [EnumPropertyDisplayValueKey("blt2")]
-        Curvilinear = 2,
-
-        /// <summary>
-        /// Цилиндрический
-        /// </summary>
-        [EnumPropertyDisplayValueKey("blt3")]
-        Cylindrical = 3
-    }
+    /// <summary>
+    /// Цилиндрический
+    /// </summary>
+    [EnumPropertyDisplayValueKey("blt3")]
+    Cylindrical = 3
 }

@@ -1,18 +1,17 @@
-﻿namespace mpESKD.Functions.mpSection.Grips
+﻿namespace mpESKD.Functions.mpSection.Grips;
+
+/// <summary>
+/// Text grip names
+/// </summary>
+public enum TextGripName
 {
     /// <summary>
-    /// Text grip names
+    /// Grip of top text
     /// </summary>
-    public enum TextGripName
-    {
-        /// <summary>
-        /// Grip of top text
-        /// </summary>
-        TopText,
+    TopText,
 
-        /// <summary>
-        /// Grip of bottom text
-        /// </summary>
-        BottomText
-    }
+    /// <summary>
+    /// Grip of bottom text
+    /// </summary>
+    BottomText
 }
