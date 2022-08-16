@@ -165,7 +165,7 @@
         /// </summary>
         private static void FindLastViewValues(ref string ViewLastLetterValue, ref string ViewLastIntegerValue)
         {
-            if (MainSettings.Instance.ViewContinueNodeNumber)
+            if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
             {
                 var Views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
                 if (Views.Any())
