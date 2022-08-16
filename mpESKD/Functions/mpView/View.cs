@@ -234,14 +234,16 @@ namespace mpESKD.Functions.mpView
         {
             try
             {
-
                 var scale = GetScale();
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
-                }
+                    //MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
 
+                    var tmpEndPoint = new Point3d(
+                        InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                    CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
+                }
                 else
                 {
                     // Задание любой другой точки
@@ -256,7 +258,6 @@ namespace mpESKD.Functions.mpView
             }
         }
 
-
         private void MakeSimplyEntity(UpdateVariant variant, double scale)
         {
             if (variant == UpdateVariant.SetInsertionPoint)
@@ -268,29 +269,28 @@ namespace mpESKD.Functions.mpView
                     InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
             }
-            else
-            {
-                /* Изменение базовых примитивов в момент указания второй точки
-                * при условии что расстояние от второй точки до первой больше минимального допустимого
-                */
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                    InsertionPoint, EndPoint, InsertionPointOCS, ShelfLength * scale);
-                UpdateEntities();
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-            }
+            //else
+            //{
+            //    /* Изменение базовых примитивов в момент указания второй точки
+            //    * при условии что расстояние от второй точки до первой больше минимального допустимого
+            //    */
+            //    var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+            //        InsertionPoint, EndPoint, InsertionPointOCS, ShelfLength * scale);
+            //    UpdateEntities();
+            //    EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+            //}
         }
 
         private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
         {
-
-            var topStrokeNormalVector = (endPoint - insertionPoint).GetNormal();
+            var normalVector = (endPoint - insertionPoint).GetNormal();
 
             // shelf line
-            var topShelfEndPoint = insertionPoint + (topStrokeNormalVector * ShelfLength * scale);
-            TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
+            var shelfEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
+            TopShelfEndPoint = shelfEndPoint.TransformBy(BlockTransform);
 
             var topStrokeArrowEndPoint = (endPoint - insertionPoint).GetNormal();
-            var tmpEndPoint = insertionPoint + (topStrokeArrowEndPoint * ShelfLength * scale);
+            var tmpEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
 
             _shelfLine = new Line
             {
@@ -299,7 +299,7 @@ namespace mpESKD.Functions.mpView
             };
 
             // shelf arrow
-            var topShelfArrowStartPoint = insertionPoint + (topStrokeArrowEndPoint * ShelfArrowLength * scale);
+            var topShelfArrowStartPoint = insertionPoint + (normalVector * ShelfArrowLength * scale);
             _shelfArrow = new Polyline(2);
             _shelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
             _shelfArrow.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, 0.0, 0.0);
@@ -334,15 +334,15 @@ namespace mpESKD.Functions.mpView
                     //    acrossShelfTextOffset = _mText.ActualWidth / 2;
                     //}
 
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * (2*scale + acrossShelfTextOffset));
+                    var tempPoint = shelfEndPoint - (normalVector * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * (2*scale + acrossShelfTextOffset));
                     _mText.Location = topTextCenterPoint;
                 }
                 else
                 {
                     //AcadUtils.Editor.WriteMessage();
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth/2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((2*scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight/2))));
+                    var tempPoint = shelfEndPoint - (normalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth/2)));
+                    var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * ((2*scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight/2))));
                     _mText.Location = topTextCenterPoint;
                 }
 
