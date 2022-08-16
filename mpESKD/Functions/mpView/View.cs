@@ -336,14 +336,18 @@ namespace mpESKD.Functions.mpView
                         acrossShelfTextOffset = _mText.ActualWidth / 2;
                     }
 
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
-                    var topTextCenterPoint = tempPoint - (topStrokeNormalVector * (scale * 2 + acrossShelfTextOffset));
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset * 2);
+                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
+                    var topTextCenterPoint = tempPoint + (normalPerpenducular * scale * acrossShelfTextOffset * 2);
+
+                    //var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
+                    //var topTextCenterPoint = tempPoint - (topStrokeNormalVector * (scale * 2 + acrossShelfTextOffset));
                     _mText.Location = topTextCenterPoint;
                 }
                 else
                 {
-                    var tempPoint = topShelfEndPoint + (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
                     _mText.Location = topTextCenterPoint;
                 }
 

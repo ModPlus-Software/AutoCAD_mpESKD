@@ -96,8 +96,8 @@ namespace mpESKD.Functions.mpView
                         else if (gripData is ViewTextGrip textGrip)
                         {
                             var view = textGrip.View;
-                            var topShelfVector = (view.InsertionPoint - view.EndPoint).GetNormal().Negate();
-                            var topStrokeVector = topShelfVector.GetPerpendicularVector();
+                            var topShelfVector = (view.InsertionPoint - view.EndPoint).GetNormal();
+                            var topStrokeVector = topShelfVector.GetPerpendicularVector().Negate();
                             
                             var deltaY = topStrokeVector.DotProduct(offset) / view.BlockTransform.GetScale();
                             var deltaX = topShelfVector.DotProduct(offset) / view.BlockTransform.GetScale();
