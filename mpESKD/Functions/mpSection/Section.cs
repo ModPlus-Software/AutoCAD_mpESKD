@@ -485,17 +485,31 @@
                     {
                         alongShelfTextOffset = _topMText.ActualHeight / 2;
                         acrossShelfTextOffset = _topMText.ActualWidth / 2;
+                        AcadUtils.Editor.WriteMessage($" if когда проверяется AlongTopShelfTextOffset на NaN \n");
                     }
 
                     var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset);
                     var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
                     _topMText.Location = topTextCenterPoint;
+                    
+                    AcadUtils.Editor.WriteMessage($"при первом создание точки текста tempPoint= {tempPoint}  topShelfEndPoint { topShelfEndPoint} + {(topShelfStartPoint - topShelfEndPoint).GetNormal() * alongShelfTextOffset} \n");
                 }
                 else
                 {
+
                     var tempPoint = topShelfEndPoint + ((topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2)));
+                    AcadUtils.Editor.WriteMessage($"при редактировании точки текста tempPoint= {tempPoint}  topShelfEndPoint { topShelfEndPoint} + (topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2) = {(topShelfStartPoint - topShelfEndPoint).GetNormal() * (AlongTopShelfTextOffset + (_topMText.ActualWidth / 2))} \n");
+                    
                     var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))));
+                    
+                    AcadUtils.Editor.WriteMessage($" в else _topMText.Location {_topMText.Location} до назначения \n");
+                    
                     _topMText.Location = topTextCenterPoint;
+                    
+                    AcadUtils.Editor.WriteMessage($" в else _topMText.Location {_topMText.Location} после назначения \n");
+                    
+                    AcadUtils.Editor.WriteMessage($" в else topTextCenterPoint= {topTextCenterPoint}  tempPoint { tempPoint} + {(topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_topMText.ActualHeight / 2))))} \n");
+                    AcadUtils.Editor.WriteMessage($"-----------------------------------------------\n");
                 }
 
                 TopDesignationPoint = _topMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
@@ -526,7 +540,7 @@
                 }
 
                 BottomDesignationPoint = _bottomMText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
-                
+
                 if (HideTextBackground)
                 {
                     var maskOffset = TextMaskOffset * scale;

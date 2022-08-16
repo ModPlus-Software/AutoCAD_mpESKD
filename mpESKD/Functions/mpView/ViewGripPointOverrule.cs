@@ -83,16 +83,12 @@ namespace mpESKD.Functions.mpView
                             if (vertexGrip.GripName == GripName.StartGrip)
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-
-                                AcadUtils.Editor.WriteMessage("двигаем весь блок");
                             }
                             else if (vertexGrip.GripName == GripName.EndGrip)
                             {
                                 view.EndPoint = vertexGrip.GripPoint + offset;
-
-                                //view.EndPoint = vertexGrip.GripPoint + offset;
-                                AcadUtils.Editor.WriteMessage("двигаем конечный грип");
                             }
+
                             // Вот тут происходит перерисовка примитивов внутри блока
                             view.UpdateEntities();
                             view.BlockRecord.UpdateAnonymousBlocks();
@@ -100,20 +96,20 @@ namespace mpESKD.Functions.mpView
                         else if (gripData is ViewTextGrip textGrip)
                         {
                             var view = textGrip.View;
-                            var topStrokeVector = (view.InsertionPoint - view.EndPoint).GetNormal();
-                            var topShelfVector = topStrokeVector.GetPerpendicularVector().Negate();
+                            var topShelfVector = (view.InsertionPoint - view.EndPoint).GetNormal().Negate();
+                            var topStrokeVector = topShelfVector.GetPerpendicularVector();
+                            
                             var deltaY = topStrokeVector.DotProduct(offset) / view.BlockTransform.GetScale();
                             var deltaX = topShelfVector.DotProduct(offset) / view.BlockTransform.GetScale();
 
-                            AcadUtils.Editor.WriteMessage($"view.AlongTopShelfTextOffset до назначения дельта {view.AlongTopShelfTextOffset} \n");
-
-                            view.AlongTopShelfTextOffset = deltaX;
-                            view.AcrossTopShelfTextOffset = deltaY;
-
-                            AcadUtils.Editor.WriteMessage($"view.AlongTopShelfTextOffset после назначения дельта {view.AlongTopShelfTextOffset} \n");
-                            AcadUtils.Editor.WriteMessage($"insertion point  {view.InsertionPoint} \n");
-
-
+                            if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
+                            {
+                                view.AlongTopShelfTextOffset = deltaX;
+                            }
+                            else
+                            {
+                                view.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
+                            }
 
                             if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
                             {
@@ -123,41 +119,10 @@ namespace mpESKD.Functions.mpView
                             {
                                 view.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
                             }
-                            if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
-                            {
-                                view.AcrossTopShelfTextOffset = deltaY;
-                            }
-                            else
-                            {
-                                view.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
-                            }
-
-
-                            //if (textGrip.Name == TextGripName.TopText)
-                            //{
-                            //    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-                            //    Debug.Print("textGrip.Name == TextGripName.TopText");
-                            //    AcadUtils.Editor.WriteMessage("textGrip.Name == TextGripName.TopText");
-                            //}
-
-
-                            AcadUtils.Editor.WriteMessage($" в overrule offset  {offset} \n");
-                            //TODO изменить текст
-                            //view.TextPoint += offset;
-
-                            AcadUtils.Editor.WriteMessage($" в overrule view.TextPoint  {view.TextPoint } \n");
-
-                            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-
-                            AcadUtils.Editor.WriteMessage($" в overrule {textGrip.Name}  тянем через грип текста \n");
 
                             view.UpdateEntities();
                             view.BlockRecord.UpdateAnonymousBlocks();
                         }
-                        //else if (gripData is ViewAddVertexGrip addVertexGrip)
-                        //{
-                        //    addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
-                        //}
                         else
                         {
                             base.MoveGripPointsAt(entity, grips, offset, bitFlags);

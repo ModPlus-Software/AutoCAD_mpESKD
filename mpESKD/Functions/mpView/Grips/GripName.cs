@@ -11,6 +11,5 @@
         /// End grip
         /// </summary>
         EndGrip,
-
     }
 }

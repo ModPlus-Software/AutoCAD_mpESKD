@@ -99,14 +99,6 @@ namespace mpESKD.Functions.mpView
         public override double MinDistanceBetweenPoints => 0.2;
 
         /// <summary>
-        /// Длина среднего штриха (половина длины полилинии на переломе)
-        /// </summary>
-        //[EntityProperty(PropertiesCategory.Geometry, 1, "p42", 8, 1, 20, descLocalKey: "d42", nameSymbol: "a")]
-        //[SaveToXData]
-        //public int MiddleStrokeLength { get; set; } = 8;
-
-
-        /// <summary>
         /// Длина полки
         /// </summary>
         [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "d")]
@@ -202,11 +194,6 @@ namespace mpESKD.Functions.mpView
         public Point3d TopShelfEndPoint { get; private set; }
 
         /// <summary>
-        /// Точка выноски
-        /// </summary>
-        [SaveToXData]
-        public Point3d TextPoint { get; set; }
-        /// <summary>
         /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="ViewReverseGrip.OnHotGrip"/>)
         /// Используется для определения положения ручки (<see cref="ViewGripPointOverrule"/>)
         /// </summary>
@@ -258,7 +245,6 @@ namespace mpESKD.Functions.mpView
                 else
                 {
                     // Задание любой другой точки
-                    AcadUtils.Editor.WriteMessage($"если не новый textpoint {TextPoint} \n");
                     CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                 }
 
@@ -302,7 +288,6 @@ namespace mpESKD.Functions.mpView
             var topStrokeNormalVector = (endPoint - insertionPoint).GetNormal();
 
             // shelf line линия стрелки
-
             var topShelfEndPoint = insertionPoint + (topStrokeNormalVector * ShelfLength * scale);
             TopShelfEndPoint = topShelfEndPoint.TransformBy(BlockTransform);
 
@@ -341,38 +326,25 @@ namespace mpESKD.Functions.mpView
                 // text
                 var alongShelfTextOffset = _mText.ActualWidth / 2;
                 var acrossShelfTextOffset = _mText.ActualHeight / 2;
+
                 if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
                 {
-                    //if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
-                    //    (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
-                    //{
-                    //    alongShelfTextOffset = _mText.ActualHeight / 2;
-                    //    acrossShelfTextOffset = _mText.ActualWidth / 2;
-                    //}
+                    if ((topStrokeNormalVector.X > check || topStrokeNormalVector.X < -check) &&
+                        (topStrokeNormalVector.Y < check || topStrokeNormalVector.Y > -check))
+                    {
+                        alongShelfTextOffset = _mText.ActualHeight / 2;
+                        acrossShelfTextOffset = _mText.ActualWidth / 2;
+                    }
 
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset * 2);
-                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
-                    var topTextCenterPoint = tempPoint + (normalPerpenducular * scale * acrossShelfTextOffset * 2);
-
-                    //var textPerpendicularVector = (AlongTopShelfTextOffset * topStrokeNormalVector);
-                    //var tempPoint = topShelfEndPoint - textPerpendicularVector * alongShelfTextOffset;
-
-                    TextPoint = topTextCenterPoint;
-
-                    //var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    var tempPoint = topShelfEndPoint + (topStrokeNormalVector * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
                     _mText.Location = topTextCenterPoint;
-
-                    AcadUtils.WriteMessageInDebug($"topTextCenterPoint - {tempPoint} \n");
                 }
                 else
                 {
-                    AcadUtils.Editor.WriteMessage($"else in text location {TextPoint} \n");
-                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector  * (_mText.ActualWidth / 2));
-                    var normalPerpenducular = topStrokeNormalVector.GetPerpendicularVector();
-                    var topTextCenterPoint =  tempPoint + (normalPerpenducular * ((scale * 2) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
+                    var tempPoint = topShelfEndPoint + (topStrokeNormalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
+                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector.GetPerpendicularVector() * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
                     _mText.Location = topTextCenterPoint;
-
-                    AcadUtils.Editor.WriteMessage($"-----------------------------------------------\n");
                 }
 
                 TextDesignationPoint = _mText.GeometricExtents.MinPoint.TransformBy(BlockTransform);
@@ -385,6 +357,25 @@ namespace mpESKD.Functions.mpView
             }
 
         }
+
+        /// <summary>
+        /// Отступ полки по длине штриха в процентах
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", 80, 0, 100, descLocalKey: "d45", nameSymbol: "c")]
+        [SaveToXData]
+        public int ShelfOffset { get; set; } = 80;
+
+        /// <summary>
+        /// Длина верхнего и нижнего штриха
+        /// </summary>
+        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", 10, 5, 10, descLocalKey: "d44", nameSymbol: "b")]
+        [SaveToXData]
+        public int StrokeLength { get; set; } = 10;
+        private double GetShelfOffset()
+        {
+            return StrokeLength * ShelfOffset / 100.0;
+        }
+
 
         /// <summary>
         /// True - есть хоть какое-то строковое значение
