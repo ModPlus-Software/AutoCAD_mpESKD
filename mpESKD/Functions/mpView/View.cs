@@ -17,7 +17,7 @@ namespace mpESKD.Functions.mpView
     using mpAxis;
 
     /// <summary>
-    /// Разрез
+    /// Вид
     /// </summary>
     [SmartEntityDisplayNameKey("h79")]
     [SystemStyleDescriptionKey("h96")]
@@ -145,7 +145,7 @@ namespace mpESKD.Functions.mpView
         public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
-        /// Обозначение разреза
+        /// Обозначение разреза поменять на вид
         /// </summary>
         [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
@@ -168,12 +168,12 @@ namespace mpESKD.Functions.mpView
         [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Позиция номера листа
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 9, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
-        [SaveToXData]
-        public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
+        ///// <summary>
+        ///// Позиция номера листа
+        ///// </summary>
+        //[EntityProperty(PropertiesCategory.Content, 9, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
+        //[SaveToXData]
+        //public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
 
         /// <summary>
         /// Отступ средней точки верхнего текста вдоль верхней полки
@@ -336,8 +336,8 @@ namespace mpESKD.Functions.mpView
                         acrossShelfTextOffset = _mText.ActualWidth / 2;
                     }
 
-                    var tempPoint = topShelfEndPoint + (topStrokeNormalVector * alongShelfTextOffset);
-                    var topTextCenterPoint = tempPoint + (topStrokeNormalVector * ((2 * scale) + acrossShelfTextOffset));
+                    var tempPoint = topShelfEndPoint - (topStrokeNormalVector * alongShelfTextOffset);
+                    var topTextCenterPoint = tempPoint - (topStrokeNormalVector * (scale * 2 + acrossShelfTextOffset));
                     _mText.Location = topTextCenterPoint;
                 }
                 else
@@ -355,27 +355,7 @@ namespace mpESKD.Functions.mpView
                     _textMask = _mText.GetBackgroundMask(maskOffset);
                 }
             }
-
         }
-
-        /// <summary>
-        /// Отступ полки по длине штриха в процентах
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 4, "p45", 80, 0, 100, descLocalKey: "d45", nameSymbol: "c")]
-        [SaveToXData]
-        public int ShelfOffset { get; set; } = 80;
-
-        /// <summary>
-        /// Длина верхнего и нижнего штриха
-        /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 3, "p44", 10, 5, 10, descLocalKey: "d44", nameSymbol: "b")]
-        [SaveToXData]
-        public int StrokeLength { get; set; } = 10;
-        private double GetShelfOffset()
-        {
-            return StrokeLength * ShelfOffset / 100.0;
-        }
-
 
         /// <summary>
         /// True - есть хоть какое-то строковое значение
@@ -391,8 +371,6 @@ namespace mpESKD.Functions.mpView
 
             return true;
         }
-
-
 
         private void SetFirstTextOnCreation()
         {
@@ -458,32 +436,6 @@ namespace mpESKD.Functions.mpView
             }
 
             // Иначе форматированный текст для многострочного текста
-
-            if (isForTopText)
-            {
-                if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Top)
-                {
-                    // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
-                    if (isSameTextHeight)
-                    {
-                        return allWithSameHeight;
-                    }
-
-                    return allWithDifferentHeight;
-                }
-
-                return prefixAndDesignation;
-            }
-
-            if (SheetNumberPosition == AxisMarkersPosition.Both || SheetNumberPosition == AxisMarkersPosition.Bottom)
-            {
-                if (isSameTextHeight)
-                {
-                    return allWithSameHeight;
-                }
-
-                return allWithDifferentHeight;
-            }
 
             return prefixAndDesignation;
         }

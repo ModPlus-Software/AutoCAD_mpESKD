@@ -1,8 +1,5 @@
 ﻿namespace mpESKD.Functions.mpView
 {
-    using System;
-    using System.Linq;
-    using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.EditorInput;
     using Autodesk.AutoCAD.Geometry;
@@ -15,6 +12,8 @@
     using Base.Utils;
     using ModPlusAPI;
     using ModPlusAPI.Windows;
+    using System;
+    using System.Linq;
 
     /// <inheritdoc />
     public class ViewFunction : ISmartEntityFunction
