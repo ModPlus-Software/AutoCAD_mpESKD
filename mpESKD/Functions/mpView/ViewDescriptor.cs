@@ -15,16 +15,16 @@
         public string Name => "mpView";
 
         /// <inheritdoc />
-        // Разрез
-        public string LName => Language.GetItem("h79");
+        // Вид
+        public string LName => Language.GetItem("h167");
 
         /// <inheritdoc />
-        // Создание обозначения разреза (сечения) по ГОСТ 2.305-68
-        public string Description => Language.GetItem("h80");
+        // Создание обозначения вида по ГОСТ 2.305-68
+        public string Description => Language.GetItem("h169");
 
         /// <inheritdoc />
-        // Создание интеллектуального объекта на основе анонимного блока, описывающего разрез (сечение) по ГОСТ 2.305-68
-        public string FullDescription => Language.GetItem("h81");
+        // Создание интеллектуального объекта на основе анонимного блока, описывающего вида по ГОСТ 2.305-68
+        public string FullDescription => Language.GetItem("h170");
 
         /// <inheritdoc />
         public string ToolTipHelpImage => string.Empty;
@@ -32,23 +32,19 @@
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
-           
+            string.Empty
         };
 
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-          
+            string.Empty
         };
 
         /// <inheritdoc />
         public List<string> SubDescriptions => new List<string>
         {
-            // Отрисовка обозначения ломаного разреза (сечения) по ГОСТ 2.305-68
-            Language.GetItem("h84"),
-
-            // Конвертирование выбранной полилинии в обозначение разреза
-            Language.GetItem("h85")
+            string.Empty
         };
 
         /// <inheritdoc />

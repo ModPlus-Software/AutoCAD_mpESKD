@@ -41,10 +41,10 @@
                  */
                 ExtendedDataUtils.AddRegAppTableRecord<View>();
 
-                var ViewLastLetterValue = string.Empty;
-                var ViewLastIntegerValue = string.Empty;
-                FindLastViewValues(ref ViewLastLetterValue, ref ViewLastIntegerValue);
-                var view = new View(ViewLastIntegerValue, ViewLastLetterValue);
+                var viewLastLetterValue = string.Empty;
+                var viewLastIntegerValue = string.Empty;
+                FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
+                var view = new View(viewLastIntegerValue, viewLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(view);
 
@@ -63,7 +63,7 @@
         }
 
         /// <summary>
-        /// Команда создания обозначения разреза
+        /// Команда создания обозначения вида
         /// </summary>
         [CommandMethod("ModPlus", "mpView", CommandFlags.Modal)]
         public void CreateViewCommand()
@@ -86,10 +86,10 @@
                 ExtendedDataUtils.AddRegAppTableRecord<View>();
 
                 var style = StyleManager.GetCurrentStyle(typeof(View));
-                var ViewLastLetterValue = string.Empty;
-                var ViewLastIntegerValue = string.Empty;
-                FindLastViewValues(ref ViewLastLetterValue, ref ViewLastIntegerValue);
-                var view = new View(ViewLastIntegerValue, ViewLastLetterValue);
+                var viewLastLetterValue = string.Empty;
+                var viewLastIntegerValue = string.Empty;
+                FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
+                var view = new View(viewLastIntegerValue, viewLastLetterValue);
 
                 var blockReference = MainFunction.CreateBlock(view);
                 view.ApplyStyle(style, true);
@@ -161,7 +161,7 @@
         }
 
         /// <summary>
-        /// Поиск последних цифровых и буквенных значений разрезов на текущем виде
+        /// Поиск последних цифровых и буквенных значений видов на текущем виде
         /// </summary>
         private static void FindLastViewValues(ref string ViewLastLetterValue, ref string ViewLastIntegerValue)
         {

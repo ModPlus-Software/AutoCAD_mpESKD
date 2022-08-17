@@ -14,8 +14,8 @@
     /// <summary>
     /// Вид
     /// </summary>
-    [SmartEntityDisplayNameKey("h79")]
-    [SystemStyleDescriptionKey("h96")]
+    [SmartEntityDisplayNameKey("h167")]
+    [SystemStyleDescriptionKey("h168")]
     public class View : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         private readonly string _lastIntegerValue = string.Empty;
@@ -140,9 +140,9 @@
         public double TextMaskOffset { get; set; } = 0.5;
 
         /// <summary>
-        /// Обозначение разреза поменять на вид
+        /// Обозначение вида
         /// </summary>
-        [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
+        [EntityProperty(PropertiesCategory.Content, 6, "p109", "", propertyScope: PropertyScope.Palette)]
         [SaveToXData]
         [ValueToSearchBy]
         public string Designation { get; set; } = string.Empty;
