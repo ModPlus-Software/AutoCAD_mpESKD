@@ -269,16 +269,16 @@ namespace mpESKD.Functions.mpView
                     InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
             }
-            //else
-            //{
-            //    /* Изменение базовых примитивов в момент указания второй точки
-            //    * при условии что расстояние от второй точки до первой больше минимального допустимого
-            //    */
-            //    var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-            //        InsertionPoint, EndPoint, InsertionPointOCS, ShelfLength * scale);
-            //    UpdateEntities();
-            //    EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-            //}
+            else
+            {
+                /* Изменение базовых примитивов в момент указания второй точки
+                * при условии что расстояние от второй точки до первой больше минимального допустимого
+                */
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                    InsertionPoint, EndPoint, InsertionPointOCS, ShelfLength * scale);
+                UpdateEntities();
+                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+            }
         }
 
         private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
