@@ -1,15 +1,10 @@
-﻿using System.Diagnostics;
-
-namespace mpESKD.Functions.mpView
+﻿namespace mpESKD.Functions.mpView
 {
-    using System.Linq;
     using Autodesk.AutoCAD.DatabaseServices;
     using Autodesk.AutoCAD.Geometry;
     using Autodesk.AutoCAD.Runtime;
     using Base;
-    using Base.Enums;
     using Base.Overrules;
-    using Base.Utils;
     using Grips;
     using ModPlusAPI.Windows;
 

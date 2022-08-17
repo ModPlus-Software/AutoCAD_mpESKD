@@ -168,13 +168,6 @@ namespace mpESKD.Functions.mpView
         [ValueToSearchBy]
         public string SheetNumber { get; set; } = string.Empty;
 
-        ///// <summary>
-        ///// Позиция номера листа
-        ///// </summary>
-        //[EntityProperty(PropertiesCategory.Content, 9, "p54", AxisMarkersPosition.Both, descLocalKey: "d54")]
-        //[SaveToXData]
-        //public AxisMarkersPosition SheetNumberPosition { get; set; } = AxisMarkersPosition.Both;
-
         /// <summary>
         /// Отступ средней точки верхнего текста вдоль верхней полки
         /// </summary>
@@ -192,13 +185,6 @@ namespace mpESKD.Functions.mpView
         /// </summary>
         [SaveToXData]
         public Point3d TopShelfEndPoint { get; private set; }
-
-        /// <summary>
-        /// Направление разреза: слева на право или справа на лево. Меняется при работе ручки (<see cref="ViewReverseGrip.OnHotGrip"/>)
-        /// Используется для определения положения ручки (<see cref="ViewGripPointOverrule"/>)
-        /// </summary>
-        [SaveToXData]
-        public EntityDirection EntityDirection { get; set; } = EntityDirection.LeftToRight;
 
         /// <inheritdoc />
         public override IEnumerable<Entity> Entities
@@ -289,7 +275,7 @@ namespace mpESKD.Functions.mpView
             var shelfEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
             TopShelfEndPoint = shelfEndPoint.TransformBy(BlockTransform);
 
-            var topStrokeArrowEndPoint = (endPoint - insertionPoint).GetNormal();
+            //var topStrokeArrowEndPoint = (endPoint - insertionPoint).GetNormal();
             var tmpEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
 
             _shelfLine = new Line
@@ -340,7 +326,6 @@ namespace mpESKD.Functions.mpView
                 }
                 else
                 {
-                    //AcadUtils.Editor.WriteMessage();
                     var tempPoint = shelfEndPoint - (normalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth/2)));
                     var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * ((2*scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight/2))));
                     _mText.Location = topTextCenterPoint;
@@ -424,9 +409,9 @@ namespace mpESKD.Functions.mpView
             }
 
             var prefixAndDesignation = DesignationPrefix + Designation;
-            var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
-            var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
-            var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
+            //var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
+            //var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
+            //var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
 
             // Если номер не указан, то обычный текст
             if (string.IsNullOrEmpty(SheetNumber))
