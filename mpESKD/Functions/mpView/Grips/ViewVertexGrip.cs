@@ -24,10 +24,10 @@
         /// </summary>
         /// <param name="view">Экземпляр класса <see cref="mpView.View"/></param>
         /// <param name="index">Индекс ручки</param>
-        public ViewVertexGrip(View view, GripName gripName)
+        public ViewVertexGrip(View view, int index)
         {
             View = view;
-            GripName = gripName;
+            GripIndex = index;
             GripType = GripType.Point;
             
             /* При инициализации ручки нужно собрать все точки разреза и поместить их в поле _points.
@@ -46,7 +46,7 @@
         /// <summary>
         /// Индекс ручки
         /// </summary>
-        public GripName GripName { get; }
+        public int GripIndex { get; }
 
         /// <inheritdoc />
         public override string GetTooltip()
@@ -92,11 +92,14 @@
                 {
                     if (_gripTmp != null)
                     {
-                        if (GripName == GripName.StartGrip)
+                        if (GripIndex == 0)
                         {
                             View.InsertionPoint = _gripTmp;
                         }
-                        
+                        else if (GripIndex == 1)
+                        {
+                            View.EndPoint = _gripTmp;
+                        }
                     }
                 }
 

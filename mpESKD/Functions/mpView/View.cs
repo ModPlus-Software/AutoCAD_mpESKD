@@ -224,11 +224,11 @@ namespace mpESKD.Functions.mpView
                 if (EndPointOCS.Equals(Point3d.Origin))
                 {
                     // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                    //MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
+                    MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
 
-                    var tmpEndPoint = new Point3d(
-                        InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                    CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
+                    //var tmpEndPoint = new Point3d(
+                    //    InsertionPointOCS.X + (ShelfLength * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                    //CreateEntities(InsertionPointOCS, tmpEndPoint, scale);
                 }
                 else
                 {
@@ -409,9 +409,9 @@ namespace mpESKD.Functions.mpView
             }
 
             var prefixAndDesignation = DesignationPrefix + Designation;
-            //var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
-            //var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
-            //var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
+            var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
+            var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
+            var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
 
             // Если номер не указан, то обычный текст
             if (string.IsNullOrEmpty(SheetNumber))
@@ -420,6 +420,11 @@ namespace mpESKD.Functions.mpView
             }
 
             // Иначе форматированный текст для многострочного текста
+            if (isForTopText)
+            {
+                // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
+                return isSameTextHeight ? allWithSameHeight : allWithDifferentHeight;
+            }
 
             return prefixAndDesignation;
         }

@@ -44,7 +44,7 @@
                             grips.Add(textGrip);
                         }
 
-                        vertexGrip = new ViewVertexGrip(view, GripName.EndGrip)
+                        vertexGrip = new ViewVertexGrip(view, 1)
                         {
                             GripPoint = view.TopShelfEndPoint
                         };
@@ -75,11 +75,11 @@
                         {
                             var view = vertexGrip.View;
 
-                            if (vertexGrip.GripName == GripName.StartGrip)
+                            if (vertexGrip.GripIndex == 0)
                             {
                                 ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
                             }
-                            else if (vertexGrip.GripName == GripName.EndGrip)
+                            else if (vertexGrip.GripIndex == 1)
                             {
                                 view.EndPoint = vertexGrip.GripPoint + offset;
                             }
