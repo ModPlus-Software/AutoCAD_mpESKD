@@ -44,7 +44,7 @@ namespace mpESKD.Functions.mpView
                             var textGrip = new ViewTextGrip(view)
                             {
                                 GripPoint = view.TextDesignationPoint,
-                                Name = TextGripName.TopText
+                                TextGripName = "TopText"
                             };
                             grips.Add(textGrip);
                         }

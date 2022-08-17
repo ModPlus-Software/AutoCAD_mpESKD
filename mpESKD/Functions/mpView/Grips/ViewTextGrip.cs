@@ -30,7 +30,7 @@
         /// <summary>
         /// Имя ручки, чтобы определить от какого она текста
         /// </summary>
-        public TextGripName Name { get; set; }
+        public string TextGripName { get; set; }
 
         public double CachedAlongTopShelfTextOffset { get; }
 

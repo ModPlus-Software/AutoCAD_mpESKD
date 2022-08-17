@@ -32,18 +32,13 @@
         /// <inheritdoc />
         public List<string> SubFunctionsNames => new List<string>
         {
-            "mpSectionBroken",
-            "mpSectionFromPolyline"
+           
         };
 
         /// <inheritdoc />
         public List<string> SubFunctionsLNames => new List<string>
         {
-            // Ломаный разрез
-            Language.GetItem("h82"),
-
-            // Разрез из полилинии
-            Language.GetItem("h83")
+          
         };
 
         /// <inheritdoc />
