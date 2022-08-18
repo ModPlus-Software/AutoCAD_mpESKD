@@ -1,185 +1,184 @@
-﻿namespace mpESKD.Functions.mpView
+﻿namespace mpESKD.Functions.mpView;
+
+using System;
+using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Runtime;
+using Base;
+using Base.Abstractions;
+using Base.Enums;
+using Base.Overrules;
+using Base.Styles;
+using Base.Utils;
+using ModPlusAPI;
+using ModPlusAPI.Windows;
+
+/// <inheritdoc />
+public class ViewFunction : ISmartEntityFunction
 {
-    using Autodesk.AutoCAD.DatabaseServices;
-    using Autodesk.AutoCAD.EditorInput;
-    using Autodesk.AutoCAD.Geometry;
-    using Autodesk.AutoCAD.Runtime;
-    using Base;
-    using Base.Abstractions;
-    using Base.Enums;
-    using Base.Overrules;
-    using Base.Styles;
-    using Base.Utils;
-    using ModPlusAPI;
-    using ModPlusAPI.Windows;
-    using System;
-    using System.Linq;
+    /// <inheritdoc />
+    public void Initialize()
+    {
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new ViewGripPointOverrule(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<View>(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<View>(), true);
+    }
 
     /// <inheritdoc />
-    public class ViewFunction : ISmartEntityFunction
+    public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
-        /// <inheritdoc />
-        public void Initialize()
-        {
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new ViewGripPointOverrule(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<View>(), true);
-            Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<View>(), true);
-        }
-
-        /// <inheritdoc />
-        public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
-        {
-            SmartEntityUtils.SendStatistic<View>();
+        SmartEntityUtils.SendStatistic<View>();
             
-            try
-            {
-                Overrule.Overruling = false;
-
-                /* Регистрация ЕСКД приложения должна запускаться при запуске
-                 * функции, т.к. регистрация происходит в текущем документе
-                 * При инициализации плагина регистрации нет!
-                 */
-                ExtendedDataUtils.AddRegAppTableRecord<View>();
-
-                var viewLastLetterValue = string.Empty;
-                var viewLastIntegerValue = string.Empty;
-                FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
-                var view = new View(viewLastIntegerValue, viewLastLetterValue);
-
-                var blockReference = MainFunction.CreateBlock(view);
-
-                view.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
-
-                InsertViewWithJig(true, view, blockReference);
-            }
-            catch (System.Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-            finally
-            {
-                Overrule.Overruling = true;
-            }
-        }
-
-        /// <summary>
-        /// Команда создания обозначения вида
-        /// </summary>
-        [CommandMethod("ModPlus", "mpView", CommandFlags.Modal)]
-        public void CreateViewCommand()
+        try
         {
-            CreateView(true);
-        }
+            Overrule.Overruling = false;
 
-        private static void CreateView(bool isSimple)
+            /* Регистрация ЕСКД приложения должна запускаться при запуске
+             * функции, т.к. регистрация происходит в текущем документе
+             * При инициализации плагина регистрации нет!
+             */
+            ExtendedDataUtils.AddRegAppTableRecord<View>();
+
+            var viewLastLetterValue = string.Empty;
+            var viewLastIntegerValue = string.Empty;
+            FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
+            var view = new View(viewLastIntegerValue, viewLastLetterValue);
+
+            var blockReference = MainFunction.CreateBlock(view);
+
+            view.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+
+            InsertViewWithJig(true, view, blockReference);
+        }
+        catch (System.Exception exception)
         {
-            SmartEntityUtils.SendStatistic<View>();
+            ExceptionBox.Show(exception);
+        }
+        finally
+        {
+            Overrule.Overruling = true;
+        }
+    }
+
+    /// <summary>
+    /// Команда создания обозначения вида
+    /// </summary>
+    [CommandMethod("ModPlus", "mpView", CommandFlags.Modal)]
+    public void CreateViewCommand()
+    {
+        CreateView(true);
+    }
+
+    private static void CreateView(bool isSimple)
+    {
+        SmartEntityUtils.SendStatistic<View>();
             
-            try
-            {
-                Overrule.Overruling = false;
-
-                /* Регистрация ЕСКД приложения должна запускаться при запуске
-                 * функции, т.к. регистрация происходит в текущем документе
-                 * При инициализации плагина регистрации нет!
-                 */
-                ExtendedDataUtils.AddRegAppTableRecord<View>();
-
-                var style = StyleManager.GetCurrentStyle(typeof(View));
-                var viewLastLetterValue = string.Empty;
-                var viewLastIntegerValue = string.Empty;
-                FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
-                var view = new View(viewLastIntegerValue, viewLastLetterValue);
-
-                var blockReference = MainFunction.CreateBlock(view);
-                view.ApplyStyle(style, true);
-
-                InsertViewWithJig(isSimple, view, blockReference);
-            }
-            catch (System.Exception exception)
-            {
-                ExceptionBox.Show(exception);
-            }
-            finally
-            {
-                Overrule.Overruling = true;
-            }
-        }
-
-        private static void InsertViewWithJig(bool isSimple, View view, BlockReference blockReference)
+        try
         {
-            var nextPointPrompt = Language.GetItem("msg5");
-            var entityJig = new DefaultEntityJig(
-                view,
-                blockReference,
-                new Point3d(20, 0, 0));
-            do
-            {
-                var status = AcadUtils.Editor.Drag(entityJig).Status;
-                if (status == PromptStatus.OK)
-                {
-                    if (isSimple)
-                    {
-                        if (entityJig.JigState == JigState.PromptInsertPoint)
-                        {
-                            entityJig.JigState = JigState.PromptNextPoint;
-                            entityJig.PromptForNextPoint = nextPointPrompt;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    using (AcadUtils.Document.LockDocument())
-                    {
-                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                        {
-                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                            obj.Erase(true);
-                            tr.Commit();
-                        }
-                    }
+            Overrule.Overruling = false;
 
-                    break;
-                }
-               
-            }
-            while (true);
+            /* Регистрация ЕСКД приложения должна запускаться при запуске
+             * функции, т.к. регистрация происходит в текущем документе
+             * При инициализации плагина регистрации нет!
+             */
+            ExtendedDataUtils.AddRegAppTableRecord<View>();
 
-            if (!view.BlockId.IsErased)
-            {
-                using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
-                {
-                    var ent = tr.GetObject(view.BlockId, OpenMode.ForWrite, true, true);
-                    ent.XData = view.GetDataForXData();
-                    tr.Commit();
-                }
-            }
+            var style = StyleManager.GetCurrentStyle(typeof(View));
+            var viewLastLetterValue = string.Empty;
+            var viewLastIntegerValue = string.Empty;
+            FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
+            var view = new View(viewLastIntegerValue, viewLastLetterValue);
+
+            var blockReference = MainFunction.CreateBlock(view);
+            view.ApplyStyle(style, true);
+
+            InsertViewWithJig(isSimple, view, blockReference);
         }
-
-        /// <summary>
-        /// Поиск последних цифровых и буквенных значений видов на текущем виде
-        /// </summary>
-        private static void FindLastViewValues(ref string ViewLastLetterValue, ref string ViewLastIntegerValue)
+        catch (System.Exception exception)
         {
-            if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
+            ExceptionBox.Show(exception);
+        }
+        finally
+        {
+            Overrule.Overruling = true;
+        }
+    }
+
+    private static void InsertViewWithJig(bool isSimple, View view, BlockReference blockReference)
+    {
+        var nextPointPrompt = Language.GetItem("msg5");
+        var entityJig = new DefaultEntityJig(
+            view,
+            blockReference,
+            new Point3d(20, 0, 0));
+        do
+        {
+            var status = AcadUtils.Editor.Drag(entityJig).Status;
+            if (status == PromptStatus.OK)
             {
-                var Views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
-                if (Views.Any())
+                if (isSimple)
                 {
-                    Views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
-                    var v = Views.Last().Designation;
-                    if (int.TryParse(v, out var i))
+                    if (entityJig.JigState == JigState.PromptInsertPoint)
                     {
-                        ViewLastIntegerValue = i.ToString();
+                        entityJig.JigState = JigState.PromptNextPoint;
+                        entityJig.PromptForNextPoint = nextPointPrompt;
                     }
                     else
                     {
-                        ViewLastLetterValue = v;
+                        break;
                     }
+                }
+            }
+            else
+            {
+                using (AcadUtils.Document.LockDocument())
+                {
+                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
+                    {
+                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
+                        obj.Erase(true);
+                        tr.Commit();
+                    }
+                }
+
+                break;
+            }
+               
+        }
+        while (true);
+
+        if (!view.BlockId.IsErased)
+        {
+            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+            {
+                var ent = tr.GetObject(view.BlockId, OpenMode.ForWrite, true, true);
+                ent.XData = view.GetDataForXData();
+                tr.Commit();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Поиск последних цифровых и буквенных значений видов на текущем виде
+    /// </summary>
+    private static void FindLastViewValues(ref string ViewLastLetterValue, ref string ViewLastIntegerValue)
+    {
+        if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
+        {
+            var Views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
+            if (Views.Any())
+            {
+                Views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
+                var v = Views.Last().Designation;
+                if (int.TryParse(v, out var i))
+                {
+                    ViewLastIntegerValue = i.ToString();
+                }
+                else
+                {
+                    ViewLastLetterValue = v;
                 }
             }
         }
