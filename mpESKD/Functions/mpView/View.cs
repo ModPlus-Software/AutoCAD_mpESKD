@@ -96,7 +96,7 @@
         /// <summary>
         /// Длина полки
         /// </summary>
-        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "d")]
+        [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "w")]
         [SaveToXData]
         public int ShelfLength { get; set; } = 10;
 
