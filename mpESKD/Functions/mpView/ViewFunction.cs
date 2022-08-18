@@ -163,22 +163,22 @@
         /// <summary>
         /// Поиск последних цифровых и буквенных значений видов на текущем виде
         /// </summary>
-        private static void FindLastViewValues(ref string ViewLastLetterValue, ref string ViewLastIntegerValue)
+        private static void FindLastViewValues(ref string viewLastLetterValue, ref string viewLastIntegerValue)
         {
             if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
             {
-                var Views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
-                if (Views.Any())
+                var views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
+                if (views.Any())
                 {
-                    Views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
-                    var v = Views.Last().Designation;
+                    views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
+                    var v = views.Last().Designation;
                     if (int.TryParse(v, out var i))
                     {
-                        ViewLastIntegerValue = i.ToString();
+                        viewLastIntegerValue = i.ToString();
                     }
                     else
                     {
-                        ViewLastLetterValue = v;
+                        viewLastLetterValue = v;
                     }
                 }
             }

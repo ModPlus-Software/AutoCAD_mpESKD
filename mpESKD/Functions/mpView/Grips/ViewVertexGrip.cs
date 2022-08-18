@@ -17,7 +17,6 @@
     /// </summary>
     public class ViewVertexGrip : SmartEntityGripData
     {
-        private readonly List<Point3d> _points;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewVertexGrip"/> class.
@@ -29,13 +28,6 @@
             View = view;
             GripIndex = index;
             GripType = GripType.Point;
-            
-            /* При инициализации ручки нужно собрать все точки вида и поместить их в поле _points.
-             * Это создаст кэш точек вида. Если в методе WorldDraw брать точки из самого вида (View),
-             * то вспомогательные линии будут меняться при зуммировании. Это связано с тем, что в методе
-             * MoveGripPointsAt происходит вызов метода UpdateEntities */
-            _points = new List<Point3d> { View.InsertionPoint };
-            _points.Add(View.EndPoint);
         }
 
         /// <summary>
