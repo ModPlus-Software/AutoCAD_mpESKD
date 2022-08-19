@@ -30,7 +30,7 @@ public class ViewFunction : ISmartEntityFunction
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
         SmartEntityUtils.SendStatistic<View>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -74,7 +74,7 @@ public class ViewFunction : ISmartEntityFunction
     private static void CreateView(bool isSimple)
     {
         SmartEntityUtils.SendStatistic<View>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -145,7 +145,6 @@ public class ViewFunction : ISmartEntityFunction
 
                 break;
             }
-               
         }
         while (true);
 
@@ -160,26 +159,25 @@ public class ViewFunction : ISmartEntityFunction
         }
     }
 
-        /// <summary>
-        /// Поиск последних цифровых и буквенных значений видов на текущем виде
-        /// </summary>
-        private static void FindLastViewValues(ref string viewLastLetterValue, ref string viewLastIntegerValue)
+    /// <summary>
+    /// Поиск последних цифровых и буквенных значений видов на текущем виде
+    /// </summary>
+    private static void FindLastViewValues(ref string viewLastLetterValue, ref string viewLastIntegerValue)
+    {
+        if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
         {
-            if (MainSettings.Instance.SectionSaveLastTextAndContinueNew)
+            var views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
+            if (views.Any())
             {
-                var views = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<View>(typeof(View));
-                if (views.Any())
+                views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
+                var v = views.Last().Designation;
+                if (int.TryParse(v, out var i))
                 {
-                    views.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
-                    var v = views.Last().Designation;
-                    if (int.TryParse(v, out var i))
-                    {
-                        viewLastIntegerValue = i.ToString();
-                    }
-                    else
-                    {
-                        viewLastLetterValue = v;
-                    }
+                    viewLastIntegerValue = i.ToString();
+                }
+                else
+                {
+                    viewLastLetterValue = v;
                 }
             }
         }
