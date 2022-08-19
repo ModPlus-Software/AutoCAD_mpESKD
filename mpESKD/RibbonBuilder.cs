@@ -293,6 +293,11 @@ public class RibbonBuilder
         // mpSectionLabel
         ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<ViewLabel>(), 0));
 
+        ribRowPanel.Items.Add(new RibbonRowBreak());
+
+        // mpView
+        ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<Functions.mpView.View>()));
+
         ribSourcePanel.Items.Add(ribRowPanel);
     }
 
