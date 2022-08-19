@@ -30,34 +30,17 @@ public class ViewDescriptor : ISmartEntityDescriptor
     public string ToolTipHelpImage => string.Empty;
 
     /// <inheritdoc />
-    public List<string> SubFunctionsNames => new List<string>
-    {
-        string.Empty
-    };
+    public List<string> SubFunctionsNames => new ();
 
     /// <inheritdoc />
-    public List<string> SubFunctionsLNames => new List<string>
-    {
-        string.Empty
-    };
+    public List<string> SubFunctionsLNames => new ();
 
     /// <inheritdoc />
-    public List<string> SubDescriptions => new List<string>
-    {
-        string.Empty
-    };
+    public List<string> SubDescriptions => new ();
 
     /// <inheritdoc />
-    public List<string> SubFullDescriptions => new List<string>
-    {
-        string.Empty,
-        string.Empty
-    };
+    public List<string> SubFullDescriptions => new ();
 
     /// <inheritdoc />
-    public List<string> SubHelpImages => new List<string>
-    {
-        string.Empty,
-        string.Empty
-    };
+    public List<string> SubHelpImages => new ();
 }

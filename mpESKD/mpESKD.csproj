@@ -207,6 +207,8 @@
 		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16_dark.png" />
+		<Resource Include="Functions\mpView\Icons\mpView_16x16.png" />
+		<Resource Include="Functions\mpView\Icons\mpView_16x16_dark.png" />
 		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16.png" />
 		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_16x16_dark.png" />
 		<Resource Include="Functions\mpWaterProofing\Icons\mpWaterProofingFromPolyline_32x32.png" />
