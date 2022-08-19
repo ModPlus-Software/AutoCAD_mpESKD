@@ -23,7 +23,7 @@ public class ViewDescriptor : ISmartEntityDescriptor
     public string Description => Language.GetItem("h169");
 
     /// <inheritdoc />
-    // Создание интеллектуального объекта на основе анонимного блока, описывающего вида по ГОСТ 2.305-68
+    // Создание интеллектуального объекта на основе анонимного блока, описывающего обозначение вида по ГОСТ 2.305-68
     public string FullDescription => Language.GetItem("h170");
 
     /// <inheritdoc />
