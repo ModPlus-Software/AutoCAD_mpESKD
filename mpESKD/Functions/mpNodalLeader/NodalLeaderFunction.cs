@@ -112,7 +112,10 @@ public class NodalLeaderFunction : ISmartEntityFunction
         // <msg18>Укажите точку выноски:</msg18>
         var leaderPointPrompt = Language.GetItem("msg18");
             
-        var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0))
+        var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0),point3d =>
+        {
+            nodalLeader.EndPoint = point3d;
+        })
         {
             PromptForInsertionPoint = insertionPointPrompt
         };

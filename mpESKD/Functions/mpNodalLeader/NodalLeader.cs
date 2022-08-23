@@ -74,6 +74,8 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
 
+    private Point3d _nodalLeaderFirstPoint;
+
     #endregion
 
     /// <summary>
@@ -318,6 +320,64 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             ExceptionBox.Show(exception);
         }
+    }
+
+    
+    private void MakeSimplyEntity(double scale)
+    {
+        var tempFramePoint = new Point3d(
+            InsertionPointOCS.X + (5 * scale),
+            InsertionPointOCS.Y + (5 * scale),
+            InsertionPointOCS.Z);
+        var tmpEndPoint = JigState == NodalLeaderJigState.InsertionPoint ?
+            new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
+            ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+
+        //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
+        //FillMainPolylineWithPoints(pts, bulges);
+
+        //_nodalLeaderFirstPoint = pts[3].ToPoint3d();
+        //EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+    }
+
+    /// <summary>
+    /// Получение точек для построения базовой полилинии
+    /// </summary>
+    private Point2dCollection PointsToCreatePolyline(
+        double scale, Point3d insertionPoint, Point3d endPoint)
+    {
+        var length = endPoint.DistanceTo(insertionPoint);
+        
+        var pts = new Point2dCollection();
+
+        // Первая точка начало дуги радиус Radius * scale
+        // 1. От первой точки до второй проводим линию это будет вектор
+        // 2. Чтобы получить точку от начала вектора, получаем нормаль и умножаем на нужную длину
+        // 3. Поворачиваем полученный вектор на 90 градусов и отсчитываем необходимую высоту
+
+        var lengthRadius = 5 * scale;
+
+        var normal = (endPoint - insertionPoint).GetNormal();
+
+        //pts.Add(insertionPoint.ToPoint2d());
+        //bulges.Add(-0.4141);
+
+        //var vectorLength = normal * lengthRadius;
+
+        //var p2_v = insertionPoint + vectorLength;
+        //var p2 = p2_v + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+        //pts.Add(p2.ToPoint2d());
+        //bulges.Add(0.0);
+
+        //var p3_t = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(insertionPoint, endPoint, (length / 2) - lengthRadius);
+        //var p3 = p3_t.ToPoint3d() + vectorLength.RotateBy(Math.PI * 0.5, Vector3d.ZAxis);
+        //_leaderFirstPoint = p3;
+        //pts.Add(p3.ToPoint2d());
+        //bulges.Add(0.4141);
+
+
+
+        return pts;
     }
 
     private void CreateEntities(
