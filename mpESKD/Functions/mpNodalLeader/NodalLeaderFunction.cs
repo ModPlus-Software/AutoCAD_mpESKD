@@ -114,7 +114,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
             
         var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0),point3d =>
         {
-            nodalLeader.EndPoint = point3d;
+            nodalLeader.LeaderPoint = point3d;
         })
         {
             PromptForInsertionPoint = insertionPointPrompt
@@ -136,17 +136,18 @@ public class NodalLeaderFunction : ISmartEntityFunction
                 {
                     nodalLeader.JigState = NodalLeaderJigState.LeaderPoint;
                     entityJig.PromptForNextPoint = leaderPointPrompt;
-                    nodalLeader.FramePoint = nodalLeader.EndPoint;
+                    nodalLeader.LeaderPoint = nodalLeader.EndPoint;
                         
                     // Тут не нужна привязка к предыдущей точке
                     entityJig.PreviousPoint = nodalLeader.InsertionPoint;
+                    entityJig.JigState = JigState.CustomPoint;
                 }
                 else
                 {
                     break;
                 }
 
-                entityJig.JigState = JigState.PromptNextPoint;
+                //entityJig.JigState = JigState.PromptNextPoint;
             }
             else
             {
