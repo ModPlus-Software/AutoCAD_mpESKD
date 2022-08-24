@@ -278,17 +278,19 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         try
         {
             var scale = GetScale();
-
+            
             //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == NodalLeaderJigState.InsertionPoint)
             {
-                //var tempFramePoint = new Point3d(
-                //    InsertionPointOCS.X + (5 * scale),
-                //    InsertionPointOCS.Y + (5 * scale),
-                //    InsertionPointOCS.Z);
-
-                //CreateEntities(InsertionPointOCS, tempFramePoint, scale);
-                MakeSimplyEntity(scale);
+                //MakeSimplyEntity(scale);
+                var tempFramePoint = new Point3d(
+                    InsertionPointOCS.X + (5 * scale),
+                    InsertionPointOCS.Y + (5 * scale),
+                    InsertionPointOCS.Z);
+                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint, out var bulges);
+                FillMainPolylineWithPoints(pts, bulges);
+                _nodalLeaderFirstPoint = pts[3].ToPoint3d();
+                EndPoint = tempFramePoint.TransformBy(BlockTransform);
             }
             //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
             //// будет перемещена в FramePoint
@@ -298,6 +300,8 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
                 var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
 
+                AcadUtils.Editor.WriteMessage($"ожидание второго клика или перетягивание \n");
+
                 if (FrameType == FrameType.Rectangular &&
                     (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
                 {
@@ -305,12 +309,20 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                         InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
                         InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
                         InsertionPointOCS.Z);
+                    AcadUtils.Editor.WriteMessage($" условие если FrameType == FrameType.Rectangular\n");
+                    AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
+                    var tmpEndPoint = JigState == NodalLeaderJigState.FramePoint
+                        ? new Point3d(InsertionPointOCS.X + (scale), InsertionPointOCS.Y,
+                            InsertionPointOCS.Z)
+                        : ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
+                            MinDistanceBetweenPoints * scale);
 
-                    //CreateEntities(InsertionPointOCS, tempFramePoint, scale);
-                    MakeSimplyEntity(scale);
+                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
+                    FillMainPolylineWithPoints(pts, bulges);
                 }
                 else
                 {
+                    AcadUtils.Editor.WriteMessage($" условие если круг\n");
                     //CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                     _nodalLeaderFirstPoint = pts[3].ToPoint3d();
@@ -319,11 +331,16 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
             else if (JigState == NodalLeaderJigState.LeaderPoint)
             {
+
+                AcadUtils.Editor.WriteMessage($" тянем за ручк полки текста\n");
+                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
                 CreateEntities(_nodalLeaderFirstPoint, LeaderPointOCS, scale);
             }
             //// Прочие случаи (включая указание точки выноски)
             else
             {
+                AcadUtils.Editor.WriteMessage($" другие случаи\n");
+                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
                 //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                 //_nodalLeaderFirstPoint = pts[3].ToPoint3d();
                 //FillMainPolylineWithPoints(pts, bulges);
@@ -347,23 +364,22 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ? new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y,
                 InsertionPointOCS.Z)
             : ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
-                MinDistanceBetweenPoints * scale);
+                 scale);
 
-        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint, out var bulges);
+        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
         FillMainPolylineWithPoints(pts, bulges);
 
         _nodalLeaderFirstPoint = pts[3].ToPoint3d();
         EndPoint = tmpEndPoint.TransformBy(BlockTransform);
     }
-
+    //TODO fix stretching from framepoint grip
     /// <summary>
     /// Получение точек для построения базовой полилинии
     /// </summary>
     private Point2dCollection PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint, out List<double> bulges)
     {
         
-        var pts = new Point2dCollection();
-
+      
         _frameCircle = null;
 
         var width = Math.Abs(endPoint.X - insertionPoint.X);
@@ -388,7 +404,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
                 new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
             };
-
         var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
         bulges = new List<double>
         {

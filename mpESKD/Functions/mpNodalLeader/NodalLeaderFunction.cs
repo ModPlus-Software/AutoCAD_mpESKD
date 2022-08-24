@@ -135,8 +135,8 @@ public class NodalLeaderFunction : ISmartEntityFunction
                 else if (nodalLeader.JigState == NodalLeaderJigState.FramePoint)
                 {
                     nodalLeader.JigState = NodalLeaderJigState.LeaderPoint;
-                    entityJig.PromptForNextPoint = leaderPointPrompt;
-                    nodalLeader.LeaderPoint = nodalLeader.EndPoint;
+                    entityJig.PromptForCustomPoint = leaderPointPrompt;
+                    //nodalLeader.LeaderPoint = nodalLeader.EndPoint;
                         
                     // Тут не нужна привязка к предыдущей точке
                     entityJig.PreviousPoint = nodalLeader.InsertionPoint;
