@@ -286,9 +286,9 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     InsertionPointOCS.X + (5 * scale),
                     InsertionPointOCS.Y + (5 * scale),
                     InsertionPointOCS.Z);
-                var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint, out var bulges);
-                FillMainPolylineWithPoints(pts, bulges);
-                _nodalLeaderFirstPoint = pts[3].ToPoint3d();
+                PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint);
+                
+                _nodalLeaderFirstPoint = InsertionPoint;
                 EndPoint = tempFramePoint.TransformBy(BlockTransform);
             }
             //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
@@ -313,16 +313,16 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
                             MinDistanceBetweenPoints * scale);
 
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
-                    FillMainPolylineWithPoints(pts, bulges);
+                    PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
+                    //FillMainPolylineWithPoints(pts, bulges);
                 }
                 else
                 {
                     AcadUtils.Editor.WriteMessage($" условие если круг\n");
                     //CreateEntities(InsertionPointOCS, EndPointOCS, scale);
-                    var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
-                    _nodalLeaderFirstPoint = pts[3].ToPoint3d();
-                    FillMainPolylineWithPoints(pts, bulges);
+                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint);
+                    _nodalLeaderFirstPoint = InsertionPoint;
+                    //FillMainPolylineWithPoints(pts, bulges);
                 }
             }
             else if (JigState == NodalLeaderJigState.LeaderPoint)
@@ -340,7 +340,10 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
                 //_nodalLeaderFirstPoint = pts[3].ToPoint3d();
                 //FillMainPolylineWithPoints(pts, bulges);
-                MakeSimplyEntity(scale);
+                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
+                            MinDistanceBetweenPoints * scale);
+
+                    PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
                 CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
@@ -373,10 +376,10 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         AcadUtils.Editor.WriteMessage($"tempFramePoint - {tempFramePoint}, tmpEndPoint - {tmpEndPoint} \n");
         AcadUtils.Editor.WriteMessage($"InsertionPoint - {InsertionPoint}, EndPointOCS - {EndPointOCS} \n");
 
-        var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
-        FillMainPolylineWithPoints(pts, bulges);
+        PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
+        //FillMainPolylineWithPoints(pts, bulges);
 
-        _nodalLeaderFirstPoint = pts[3].ToPoint3d();
+        _nodalLeaderFirstPoint = InsertionPoint;
         EndPoint = tmpEndPoint.TransformBy(BlockTransform);
     }
 
@@ -384,7 +387,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Получение точек для построения базовой полилинии
     /// </summary>
-    private Point2dCollection PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint, out List<double> bulges)
+    private void PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint)
     {
         //_frameCircle = null;
 
@@ -435,37 +438,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
 
 
-        if (FrameType == FrameType.Round)
-        {
-            _framePolyline = null;
 
-            try
-            {
-                var radius = endPoint.DistanceTo(insertionPoint);
-                if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-                    radius = 5 * scale;
-
-                _frameCircle = new Circle
-                {
-                    Center = insertionPoint,
-                    Radius = radius
-                };
-
-                //if (!drawLeader)
-                //    return;
-
-                var leaderLine = new Line(insertionPoint, endPoint);
-                var pts = new Point3dCollection();
-                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                _leaderLine = pts.Count > 0 ? new Line(pts[0], endPoint) : leaderLine;
-            }
-            catch
-            {
-                _frameCircle = null;
-            }
-        }
-        else
-        {
             _frameCircle = null;
 
             var width = Math.Abs(endPoint.X - insertionPoint.X);
@@ -492,7 +465,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             };
 
             var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-            bulges = new[]
+            var bulges = new[]
             {
                 -bevelBulge,
                 0.0,
@@ -513,9 +486,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             _framePolyline.Closed = true;
 
-           
-
-            return points;
+        
     }
 
     private void FillMainPolylineWithPoints(Point2dCollection points, IList<double> bulges)
