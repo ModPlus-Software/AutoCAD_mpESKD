@@ -48,12 +48,11 @@ public class NodalLeaderGrip : SmartEntityGripData
 
     public NodalLeaderGrip(
         NodalLeader nodalLeader,
-        GripType gripType,
         GripName gripName)
     {
         NodalLeader = nodalLeader;
         GripName = gripName;
-        GripType = gripType;
+        GripType = GripType.Point;
     }
 
 
@@ -151,10 +150,10 @@ public class NodalLeaderGrip : SmartEntityGripData
                             NodalLeader.InsertionPoint = _startGripTmp;
                             break;
                         case GripName.FramePoint:
-                            NodalLeader.LeaderPoint = _endGripTmp;
+                            NodalLeader.EndPoint = _endGripTmp;
                             break;
                         case GripName.LeaderPoint:
-                            NodalLeader.EndPoint = _leaderGripTmp;
+                            NodalLeader.LeaderPoint = _leaderGripTmp;
                             break;
                     }
                 }

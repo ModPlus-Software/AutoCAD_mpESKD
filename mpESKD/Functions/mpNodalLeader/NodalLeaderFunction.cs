@@ -128,12 +128,16 @@ public class NodalLeaderFunction : ISmartEntityFunction
             {
                 if (nodalLeader.JigState == NodalLeaderJigState.InsertionPoint)
                 {
-                    nodalLeader.JigState = NodalLeaderJigState.FramePoint;
+                    AcadUtils.Editor.WriteMessage($" JigState in function {nodalLeader.JigState.Value.ToString()} \n");
+                    nodalLeader.JigState = NodalLeaderJigState.EndPoint;
                     entityJig.PromptForNextPoint = framePointPrompt;
                     entityJig.PreviousPoint = nodalLeader.InsertionPoint;
+
+                    entityJig.JigState = JigState.PromptNextPoint;
                 }
-                else if (nodalLeader.JigState == NodalLeaderJigState.FramePoint)
+                else if (nodalLeader.JigState == NodalLeaderJigState.EndPoint)
                 {
+                    AcadUtils.Editor.WriteMessage($"{nodalLeader.JigState.Value.ToString()}");
                     nodalLeader.JigState = NodalLeaderJigState.LeaderPoint;
                     entityJig.PromptForCustomPoint = leaderPointPrompt;
                     //nodalLeader.LeaderPoint = nodalLeader.EndPoint;
@@ -144,6 +148,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
                 }
                 else
                 {
+                    AcadUtils.Editor.WriteMessage($" JigState in function {nodalLeader.JigState.Value.ToString()} \n");
                     break;
                 }
 
