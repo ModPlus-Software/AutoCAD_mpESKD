@@ -343,7 +343,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                  var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
                             MinDistanceBetweenPoints * scale);
 
-                    PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
+                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
                 CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
