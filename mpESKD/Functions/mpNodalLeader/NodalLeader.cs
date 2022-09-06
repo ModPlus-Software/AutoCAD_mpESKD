@@ -74,8 +74,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
 
-    private Point3d _nodalLeaderFirstPoint;
-    private Polyline _mainPolyline;
 
     #endregion
 
@@ -287,8 +285,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     InsertionPointOCS.Y + (5 * scale),
                     InsertionPointOCS.Z);
                 PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint);
-                
-                _nodalLeaderFirstPoint = InsertionPoint;
                 EndPoint = tempFramePoint.TransformBy(BlockTransform);
             }
             //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
@@ -299,51 +295,28 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
                 var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
 
-                AcadUtils.Editor.WriteMessage($"ожидание второго клика или перетягивание \n");
-
                 if (FrameType == FrameType.Rectangular &&
                     (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
                 {
-                    var tempFramePoint = new Point3d(
-                        InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
-                        InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
-                        InsertionPointOCS.Z);
-                    AcadUtils.Editor.WriteMessage($" условие если FrameType == FrameType.Rectangular\n");
-                    AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
+
                     var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
                             MinDistanceBetweenPoints * scale);
 
                     PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
-                    //FillMainPolylineWithPoints(pts, bulges);
                 }
                 else
                 {
-                    AcadUtils.Editor.WriteMessage($" условие если круг\n");
-                    //CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                     PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint);
-                    _nodalLeaderFirstPoint = InsertionPoint;
-                    //FillMainPolylineWithPoints(pts, bulges);
                 }
             }
             else if (JigState == NodalLeaderJigState.LeaderPoint)
             {
-
-                AcadUtils.Editor.WriteMessage($" тянем за ручк полки текста\n");
-                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
-                CreateEntities(_nodalLeaderFirstPoint, LeaderPointOCS, scale);
+                CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
             //// Прочие случаи (включая указание точки выноски)
             else
             {
-                AcadUtils.Editor.WriteMessage($" другие случаи\n");
-                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
-                //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
-                //_nodalLeaderFirstPoint = pts[3].ToPoint3d();
-                //FillMainPolylineWithPoints(pts, bulges);
-                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
-                            MinDistanceBetweenPoints * scale);
-
-                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
+                PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
                 CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
@@ -363,82 +336,46 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (JigState == NodalLeaderJigState.InsertionPoint)
         {
             tmpEndPoint = tempFramePoint;
-            AcadUtils.Editor.WriteMessage($"условие для NodalLeaderJigState.InsertionPoint tempFramePoint - {tempFramePoint}, tmpEndPoint - {tmpEndPoint} \n");
         }
         else
         {
-            
             tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
                 scale);
-            AcadUtils.Editor.WriteMessage($"условие если не NodalLeaderJigState.InsertionPoint tempFramePoint - {tempFramePoint}, tmpEndPoint - {tmpEndPoint} \n");
         }
 
-        AcadUtils.Editor.WriteMessage($"tempFramePoint - {tempFramePoint}, tmpEndPoint - {tmpEndPoint} \n");
-        AcadUtils.Editor.WriteMessage($"InsertionPoint - {InsertionPoint}, EndPointOCS - {EndPointOCS} \n");
-
         PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
-        //FillMainPolylineWithPoints(pts, bulges);
 
-        _nodalLeaderFirstPoint = InsertionPoint;
         EndPoint = tmpEndPoint.TransformBy(BlockTransform);
     }
 
-    //TODO fix stretching from framepoint grip
     /// <summary>
     /// Получение точек для построения базовой полилинии
     /// </summary>
     private void PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint)
     {
-        //_frameCircle = null;
+        if (FrameType == FrameType.Round)
+        {
+            _framePolyline = null;
 
-        //var width = Math.Abs(endPoint.X - insertionPoint.X);
-        //var height = Math.Abs(endPoint.Y - insertionPoint.Y);
-        //var cornerRadius = CornerRadius * scale;
+            try
+            {
+                var radius = endPoint.DistanceTo(insertionPoint);
+                if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
+                    radius = 5 * scale;
 
-        //if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
-        //    ((height * 2) - (cornerRadius * 2)) < (1 * scale))
-        //{
-        //    var minSize = Math.Min(width * 2, height * 2);
-        //    cornerRadius = (int)((minSize - (1 * scale)) / 2);
-        //}
-
-        //var points = new Point2dCollection
-        //{
-        //        new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y - height),
-        //        new Point2d(insertionPoint.X - width, insertionPoint.Y - height + cornerRadius),
-        //        new Point2d(insertionPoint.X - width, insertionPoint.Y + height - cornerRadius),
-        //        new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y + height),
-        //        new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y + height),
-        //        new Point2d(insertionPoint.X + width, insertionPoint.Y + height - cornerRadius),
-        //        new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
-        //        new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
-        //    };
-        //var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-        //bulges = new List<double>
-        //{
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0
-        //    };
-
-        //_framePolyline = new Polyline(points.Count);
-
-        //for (var i = 0; i < points.Count; i++)
-        //{
-        //    _framePolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
-        //}
-
-        //_framePolyline.Closed = true;
-
-
-
-
-
+                _frameCircle = new Circle
+                {
+                    Center = insertionPoint,
+                    Radius = radius
+                };
+            }
+            catch
+            {
+                _frameCircle = null;
+            }
+        }
+        else
+        {
             _frameCircle = null;
 
             var width = Math.Abs(endPoint.X - insertionPoint.X);
@@ -485,110 +422,25 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
 
             _framePolyline.Closed = true;
-
-        
-    }
-
-    private void FillMainPolylineWithPoints(Point2dCollection points, IList<double> bulges)
-    {
-        _mainPolyline = new Polyline(points.Count);
-        SetImmutablePropertiesToNestedEntity(_mainPolyline);
-        for (var i = 0; i < points.Count; i++)
-        {
-            _mainPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
         }
     }
 
     private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
     {
-        //if (FrameType == FrameType.Round)
-        //{
-        //    _framePolyline = null;
-
-        //    try
-        //    {
-        //        var radius = leaderPoint.DistanceTo(insertionPoint);
-        //        if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-        //            radius = 5 * scale;
-
-        //        _frameCircle = new Circle
-        //        {
-        //            Center = insertionPoint,
-        //            Radius = radius
-        //        };
-
-        //        if (!drawLeader)
-        //            return;
-
-        //        var leaderLine = new Line(insertionPoint, leaderPoint);
-        //        var pts = new Point3dCollection();
-        //        _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-        //        _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-        //    }
-        //    catch
-        //    {
-        //        _frameCircle = null;
-        //    }
-        //}
-        //else
-        //{
-        //    _frameCircle = null;
-
-        //    var width = Math.Abs(framePoint.X - insertionPoint.X);
-        //    var height = Math.Abs(framePoint.Y - insertionPoint.Y);
-        //    var cornerRadius = CornerRadius * scale;
-
-        //    if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
-        //        ((height * 2) - (cornerRadius * 2)) < (1 * scale))
-        //    {
-        //        var minSize = Math.Min(width * 2, height * 2);
-        //        cornerRadius = (int)((minSize - (1 * scale)) / 2);
-        //    }
-
-        //    var points = new[]
-        //    {
-        //        new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y - height),
-        //        new Point2d(insertionPoint.X - width, insertionPoint.Y - height + cornerRadius),
-        //        new Point2d(insertionPoint.X - width, insertionPoint.Y + height - cornerRadius),
-        //        new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y + height),
-        //        new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y + height),
-        //        new Point2d(insertionPoint.X + width, insertionPoint.Y + height - cornerRadius),
-        //        new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
-        //        new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
-        //    };
-
-        //    var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-        //    var bulges = new[]
-        //    {
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0,
-        //        -bevelBulge,
-        //        0.0
-        //    };
-
-        //    _framePolyline = new Polyline(points.Length);
-
-        //    for (var i = 0; i < points.Length; i++)
-        //    {
-        //        _framePolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
-        //    }
-
-        //    _framePolyline.Closed = true;
-
-        //    if (!drawLeader)
-        //        return;
-
         var leaderLine = new Line(insertionPoint, leaderPoint);
         var pts = new Point3dCollection();
-        _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-        _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-        //}
 
-        // Если drawLeader == false, то дальше код не выполнится
+        if (FrameType == FrameType.Round)
+        {
+            _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+        }
+        else
+        {
+            _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+        }
+
+        _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+
 
         //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
 

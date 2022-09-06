@@ -31,24 +31,10 @@ public class NodalLeaderGrip : SmartEntityGripData
     /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
     /// </summary>
     /// <param name="nodalLeader">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
-    /// <param name="gripType">Вид ручки</param>
     /// <param name="gripName">Имя ручки</param>
-    /// <param name="gripPoint">Точка ручки</param>
     public NodalLeaderGrip(
         NodalLeader nodalLeader,
-        GripType gripType,
-        GripName gripName,
-        Point3d gripPoint)
-    {
-        NodalLeader = nodalLeader;
-        GripName = gripName;
-        GripType = gripType;
-        GripPoint = gripPoint;
-    }
-
-    public NodalLeaderGrip(
-        NodalLeader nodalLeader,
-        GripName gripName)
+        GripName gripName, GripType gripType)
     {
         NodalLeader = nodalLeader;
         GripName = gripName;
@@ -69,12 +55,6 @@ public class NodalLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        //// Переместить
-        //if (GripName == GripName.InsertionPoint)
-        //    return Language.GetItem("gp2");
-            
-        //// Растянуть
-        //return Language.GetItem("gp1");
         switch (GripName)
         {
             case GripName.LeaderPoint:
@@ -94,12 +74,6 @@ public class NodalLeaderGrip : SmartEntityGripData
     {
         try
         {
-            //// При начале перемещения запоминаем первоначальное положение ручки
-            //// Запоминаем начальные значения
-            //if (newStatus == Status.GripStart)
-            //{
-            //    _gripTmp = GripPoint;
-            //}
             // При начале перемещения запоминаем первоначальное положение ручки
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
@@ -113,7 +87,6 @@ public class NodalLeaderGrip : SmartEntityGripData
                 {
                     _endGripTmp = GripPoint;
                 }
-
 
                 if (GripName == GripName.LeaderPoint)
                 {

@@ -142,7 +142,6 @@ public class ViewFunction : ISmartEntityFunction
                         tr.Commit();
                     }
                 }
-
                 break;
             }
         }

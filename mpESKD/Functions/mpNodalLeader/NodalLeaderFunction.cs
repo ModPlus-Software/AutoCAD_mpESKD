@@ -31,7 +31,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
         SmartEntityUtils.SendStatistic<NodalLeader>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -41,7 +41,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
              * При инициализации плагина регистрации нет!
              */
             ExtendedDataUtils.AddRegAppTableRecord<NodalLeader>();
-                
+
             var lastNodeNumber = FindLastNodeNumber();
             var nodalLeader = new NodalLeader(lastNodeNumber);
             var blockReference = MainFunction.CreateBlock(nodalLeader);
@@ -71,7 +71,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
     private static void CreateNodalLeader()
     {
         SmartEntityUtils.SendStatistic<NodalLeader>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -81,7 +81,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
              * При инициализации плагина регистрации нет!
              */
             ExtendedDataUtils.AddRegAppTableRecord<NodalLeader>();
-                
+
             var style = StyleManager.GetCurrentStyle(typeof(NodalLeader));
             var lastNodeNumber = FindLastNodeNumber();
             var nodalLeader = new NodalLeader(lastNodeNumber);
@@ -111,15 +111,15 @@ public class NodalLeaderFunction : ISmartEntityFunction
 
         // <msg18>Укажите точку выноски:</msg18>
         var leaderPointPrompt = Language.GetItem("msg18");
-            
-        var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0),point3d =>
+
+        var entityJig = new DefaultEntityJig(nodalLeader, blockReference, new Point3d(0, 0, 0), point3d =>
         {
             nodalLeader.LeaderPoint = point3d;
         })
         {
             PromptForInsertionPoint = insertionPointPrompt
         };
-            
+
         nodalLeader.JigState = NodalLeaderJigState.InsertionPoint;
         do
         {
@@ -128,7 +128,6 @@ public class NodalLeaderFunction : ISmartEntityFunction
             {
                 if (nodalLeader.JigState == NodalLeaderJigState.InsertionPoint)
                 {
-                    AcadUtils.Editor.WriteMessage($" JigState in function {nodalLeader.JigState.Value.ToString()} \n");
                     nodalLeader.JigState = NodalLeaderJigState.EndPoint;
                     entityJig.PromptForNextPoint = framePointPrompt;
                     entityJig.PreviousPoint = nodalLeader.InsertionPoint;
@@ -140,15 +139,13 @@ public class NodalLeaderFunction : ISmartEntityFunction
                     AcadUtils.Editor.WriteMessage($"{nodalLeader.JigState.Value.ToString()}");
                     nodalLeader.JigState = NodalLeaderJigState.LeaderPoint;
                     entityJig.PromptForCustomPoint = leaderPointPrompt;
-                    //nodalLeader.LeaderPoint = nodalLeader.EndPoint;
-                        
+
                     // Тут не нужна привязка к предыдущей точке
                     entityJig.PreviousPoint = nodalLeader.InsertionPoint;
                     entityJig.JigState = JigState.CustomPoint;
                 }
                 else
                 {
-                    AcadUtils.Editor.WriteMessage($" JigState in function {nodalLeader.JigState.Value.ToString()} \n");
                     break;
                 }
 
@@ -171,7 +168,7 @@ public class NodalLeaderFunction : ISmartEntityFunction
             }
         }
         while (true);
-            
+
         if (!nodalLeader.BlockId.IsErased)
         {
             using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())

@@ -14,48 +14,7 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 /// <inheritdoc />
 public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLeader>
 {
-    private Point3d _initFramePoint;
-
     /// <inheritdoc />
-    //public override void GetGripPoints(
-    //    Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
-    //{
-    //    try
-    //    {
-    //        if (IsApplicable(entity))
-    //        {
-    //            // Удаляю все ручки - это удалит ручку вставки блока
-    //            grips.Clear();
-
-    //            var nodalLeader = EntityReaderService.Instance.GetFromEntity<NodalLeader>(entity);
-    //            if (nodalLeader != null)
-    //            {
-    //                grips.Add(new NodalLeaderGrip(
-    //                    nodalLeader, GripType.BasePoint, GripName.InsertionPoint, nodalLeader.InsertionPoint));
-    //                grips.Add(new NodalLeaderGrip(
-    //                    nodalLeader, GripType.Point, GripName.FramePoint, nodalLeader.LeaderPoint));
-    //                grips.Add(new NodalLeaderGrip(
-    //                    nodalLeader, GripType.Point, GripName.LeaderPoint, nodalLeader.EndPoint));
-
-    //                grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
-    //                {
-    //                    GripPoint = nodalLeader.EndPoint +
-    //                                (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
-    //                    GripType = GripType.TwoArrowsLeftRight
-    //                });
-
-    //                _initFramePoint = nodalLeader.LeaderPoint;
-    //            }
-    //        }
-    //    }
-    //    catch (Exception exception)
-    //    {
-    //        if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-    //            ExceptionBox.Show(exception);
-    //    }
-    //}
-
-
     public override void GetGripPoints(
     Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
     {
@@ -93,7 +52,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                 if (nodalLeader != null)
                 {
                     // Получаем первую ручку (совпадает с точкой вставки блока)
-                    var gp = new NodalLeaderGrip(nodalLeader, GripName.InsertionPoint)
+                    var gp = new NodalLeaderGrip(nodalLeader, GripName.InsertionPoint, GripType.Point)
                     {
                         GripPoint = nodalLeader.InsertionPoint
                     };
@@ -101,7 +60,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
 
 
                     // получаем конечную ручку
-                    gp = new NodalLeaderGrip(nodalLeader, GripName.FramePoint)
+                    gp = new NodalLeaderGrip(nodalLeader, GripName.FramePoint, GripType.Point)
                     {
                         GripPoint = nodalLeader.EndPoint
                     };
@@ -111,7 +70,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                     if (!(!string.IsNullOrEmpty(nodalLeader.NodeNumber) |
                           !string.IsNullOrEmpty(nodalLeader.SheetNumber)))
                         return;
-                    gp = new NodalLeaderGrip(nodalLeader, GripName.LeaderPoint)
+                    gp = new NodalLeaderGrip(nodalLeader, GripName.LeaderPoint, GripType.Point)
                     {
                         GripPoint = nodalLeader.LeaderPoint
                     };
@@ -122,6 +81,12 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                                     (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
                         GripType = GripType.TwoArrowsLeftRight
                     });
+                    grips.Add(new NodalFrameTypeGrip(nodalLeader)
+                    {
+                        GripPoint = nodalLeader.EndPoint +
+                                    (Vector3d.YAxis * nodalLeader.GetFullScale()),
+                        GripType = GripType.List
+                    });
                 }
             }
         }
@@ -131,108 +96,6 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                 ExceptionBox.Show(exception);
         }
     }
-
-
-    //public override void MoveGripPointsAt(
-    //    Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
-    //{
-    //    try
-    //    {
-
-    //        if (IsApplicable(entity))
-    //        {
-    //            // Проходим по коллекции ручек
-    //            foreach (var gripData in grips)
-    //            {
-    //                if (gripData is NodalLeaderGrip nodalLeaderGrip)
-    //                {
-
-    //                    var gripPoint = nodalLeaderGrip.GripPoint;
-    //                    var nodalLeader = nodalLeaderGrip.NodalLeader;
-    //                    var scale = nodalLeader.GetFullScale();
-
-    //                    // Далее, в зависимости от имени ручки произвожу действия
-    //                    if (nodalLeaderGrip.GripName == GripName.InsertionPoint)
-    //                    {
-    //                        // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
-    //                        // Все точки всегда совпадают (+ ручка)
-    //                        //((BlockReference)entity).Position = gripPoint + offset;
-    //                        //var newPt = nodalLeaderGrip.GripPoint + offset;
-    //                        //var length = fragmentMarker.EndPoint.DistanceTo(newPt);
-    //                        ((BlockReference)entity).Position = gripPoint + offset;
-    //                        //nodalLeader.InsertionPoint = gripPoint + offset;
-    //                        //nodalLeader.LeaderPoint = _initFramePoint + offset;
-    //                        var newPt = nodalLeaderGrip.GripPoint + offset;
-    //                        var length = nodalLeader.EndPoint.DistanceTo(newPt);
-    //                        if (length < nodalLeader.MinDistanceBetweenPoints * scale)
-    //                        {
-    //                            /* Если новая точка получается на расстоянии меньше минимального, то
-    //                             * переносим ее в направлении между двумя точками на минимальное расстояние
-    //                             */
-    //                            var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-    //                                nodalLeader.EndPoint, newPt, nodalLeader.EndPoint,
-    //                                nodalLeader.MinDistanceBetweenPoints * scale);
-
-    //                            if (nodalLeader.EndPoint.Equals(newPt))
-    //                            {
-    //                                // Если точки совпали, то задаем минимальное значение
-    //                                tmpInsertionPoint = new Point3d(
-    //                                    nodalLeader.EndPoint.X + (nodalLeader.MinDistanceBetweenPoints * scale),
-    //                                    nodalLeader.EndPoint.Y, nodalLeader.EndPoint.Z);
-    //                            }
-
-    //                            ((BlockReference)entity).Position = tmpInsertionPoint;
-    //                            nodalLeader.InsertionPoint = tmpInsertionPoint;
-    //                        }
-    //                        else
-    //                        {
-    //                            ((BlockReference)entity).Position = nodalLeaderGrip.GripPoint + offset;
-    //                            nodalLeader.InsertionPoint = nodalLeaderGrip.GripPoint + offset;
-    //                        }
-    //                    }
-    //                    if (nodalLeaderGrip.GripName == GripName.FramePoint)
-    //                    {
-    //                        var newPt = nodalLeaderGrip.GripPoint + offset;
-    //                        if (newPt.Equals(((BlockReference)entity).Position))
-    //                        {
-    //                            nodalLeader.EndPoint = new Point3d(
-    //                                ((BlockReference)entity).Position.X + (nodalLeader.MinDistanceBetweenPoints * scale),
-    //                                ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
-    //                        }
-
-    //                        // С конечной точкой все просто
-    //                        else
-    //                        {
-    //                            nodalLeader.EndPoint = nodalLeaderGrip.GripPoint + offset;
-    //                        }
-    //                    }
-
-    //                    if (nodalLeaderGrip.GripName == GripName.LeaderPoint)
-    //                    {
-    //                        nodalLeader.LeaderPoint = gripPoint + offset;
-    //                    }
-
-    //                    // Вот тут происходит перерисовка примитивов внутри блока
-    //                    nodalLeader.UpdateEntities();
-    //                    nodalLeader.BlockRecord.UpdateAnonymousBlocks();
-    //                }
-    //                else
-    //                {
-    //                    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-    //            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-    //        }
-    //    }
-    //    catch (Exception exception)
-    //    {
-    //        if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-    //            ExceptionBox.Show(exception);
-    //    }
-    //}
 
     /// <inheritdoc />
     public override void MoveGripPointsAt(
@@ -253,8 +116,6 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         if (levelMarkGrip.GripName == GripName.InsertionPoint)
                         {
                             ((BlockReference)entity).Position = gripPoint + offset;
-                            //nodalLeader.InsertionPoint = gripPoint + offset;
-                            //nodalLeader.LeaderPoint =  + offset;
                         }
                         else if (levelMarkGrip.GripName == GripName.FramePoint)
                         {
