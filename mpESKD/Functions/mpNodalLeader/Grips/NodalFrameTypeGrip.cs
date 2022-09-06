@@ -25,27 +25,24 @@ public class NodalFrameTypeGrip : SmartEntityGripData
         NodalLeader = nodalLeader;
         GripType = GripType.List;
     }
-        
+
     /// <summary>
     /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
     /// </summary>
     public NodalLeader NodalLeader { get; }
-        
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
         return Language.GetItem("p78"); // ""; TODO изменить на "Тип рамки"
     }
 
-    //public FrameType FrameType { get; set; } = FrameType.Round;
-        
     /// <inheritdoc />
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
         using (NodalLeader)
         {
-            _win = new ContextMenuHost(NodalLeader);
-            _win.Show();
+            _win = new ContextMenuHost();
 
             ContextMenu cm;
 
@@ -72,11 +69,12 @@ public class NodalFrameTypeGrip : SmartEntityGripData
                 };
                 menuItem.Click += MenuItemOnClick;
                 cm.Items.Add(menuItem);
-
+                cm.MouseMove += (_, _) => _win.Close();
                 cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
 
                 cm.IsOpen = true;
             };
+            _win.Show();
         }
 
         return ReturnValue.GetNewGripPoints;
@@ -87,9 +85,9 @@ public class NodalFrameTypeGrip : SmartEntityGripData
         _win?.Close();
 
         var menuItem = (MenuItem)sender;
-        
+
         NodalLeader.FrameType = menuItem.Name == "Round" ? FrameType.Round : FrameType.Rectangular;
-        
+
         NodalLeader.UpdateEntities();
         NodalLeader.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())

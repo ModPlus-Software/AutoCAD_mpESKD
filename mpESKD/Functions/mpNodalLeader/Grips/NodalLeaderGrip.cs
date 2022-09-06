@@ -41,7 +41,6 @@ public class NodalLeaderGrip : SmartEntityGripData
         GripType = GripType.Point;
     }
 
-
     /// <summary>
     /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
     /// </summary>

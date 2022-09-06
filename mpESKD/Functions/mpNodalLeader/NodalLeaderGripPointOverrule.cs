@@ -81,7 +81,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                     });
                     grips.Add(new NodalFrameTypeGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.EndPoint +
+                        GripPoint = nodalLeader.EndPoint - 
                                     (Vector3d.YAxis * nodalLeader.GetFullScale()),
                     });
                 }

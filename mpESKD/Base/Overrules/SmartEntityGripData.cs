@@ -73,8 +73,9 @@ public abstract class SmartEntityGripData : GripData
         }
         else if (GripType == GripType.List)
         {
-            worldDraw.Geometry.Polygon(PointsForMinusGrip(num, ecs));
-            worldDraw.Geometry.Polygon(PointsForListGrip(num, ecs));
+            worldDraw.Geometry.Polygon(PointsForListMinusGrip(num, ecs));
+            //worldDraw.Geometry.Polygon(PointsForListGrip(num, ecs));
+            worldDraw.Geometry.Polygon(PointsForListTriangle(num, ecs));
         }
         else
         {
@@ -242,20 +243,27 @@ public abstract class SmartEntityGripData : GripData
         };
     }
 
-    private Point3dCollection PointsForListGrip(double num, CoordinateSystem3d ecs)
+    private Point3dCollection PointsForListTriangle(double num, CoordinateSystem3d ecs)
     {
-        var horUnit = num * ecs.Xaxis;
-        var verUnit = num * ecs.Yaxis;
+        var horUnit = num  * 0.8 * ecs.Xaxis;
+        var verUnit = num  * 0.8 * ecs.Yaxis;
         return new Point3dCollection
         {
-            GripPoint - horUnit - verUnit,
+            GripPoint - verUnit,
             GripPoint - horUnit + verUnit,
-
-
-            GripPoint + (horUnit * 1.0),
-            GripPoint + (horUnit * 1.0),
-            GripPoint + (horUnit * 1.0),
-            GripPoint + (horUnit * 1.0)
+            GripPoint + horUnit + verUnit
+        };
+    }
+    private Point3dCollection PointsForListMinusGrip(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.8 * ecs.Xaxis;
+        var verUnit = num * 0.8 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit + verUnit * 1.5,
+            GripPoint + horUnit + verUnit * 1.5,
+            GripPoint + horUnit + verUnit * 2,
+            GripPoint - horUnit + verUnit * 2
         };
     }
 
