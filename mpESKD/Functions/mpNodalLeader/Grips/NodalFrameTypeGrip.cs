@@ -6,6 +6,7 @@ using Base.Utils;
 using ModPlusAPI;
 using System.Windows;
 using System.Windows.Controls;
+using Base.Enums;
 using Base.Overrules.Grips;
 
 /// <summary>
@@ -22,6 +23,7 @@ public class NodalFrameTypeGrip : SmartEntityGripData
     public NodalFrameTypeGrip(NodalLeader nodalLeader)
     {
         NodalLeader = nodalLeader;
+        GripType = GripType.List;
     }
         
     /// <summary>

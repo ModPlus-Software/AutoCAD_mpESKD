@@ -57,8 +57,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         GripPoint = nodalLeader.InsertionPoint
                     };
                     grips.Add(gp);
-
-
+                    
                     // получаем конечную ручку
                     gp = new NodalLeaderGrip(nodalLeader, GripName.FramePoint, GripType.Point)
                     {
@@ -79,13 +78,11 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                     {
                         GripPoint = nodalLeader.LeaderPoint +
                                     (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
-                        GripType = GripType.TwoArrowsLeftRight
                     });
                     grips.Add(new NodalFrameTypeGrip(nodalLeader)
                     {
                         GripPoint = nodalLeader.EndPoint +
                                     (Vector3d.YAxis * nodalLeader.GetFullScale()),
-                        GripType = GripType.List
                     });
                 }
             }

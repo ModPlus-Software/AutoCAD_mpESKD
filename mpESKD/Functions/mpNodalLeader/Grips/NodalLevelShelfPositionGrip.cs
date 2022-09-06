@@ -18,6 +18,7 @@ public class NodalLevelShelfPositionGrip : SmartEntityGripData
     public NodalLevelShelfPositionGrip(NodalLeader nodalLeader)
     {
         NodalLeader = nodalLeader;
+        GripType = GripType.TwoArrowsLeftRight;
     }
         
     /// <summary>
