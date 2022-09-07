@@ -24,9 +24,6 @@ public class NodalLeaderGrip : SmartEntityGripData
     // временное значение последней ручки
     private Point3d _leaderGripTmp;
 
-    // Временное значение ручки
-    private Point3d _gripTmp;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
     /// </summary>
@@ -34,7 +31,7 @@ public class NodalLeaderGrip : SmartEntityGripData
     /// <param name="gripName">Имя ручки</param>
     public NodalLeaderGrip(
         NodalLeader nodalLeader,
-        GripName gripName, GripType gripType)
+        GripName gripName)
     {
         NodalLeader = nodalLeader;
         GripName = gripName;
@@ -114,7 +111,7 @@ public class NodalLeaderGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_gripTmp != null)
+                if (_startGripTmp != null)
                 {
                     switch (GripName)
                     {

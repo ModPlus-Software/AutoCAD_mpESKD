@@ -74,7 +74,6 @@ public abstract class SmartEntityGripData : GripData
         else if (GripType == GripType.List)
         {
             worldDraw.Geometry.Polygon(PointsForListMinusGrip(num, ecs));
-            //worldDraw.Geometry.Polygon(PointsForListGrip(num, ecs));
             worldDraw.Geometry.Polygon(PointsForListTriangle(num, ecs));
         }
         else

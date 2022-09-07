@@ -34,6 +34,7 @@ public class NodalFrameTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
+        // Тип рамки
         return Language.GetItem("p82"); 
     }
 
@@ -54,7 +55,7 @@ public class NodalFrameTypeGrip : SmartEntityGripData
                 {
                     Name = "Round",
                     IsCheckable = true,
-                    Header = Language.GetItem("ft1"),
+                    Header = Language.GetItem("ft1"), // Круглая 
                     IsChecked = NodalLeader.FrameType == FrameType.Round
                 };
                 menuItem.Click += MenuItemOnClick;
@@ -64,7 +65,7 @@ public class NodalFrameTypeGrip : SmartEntityGripData
                 {
                     Name = "Rectangular",
                     IsCheckable = true,
-                    Header = Language.GetItem("ft2"),
+                    Header = Language.GetItem("ft2"), // Прямоугольная 
                     IsChecked = NodalLeader.FrameType == FrameType.Rectangular
                 };
                 menuItem.Click += MenuItemOnClick;
