@@ -287,7 +287,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 EndPoint = tempFramePoint.TransformBy(BlockTransform);
             }
             //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
-            //// будет перемещена в FramePoint
+            //// будет перемещена в EndPoint
             else if (JigState == NodalLeaderJigState.EndPoint)
             {
                 // Так как FramePoint тут еще не задана, то свойства FrameWidth и FrameHeight нужно высчитывать из EndPoint
@@ -297,11 +297,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 if (FrameType == FrameType.Rectangular &&
                     (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
                 {
-
-                    var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
-                            MinDistanceBetweenPoints * scale);
-
-                    PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
+                    MakeSimplyEntity(scale);
                 }
                 else
                 {
@@ -315,7 +311,16 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             //// Прочие случаи (включая указание точки выноски)
             else
             {
-                PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
+                var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+                if (length <= MinDistanceBetweenPoints)
+                {
+                    MakeSimplyEntity(scale);
+                }
+                else
+                {
+                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);    
+                }
+                
                 CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
@@ -323,6 +328,15 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             ExceptionBox.Show(exception);
         }
+    }
+
+    private void MakeSimplyEntity(double scale)
+    {
+        var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
+            MinDistanceBetweenPoints * scale);
+
+        PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
+        EndPoint = tmpEndPoint.TransformBy(BlockTransform);
     }
 
     /// <summary>
