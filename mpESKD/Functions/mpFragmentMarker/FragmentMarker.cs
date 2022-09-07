@@ -4,7 +4,6 @@ namespace mpESKD.Functions.mpFragmentMarker;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -257,7 +256,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
-
+            
             //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == FragmentMarkerJigState.InsertionPoint)
             {
@@ -266,6 +265,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             }
             else if (JigState == FragmentMarkerJigState.EndPoint)
             {
+                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
                 if (length < MinDistanceBetweenPoints * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
@@ -282,9 +282,13 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             else if (JigState == FragmentMarkerJigState.LeaderPoint)
             {
                 CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
+                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
             }
             else
             {
+                AcadUtils.Editor.WriteMessage($" другие случаи\n");
+                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
+                
                 // Задание второй точки - случай когда расстояние между точками меньше минимального
                 if (length > MinDistanceBetweenPoints * scale)
                 {

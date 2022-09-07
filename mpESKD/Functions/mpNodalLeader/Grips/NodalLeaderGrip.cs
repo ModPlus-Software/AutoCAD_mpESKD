@@ -14,26 +14,27 @@ using ModPlusAPI.Windows;
 /// </summary>
 public class NodalLeaderGrip : SmartEntityGripData
 {
-    // Временное значение ручки
-    private Point3d _gripTmp;
+    // Временное значение первой ручки
+    private Point3d _startGripTmp;
+
+    // временное значение последней ручки
+    private Point3d _endGripTmp;
+
+    // временное значение последней ручки
+    private Point3d _leaderGripTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
     /// </summary>
     /// <param name="nodalLeader">Экземпляр <see cref="mpNodalLeader.NodalLeader"/></param>
-    /// <param name="gripType">Вид ручки</param>
     /// <param name="gripName">Имя ручки</param>
-    /// <param name="gripPoint">Точка ручки</param>
     public NodalLeaderGrip(
         NodalLeader nodalLeader,
-        GripType gripType,
-        GripName gripName,
-        Point3d gripPoint)
+        GripName gripName)
     {
         NodalLeader = nodalLeader;
         GripName = gripName;
-        GripType = gripType;
-        GripPoint = gripPoint;
+        GripType = GripType.Point;
     }
 
     /// <summary>
@@ -49,12 +50,18 @@ public class NodalLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Переместить
-        if (GripName == GripName.InsertionPoint)
-            return Language.GetItem("gp2");
-            
-        // Растянуть
-        return Language.GetItem("gp1");
+        switch (GripName)
+        {
+            case GripName.LeaderPoint:
+            case GripName.FramePoint:
+            {
+                return Language.GetItem("gp1"); // stretch
+            }
+
+            case GripName.InsertionPoint: return Language.GetItem("gp2"); // move
+        }
+
+        return base.GetTooltip();
     }
 
     /// <inheritdoc />
@@ -66,7 +73,18 @@ public class NodalLeaderGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                _gripTmp = GripPoint;
+                switch (GripName)
+                {
+                    case GripName.InsertionPoint:
+                        _startGripTmp = GripPoint;
+                        break;
+                    case GripName.FramePoint:
+                        _endGripTmp = GripPoint;
+                        break;
+                    case GripName.LeaderPoint:
+                        _leaderGripTmp = NodalLeader.LeaderPoint;
+                        break;
+                }
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -90,20 +108,20 @@ public class NodalLeaderGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_gripTmp != null)
+                switch (GripName)
                 {
-                    switch (GripName)
-                    {
-                        case GripName.InsertionPoint:
-                            NodalLeader.InsertionPoint = _gripTmp;
-                            break;
-                        case GripName.FramePoint:
-                            NodalLeader.FramePoint = _gripTmp;
-                            break;
-                        case GripName.LeaderPoint:
-                            NodalLeader.EndPoint = _gripTmp;
-                            break;
-                    }
+                    case GripName.InsertionPoint:
+                        if (_startGripTmp != null)
+                            NodalLeader.InsertionPoint = _startGripTmp;
+                        break;
+                    case GripName.FramePoint:
+                        if (_endGripTmp != null)
+                            NodalLeader.EndPoint = _endGripTmp;
+                        break;
+                    case GripName.LeaderPoint:
+                        if (_leaderGripTmp != null)
+                            NodalLeader.LeaderPoint = _leaderGripTmp;
+                        break;
                 }
             }
 

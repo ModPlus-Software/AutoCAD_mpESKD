@@ -74,6 +74,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
 
+
     #endregion
 
     /// <summary>
@@ -105,12 +106,12 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точка рамки
     /// </summary>
     [SaveToXData]
-    public Point3d FramePoint { get; set; }
-
+    public Point3d LeaderPoint { get; set; }
+    private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
     /// <summary>
     /// Точка рамки в внутренней системе координат блока
     /// </summary>
-    private Point3d FramePointOCS => FramePoint.TransformBy(BlockTransform.Inverse());
+    private Point3d EndPointOCS => EndPoint.TransformBy(BlockTransform.Inverse());
 
     /// <summary>
     /// Состояние Jig при создании узловой выноски
@@ -264,8 +265,8 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
         yield return InsertionPoint;
-        yield return FramePoint;
         yield return EndPoint;
+        yield return LeaderPoint;
     }
 
     /// <inheritdoc/>
@@ -282,36 +283,40 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     InsertionPointOCS.X + (5 * scale),
                     InsertionPointOCS.Y + (5 * scale),
                     InsertionPointOCS.Z);
-                    
-                CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
+                PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint);
+                EndPoint = tempFramePoint.TransformBy(BlockTransform);
             }
             //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
             //// будет перемещена в FramePoint
-            else if (JigState == NodalLeaderJigState.FramePoint)
+            else if (JigState == NodalLeaderJigState.EndPoint)
             {
                 // Так как FramePoint тут еще не задана, то свойства FrameWidth и FrameHeight нужно высчитывать из EndPoint
                 var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
                 var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
-                    
+
                 if (FrameType == FrameType.Rectangular &&
                     (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
                 {
-                    var tempFramePoint = new Point3d(
-                        InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
-                        InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
-                        InsertionPointOCS.Z);
-                        
-                    CreateEntities(InsertionPointOCS, tempFramePoint, Point3d.Origin, scale, false);
+
+                    var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
+                            MinDistanceBetweenPoints * scale);
+
+                    PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
                 }
                 else
                 {
-                    CreateEntities(InsertionPointOCS, EndPointOCS, Point3d.Origin, scale, false);
+                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint);
                 }
+            }
+            else if (JigState == NodalLeaderJigState.LeaderPoint)
+            {
+                CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
             //// Прочие случаи (включая указание точки выноски)
             else
             {
-                CreateEntities(InsertionPointOCS, FramePointOCS, EndPointOCS, scale, true);
+                PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
+                CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
         catch (Exception exception)
@@ -320,12 +325,10 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
     }
 
-    private void CreateEntities(
-        Point3d insertionPoint,
-        Point3d framePoint,
-        Point3d leaderPoint,
-        double scale,
-        bool drawLeader)
+    /// <summary>
+    /// Получение точек для построения базовой полилинии
+    /// </summary>
+    private void PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint)
     {
         if (FrameType == FrameType.Round)
         {
@@ -333,7 +336,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             try
             {
-                var radius = framePoint.DistanceTo(insertionPoint);
+                var radius = endPoint.DistanceTo(insertionPoint);
                 if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
                     radius = 5 * scale;
 
@@ -342,14 +345,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     Center = insertionPoint,
                     Radius = radius
                 };
-
-                if (!drawLeader)
-                    return;
-
-                var leaderLine = new Line(insertionPoint, leaderPoint);
-                var pts = new Point3dCollection();
-                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-                _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
             }
             catch
             {
@@ -360,8 +355,8 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _frameCircle = null;
 
-            var width = Math.Abs(framePoint.X - insertionPoint.X);
-            var height = Math.Abs(framePoint.Y - insertionPoint.Y);
+            var width = Math.Abs(endPoint.X - insertionPoint.X);
+            var height = Math.Abs(endPoint.Y - insertionPoint.Y);
             var cornerRadius = CornerRadius * scale;
 
             if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
@@ -404,18 +399,26 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
 
             _framePolyline.Closed = true;
+        }
+    }
 
-            if (!drawLeader)
-                return;
+    private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
+    {
+        var leaderLine = new Line(insertionPoint, leaderPoint);
+        var pts = new Point3dCollection();
 
-            var leaderLine = new Line(insertionPoint, leaderPoint);
-            var pts = new Point3dCollection();
+        if (FrameType == FrameType.Round)
+        {
+            _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+        }
+        else
+        {
             _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-            _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
         }
 
-        // Если drawLeader == false, то дальше код не выполнится
-            
+        _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
+
+
         //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
@@ -500,7 +503,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 leaderPoint -
                 (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
                 (Vector3d.YAxis * textVerticalOffset);
-                
+
             if (_topFirstDbText != null)
             {
                 _topFirstDbText.Position = sheetNumberEndPoint -
@@ -509,7 +512,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             if (_topSecondDbText != null)
             {
-                _topSecondDbText.Position = sheetNumberEndPoint - 
+                _topSecondDbText.Position = sheetNumberEndPoint -
                                             (Vector3d.XAxis * topSecondTextLength);
             }
 
@@ -525,7 +528,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
-            
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;

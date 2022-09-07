@@ -71,6 +71,11 @@ public abstract class SmartEntityGripData : GripData
             worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightFirstArrow(num, ecs));
             worldDraw.Geometry.Polygon(PointsForTwoArrowsGripLeftRightSecondArrow(num, ecs));
         }
+        else if (GripType == GripType.List)
+        {
+            worldDraw.Geometry.Polygon(PointsForListMinusGrip(num, ecs));
+            worldDraw.Geometry.Polygon(PointsForListTriangle(num, ecs));
+        }
         else
         {
             worldDraw.Geometry.Polygon(point3dCollections);
@@ -94,7 +99,7 @@ public abstract class SmartEntityGripData : GripData
         {
             worldDraw.Geometry.Polygon(point3dCollections);
         }
-            
+
         // restore
         worldDraw.SubEntityTraits.Color = backupColor;
         worldDraw.SubEntityTraits.FillType = backupFillType;
@@ -220,7 +225,7 @@ public abstract class SmartEntityGripData : GripData
             GripPoint + (horUnit * 0.5) + (verUnit * 0.25)
         };
     }
-        
+
     private Point3dCollection PointsForTwoArrowsGripLeftRightSecondArrow(double num, CoordinateSystem3d ecs)
     {
         var horUnit = num * ecs.Xaxis;
@@ -234,6 +239,31 @@ public abstract class SmartEntityGripData : GripData
             GripPoint + (horUnit * 1.25) - (verUnit * 1.0),
             GripPoint + (horUnit * 1.25) - (verUnit * 0.5),
             GripPoint + (horUnit * 0.25) - (verUnit * 0.5)
+        };
+    }
+
+    private Point3dCollection PointsForListTriangle(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.8 * ecs.Xaxis;
+        var verUnit = num * 0.8 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - verUnit,
+            GripPoint - horUnit + verUnit,
+            GripPoint + horUnit + verUnit
+        };
+    }
+
+    private Point3dCollection PointsForListMinusGrip(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.8 * ecs.Xaxis;
+        var verUnit = num * 0.8 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 2),
+            GripPoint - horUnit + (verUnit * 2)
         };
     }
 

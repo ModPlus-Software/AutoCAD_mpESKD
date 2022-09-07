@@ -97,7 +97,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<OutputPath>C:\Users\yusufzhon.marasulov\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD\</OutputPath>
+		<OutputPath>C:\Users\yusufzhon.marasulov\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='A2013'">

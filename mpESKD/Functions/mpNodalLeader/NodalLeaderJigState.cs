@@ -13,7 +13,7 @@ public enum NodalLeaderJigState
     /// <summary>
     /// Происходит указание точки рамки
     /// </summary>
-    FramePoint,
+    EndPoint,
 
     /// <summary>
     /// Указание конечной точки (точка выноски)
