@@ -14,7 +14,6 @@ using ModPlusAPI.Windows;
 /// </summary>
 public class NodalLeaderGrip : SmartEntityGripData
 {
-
     // Временное значение первой ручки
     private Point3d _startGripTmp;
 
@@ -74,19 +73,17 @@ public class NodalLeaderGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                if (GripName == GripName.InsertionPoint)
+                switch (GripName)
                 {
-                    _startGripTmp = GripPoint;
-                }
-
-                if (GripName == GripName.FramePoint)
-                {
-                    _endGripTmp = GripPoint;
-                }
-
-                if (GripName == GripName.LeaderPoint)
-                {
-                    _leaderGripTmp = NodalLeader.LeaderPoint;
+                    case GripName.InsertionPoint:
+                        _startGripTmp = GripPoint;
+                        break;
+                    case GripName.FramePoint:
+                        _endGripTmp = GripPoint;
+                        break;
+                    case GripName.LeaderPoint:
+                        _leaderGripTmp = NodalLeader.LeaderPoint;
+                        break;
                 }
             }
 
@@ -111,20 +108,20 @@ public class NodalLeaderGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_startGripTmp != null)
+                switch (GripName)
                 {
-                    switch (GripName)
-                    {
-                        case GripName.InsertionPoint:
+                    case GripName.InsertionPoint:
+                        if (_startGripTmp != null)
                             NodalLeader.InsertionPoint = _startGripTmp;
-                            break;
-                        case GripName.FramePoint:
+                        break;
+                    case GripName.FramePoint:
+                        if (_endGripTmp != null)
                             NodalLeader.EndPoint = _endGripTmp;
-                            break;
-                        case GripName.LeaderPoint:
+                        break;
+                    case GripName.LeaderPoint:
+                        if (_leaderGripTmp != null)
                             NodalLeader.LeaderPoint = _leaderGripTmp;
-                            break;
-                    }
+                        break;
                 }
             }
 

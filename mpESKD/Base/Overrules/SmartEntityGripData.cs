@@ -244,8 +244,8 @@ public abstract class SmartEntityGripData : GripData
 
     private Point3dCollection PointsForListTriangle(double num, CoordinateSystem3d ecs)
     {
-        var horUnit = num  * 0.8 * ecs.Xaxis;
-        var verUnit = num  * 0.8 * ecs.Yaxis;
+        var horUnit = num * 0.8 * ecs.Xaxis;
+        var verUnit = num * 0.8 * ecs.Yaxis;
         return new Point3dCollection
         {
             GripPoint - verUnit,
@@ -253,16 +253,17 @@ public abstract class SmartEntityGripData : GripData
             GripPoint + horUnit + verUnit
         };
     }
+
     private Point3dCollection PointsForListMinusGrip(double num, CoordinateSystem3d ecs)
     {
         var horUnit = num * 0.8 * ecs.Xaxis;
         var verUnit = num * 0.8 * ecs.Yaxis;
         return new Point3dCollection
         {
-            GripPoint - horUnit + verUnit * 1.5,
-            GripPoint + horUnit + verUnit * 1.5,
-            GripPoint + horUnit + verUnit * 2,
-            GripPoint - horUnit + verUnit * 2
+            GripPoint - horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 2),
+            GripPoint - horUnit + (verUnit * 2)
         };
     }
 

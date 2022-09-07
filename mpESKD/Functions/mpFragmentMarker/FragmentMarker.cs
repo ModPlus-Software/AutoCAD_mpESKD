@@ -4,7 +4,6 @@ namespace mpESKD.Functions.mpFragmentMarker;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -289,6 +288,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             {
                 AcadUtils.Editor.WriteMessage($" другие случаи\n");
                 AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
+                
                 // Задание второй точки - случай когда расстояние между точками меньше минимального
                 if (length > MinDistanceBetweenPoints * scale)
                 {
