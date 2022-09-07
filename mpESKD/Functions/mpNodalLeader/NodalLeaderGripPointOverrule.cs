@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpNodalLeader;
 
-using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -9,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -57,7 +57,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         GripPoint = nodalLeader.InsertionPoint
                     };
                     grips.Add(gp);
-                    
+
                     // получаем конечную ручку
                     gp = new NodalLeaderGrip(nodalLeader, GripName.FramePoint, GripType.Point)
                     {
@@ -81,8 +81,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                     });
                     grips.Add(new NodalFrameTypeGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.EndPoint - 
-                                    (Vector3d.YAxis * nodalLeader.GetFullScale()),
+                        GripPoint = new Point3d(nodalLeader.EndPoint.X * -1, nodalLeader.EndPoint.Y, nodalLeader.EndPoint.Z)
                     });
                 }
             }

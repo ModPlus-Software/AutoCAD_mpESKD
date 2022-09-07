@@ -279,7 +279,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == NodalLeaderJigState.InsertionPoint)
             {
-                //MakeSimplyEntity(scale);
                 var tempFramePoint = new Point3d(
                     InsertionPointOCS.X + (5 * scale),
                     InsertionPointOCS.Y + (5 * scale),
@@ -324,28 +323,6 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             ExceptionBox.Show(exception);
         }
-    }
-
-    private void MakeSimplyEntity(double scale)
-    {
-        var tempFramePoint = new Point3d(
-            InsertionPointOCS.X + (5 * scale),
-            InsertionPointOCS.Y + (5 * scale),
-            InsertionPointOCS.Z);
-        var tmpEndPoint = new Point3d();
-        if (JigState == NodalLeaderJigState.InsertionPoint)
-        {
-            tmpEndPoint = tempFramePoint;
-        }
-        else
-        {
-            tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
-                scale);
-        }
-
-        PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
-
-        EndPoint = tmpEndPoint.TransformBy(BlockTransform);
     }
 
     /// <summary>
