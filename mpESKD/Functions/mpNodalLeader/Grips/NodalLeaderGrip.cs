@@ -14,14 +14,8 @@ using ModPlusAPI.Windows;
 /// </summary>
 public class NodalLeaderGrip : SmartEntityGripData
 {
-    // Временное значение первой ручки
-    private Point3d _startGripTmp;
-
-    // временное значение последней ручки
-    private Point3d _endGripTmp;
-
-    // временное значение последней ручки
-    private Point3d _leaderGripTmp;
+    // Временное значение ручки
+    private Point3d _gripTemp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="NodalLeaderGrip"/> class.
@@ -41,7 +35,7 @@ public class NodalLeaderGrip : SmartEntityGripData
     /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
     /// </summary>
     public NodalLeader NodalLeader { get; }
-        
+
     /// <summary>
     /// Имя ручки
     /// </summary>
@@ -54,9 +48,9 @@ public class NodalLeaderGrip : SmartEntityGripData
         {
             case GripName.LeaderPoint:
             case GripName.FramePoint:
-            {
-                return Language.GetItem("gp1"); // stretch
-            }
+                {
+                    return Language.GetItem("gp1"); // stretch
+                }
 
             case GripName.InsertionPoint: return Language.GetItem("gp2"); // move
         }
@@ -73,18 +67,7 @@ public class NodalLeaderGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                switch (GripName)
-                {
-                    case GripName.InsertionPoint:
-                        _startGripTmp = GripPoint;
-                        break;
-                    case GripName.FramePoint:
-                        _endGripTmp = GripPoint;
-                        break;
-                    case GripName.LeaderPoint:
-                        _leaderGripTmp = NodalLeader.LeaderPoint;
-                        break;
-                }
+                _gripTemp = GripPoint;
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -106,21 +89,18 @@ public class NodalLeaderGrip : SmartEntityGripData
             }
 
             // При отмене перемещения возвращаем временные значения
-            if (newStatus == Status.GripAbort)
+            if (newStatus == Status.GripAbort && _gripTemp != null)
             {
                 switch (GripName)
                 {
                     case GripName.InsertionPoint:
-                        if (_startGripTmp != null)
-                            NodalLeader.InsertionPoint = _startGripTmp;
+                        NodalLeader.InsertionPoint = _gripTemp;
                         break;
                     case GripName.FramePoint:
-                        if (_endGripTmp != null)
-                            NodalLeader.EndPoint = _endGripTmp;
+                        NodalLeader.EndPoint = _gripTemp;
                         break;
                     case GripName.LeaderPoint:
-                        if (_leaderGripTmp != null)
-                            NodalLeader.LeaderPoint = _leaderGripTmp;
+                        NodalLeader.LeaderPoint = _gripTemp;
                         break;
                 }
             }
