@@ -265,7 +265,6 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             }
             else if (JigState == FragmentMarkerJigState.EndPoint)
             {
-                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
                 if (length < MinDistanceBetweenPoints * scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
@@ -282,13 +281,9 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             else if (JigState == FragmentMarkerJigState.LeaderPoint)
             {
                 CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
-                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
             }
             else
             {
-                AcadUtils.Editor.WriteMessage($" другие случаи\n");
-                AcadUtils.Editor.WriteMessage($"JigState {JigState} \n");
-                
                 // Задание второй точки - случай когда расстояние между точками меньше минимального
                 if (length > MinDistanceBetweenPoints * scale)
                 {
