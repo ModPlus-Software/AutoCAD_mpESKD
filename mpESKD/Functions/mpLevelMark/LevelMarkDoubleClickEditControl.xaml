@@ -18,6 +18,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -42,6 +43,12 @@
                      Name="TbNote"
                      mps:TextFieldAssist.ClearTextButton="True"
                      mps:TextFieldAssist.SelectAllOnFocus="True"/>
+            <CheckBox Grid.Row="2" 
+                      Grid.Column="1"
+                      Name="NumericBox"> Отметка
+
+            </CheckBox>
+
         </Grid>
     </mps:Card>
 </UserControl>

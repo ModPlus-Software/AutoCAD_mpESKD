@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpLevelMark;
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace mpESKD.Functions.mpLevelMark;
 
 using System;
 using Base.Abstractions;
@@ -39,5 +41,10 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
     {
         _levelMark.OverrideValue = TbOverrideValue.Text;
         _levelMark.Note = TbNote.Text;
+
+        if (NumericBox.IsChecked == true)
+        {
+            _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X, Convert.ToDouble(_levelMark?.OverrideValue),_levelMark.ObjectPoint.Z);
+        }
     }
 }
