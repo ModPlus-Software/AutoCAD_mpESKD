@@ -275,7 +275,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         try
         {
             var scale = GetScale();
-
+            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == NodalLeaderJigState.InsertionPoint)
             {
@@ -294,8 +294,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
                 var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
 
-                if (FrameType == FrameType.Rectangular &&
-                    (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints))
+                if (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints || length <= MinDistanceBetweenPoints)
                 {
                     MakeSimplyEntity(scale);
                 }
@@ -311,16 +310,15 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             //// Прочие случаи (включая указание точки выноски)
             else
             {
-                var length = EndPointOCS.DistanceTo(InsertionPointOCS);
                 if (length <= MinDistanceBetweenPoints)
                 {
                     MakeSimplyEntity(scale);
                 }
                 else
                 {
-                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);    
+                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
                 }
-                
+
                 CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
             }
         }
@@ -332,8 +330,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     private void MakeSimplyEntity(double scale)
     {
-        var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS,
-            MinDistanceBetweenPoints * scale);
+        var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
 
         PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
         EndPoint = tmpEndPoint.TransformBy(BlockTransform);
