@@ -331,6 +331,10 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private void MakeSimplyEntity(double scale)
     {
         var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+        if (InsertionPointOCS.IsEqualTo(EndPointOCS))
+        {
+            tmpEndPoint = new Point3d(0, MinDistanceBetweenPoints * scale, 0);
+        }
 
         PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
         EndPoint = tmpEndPoint.TransformBy(BlockTransform);
@@ -349,7 +353,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 var radius = endPoint.DistanceTo(insertionPoint);
                 if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-                    radius = 5 * scale;
+                    radius = MinDistanceBetweenPoints * scale;
 
                 _frameCircle = new Circle
                 {
@@ -368,6 +372,16 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             var width = Math.Abs(endPoint.X - insertionPoint.X);
             var height = Math.Abs(endPoint.Y - insertionPoint.Y);
+            if (width == 0)
+            {
+                width = MinDistanceBetweenPoints * scale;
+            }
+
+            if (height == 0)
+            {
+                height = MinDistanceBetweenPoints * scale;
+            }
+
             var cornerRadius = CornerRadius * scale;
 
             if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
