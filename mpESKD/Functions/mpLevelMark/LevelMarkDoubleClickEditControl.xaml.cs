@@ -36,7 +36,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
         TbNote.Text = _levelMark.Note;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc/>a
     public void OnAccept()
     {
         _levelMark.OverrideValue = TbOverrideValue.Text;
@@ -44,7 +44,9 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
 
         if (NumericBox.IsChecked == true)
         {
-            _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X, Convert.ToDouble(_levelMark?.OverrideValue),_levelMark.ObjectPoint.Z);
+            if (_levelMark != null)
+                _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X,
+                    Convert.ToDouble(_levelMark?.OverrideValue), _levelMark.ObjectPoint.Z);
         }
     }
 }

@@ -580,9 +580,9 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 }
                 else
                 {
-                    AcadUtils.WriteMessageInDebug("Create other variant");
+                    AcadUtils.WriteMessageInDebug($"Create other variant InsertionPointOCS- {InsertionPointOCS}, BottomShelfStartPointOCS - {BottomShelfStartPointOCS}, EndPointOCS {EndPointOCS}, EndPointOCS ");
                     CreateEntities(
-                        InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, ShelfPointOCS, scale);
+                        InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, EndPointOCS, scale);
                 }
             }
         }
