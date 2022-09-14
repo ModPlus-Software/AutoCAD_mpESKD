@@ -1,8 +1,4 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpLevelMark;
-
-using System;
+﻿namespace mpESKD.Functions.mpLevelMark;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -11,6 +7,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -75,7 +72,6 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         {
                             ((BlockReference)entity).Position = gripPoint + offset;
                             levelMark.InsertionPoint = gripPoint + offset;
-                            AcadUtils.WriteMessageInDebug($"grip is {levelMarkGrip.GripName}");
                         }
                         else if (levelMarkGrip.GripName == GripName.ObjectPoint)
                         {
@@ -88,11 +84,9 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                                 levelMark.EndPoint.X,
                                 levelMark.ObjectPoint.Y,
                                 levelMark.EndPoint.Z);
-                            AcadUtils.WriteMessageInDebug($"grip is {levelMarkGrip.GripName}");
                         }
                         else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                         {
-                            AcadUtils.WriteMessageInDebug($"grip is {levelMarkGrip.GripName}");
                             levelMark.BottomShelfStartPoint = gripPoint + offset;
                             if (levelMark.ObjectLine)
                             {
@@ -114,12 +108,10 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         }
                         else if (levelMarkGrip.GripName == GripName.ArrowPoint)
                         {
-                            AcadUtils.WriteMessageInDebug($"grip is {levelMarkGrip.GripName}");
                             levelMark.SetArrowPoint(gripPoint + offset);
                         }
                         else if (levelMarkGrip.GripName == GripName.TopShelfPoint)
                         {
-                            AcadUtils.WriteMessageInDebug($"grip is {levelMarkGrip.GripName}");
                             levelMark.ShelfPoint = gripPoint + offset;
                         }
 

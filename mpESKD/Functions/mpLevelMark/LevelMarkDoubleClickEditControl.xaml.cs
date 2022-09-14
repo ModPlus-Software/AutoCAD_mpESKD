@@ -1,7 +1,5 @@
-﻿using Autodesk.AutoCAD.Geometry;
-
-namespace mpESKD.Functions.mpLevelMark;
-
+﻿namespace mpESKD.Functions.mpLevelMark;
+using Autodesk.AutoCAD.Geometry;
 using System;
 using Base.Abstractions;
 
