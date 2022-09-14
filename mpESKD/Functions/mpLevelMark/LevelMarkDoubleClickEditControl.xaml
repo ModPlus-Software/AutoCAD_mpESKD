@@ -43,12 +43,13 @@
                      Name="TbNote"
                      mps:TextFieldAssist.ClearTextButton="True"
                      mps:TextFieldAssist.SelectAllOnFocus="True"/>
-            <CheckBox Grid.Row="2" 
-                      Grid.Column="1"
-                      Name="NumericBox"> Отметка
-
-            </CheckBox>
-
+            <TextBlock Grid.Row="2"
+                       Grid.Column="0"
+                       Text="{Binding Source={StaticResource Lang}, XPath=h105}"/>
+            <mps:NumericBox 
+                Grid.Row="2" 
+                Grid.Column="1"
+                Name="LevelNumBox"/>
         </Grid>
     </mps:Card>
 </UserControl>

@@ -11,7 +11,7 @@ using Base.Abstractions;
 public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
 {
     private LevelMark _levelMark;
-        
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelMarkDoubleClickEditControl"/> class.
     /// </summary>
@@ -23,7 +23,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
 
     /// <inheritdoc/>
     public Type EntityType => typeof(LevelMark);
-        
+
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
@@ -31,7 +31,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
             throw new ArgumentException("Wrong type of entity");
 
         _levelMark = levelMark;
-            
+
         TbOverrideValue.Text = _levelMark.OverrideValue;
         TbNote.Text = _levelMark.Note;
     }
@@ -42,11 +42,12 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
         _levelMark.OverrideValue = TbOverrideValue.Text;
         _levelMark.Note = TbNote.Text;
 
-        if (NumericBox.IsChecked == true)
-        {
-            if (_levelMark != null)
-                _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X,
-                    Convert.ToDouble(_levelMark?.OverrideValue), _levelMark.ObjectPoint.Z);
-        }
+        if (LevelNumBox.Value == null)
+            return;
+        var levelValue = _levelMark.InsertionPoint.Y + _levelMark.InsertionPointOCS.Y + LevelNumBox.Value;
+        _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X, (double)levelValue, _levelMark.ObjectPoint.Z);
+        _levelMark.BottomShelfStartPoint = new Point3d(_levelMark.BottomShelfStartPoint.X, (double)levelValue, _levelMark.BottomShelfStartPoint.Z);
+        _levelMark.EndPoint = new Point3d(_levelMark.EndPoint.X, (double)levelValue, _levelMark.EndPoint.Z);
+        _levelMark.ShelfPoint = new Point3d(_levelMark.ShelfPoint.X, (double)levelValue + _levelMark.DistanceBetweenShelfs, _levelMark.ShelfPoint.Z);
     }
 }
