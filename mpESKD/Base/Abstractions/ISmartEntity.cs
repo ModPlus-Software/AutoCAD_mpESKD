@@ -67,6 +67,11 @@ public interface ISmartEntity
     /// Угол поворота BlockReference
     /// </summary>
     double Rotation { get; set; }
+
+    /// <summary>
+    /// Угол поворота BlockReference
+    /// </summary>
+    double ScaleFactorX { get; set; }
         
     /// <summary>
     /// BlockReference повернут (имеет угол, отличный от 0,0)

@@ -94,6 +94,9 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     public double Rotation { get; set; }
 
     /// <inheritdoc/>
+    public double ScaleFactorX { get; set; }
+
+    /// <inheritdoc/>
     public bool IsRotated => Rotation != 0.0;
 
     /// <inheritdoc />
@@ -369,6 +372,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
             InsertionPoint = blockReference.Position;
             BlockTransform = blockReference.BlockTransform;
             Rotation = blockReference.Rotation;
+            ScaleFactorX = blockReference.ScaleFactors.X;
         }
     }
 

@@ -61,6 +61,9 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// </summary>
     private Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
 
+    /// <inheritdoc/>
+    //public double ScaleFactorX { get; set; }
+
     /// <summary>
     /// Точка начала верхней полки. Задает высоту от нижней полки до верхней
     /// </summary>
@@ -726,6 +729,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
+        MirrorIfNeed(_topDbText);
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
@@ -752,5 +756,14 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     {
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
+    }
+
+    public void MirrorIfNeed(DBText dbText)
+    {
+        if (ScaleFactorX < 0)
+        {
+            var mirror = Matrix3d.Mirroring(InsertionPointOCS);
+            dbText.TransformBy(mirror);
+        }
     }
 }
