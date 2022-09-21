@@ -1,7 +1,9 @@
 ﻿namespace mpESKD.Base.Utils;
 
+using System;
 using System.Globalization;
 using Autodesk.AutoCAD.Geometry;
+using ModPlusAPI.Exceptions;
 
 /// <summary>
 /// Утилиты работы с геометрией
@@ -62,10 +64,17 @@ public static class GeometryUtils
             var splitted = str.Split('$');
             if (splitted.Length == 3)
             {
-                return new Point3d(
-                    double.Parse(splitted[0].Replace(',', '.'), NumberStyles.Any),
-                    double.Parse(splitted[1].Replace(',', '.'), NumberStyles.Any),
-                    double.Parse(splitted[2].Replace(',', '.'), NumberStyles.Any));
+                try
+                {
+                    return new Point3d(
+                        double.Parse(splitted[0].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture),
+                        double.Parse(splitted[1].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture),
+                        double.Parse(splitted[2].Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture));
+                }
+                catch (Exception exception)
+                {
+                    throw new UserException($"Failed parse form \"{str}\": {exception.Message}");
+                }
             }
         }
 
