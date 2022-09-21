@@ -73,7 +73,7 @@ public static class GeometryUtils
                 }
                 catch (Exception exception)
                 {
-                    throw new UserException($"Failed parse form \"{str}\": {exception.Message}");
+                    throw new Exception($"Failed parse form \"{str}\": {exception.Message}");
                 }
             }
         }
