@@ -35,6 +35,8 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static string StylesPath { get; private set; } = string.Empty;
 
+    public static bool Mirroring { get; private set; } = false;
+
     /// <inheritdoc />
     public void Initialize()
     {
@@ -77,6 +79,36 @@ public class MainFunction : IExtensionApplication
         }
     }
 
+    public static void SubscribeToDoc(Document document)
+    {
+        document.CommandWillStart += new CommandEventHandler(CommandWillStart);
+        document.CommandEnded += new CommandEventHandler(CommandEnded);
+        document.CommandCancelled += new CommandEventHandler(CommandCancelled);
+    }
+
+    static void CommandCancelled(object sender, CommandEventArgs e)
+    {
+        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} cancelled.\n", e.GlobalCommandName));
+        Mirroring = false;
+    }
+
+    static void CommandEnded(object sender, CommandEventArgs e)
+    {
+        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} ended.\n", e.GlobalCommandName));
+        Mirroring = false;
+    }
+
+    static void CommandWillStart(object sender, CommandEventArgs e)
+    {
+        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} will start.\n", e.GlobalCommandName));
+        if (e.GlobalCommandName == "MIRROR")
+        {
+            AcadUtils.WriteMessageInDebug("надо зеркалить");
+            Mirroring = true;
+        }
+    }
+
+
     private void AcAppOnSystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
     {
         if (e.Name.Equals("WSCURRENT") && 
@@ -115,6 +147,8 @@ public class MainFunction : IExtensionApplication
                 Language.GetItem("err5"),
                 ModPlusAPI.Windows.MessageBoxIcon.Close);
         }
+
+        SubscribeToDoc(AcadUtils.Document);
     }
 
     /// <summary>
@@ -436,6 +470,7 @@ public class MainFunction : IExtensionApplication
         {
             // ignore
         }
+        SubscribeToDoc(AcadUtils.Document);
     }
 
     private static void Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)

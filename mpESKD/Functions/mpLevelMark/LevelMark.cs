@@ -22,6 +22,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private bool _objectLine;
     private int _objectLineOffset = 5;
     private int _bottomShelfLength = 10;
+    private bool _mirrored = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -729,7 +730,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
-        MirrorIfNeed(_topDbText);
+        //var mirrorPoint = new Point3d(shelfPoint.X + ,
+        AcadUtils.WriteMessageInDebug($" shelfpoint- {shelfPoint}, ShelfPointOCS-{ShelfPointOCS}, ShelfLedge-{ShelfLedge},_topDbText.Position {_topDbText.Position}");
+        var mirrorPoint = new Point3d(_topDbText.Position.X + EntityUtils.GetLength(_topDbText) / 2, _topDbText.Position.Y + EntityUtils.GetHeight(_topDbText) / 2, ShelfPoint.Z);
+        if (MainFunction.Mirroring | ScaleFactorX > 0)
+        {
+            MirrorIfNeed(_topDbText, mirrorPoint);
+        }
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
@@ -758,12 +765,14 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    public void MirrorIfNeed(DBText dbText)
+    public void MirrorIfNeed(DBText dbText, Point3d mirrorPoint)
     {
-        if (ScaleFactorX < 0)
-        {
-            var mirror = Matrix3d.Mirroring(InsertionPointOCS);
-            dbText.TransformBy(mirror);
-        }
+
+        var mirror = Matrix3d.Mirroring(mirrorPoint);
+        AcadUtils.WriteMessageInDebug($"dbtext pos before {dbText.Position} \n");
+        dbText.TransformBy(mirror);
+        AcadUtils.WriteMessageInDebug($"dbtext pos after {dbText.Position} \n");
+
+
     }
 }
