@@ -1,4 +1,5 @@
 ﻿namespace mpESKD.Functions.mpLevelMark;
+
 using Autodesk.AutoCAD.Geometry;
 using System;
 using Base.Abstractions;
@@ -25,7 +26,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
-        if (!(smartEntity is LevelMark levelMark))
+        if (smartEntity is not LevelMark levelMark)
             throw new ArgumentException("Wrong type of entity");
 
         _levelMark = levelMark;
