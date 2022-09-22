@@ -22,7 +22,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private bool _objectLine;
     private int _objectLineOffset = 5;
     private int _bottomShelfLength = 10;
-    private bool _mirrored = false;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -61,9 +60,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// Точка начала (со стороны объекта) нижней полки в системе координат блока
     /// </summary>
     private Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
-
-    /// <inheritdoc/>
-    //public double ScaleFactorX { get; set; }
 
     /// <summary>
     /// Точка начала верхней полки. Задает высоту от нижней полки до верхней
@@ -732,12 +728,9 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
-        //var mirrorPoint = new Point3d(shelfPoint.X + ,
-        AcadUtils.WriteMessageInDebug($" shelfpoint- {shelfPoint}, ShelfPointOCS-{ShelfPointOCS}, ShelfLedge-{ShelfLedge},_topDbText.Position {_topDbText.Position}");
 
         MirrorIfNeed(_topDbText);
         MirrorIfNeed(_bottomDbText);
-
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
