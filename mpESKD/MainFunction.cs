@@ -1,4 +1,6 @@
-﻿namespace mpESKD;
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace mpESKD;
 
 using System;
 using System.Diagnostics;
@@ -35,7 +37,7 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static string StylesPath { get; private set; } = string.Empty;
 
-    public static bool Mirroring { get; private set; } = false;
+    public static bool Mirroring { get; private set; }
 
     /// <inheritdoc />
     public void Initialize()
@@ -88,26 +90,21 @@ public class MainFunction : IExtensionApplication
 
     static void CommandCancelled(object sender, CommandEventArgs e)
     {
-        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} cancelled.\n", e.GlobalCommandName));
         Mirroring = false;
     }
 
     static void CommandEnded(object sender, CommandEventArgs e)
     {
-        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} ended.\n", e.GlobalCommandName));
         Mirroring = false;
     }
 
     static void CommandWillStart(object sender, CommandEventArgs e)
     {
-        (sender as Document).Editor.WriteMessage(string.Format("\nCommand {0} will start.\n", e.GlobalCommandName));
         if (e.GlobalCommandName == "MIRROR")
         {
-            AcadUtils.WriteMessageInDebug("надо зеркалить");
             Mirroring = true;
         }
     }
-
 
     private void AcAppOnSystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
     {

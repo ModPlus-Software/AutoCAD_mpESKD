@@ -726,17 +726,18 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             var maskOffset = TextMaskOffset * scale;
             _topTextMask = _topDbText.GetBackgroundMask(maskOffset);
             if (_bottomDbText != null)
+            {
                 _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset);
+            }
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
         //var mirrorPoint = new Point3d(shelfPoint.X + ,
         AcadUtils.WriteMessageInDebug($" shelfpoint- {shelfPoint}, ShelfPointOCS-{ShelfPointOCS}, ShelfLedge-{ShelfLedge},_topDbText.Position {_topDbText.Position}");
-        var mirrorPoint = new Point3d(_topDbText.Position.X + EntityUtils.GetLength(_topDbText) / 2, _topDbText.Position.Y + EntityUtils.GetHeight(_topDbText) / 2, ShelfPoint.Z);
-        if (MainFunction.Mirroring | ScaleFactorX > 0)
-        {
-            MirrorIfNeed(_topDbText, mirrorPoint);
-        }
+
+        MirrorIfNeed(_topDbText);
+        MirrorIfNeed(_bottomDbText);
+
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
@@ -763,16 +764,5 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     {
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
-    }
-
-    public void MirrorIfNeed(DBText dbText, Point3d mirrorPoint)
-    {
-
-        var mirror = Matrix3d.Mirroring(mirrorPoint);
-        AcadUtils.WriteMessageInDebug($"dbtext pos before {dbText.Position} \n");
-        dbText.TransformBy(mirror);
-        AcadUtils.WriteMessageInDebug($"dbtext pos after {dbText.Position} \n");
-
-
     }
 }

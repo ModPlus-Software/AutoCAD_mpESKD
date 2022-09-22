@@ -1189,6 +1189,14 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         UpdateTextEntity(_bottomOrientDBText, BottomOrientText, ref _bottomOrientTextMask);
 
         UpdateTextEntity(_topOrientDBText, TopOrientText, ref _topOrientTextMask);
+
+        MirrorIfNeed(_bottomFirstDBText);
+        MirrorIfNeed(_bottomSecondDBText);
+        MirrorIfNeed(_bottomThirdDBText);
+        MirrorIfNeed(_topFirstDBText);
+        MirrorIfNeed(_topSecondDBText);
+        MirrorIfNeed(_topThirdDBText);
+        MirrorIfNeed(_topOrientDBText);
     }
 
     /// <summary>

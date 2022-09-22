@@ -575,6 +575,9 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
 
         _shelfLine = new Line(leaderPoint, shelfEndPoint);
+        MirrorIfNeed(_topFirstDbText);
+        MirrorIfNeed(_topSecondDbText);
+        MirrorIfNeed(_bottomDbText);
     }
 
     private void SetNodeNumberOnCreation()

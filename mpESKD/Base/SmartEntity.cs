@@ -677,4 +677,21 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     {
         _blockRecord?.Dispose();
     }
+
+    /// <summary>
+    /// Метод для зеркалирования текста при необходимости 
+    /// </summary>
+    /// <param name="dbText"> зеркалируемый текст</param>
+    /// <param name="ScaleFactorX"> проверка блока отзеркалированность, - 1 если отзеркалирован </param>
+    public void MirrorIfNeed(DBText dbText)
+    {
+        if (dbText == null)
+            return;
+        if ((!(ScaleFactorX < 0) || MainFunction.Mirroring) && (!(ScaleFactorX > 0) || !MainFunction.Mirroring))
+            return;
+        var mirrorPoint = new Point3d(dbText.Position.X + EntityUtils.GetLength(dbText) / 2,
+            dbText.Position.Y + EntityUtils.GetHeight(dbText) / 2, dbText.Position.Z);
+        var mirror = Matrix3d.Mirroring(mirrorPoint);
+        dbText.TransformBy(mirror);
+    }
 }

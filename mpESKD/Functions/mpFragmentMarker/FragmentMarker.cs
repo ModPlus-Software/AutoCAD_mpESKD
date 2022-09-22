@@ -510,6 +510,9 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _shelfLine = new Line(leaderPoint, shelfEndPoint);
         }
+
+        MirrorIfNeed(_topDbText);
+        MirrorIfNeed(_bottomDbText);
     }
 
     private void SetNodeNumberOnCreation()
