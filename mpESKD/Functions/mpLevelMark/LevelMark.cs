@@ -722,9 +722,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             var maskOffset = TextMaskOffset * scale;
             _topTextMask = _topDbText.GetBackgroundMask(maskOffset);
             if (_bottomDbText != null)
-            {
                 _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset);
-            }
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
