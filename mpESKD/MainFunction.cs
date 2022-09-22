@@ -37,6 +37,9 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static string StylesPath { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Свойство для отслеживания зеркалирования текста
+    /// </summary>
     public static bool Mirroring { get; private set; }
 
     /// <inheritdoc />
@@ -81,24 +84,17 @@ public class MainFunction : IExtensionApplication
         }
     }
 
-    public static void SubscribeToDoc(Document document)
-    {
-        document.CommandWillStart += new CommandEventHandler(CommandWillStart);
-        document.CommandEnded += new CommandEventHandler(CommandEnded);
-        document.CommandCancelled += new CommandEventHandler(CommandCancelled);
-    }
-
-    static void CommandCancelled(object sender, CommandEventArgs e)
+    private static void CommandCancelled(object sender, CommandEventArgs e)
     {
         Mirroring = false;
     }
 
-    static void CommandEnded(object sender, CommandEventArgs e)
+    private static void CommandEnded(object sender, CommandEventArgs e)
     {
         Mirroring = false;
     }
 
-    static void CommandWillStart(object sender, CommandEventArgs e)
+    private static void CommandWillStart(object sender, CommandEventArgs e)
     {
         if (e.GlobalCommandName == "MIRROR")
         {
@@ -144,8 +140,6 @@ public class MainFunction : IExtensionApplication
                 Language.GetItem("err5"),
                 ModPlusAPI.Windows.MessageBoxIcon.Close);
         }
-
-        SubscribeToDoc(AcadUtils.Document);
     }
 
     /// <summary>
@@ -437,7 +431,9 @@ public class MainFunction : IExtensionApplication
 
         e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-
+        e.Document.CommandWillStart += CommandWillStart;
+        e.Document.CommandEnded += CommandEnded;
+        e.Document.CommandCancelled += CommandCancelled;
         // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
         // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
         try
@@ -467,7 +463,6 @@ public class MainFunction : IExtensionApplication
         {
             // ignore
         }
-        SubscribeToDoc(AcadUtils.Document);
     }
 
     private static void Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)
@@ -479,6 +474,9 @@ public class MainFunction : IExtensionApplication
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
         e.Document.LayoutSwitched -= DocumentOnLayoutSwitched;
         e.Document.LayoutSwitched += DocumentOnLayoutSwitched;
+        e.Document.CommandWillStart += CommandWillStart;
+        e.Document.CommandEnded += CommandEnded;
+        e.Document.CommandCancelled += CommandCancelled;
     }
 
     private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)

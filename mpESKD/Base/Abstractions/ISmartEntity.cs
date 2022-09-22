@@ -69,7 +69,7 @@ public interface ISmartEntity
     double Rotation { get; set; }
 
     /// <summary>
-    /// Угол поворота BlockReference
+    /// Проверка блока на отзеркалированность, - 1 если отзеркалирован
     /// </summary>
     double ScaleFactorX { get; set; }
         
