@@ -94,6 +94,9 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     public double Rotation { get; set; }
 
     /// <inheritdoc/>
+    public double ScaleFactorX { get; set; }
+
+    /// <inheritdoc/>
     public bool IsRotated => Rotation != 0.0;
 
     /// <inheritdoc />
@@ -369,6 +372,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
             InsertionPoint = blockReference.Position;
             BlockTransform = blockReference.BlockTransform;
             Rotation = blockReference.Rotation;
+            ScaleFactorX = blockReference.ScaleFactors.X;
         }
     }
 
@@ -672,5 +676,35 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     public void Dispose()
     {
         _blockRecord?.Dispose();
+    }
+
+    /// <summary>
+    /// Выполнить зеркалирования текста при необходимости 
+    /// </summary>
+    /// <param name="dbText">Однострочный текст</param>
+    protected void MirrorIfNeed(DBText dbText)
+    {
+        if (dbText == null)
+            return;
+        if ((ScaleFactorX >= 0 || MainFunction.Mirroring) && (ScaleFactorX <= 0 || !MainFunction.Mirroring))
+            return;
+        var mirrorPoint = new Point3d(
+            dbText.Position.X + (dbText.GetLength() / 2),
+            dbText.Position.Y + (dbText.GetHeight() / 2), 
+            dbText.Position.Z);
+        var mirror = Matrix3d.Mirroring(mirrorPoint);
+        dbText.TransformBy(mirror);
+    }
+
+    /// <summary>
+    /// Выполнить зеркалирования текста при необходимости 
+    /// </summary>
+    /// <param name="dbTexts">Однострочные тексты</param>
+    protected void MirrorIfNeed(IEnumerable<DBText> dbTexts)
+    {
+        foreach (var dbText in dbTexts)
+        {
+            MirrorIfNeed(dbText);
+        }
     }
 }

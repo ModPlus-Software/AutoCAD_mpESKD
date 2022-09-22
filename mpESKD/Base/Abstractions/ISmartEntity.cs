@@ -67,6 +67,11 @@ public interface ISmartEntity
     /// Угол поворота BlockReference
     /// </summary>
     double Rotation { get; set; }
+
+    /// <summary>
+    /// Значение X свойства <see cref="BlockReference.ScaleFactors"/>. Если блок отзеркален, то имеет значение -1
+    /// </summary>
+    double ScaleFactorX { get; set; }
         
     /// <summary>
     /// BlockReference повернут (имеет угол, отличный от 0,0)

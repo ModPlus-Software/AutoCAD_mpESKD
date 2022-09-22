@@ -32,6 +32,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
 
         TbOverrideValue.Text = _levelMark.OverrideValue;
         TbNote.Text = _levelMark.Note;
+        LevelNumBox.Value = Math.Round(_levelMark.MeasuredValue, _levelMark.Accuracy);
     }
 
     /// <inheritdoc/>a

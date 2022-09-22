@@ -35,6 +35,11 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static string StylesPath { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Возвращает true, если в данный момент выполняется команда MIRROR
+    /// </summary>
+    public static bool Mirroring { get; private set; }
+
     /// <inheritdoc />
     public void Initialize()
     {
@@ -406,7 +411,9 @@ public class MainFunction : IExtensionApplication
 
         e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-
+        e.Document.CommandWillStart += CommandWillStart;
+        e.Document.CommandEnded += CommandEnded;
+        e.Document.CommandCancelled += CommandCancelled;
         // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
         // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
         try
@@ -447,6 +454,9 @@ public class MainFunction : IExtensionApplication
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
         e.Document.LayoutSwitched -= DocumentOnLayoutSwitched;
         e.Document.LayoutSwitched += DocumentOnLayoutSwitched;
+        e.Document.CommandWillStart += CommandWillStart;
+        e.Document.CommandEnded += CommandEnded;
+        e.Document.CommandCancelled += CommandCancelled;
     }
 
     private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
@@ -517,6 +527,24 @@ public class MainFunction : IExtensionApplication
         catch (System.Exception exception)
         {
             Debug.Print(exception.Message);
+        }
+    }
+
+    private static void CommandCancelled(object sender, CommandEventArgs e)
+    {
+        Mirroring = false;
+    }
+
+    private static void CommandEnded(object sender, CommandEventArgs e)
+    {
+        Mirroring = false;
+    }
+
+    private static void CommandWillStart(object sender, CommandEventArgs e)
+    {
+        if (e.GlobalCommandName == "MIRROR")
+        {
+            Mirroring = true;
         }
     }
 

@@ -726,6 +726,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
+
+        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
