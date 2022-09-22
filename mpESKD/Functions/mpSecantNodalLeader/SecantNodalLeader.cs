@@ -308,7 +308,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
             _leaderLine = new Line(secantEnd, leaderPoint);
 
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
-            
+
         SetNodeNumberOnCreation();
 
         var mainTextHeight = MainTextHeight * scale;
@@ -391,7 +391,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
                 leaderPoint -
                 (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
                 (Vector3d.YAxis * textVerticalOffset);
-                
+
             if (_topFirstDbText != null)
             {
                 _topFirstDbText.Position = sheetNumberEndPoint -
@@ -400,7 +400,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
             if (_topSecondDbText != null)
             {
-                _topSecondDbText.Position = sheetNumberEndPoint - 
+                _topSecondDbText.Position = sheetNumberEndPoint -
                                             (Vector3d.XAxis * topSecondTextLength);
             }
 
@@ -416,7 +416,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
-            
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
@@ -438,9 +438,6 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         }
 
         _shelfLine = new Line(leaderPoint, shelfEndPoint);
-        MirrorIfNeed(_topFirstDbText);
-        MirrorIfNeed(_topSecondDbText);
-        MirrorIfNeed(_bottomDbText);
     }
 
     private void SetNodeNumberOnCreation()

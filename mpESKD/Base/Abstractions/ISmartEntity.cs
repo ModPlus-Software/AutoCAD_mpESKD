@@ -69,7 +69,7 @@ public interface ISmartEntity
     double Rotation { get; set; }
 
     /// <summary>
-    /// Проверка блока на отзеркалированность, - 1 если отзеркалирован
+    /// Значение X свойства <see cref="BlockReference.ScaleFactors"/>. Если блок отзеркален, то имеет значение -1
     /// </summary>
     double ScaleFactorX { get; set; }
         

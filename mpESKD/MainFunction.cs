@@ -1,6 +1,4 @@
-﻿using Autodesk.AutoCAD.Geometry;
-
-namespace mpESKD;
+﻿namespace mpESKD;
 
 using System;
 using System.Diagnostics;
@@ -38,7 +36,7 @@ public class MainFunction : IExtensionApplication
     public static string StylesPath { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Свойство для отслеживания зеркалирования текста
+    /// Возвращает true, если в данный момент выполняется команда MIRROR
     /// </summary>
     public static bool Mirroring { get; private set; }
 
@@ -81,24 +79,6 @@ public class MainFunction : IExtensionApplication
         {
             document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
             document.LayoutSwitched += DocumentOnLayoutSwitched;
-        }
-    }
-
-    private static void CommandCancelled(object sender, CommandEventArgs e)
-    {
-        Mirroring = false;
-    }
-
-    private static void CommandEnded(object sender, CommandEventArgs e)
-    {
-        Mirroring = false;
-    }
-
-    private static void CommandWillStart(object sender, CommandEventArgs e)
-    {
-        if (e.GlobalCommandName == "MIRROR")
-        {
-            Mirroring = true;
         }
     }
 
@@ -547,6 +527,24 @@ public class MainFunction : IExtensionApplication
         catch (System.Exception exception)
         {
             Debug.Print(exception.Message);
+        }
+    }
+
+    private static void CommandCancelled(object sender, CommandEventArgs e)
+    {
+        Mirroring = false;
+    }
+
+    private static void CommandEnded(object sender, CommandEventArgs e)
+    {
+        Mirroring = false;
+    }
+
+    private static void CommandWillStart(object sender, CommandEventArgs e)
+    {
+        if (e.GlobalCommandName == "MIRROR")
+        {
+            Mirroring = true;
         }
     }
 

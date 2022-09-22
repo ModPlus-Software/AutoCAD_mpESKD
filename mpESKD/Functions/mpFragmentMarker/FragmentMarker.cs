@@ -22,9 +22,9 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
 {
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
-        
+
     #region Entities
-        
+
     /// <summary>
     /// Главная полилиния примитива
     /// </summary>
@@ -110,7 +110,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             return entities;
         }
     }
-        
+
     /// <inheritdoc />
     /// В примитиве не используется!
     public override string LineType { get; set; }
@@ -125,7 +125,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
 
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => 20;
-        
+
     /// <summary>
     /// Радиус скругления
     /// </summary>
@@ -233,14 +233,14 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     public string SmallText { get; set; } = string.Empty;
 
     private Point3d _leaderFirstPoint;
-        
+
     /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
     public Point3d MiddlePoint =>
         new Point3d(
             (InsertionPoint.X + EndPoint.X) / 2,
             (InsertionPoint.Y + EndPoint.Y) / 2,
             (InsertionPoint.Z + EndPoint.Z) / 2);
-        
+
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
@@ -256,7 +256,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
-            
+
             //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == FragmentMarkerJigState.InsertionPoint)
             {
@@ -400,7 +400,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             _leaderLine = null;
             _shelfLine = null;
         }
-            
+
         //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
@@ -439,7 +439,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _bottomDbText = null;
         }
-            
+
         var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         var shelfLength = textIndent + largestTextLength + shelfLedge;
@@ -511,8 +511,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             _shelfLine = new Line(leaderPoint, shelfEndPoint);
         }
 
-        MirrorIfNeed(_topDbText);
-        MirrorIfNeed(_bottomDbText);
+        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
     }
 
     private void SetNodeNumberOnCreation()
