@@ -22,7 +22,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     // last values
     private readonly string _lastHorizontalValue = string.Empty;
     private readonly string _lastVerticalValue = string.Empty;
-        
+
     private int _bottomFractureOffset;
     private int _markersCount = 1;
     private bool _bottomOrientMarkerVisible;
@@ -138,7 +138,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     #endregion
 
     #endregion
-        
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Axis"/> class.
     /// </summary>
@@ -181,7 +181,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     [EntityProperty(PropertiesCategory.Content, 1, "p17", "Standard", descLocalKey: "d17")]
     public override string TextStyle { get; set; } = "Standard";
-        
+
     /// <summary>Положение маркеров</summary>
     [EntityProperty(PropertiesCategory.Geometry, 1, "p8", AxisMarkersPosition.Bottom, descLocalKey: "d8")]
     [SaveToXData]
@@ -346,7 +346,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [EntityProperty(PropertiesCategory.Content, 2, "p18", 3.5, 0.000000001, 1.0000E+99, descLocalKey: "d18", nameSymbol: "h")]
     [SaveToXData]
     public double TextHeight { get; set; } = 3.5;
-        
+
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 3, "p85", false, descLocalKey: "d85")]
     [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
@@ -537,10 +537,10 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             TopOrientMarkerOffset = mainLineVectorNormal.DotProduct(vector) / GetScale() / BlockTransform.GetScale();
         }
     }
-        
+
     // Получение управляющих точек в системе координат блока для отрисовки содержимого
     private Point3d BottomMarkerPointOCS => BottomMarkerPoint.TransformBy(BlockTransform.Inverse());
-        
+
     private Point3d TopMarkerPointOCS => TopMarkerPoint.TransformBy(BlockTransform.Inverse());
 
     private Point3d BottomOrientPointOCS => BottomOrientPoint.TransformBy(BlockTransform.Inverse());
@@ -609,7 +609,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             return entities;
         }
     }
-        
+
     /// <inheritdoc/>
     protected override void ProcessScaleChange(AnnotationScale oldScale, AnnotationScale newScale)
     {
@@ -628,7 +628,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
-            
+
         if (MarkersPosition == AxisMarkersPosition.Both ||
             MarkersPosition == AxisMarkersPosition.Bottom)
         {
@@ -718,7 +718,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private void SetEntitiesPoints(Point3d insertionPoint, Point3d endPoint, Point3d bottomMarkerPoint, Point3d topMarkerPoint, double scale)
     {
         var textHeight = TextHeight * GetScale();
-            
+
         // main line
         _mainLine = new Line
         {
@@ -1189,6 +1189,12 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         UpdateTextEntity(_bottomOrientDBText, BottomOrientText, ref _bottomOrientTextMask);
 
         UpdateTextEntity(_topOrientDBText, TopOrientText, ref _topOrientTextMask);
+
+        MirrorIfNeed(new[]
+        {
+            _bottomFirstDBText, _bottomSecondDBText, _bottomThirdDBText, _bottomOrientDBText,
+            _topFirstDBText, _topSecondDBText, _topThirdDBText, _topOrientDBText
+        });
     }
 
     /// <summary>
@@ -1213,7 +1219,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                           (Vector3d.YAxis * (dbText.GetHeight() / 2));
         if (textRotation != 0.0)
             dbText.TransformBy(rotationMatrix);
-                
+
         if (HideTextBackground)
         {
             mask = dbText.GetBackgroundMask(maskOffset);
@@ -1226,7 +1232,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         if (!IsValueCreated)
             return;
-            
+
         var check = 1 / Math.Sqrt(2);
         var v = (EndPointOCS - InsertionPointOCS).GetNormal();
         if ((v.X > check || v.X < -check) && (v.Y < check || v.Y > -check))
