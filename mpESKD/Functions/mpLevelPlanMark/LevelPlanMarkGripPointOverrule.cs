@@ -22,13 +22,13 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                 // Удаляю все ручки - это удалит ручку вставки блока
                 grips.Clear();
 
-                var viewLabel = EntityReaderService.Instance.GetFromEntity<LevelPlanMark>(entity);
-                if (viewLabel != null)
+                var levelPlanMark = EntityReaderService.Instance.GetFromEntity<LevelPlanMark>(entity);
+                if (levelPlanMark != null)
                 {
                     // insertion (start) grip
-                    var vertexGrip = new ViewLabelVertexGrip(viewLabel, 0)
+                    var vertexGrip = new LevelPlanMarkVertexGrip(levelPlanMark, 0)
                     {
-                        GripPoint = viewLabel.InsertionPoint
+                        GripPoint = levelPlanMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
                 }
@@ -51,19 +51,19 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
             {
                 foreach (var gripData in grips)
                 {
-                    if (!(gripData is ViewLabelVertexGrip vertexGrip)) 
+                    if (!(gripData is LevelPlanMarkVertexGrip vertexGrip)) 
                         continue;
-                    var viewLabel = vertexGrip.ViewLabel;
+                    var levelPlanMark = vertexGrip.LevelPlanMark;
 
                     if (vertexGrip.GripIndex == 0)
                     {
                         ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                        viewLabel.InsertionPoint = vertexGrip.GripPoint + offset;
+                        levelPlanMark.InsertionPoint = vertexGrip.GripPoint + offset;
                     }
 
                     // Вот тут происходит перерисовка примитивов внутри блока
-                    viewLabel.UpdateEntities();
-                    viewLabel.BlockRecord.UpdateAnonymousBlocks();
+                    levelPlanMark.UpdateEntities();
+                    levelPlanMark.BlockRecord.UpdateAnonymousBlocks();
                 }
             }
             else

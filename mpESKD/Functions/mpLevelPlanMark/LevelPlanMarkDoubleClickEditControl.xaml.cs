@@ -30,15 +30,14 @@ public partial class LevelPlanMarkDoubleClickEditControl : IDoubleClickEditContr
 
         _levelPlanMark = levelPlanMark;
             
-        TbDesignation.Text = _levelPlanMark.Designation;
-        TbDesignationPrefix.Text = _levelPlanMark.DesignationPrefix;
-        TbDesignation.Focus();
+        TbValue.Text = _levelPlanMark.PlanMark;
+
+        TbValue.Focus();
     }
 
     /// <inheritdoc/>
     public void OnAccept()
     {
-        _levelPlanMark.Designation = TbDesignation.Text;
-        _levelPlanMark.DesignationPrefix = TbDesignationPrefix.Text;
+        _levelPlanMark.PlanMark = TbValue.Text;
     }
 }

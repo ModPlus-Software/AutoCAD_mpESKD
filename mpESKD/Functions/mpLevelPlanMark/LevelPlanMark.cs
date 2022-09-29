@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark;
+﻿using System.Diagnostics;
+
+namespace mpESKD.Functions.mpLevelPlanMark;
 
 using System;
 using System.Collections.Generic;
@@ -22,8 +24,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     #region Text entities
 
-    private MText _mText;
-    private Wipeout _mTextMask;
+    private DBText _dbText;
+    private Wipeout _dbTextMask;
+    private Polyline _framePolyline;
 
     #endregion
 
@@ -50,7 +53,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     ///// <param name="lastLetterValue">Буквенное значение последней созданной оси</param>
     //public LevelPlanMark(string lastIntegerValue, string lastLetterValue)
     //{
-       
+
     //}
 
     /// <inheritdoc />
@@ -65,7 +68,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public override string TextStyle { get; set; }
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => double.NaN;
+    public override double MinDistanceBetweenPoints => 9;
 
     /// <summary>
     /// Высота текста
@@ -73,13 +76,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
     [SaveToXData]
     public double MainTextHeight { get; set; } = 3.5;
-
-    /// <summary>
-    /// Высота малого текста
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
-    [SaveToXData]
-    public double SecondTextHeight { get; set; } = 2.5;
 
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
@@ -98,15 +94,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
-    public string Designation { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Префикс обозначения
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p52", "", propertyScope: PropertyScope.Palette)]
-    [SaveToXData]
-    [ValueToSearchBy]
-    public string DesignationPrefix { get; set; } = string.Empty;
+    public string PlanMark { get; set; } = "0.000";
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -115,8 +103,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             var entities = new List<Entity>
             {
-                _mTextMask,
-                _mText,
+
+                _dbTextMask,
+                _dbText,
+                _framePolyline
             };
 
             foreach (var e in entities)
@@ -139,8 +129,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     {
         try
         {
+            AcadUtils.WriteMessageInDebug($" insertionPointOCS {InsertionPointOCS} \n");
             var scale = GetScale();
             CreateEntities(InsertionPointOCS, scale);
+
         }
         catch (Exception exception)
         {
@@ -151,23 +143,70 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private void CreateEntities(Point3d insertionPoint, double scale)
     {
         // text
-        var textContents = "+0.000";
-        if (string.IsNullOrEmpty(textContents)) 
-            return;
         var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
         var textHeight = MainTextHeight * scale;
-        _mText = new MText
+        if (string.IsNullOrEmpty(PlanMark)) PlanMark = "0.000";
+        _dbText = new DBText()
         {
+            Position = insertionPoint,
             TextStyleId = textStyleId,
-            Contents = textContents,
-            TextHeight = textHeight,
-            Attachment = AttachmentPoint.MiddleCenter,
-            Location = insertionPoint
+            TextString = PlanMark,
+            Height = textHeight,
+            Justify = AttachmentPoint.MiddleCenter,
+            AlignmentPoint = insertionPoint
         };
-            
-        if (!HideTextBackground) 
-            return;
-        var maskOffset = TextMaskOffset * scale;
-        _mTextMask = _mText.GetBackgroundMask(maskOffset);
+        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+        //_dbText.SetProperties(TextStyle, textHeight);
+        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+        AcadUtils.WriteMessageInDebug($"_dbtext text {_dbText.TextString}");
+        if (HideTextBackground)
+        {
+            var offset = TextMaskOffset * scale;
+            _dbTextMask = _dbText.GetBackgroundMask(offset);
+        }
+
+        var width = _dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X;
+        
+        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+        var height = _dbText.GetHeight();
+        if (width == 0)
+        {
+            width = (MinDistanceBetweenPoints * scale);
+        }
+
+        //if (width == -0.2196699141101135)
+        //{
+        //    width = -9.3106601717789772;
+        //}
+
+        if (height == 0)
+        {
+            height = MinDistanceBetweenPoints * scale;
+        }
+
+        AcadUtils.WriteMessageInDebug($"  width {width}, height {height} \n");
+        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+
+        var points = new[]
+        {
+                new Point2d(insertionPoint.X - width, insertionPoint.Y - height),
+                new Point2d(insertionPoint.X - width, insertionPoint.Y + height),
+                new Point2d(insertionPoint.X + width , insertionPoint.Y + height),
+                new Point2d(insertionPoint.X + width , insertionPoint.Y - height)
+        };
+
+        _framePolyline = new Polyline(points.Length);
+
+        for (var i = 0; i < points.Length; i++)
+        {
+            _framePolyline.AddVertexAt(i, points[i], 0, 0.0, 0.0);
+        }
+
+        _framePolyline.Closed = true;
+
+        AcadUtils.WriteMessageInDebug($" _dbText.Position {_dbText.Position} \n");
+        AcadUtils.WriteMessageInDebug($" _____________________________ \n");
+        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
     }
 }
