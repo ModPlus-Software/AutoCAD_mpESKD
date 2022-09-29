@@ -17,9 +17,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
+
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -31,28 +29,8 @@
                        Text="{Binding Source={StaticResource Lang}, XPath=p51}"/>
             <TextBox Grid.Row="0"
                      Grid.Column="1"
-                     Name="TbDesignation"
+                     Name="TbValue"
                      MaxLength="20"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
-
-            <TextBlock Grid.Row="1"
-                       Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p52}"/>
-            <TextBox Grid.Row="1"
-                     Grid.Column="1"
-                     Name="TbDesignationPrefix"
-                     MaxLength="3"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
-
-            <TextBlock Grid.Row="2"
-                       Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p53}"/>
-            <TextBox Grid.Row="2"
-                     Grid.Column="1"
-                     Name="TbSheetNumber" 
-                     MaxLength="5"
                      mps:TextFieldAssist.ClearTextButton="True"
                      mps:TextFieldAssist.SelectAllOnFocus="True"/>
         </Grid>

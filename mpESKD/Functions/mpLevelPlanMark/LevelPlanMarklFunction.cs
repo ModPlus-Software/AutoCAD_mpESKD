@@ -1,7 +1,5 @@
 ﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
-using System;
-using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -14,6 +12,7 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using mpESKD.Functions.mpLevelMark;
 
 /// <inheritdoc />
 public class LevelPlanMarkFunction : ISmartEntityFunction
@@ -21,7 +20,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
     /// <inheritdoc />
     public void Initialize()
     {
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new ViewLabelGripPointOverrule(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LevelMarkGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<LevelPlanMark>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<LevelPlanMark>(), true);
     }
@@ -41,15 +40,12 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
              */
             ExtendedDataUtils.AddRegAppTableRecord<LevelPlanMark>();
 
-            var viewLabelLastLetterValue = string.Empty;
-            var viewLabelLastIntegerValue = string.Empty;
-            FindLastViewLabelValues(ref viewLabelLastLetterValue, ref viewLabelLastIntegerValue);
-            var viewLabel = new LevelPlanMark(viewLabelLastIntegerValue, viewLabelLastLetterValue);
+            var levelPlanMark = new LevelPlanMark();
 
-            var blockReference = MainFunction.CreateBlock(viewLabel);
+            var blockReference = MainFunction.CreateBlock(levelPlanMark);
 
-            viewLabel.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
-            InsertLabelWithJig(viewLabel, blockReference);
+            levelPlanMark.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+            InsertLabelWithJig(levelPlanMark, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -67,10 +63,10 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
     [CommandMethod("ModPlus", "mpLevelPlanMark", CommandFlags.Modal)]
     public void CreateViewLabelCommand()
     {
-        CreateViewLabel(LevelPlanMark);
+        CreateLevelPlanMark();
     }
 
-    private static void CreateViewLabel(LevelPlanMark viewLabelType)
+    private static void CreateLevelPlanMark()
     {
         SmartEntityUtils.SendStatistic<LevelPlanMark>();
             
@@ -85,11 +81,8 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<LevelPlanMark>();
 
             var style = StyleManager.GetCurrentStyle(typeof(LevelPlanMark));
-            var viewLabelLastLetterValue = string.Empty;
-            var viewLabelLastIntegerValue = string.Empty;
 
-            FindLastViewLabelValues(ref viewLabelLastLetterValue, ref viewLabelLastIntegerValue);
-            var levelPlanMark = new LevelPlanMark(viewLabelLastIntegerValue, viewLabelLastLetterValue);
+            var levelPlanMark = new LevelPlanMark();
 
             var blockReference = MainFunction.CreateBlock(levelPlanMark);
             levelPlanMark.ApplyStyle(style, true);
@@ -128,28 +121,6 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
             var ent = tr.GetObject(levelPlanMark.BlockId, OpenMode.ForWrite, true, true);
             ent.XData = levelPlanMark.GetDataForXData();
             tr.Commit();
-        }
-    }
-
-    /// <summary>
-    /// Поиск последних цифровых и буквенных значений разрезов на текущем виде
-    /// </summary>
-    private static void FindLastViewLabelValues(ref string viewLabelLastLetterValue, ref string viewLabelLastIntegerValue)
-    {
-        if (!MainSettings.Instance.ViewLabelSaveLastTextAndContinueNew)
-            return;
-        var viewLabels = AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<LevelPlanMark>(typeof(LevelPlanMark));
-        if (!viewLabels.Any())
-            return;
-        viewLabels.Sort((s1, s2) => string.Compare(s1.BlockRecord.Name, s2.BlockRecord.Name, StringComparison.Ordinal));
-        var valueDesignation = viewLabels.Last().Designation;
-        if (int.TryParse(valueDesignation, out var i))
-        {
-            viewLabelLastIntegerValue = i.ToString();
-        }
-        else
-        {
-            viewLabelLastLetterValue = valueDesignation;
         }
     }
 }
