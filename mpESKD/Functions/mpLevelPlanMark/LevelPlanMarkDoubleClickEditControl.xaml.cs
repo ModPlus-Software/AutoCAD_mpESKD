@@ -29,15 +29,16 @@ public partial class LevelPlanMarkDoubleClickEditControl : IDoubleClickEditContr
             throw new ArgumentException("Wrong type of entity");
 
         _levelPlanMark = levelPlanMark;
-            
-        TbValue.Text = _levelPlanMark.PlanMark;
+        
+        LevelNumBox.Value = Math.Round(_levelPlanMark.PlanMark, _levelPlanMark.Accuracy);
+        
 
-        TbValue.Focus();
+        LevelNumBox.Focus();
     }
 
     /// <inheritdoc/>
     public void OnAccept()
     {
-        _levelPlanMark.PlanMark = TbValue.Text;
+        _levelPlanMark.PlanMark = LevelNumBox.Value.Value;
     }
 }

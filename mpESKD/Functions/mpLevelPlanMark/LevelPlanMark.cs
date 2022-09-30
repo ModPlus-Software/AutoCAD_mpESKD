@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace mpESKD.Functions.mpLevelPlanMark;
+﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
 using System;
 using System.Collections.Generic;
@@ -19,7 +17,7 @@ using ModPlusAPI.Windows;
 [SmartEntityDisplayNameKey("h151")] //TODO localization
 [SystemStyleDescriptionKey("h152")] //TODO localization
 
-public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
+public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWithDoubleClickEditor
 {
 
     #region Text entities
@@ -46,16 +44,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     {
     }
 
-    ///// <summary>
-    ///// Initializes a new instance of the <see cref="LevelPlanMark"/> class.
-    ///// </summary>
-    ///// <param name="lastIntegerValue">Числовое значение последней созданной оси</param>
-    ///// <param name="lastLetterValue">Буквенное значение последней созданной оси</param>
-    //public LevelPlanMark(string lastIntegerValue, string lastLetterValue)
-    //{
-
-    //}
-
     /// <inheritdoc />
     public override string LineType { get; set; }
 
@@ -68,7 +56,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public override string TextStyle { get; set; }
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => 9;
+    public override double MinDistanceBetweenPoints => 9.3106601717789772;
 
     /// <summary>
     /// Высота текста
@@ -94,7 +82,61 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
-    public string PlanMark { get; set; } = "0.000";
+    public double PlanMark { get; set; } = 0.000;
+
+    /// <inheritdoc />
+    [EntityProperty(PropertiesCategory.Content, 6, "p72", NumberSeparator.Dot, descLocalKey: "d72")]
+    [SaveToXData]
+    public NumberSeparator NumberSeparator { get; set; } = NumberSeparator.Dot;
+
+    /// <summary>
+    /// Показывать плюс
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 8, "p64", true, descLocalKey: "d64")]
+    [SaveToXData]
+    public bool ShowPlus { get; set; } = true;
+
+    /// <summary>
+    /// Добавление звездочки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 9, "p75", false, descLocalKey: "d75")]
+    [SaveToXData]
+    public bool AddAsterisk { get; set; }
+
+    /// <summary>
+    /// Точность
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 10, "p67", 3, 0, 5, descLocalKey: "d67")]
+    [SaveToXData]
+    public int Accuracy { get; set; } = 3;
+
+    /// <summary>
+    /// Длина рамки
+    /// </summary> //TODO localization
+    [EntityProperty(PropertiesCategory.Content, 11, "p67", 9, 1, 10, descLocalKey: "d67")]
+    [SaveToXData]
+    public double BorderLength { get; set; }
+
+    /// <summary>
+    /// Высота рамки
+    /// </summary> //TODO localization
+    [EntityProperty(PropertiesCategory.Content, 12, "p67", 3, 0, 10, descLocalKey: "d67")]
+    [SaveToXData]
+    public double BorderHeight { get; set; }
+
+    /// <summary>
+    /// Отображаемое значение
+    /// </summary>
+    [ValueToSearchBy]
+    public string DisplayedValue
+    {
+        get
+        {
+            var asterisk = AddAsterisk ? "*" : string.Empty;
+            var plus = ShowPlus ? "+" : string.Empty;
+            return ReplaceSeparator($"{plus}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{asterisk}");
+        }
+    }
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -106,6 +148,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 _dbTextMask,
                 _dbText,
+                //_mText,
+                //_mTextMask,
                 _framePolyline
             };
 
@@ -145,55 +189,44 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // text
         var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
         var textHeight = MainTextHeight * scale;
-        if (string.IsNullOrEmpty(PlanMark)) PlanMark = "0.000";
+
         _dbText = new DBText()
         {
             Position = insertionPoint,
             TextStyleId = textStyleId,
-            TextString = PlanMark,
+            TextString = DisplayedValue,
             Height = textHeight,
             Justify = AttachmentPoint.MiddleCenter,
             AlignmentPoint = insertionPoint
         };
-        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
-        //_dbText.SetProperties(TextStyle, textHeight);
-        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
-        AcadUtils.WriteMessageInDebug($"_dbtext text {_dbText.TextString}");
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
             _dbTextMask = _dbText.GetBackgroundMask(offset);
         }
 
-        var width = _dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X;
         
-        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
-        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
-        var height = _dbText.GetHeight();
-        if (width == 0)
+        
+        if (BorderLength == 0)
         {
-            width = (MinDistanceBetweenPoints * scale);
+            BorderLength = MinDistanceBetweenPoints * scale;
         }
 
-        //if (width == -0.2196699141101135)
-        //{
-        //    width = -9.3106601717789772;
-        //}
-
-        if (height == 0)
+        if (BorderHeight == 0)
         {
-            height = MinDistanceBetweenPoints * scale;
+            BorderHeight = MinDistanceBetweenPoints * scale;
         }
 
-        AcadUtils.WriteMessageInDebug($"  width {width}, height {height} \n");
+        AcadUtils.WriteMessageInDebug($" length {BorderLength}, height {BorderHeight} \n");
         AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
 
         var points = new[]
         {
-                new Point2d(insertionPoint.X - width, insertionPoint.Y - height),
-                new Point2d(insertionPoint.X - width, insertionPoint.Y + height),
-                new Point2d(insertionPoint.X + width , insertionPoint.Y + height),
-                new Point2d(insertionPoint.X + width , insertionPoint.Y - height)
+                new Point2d(insertionPoint.X - BorderLength, insertionPoint.Y - BorderHeight),
+                new Point2d(insertionPoint.X - BorderLength, insertionPoint.Y + BorderHeight),
+                new Point2d(insertionPoint.X + BorderLength, insertionPoint.Y + BorderHeight),
+                new Point2d(insertionPoint.X + BorderLength, insertionPoint.Y - BorderHeight)
         };
 
         _framePolyline = new Polyline(points.Length);
@@ -206,7 +239,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _framePolyline.Closed = true;
 
         AcadUtils.WriteMessageInDebug($" _dbText.Position {_dbText.Position} \n");
-        AcadUtils.WriteMessageInDebug($" _____________________________ \n");
-        Debug.Print($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+    }
+
+    private string ReplaceSeparator(string numericValue)
+    {
+        var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
+        return numericValue.Replace(',', '.').Replace('.', c);
     }
 }
