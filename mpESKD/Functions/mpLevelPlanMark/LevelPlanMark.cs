@@ -79,7 +79,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Обозначение плана
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 6, "p51", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
     public double PlanMark { get; set; } = 0.000;
@@ -125,16 +124,35 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public double BorderHeight { get; set; }
 
     /// <summary>
+    /// Префикс обозначения
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 13, "p52", "", propertyScope: PropertyScope.Palette)]
+    [RegexInputRestriction("^.{0,10}$")]
+    [SaveToXData]
+    [ValueToSearchBy]
+    public string DesignationPrefix { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Суффикс обозначения
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 14, "p52", "", 0, 5, propertyScope: PropertyScope.Palette)]
+    [SaveToXData]
+    [ValueToSearchBy]
+    public string DesignationSuffix { get; set; } = string.Empty;
+
+    /// <summary>
     /// Отображаемое значение
     /// </summary>
     [ValueToSearchBy]
     public string DisplayedValue
     {
         get
-        {
+        { 
+            var prefix = string.IsNullOrEmpty(DesignationPrefix) ? string.Empty : DesignationPrefix;
+            var suffix = string.IsNullOrEmpty(DesignationSuffix) ? string.Empty : DesignationSuffix;
             var asterisk = AddAsterisk ? "*" : string.Empty;
             var plus = ShowPlus ? "+" : string.Empty;
-            return ReplaceSeparator($"{plus}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{asterisk}");
+            return ReplaceSeparator($"{plus}{prefix}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{suffix}{asterisk}");
         }
     }
 
@@ -206,8 +224,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             _dbTextMask = _dbText.GetBackgroundMask(offset);
         }
 
-        
-        
         if (BorderLength == 0)
         {
             BorderLength = MinDistanceBetweenPoints * scale;
@@ -246,4 +262,38 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
     }
+
+    /// <summary>
+    /// Содержимое для MText в зависимости от значений
+    /// </summary>
+    /// <param name="isForTopText">True - содержимое для верхнего текста. False - содержимое для нижнего текста</param>
+    /// <returns></returns>
+    //private string GetTextContents(bool isForTopText)
+    //{
+
+    //    if (!HasTextValue())
+    //    {
+    //        return string.Empty;
+    //    }
+
+    //    var prefixAndDesignation = DesignationPrefix + Designation;
+    //    var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
+    //    var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
+    //    var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
+
+    //    // Если номер не указан, то обычный текст
+    //    if (string.IsNullOrEmpty(SheetNumber))
+    //    {
+    //        return prefixAndDesignation;
+    //    }
+
+    //    // Иначе форматированный текст для многострочного текста
+    //    if (isForTopText)
+    //    {
+    //        // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
+    //        return isSameTextHeight ? allWithSameHeight : allWithDifferentHeight;
+    //    }
+
+    //    return prefixAndDesignation;
+    //}
 }
