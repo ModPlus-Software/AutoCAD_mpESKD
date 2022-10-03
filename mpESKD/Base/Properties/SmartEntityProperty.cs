@@ -75,6 +75,7 @@ public class SmartEntityProperty : ObservableObject
 
         PropertyScope = attribute.PropertyScope;
         IsReadOnly = attribute.IsReadOnly;
+        StringMaxLength = attribute.StringMaxLength;
     }
 
     /// <summary>
@@ -209,6 +210,11 @@ public class SmartEntityProperty : ObservableObject
     /// Свойство только для чтения. Используется только в палитре свойств
     /// </summary>
     public bool IsReadOnly { get; }
+
+    /// <summary>
+    /// Максимальная длина строки для текстовых свойств
+    /// </summary>
+    public int StringMaxLength { get; }
 
     /// <summary>
     /// Установить значение с учетом того, что value может быть <see cref="double"/> или <see cref="int"/>

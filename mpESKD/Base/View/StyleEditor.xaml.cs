@@ -398,6 +398,9 @@ public partial class StyleEditor
                         if (property.RegexInputRestrictionAttribute != null)
                             SetInputRestriction(tb, property.RegexInputRestrictionAttribute);
 
+                        if (property.StringMaxLength != -1)
+                            tb.MaxLength = property.StringMaxLength;
+
                         propertiesGrid.Children.Add(tb);
                     }
                     catch (Exception exception)

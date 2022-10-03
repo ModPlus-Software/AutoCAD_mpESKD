@@ -564,6 +564,11 @@ public partial class PropertiesPalette
                                 if (regexInputRestrictionAttributes.ContainsKey(summaryProperty.PropertyName))
                                     SetInputRestriction(tb, regexInputRestrictionAttributes[summaryProperty.PropertyName]);
 
+                                var maxLengths = summaryProperty.EntityPropertyDataCollection
+                                    .Where(p => p.StringMaxLength != -1).Select(p => p.StringMaxLength).ToList();
+                                if (maxLengths.Any())
+                                    tb.MaxLength = maxLengths.Max();
+
                                 grid.Children.Add(tb);
                             }
                             catch (Exception exception)

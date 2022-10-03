@@ -26,6 +26,7 @@ public class EntityPropertyAttribute : Attribute
     /// <param name="nameSymbol">Условное обозначение свойства на изображении в редакторе стилей.
     /// Условные обозначения всегда указываются латинскими буквами, а значит не требуют локализации</param>
     /// <param name="isReadOnly">Свойство только для чтения. Используется только в палитре свойств</param>
+    /// <param name="stringMaxLength">Максимальная длина строки для текстовых свойств. -1 - не задано</param>
     public EntityPropertyAttribute(
         PropertiesCategory category,
         int orderIndex,
@@ -37,7 +38,8 @@ public class EntityPropertyAttribute : Attribute
         [CallerMemberName] string name = null,
         string descLocalKey = null,
         string nameSymbol = null,
-        bool isReadOnly = false)
+        bool isReadOnly = false,
+        int stringMaxLength = -1)
     {
         Category = category;
         OrderIndex = orderIndex;
@@ -52,6 +54,7 @@ public class EntityPropertyAttribute : Attribute
         PropertyScope = propertyScope;
         NameSymbol = nameSymbol;
         IsReadOnly = isReadOnly;
+        StringMaxLength = stringMaxLength;
     }
 
     /// <summary>
@@ -112,4 +115,9 @@ public class EntityPropertyAttribute : Attribute
     /// Свойство только для чтения. Используется только в палитре свойств
     /// </summary>
     public bool IsReadOnly { get; }
+
+    /// <summary>
+    /// Максимальная длина строки для текстовых свойств. -1 - не задано
+    /// </summary>
+    public int StringMaxLength { get; }
 }
