@@ -58,12 +58,12 @@ public class RibbonBuilder
             {
                 var ribbonControl = ComponentManager.Ribbon;
                 var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-                foreach (var tab in ribbonControl.Tabs.Where(
-                             tab => tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName)))
+                var tab = ribbonControl.Tabs.FirstOrDefault(tab =>
+                    !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
+                if (tab != null)
                 {
                     ribbonControl.Tabs.Remove(tab);
                     Application.SystemVariableChanged -= AcadApp_SystemVariableChanged;
-                    break;
                 }
             }
         }
@@ -75,19 +75,9 @@ public class RibbonBuilder
 
     private static bool IsLoaded()
     {
-        var loaded = false;
         var ribbonControl = ComponentManager.Ribbon;
         var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-        foreach (var tab in ribbonControl.Tabs)
-        {
-            if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
-            {
-                loaded = true;
-                break;
-            }
-        }
-
-        return loaded;
+        return ribbonControl.Tabs.Any(tab => !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
     }
 
     private static bool IsActive()
@@ -96,7 +86,7 @@ public class RibbonBuilder
         var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
         foreach (var tab in ribbonControl.Tabs)
         {
-            if (tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
+            if (!string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
             {
                 return tab.IsActive;
             }
@@ -124,15 +114,9 @@ public class RibbonBuilder
     {
         try
         {
+            // 0 - dark, 1 - light
             var sv = Application.GetSystemVariable("COLORTHEME").ToString();
-            if (int.TryParse(sv, out var i))
-            {
-                _colorTheme = i;
-            }
-            else
-            {
-                _colorTheme = 1; // light
-            }
+            _colorTheme = int.TryParse(sv, out var i) ? i : 1;
         }
         catch
         {
