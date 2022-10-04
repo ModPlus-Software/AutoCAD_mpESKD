@@ -126,7 +126,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Префикс обозначения
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 13, "p52", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 13, "p52", "", propertyScope: PropertyScope.Palette, stringMaxLength:10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
@@ -135,7 +135,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Суффикс обозначения
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 14, "p52", "", 0, 5, propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 14, "p52", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength:10)]
     [SaveToXData]
     [ValueToSearchBy]
     public string DesignationSuffix { get; set; } = string.Empty;
@@ -163,11 +163,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             var entities = new List<Entity>
             {
-
                 _dbTextMask,
                 _dbText,
-                //_mText,
-                //_mTextMask,
                 _framePolyline
             };
 
@@ -194,7 +191,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             AcadUtils.WriteMessageInDebug($" insertionPointOCS {InsertionPointOCS} \n");
             var scale = GetScale();
             CreateEntities(InsertionPointOCS, scale);
-
         }
         catch (Exception exception)
         {
@@ -218,11 +214,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             AlignmentPoint = insertionPoint
         };
 
-        if (HideTextBackground)
-        {
-            var offset = TextMaskOffset * scale;
-            _dbTextMask = _dbText.GetBackgroundMask(offset);
-        }
+  
 
         if (BorderLength == 0)
         {
@@ -250,9 +242,15 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         for (var i = 0; i < points.Length; i++)
         {
             _framePolyline.AddVertexAt(i, points[i], 0, 0.0, 0.0);
+            AcadUtils.WriteMessageInDebug($"points[i] {points[i]} \n");
         }
 
         _framePolyline.Closed = true;
+
+        if (HideTextBackground)
+        {
+            _dbTextMask = _framePolyline.GetBackgroundMask();
+        }
 
         AcadUtils.WriteMessageInDebug($" _dbText.Position {_dbText.Position} \n");
     }
@@ -263,37 +261,5 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    /// <summary>
-    /// Содержимое для MText в зависимости от значений
-    /// </summary>
-    /// <param name="isForTopText">True - содержимое для верхнего текста. False - содержимое для нижнего текста</param>
-    /// <returns></returns>
-    //private string GetTextContents(bool isForTopText)
-    //{
 
-    //    if (!HasTextValue())
-    //    {
-    //        return string.Empty;
-    //    }
-
-    //    var prefixAndDesignation = DesignationPrefix + Designation;
-    //    var allWithSameHeight = $"{DesignationPrefix}{Designation} ({SheetNumber})";
-    //    var allWithDifferentHeight = $"{DesignationPrefix}{Designation}{{\\H{SecondTextHeight / MainTextHeight}x;({SheetNumber})";
-    //    var isSameTextHeight = Math.Abs(MainTextHeight - SecondTextHeight) < 0.0001;
-
-    //    // Если номер не указан, то обычный текст
-    //    if (string.IsNullOrEmpty(SheetNumber))
-    //    {
-    //        return prefixAndDesignation;
-    //    }
-
-    //    // Иначе форматированный текст для многострочного текста
-    //    if (isForTopText)
-    //    {
-    //        // Если номер указан, но высоты текста одинаковые, то обычный текст с номером
-    //        return isSameTextHeight ? allWithSameHeight : allWithDifferentHeight;
-    //    }
-
-    //    return prefixAndDesignation;
-    //}
 }

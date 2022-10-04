@@ -134,6 +134,51 @@ public static class EntityUtils
     }
 
     /// <summary>
+    /// Возвращает маскировку, созданную по контуру полилини
+    /// </summary>
+    /// <param name="polyline">Экземпляр <see cref="Polyline"/></param>
+    public static Wipeout GetBackgroundMask(this Polyline polyline)
+    {
+        if (polyline == null && !polyline.Closed)
+            return null;
+
+        try
+        {
+            
+            var vertexCollection = new Point2dCollection();
+
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+                var vertex = new Point2d(polyline.GetPoint2dAt(i).X, polyline.GetPoint2dAt(i).Y);
+                AcadUtils.WriteMessageInDebug($"vertex {vertex} \n");
+                vertexCollection.Add(vertex);
+            }
+
+            var bottomLeftPoint = new Point2d(polyline.GetPoint2dAt(0).X, polyline.GetPoint2dAt(0).Y);
+            var topLeftPoint = new Point2d(polyline.GetPoint2dAt(1).X, polyline.GetPoint2dAt(1).Y);
+            var topRightPoint = new Point2d(polyline.GetPoint2dAt(2).X, polyline.GetPoint2dAt(2).Y);
+            var bottomRightPoint = new Point2d(polyline.GetPoint2dAt(3).X, polyline.GetPoint2dAt(3).Y);
+            var wipeout = new Wipeout();
+            //wipeout.SetFrom(vertexCollection, Vector3d.ZAxis);
+            wipeout.SetFrom(
+                new Point2dCollection
+                {
+                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
+                }, Vector3d.ZAxis);
+            return wipeout;
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+        {
+            if (ex.Message == "eNullExtents")
+            {
+                return null;
+            }
+                
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Возвращает маскировку, созданную по контуру с указанным отступом
     /// </summary>
     /// <param name="extents3d">Крайние границы</param>
@@ -167,7 +212,7 @@ public static class EntityUtils
             throw;
         }
     }
-        
+
     /// <summary>
     /// Возвращает номер узла в зависимости от номера узла последнего созданного объекта
     /// </summary>
