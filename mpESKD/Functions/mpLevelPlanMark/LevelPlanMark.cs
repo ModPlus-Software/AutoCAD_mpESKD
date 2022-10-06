@@ -208,23 +208,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private void CreateEntities(Point3d insertionPoint, double scale)
     {
-        // text
-        var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-        var textHeight = TextHeight * scale;
-
-        _dbText = new DBText()
-        {
-            Position = insertionPoint,
-            TextStyleId = textStyleId,
-            TextString = DisplayedValue,
-            Height = textHeight,
-            Justify = AttachmentPoint.MiddleCenter,
-            AlignmentPoint = insertionPoint
-        };
-
-        //_dbText.SetProperties(TextStyle, textHeight);
-        //_dbText.Justify = AttachmentPoint.MiddleAlign;
-        //_dbText.AlignmentPoint = insertionPoint;
+        _dbText = new DBText { TextString = DisplayedValue, Position = insertionPoint };
+        _dbText.SetProperties(TextStyle, TextHeight);
+        _dbText.Position = _dbText.Position - (Vector3d.XAxis * (_dbText.GetLength() / 2)) - (Vector3d.YAxis * (_dbText.GetHeight() / 2));
 
         // TODO
 
@@ -255,9 +241,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             if (HideTextBackground)
             {
                 AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
-                _dbText.Position = _dbText.Position -
-                                   (Vector3d.XAxis * (_dbText.GetLength() / 2)) -
-                                   (Vector3d.YAxis * (_dbText.GetHeight() / 2));
+                
                 _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
             }
         }
@@ -265,7 +249,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             if (FrameType == FrameType.Line)
             {
-
                 _framePolyline = new Polyline(points.Length - 2);
                 for (var i = 0; i < points.Length - 2; i++)
                 {
@@ -274,9 +257,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
                 if (HideTextBackground)
                 {
-                    //_dbText.Position = _dbText.Position -
-                    //                   (Vector3d.XAxis * (_dbText.GetLength() / 2)) -
-                    //                   (Vector3d.YAxis * (_dbText.GetHeight() / 2));
                     AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
                     _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
                 }
