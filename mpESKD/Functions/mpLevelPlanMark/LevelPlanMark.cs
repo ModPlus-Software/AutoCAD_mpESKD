@@ -56,25 +56,32 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public override string TextStyle { get; set; }
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => 9.3106601717789772;
+    public override double MinDistanceBetweenPoints => 1;
 
     /// <summary>
     /// Высота текста
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
     [SaveToXData]
-    public double MainTextHeight { get; set; } = 3.5;
+    public double TextHeight { get; set; } = 3.5;
+
+    /// <summary>
+    /// Тип рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p82", FrameType.Rectangular)]
+    [SaveToXData]
+    public FrameType FrameType { get; set; } = FrameType.Rectangular;
 
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
-    [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
     [SaveToXData]
     public bool HideTextBackground { get; set; }
 
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 5, "p86", 0.5, 0.0, 5.0)]
+    [PropertyVisibilityDependency(new[] { nameof(FrameType.None) }, new[] { nameof(FrameType.Rectangular) })]
     [SaveToXData]
-    public double TextMaskOffset { get; set; } = 0.5;
+    public double TextMaskOffset { get; set; }
 
     /// <summary>
     /// Обозначение плана
@@ -110,32 +117,33 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public int Accuracy { get; set; } = 3;
 
     /// <summary>
-    /// Длина рамки
-    /// </summary> //TODO localization
-    [EntityProperty(PropertiesCategory.Content, 11, "p67", 9, 1, 10, descLocalKey: "d67")]
+    /// Ширина рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 11, "p77", 9, 1, 10, descLocalKey: "d67")]
     [SaveToXData]
-    public double BorderLength { get; set; }
+    public double BorderWidth { get; set; }
 
     /// <summary>
     /// Высота рамки
-    /// </summary> //TODO localization
-    [EntityProperty(PropertiesCategory.Content, 12, "p67", 3, 0, 10, descLocalKey: "d67")]
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 12, "p76", 3, 0, 10, descLocalKey: "d67")]
     [SaveToXData]
     public double BorderHeight { get; set; }
 
     /// <summary>
-    /// Префикс обозначения
+    /// Префикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 13, "p52", "", propertyScope: PropertyScope.Palette, stringMaxLength:10)]
+    [EntityProperty(PropertiesCategory.Content, 13, "p110", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
     public string DesignationPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Суффикс обозначения
+    /// Суффикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 14, "p52", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength:10)]
+    [EntityProperty(PropertiesCategory.Content, 14, "p111", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
     public string DesignationSuffix { get; set; } = string.Empty;
@@ -147,7 +155,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public string DisplayedValue
     {
         get
-        { 
+        {
             var prefix = string.IsNullOrEmpty(DesignationPrefix) ? string.Empty : DesignationPrefix;
             var suffix = string.IsNullOrEmpty(DesignationSuffix) ? string.Empty : DesignationSuffix;
             var asterisk = AddAsterisk ? "*" : string.Empty;
@@ -202,7 +210,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     {
         // text
         var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-        var textHeight = MainTextHeight * scale;
+        var textHeight = TextHeight * scale;
 
         _dbText = new DBText()
         {
@@ -214,11 +222,15 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             AlignmentPoint = insertionPoint
         };
 
-  
+        //_dbText.SetProperties(TextStyle, textHeight);
+        //_dbText.Justify = AttachmentPoint.MiddleAlign;
+        //_dbText.AlignmentPoint = insertionPoint;
 
-        if (BorderLength == 0)
+        // TODO
+
+        if (BorderWidth == 0)
         {
-            BorderLength = MinDistanceBetweenPoints * scale;
+            BorderWidth = MinDistanceBetweenPoints * scale;
         }
 
         if (BorderHeight == 0)
@@ -226,33 +238,65 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             BorderHeight = MinDistanceBetweenPoints * scale;
         }
 
-        AcadUtils.WriteMessageInDebug($" length {BorderLength}, height {BorderHeight} \n");
-        AcadUtils.WriteMessageInDebug($" _dbText.MaxPoint.X {_dbText.GeometricExtents.MaxPoint.X}  - _dbText.MinPointX {_dbText.GeometricExtents.MinPoint.X} = {_dbText.GeometricExtents.MaxPoint.X - _dbText.GeometricExtents.MinPoint.X}\n");
+        var borderHalfLength = BorderWidth / 2 * scale;
+        var borderHalfHeight = BorderHeight / 2 * scale;
 
         var points = new[]
         {
-                new Point2d(insertionPoint.X - BorderLength, insertionPoint.Y - BorderHeight),
-                new Point2d(insertionPoint.X - BorderLength, insertionPoint.Y + BorderHeight),
-                new Point2d(insertionPoint.X + BorderLength, insertionPoint.Y + BorderHeight),
-                new Point2d(insertionPoint.X + BorderLength, insertionPoint.Y - BorderHeight)
+            new Point2d(insertionPoint.X - borderHalfLength, insertionPoint.Y - borderHalfHeight),
+            new Point2d(insertionPoint.X + borderHalfLength, insertionPoint.Y - borderHalfHeight),
+            new Point2d(insertionPoint.X + borderHalfLength, insertionPoint.Y + borderHalfHeight),
+            new Point2d(insertionPoint.X - borderHalfLength, insertionPoint.Y + borderHalfHeight)
+
         };
 
-        _framePolyline = new Polyline(points.Length);
-
-        for (var i = 0; i < points.Length; i++)
+        if (FrameType == FrameType.None)
         {
-            _framePolyline.AddVertexAt(i, points[i], 0, 0.0, 0.0);
-            AcadUtils.WriteMessageInDebug($"points[i] {points[i]} \n");
+            if (HideTextBackground)
+            {
+                AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
+                _dbText.Position = _dbText.Position -
+                                   (Vector3d.XAxis * (_dbText.GetLength() / 2)) -
+                                   (Vector3d.YAxis * (_dbText.GetHeight() / 2));
+                _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
+            }
         }
-
-        _framePolyline.Closed = true;
-
-        if (HideTextBackground)
+        else
         {
-            _dbTextMask = _framePolyline.GetBackgroundMask();
-        }
+            if (FrameType == FrameType.Line)
+            {
 
-        AcadUtils.WriteMessageInDebug($" _dbText.Position {_dbText.Position} \n");
+                _framePolyline = new Polyline(points.Length - 2);
+                for (var i = 0; i < points.Length - 2; i++)
+                {
+                    _framePolyline.AddVertexAt(i, points[i], 0, 0.0, 0.0);
+                }
+
+                if (HideTextBackground)
+                {
+                    //_dbText.Position = _dbText.Position -
+                    //                   (Vector3d.XAxis * (_dbText.GetLength() / 2)) -
+                    //                   (Vector3d.YAxis * (_dbText.GetHeight() / 2));
+                    AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
+                    _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
+                }
+            }
+            else
+            {
+                _framePolyline = new Polyline(points.Length);
+                for (var i = 0; i < points.Length; i++)
+                {
+                    _framePolyline.AddVertexAt(i, points[i], 0, 0.0, 0.0);
+                }
+
+                _framePolyline.Closed = true;
+
+                if (HideTextBackground)
+                {
+                    _dbTextMask = _framePolyline.GetBackgroundMask();
+                }
+            }
+        }
     }
 
     private string ReplaceSeparator(string numericValue)
@@ -260,6 +304,4 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
     }
-
-
 }

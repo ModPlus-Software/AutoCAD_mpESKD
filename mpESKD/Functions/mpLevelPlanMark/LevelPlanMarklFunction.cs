@@ -12,7 +12,6 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpLevelMark;
 
 /// <inheritdoc />
 public class LevelPlanMarkFunction : ISmartEntityFunction
@@ -20,7 +19,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
     /// <inheritdoc />
     public void Initialize()
     {
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LevelMarkGripPointOverrule(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new LevelPlanMarkGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<LevelPlanMark>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<LevelPlanMark>(), true);
     }
@@ -45,7 +44,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
             var blockReference = MainFunction.CreateBlock(levelPlanMark);
 
             levelPlanMark.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
-            InsertLabelWithJig(levelPlanMark, blockReference);
+            InsertLevelPlanMarkWithJig(levelPlanMark, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -61,7 +60,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
     /// Команда создания обозначения уровня
     /// </summary>
     [CommandMethod("ModPlus", "mpLevelPlanMark", CommandFlags.Modal)]
-    public void CreateViewLabelCommand()
+    public void CreateLevelPlanMarkCommand()
     {
         CreateLevelPlanMark();
     }
@@ -86,7 +85,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
 
             var blockReference = MainFunction.CreateBlock(levelPlanMark);
             levelPlanMark.ApplyStyle(style, true);
-            InsertLabelWithJig(levelPlanMark, blockReference);
+            InsertLevelPlanMarkWithJig(levelPlanMark, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -98,7 +97,7 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
         }
     }
 
-    private static void InsertLabelWithJig(LevelPlanMark levelPlanMark, BlockReference blockReference)
+    private static void InsertLevelPlanMarkWithJig(LevelPlanMark levelPlanMark, BlockReference blockReference)
     {
         var nextPointPrompt = Language.GetItem("msg5");
         var entityJig = new DefaultEntityJig(
