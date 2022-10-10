@@ -47,16 +47,23 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                         GripPoint = levelPlanMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
+                    // получаем ручку типа рамки
+                    grips.Add(new LevelPlanMarkTypeGrip(levelPlanMark)
+                    {
+                        GripPoint = new Point3d(
+                            (levelPlanMark.InsertionPoint.X - levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
+                            (levelPlanMark.InsertionPoint.Y + levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
+                            levelPlanMark.InsertionPoint.Z)
+                    });
 
                     // получаем ручку типа рамки
                     grips.Add(new LevelPlanMarkTypeGrip(levelPlanMark)
                     {
-
                         GripPoint = new Point3d(
                             (levelPlanMark.InsertionPoint.X + levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
                             (levelPlanMark.InsertionPoint.Y - levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
                             levelPlanMark.InsertionPoint.Z)
-                    });//insertionPoint.X + borderHalfLength, insertionPoint.Y - borderHalfHeight
+                    });
                 }
             }
         }
