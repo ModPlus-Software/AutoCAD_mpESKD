@@ -57,7 +57,7 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
-            // По этим данным я потом получаю экземпляр класса section
+            // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

@@ -47,8 +47,9 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                         GripPoint = levelPlanMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
-                    // получаем ручку типа рамки
-                    grips.Add(new LevelPlanMarkTypeGrip(levelPlanMark)
+
+                    // получаем ручку для создания выноскти
+                    grips.Add(new LevelPlanMarkAddLeaderGrip(levelPlanMark)
                     {
                         GripPoint = new Point3d(
                             (levelPlanMark.InsertionPoint.X - levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
@@ -84,19 +85,29 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
             {
                 foreach (var gripData in grips)
                 {
-                    if (!(gripData is LevelPlanMarkVertexGrip vertexGrip))
-                        continue;
-                    var levelPlanMark = vertexGrip.LevelPlanMark;
-
-                    if (vertexGrip.GripIndex == 0)
+                    if (gripData is LevelPlanMarkVertexGrip vertexGrip)
                     {
-                        ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                        levelPlanMark.InsertionPoint = vertexGrip.GripPoint + offset;
-                    }
+                        var levelPlanMark = vertexGrip.LevelPlanMark;
 
-                    // Вот тут происходит перерисовка примитивов внутри блока
-                    levelPlanMark.UpdateEntities();
-                    levelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+                        if (vertexGrip.GripIndex == 0)
+                        {
+                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
+                            levelPlanMark.InsertionPoint = vertexGrip.GripPoint + offset;
+                        }
+
+                        
+                        // Вот тут происходит перерисовка примитивов внутри блока
+                        levelPlanMark.UpdateEntities();
+                        levelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+                    }
+                    else if (gripData is LevelPlanMarkAddLeaderGrip addLeaderGrip)
+                    {
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                    }
+                    else
+                    {
+                        base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                    }
                 }
             }
             else

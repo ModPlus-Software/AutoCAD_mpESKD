@@ -131,9 +131,16 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public double BorderHeight { get; set; }
 
     /// <summary>
+    /// Размер стрелки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 13, "p76", 5, 0, 100, descLocalKey: "d67")]
+    [SaveToXData]
+    public double ArrowSize { get; set; } = 5;
+
+    /// <summary>
     /// Префикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 13, "p110", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 14, "p110", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
@@ -142,7 +149,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Суффикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 14, "p111", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 15, "p111", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
@@ -175,6 +182,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                 _dbText,
                 _framePolyline
             };
+            if (_leaderLines?.Count > 0)
+            {
+                entities.AddRange(_leaderLines);
+            }
+
 
             foreach (var e in entities)
             {
@@ -183,6 +195,32 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
             return entities;
         }
+    }
+
+    /// <summary>
+    /// Точки мтекста
+    /// </summary>
+    private List<Point3d> _leaderPoints = new();
+
+    [SaveToXData]
+    public List<Point3d> LeaderPoints { get; set; } = new List<Point3d>();
+
+    /// <summary>
+    /// Составные линии
+    /// </summary>
+    private List<Line> _leaderTypes = new();
+
+    private List<Line> _leaderLines = new();
+
+    private List<Point3d> LeaderPointsOCS
+    {
+        get
+        {
+            var points = new List<Point3d>();
+            LeaderPoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
+            return points;
+        }
+
     }
 
     /// <inheritdoc />
@@ -241,7 +279,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             if (HideTextBackground)
             {
                 AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
-                
+
                 _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
             }
         }
@@ -277,11 +315,30 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                 }
             }
         }
+
+        _leaderLines.AddRange(CreateLeaders(LeaderPointsOCS));
+    }
+
+    private IEnumerable<Line> CreateLeaders(List<Point3d> points)
+    {
+        var lines = new List<Line>();
+        foreach (Point3d point in points)
+        {
+            var line = new Line(InsertionPoint, point);
+            lines.Add(line);
+        }
+
+        return lines;
     }
 
     private string ReplaceSeparator(string numericValue)
     {
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
+    }
+
+    private void CreateHalfArrow(Line line, Point3d point3d)
+    {
+        Polyline()
     }
 }
