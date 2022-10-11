@@ -339,6 +339,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private void CreateHalfArrow(Line line, Point3d point3d)
     {
-        Polyline()
+        var vector = (line.EndPoint - line.StartPoint).GetNormal();
+        vector.GetAngleTo()
+        var pline = new Polyline(2);
     }
 }

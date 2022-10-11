@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Base.Enums;
+﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
 /// <summary>
 /// Тип концов выносок
