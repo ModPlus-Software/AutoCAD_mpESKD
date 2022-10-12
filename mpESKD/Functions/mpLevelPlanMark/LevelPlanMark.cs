@@ -186,7 +186,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             {
                 entities.AddRange(_leaderLines);
             }
-
+            entities.AddRange(_leaderEndLines);
 
             foreach (var e in entities)
             {
@@ -211,6 +211,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     private List<Line> _leaderTypes = new();
 
     private List<Line> _leaderLines = new();
+    private List<Polyline> _leaderEndLines = new();
 
     private List<Point3d> LeaderPointsOCS
     {
@@ -317,6 +318,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
 
         _leaderLines.AddRange(CreateLeaders(LeaderPointsOCS));
+        foreach (var line in _leaderLines)
+        {
+            _leaderEndLines.Add(CreateResection(line));
+        }
     }
 
     private IEnumerable<Line> CreateLeaders(List<Point3d> points)
@@ -337,10 +342,19 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    private void CreateHalfArrow(Line line, Point3d point3d)
+    private Polyline CreateResection(Line line)
     {
-        var vector = (line.EndPoint - line.StartPoint).GetNormal();
-        vector.GetAngleTo()
+        var vector = new Vector3d(0, 0, 1);
+        var tmpPoint = line.GetPointAtDist(line.Length - 1.5);
+        var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, line.EndPoint);
+        var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, line.EndPoint);
+
         var pline = new Polyline(2);
+
+        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0.3, 0.3);
+        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0.3, 0.3);
+
+        return pline;
+
     }
 }

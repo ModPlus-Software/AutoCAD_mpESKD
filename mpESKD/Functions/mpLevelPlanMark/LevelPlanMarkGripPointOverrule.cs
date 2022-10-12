@@ -32,6 +32,7 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                         break;
                     }
                 }
+
                 if (toRemove != null)
                 {
                     grips.Remove(toRemove);
@@ -40,7 +41,6 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                 var levelPlanMark = EntityReaderService.Instance.GetFromEntity<LevelPlanMark>(entity);
                 if (levelPlanMark != null)
                 {
-                    
                     // insertion (start) grip
                     var vertexGrip = new LevelPlanMarkVertexGrip(levelPlanMark, 0)
                     {
@@ -65,6 +65,26 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                             (levelPlanMark.InsertionPoint.Y - levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
                             levelPlanMark.InsertionPoint.Z)
                     });
+
+                    for (var i = 0; i < levelPlanMark.LeaderPoints.Count; i++)
+                    {
+                        grips.Add(new LevelPlanMarkLeaderMoveGrip(levelPlanMark, i)
+                        {
+                            GripPoint = levelPlanMark.LeaderPoints[i]
+                        });
+                        var deleteGripPoint = new Point3d(levelPlanMark.LeaderPoints[i].X + 1,
+                            levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
+                        var leaderEndTypeGripPoint = new Point3d(levelPlanMark.LeaderPoints[i].X - 1,
+                            levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
+                        grips.Add(new LevelPlanMarkLeaderRemoveGrip(levelPlanMark, i)
+                        {
+                            GripPoint = deleteGripPoint
+                        });
+                        grips.Add(new LevelPlanMarkLeaderEndTypeGrip(levelPlanMark, i)
+                        {
+                            GripPoint = leaderEndTypeGripPoint
+                        });
+                    }
                 }
             }
         }
@@ -95,7 +115,6 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                             levelPlanMark.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
-                        
                         // Вот тут происходит перерисовка примитивов внутри блока
                         levelPlanMark.UpdateEntities();
                         levelPlanMark.BlockRecord.UpdateAnonymousBlocks();

@@ -12,7 +12,7 @@ using ModPlusAPI.Windows;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class LevelPlanMarkVertexGrip : SmartEntityGripData
+public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
 {
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
@@ -33,16 +33,51 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
     private Point3d _gripTmp;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
+    /// Initializes a new instance of the <see cref="LevelPlanMarkLeaderRemoveGrip"/> class.
     /// </summary>
     /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkVertexGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    public LevelPlanMarkLeaderRemoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
     {
         LevelPlanMark = levelPlanMark;
         GripIndex = gripIndex;
-        GripType = GripType.Point;
+        GripType = GripType.Minus;
     }
+
+    public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
+    {
+        using (LevelPlanMark)
+        {
+            Point3d? newInsertionPoint = null;
+
+            
+
+ 
+                LevelPlanMark.LeaderPoints.RemoveAt(GripIndex);
+ 
+
+            LevelPlanMark.UpdateEntities();
+            LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                if (newInsertionPoint.HasValue)
+                {
+                    ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                }
+
+                using (var resBuf = LevelPlanMark.GetDataForXData())
+                {
+                    blkRef.XData = resBuf;
+                }
+
+                tr.Commit();
+            }
+        }
+
+        return ReturnValue.GetNewGripPoints;
+    }
+
 
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -60,7 +95,6 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                AcadUtils.WriteMessageInDebug($"id грипа {GripIndex}");
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);

@@ -12,7 +12,7 @@ using ModPlusAPI.Windows;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class LevelPlanMarkVertexGrip : SmartEntityGripData
+public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 {
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
@@ -37,11 +37,11 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
     /// </summary>
     /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkVertexGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    public LevelPlanMarkLeaderEndTypeGrip(LevelPlanMark levelPlanMark, int gripIndex)
     {
         LevelPlanMark = levelPlanMark;
         GripIndex = gripIndex;
-        GripType = GripType.Point;
+        GripType = GripType.List;
     }
 
     /// <inheritdoc />
@@ -60,7 +60,6 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                AcadUtils.WriteMessageInDebug($"id грипа {GripIndex}");
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
