@@ -12,15 +12,15 @@ using Base.Overrules.Grips;
 /// <summary>
 /// Ручка выбора типа рамки, меняющая тип рамки
 /// </summary>
-public class LevelPlanMarkTypeGrip : SmartEntityGripData
+public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkTypeGrip"/> class.
+    /// Initializes a new instance of the <see cref="LevelPlanMarkFrameTypeGrip"/> class.
     /// </summary>
     /// <param name="levelPlanMark">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public LevelPlanMarkTypeGrip(LevelPlanMark levelPlanMark)
+    public LevelPlanMarkFrameTypeGrip(LevelPlanMark levelPlanMark)
     {
         LevelPlanMark = levelPlanMark;
         GripType = GripType.List;

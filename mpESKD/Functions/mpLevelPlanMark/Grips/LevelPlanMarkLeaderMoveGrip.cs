@@ -20,6 +20,11 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
     public LevelPlanMark LevelPlanMark { get; }
 
     /// <summary>
+    /// Новое значение точки вершины
+    /// </summary>
+    public Point3d NewPoint { get; set; }
+
+    /// <summary>
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
@@ -44,54 +49,123 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         GripType = GripType.Point;
     }
 
+    ///// <inheritdoc />
+    //public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
+    //{
+    //    try
+    //    {
+    //        // При начале перемещения запоминаем первоначальное положение ручки
+    //        // Запоминаем начальные значения
+    //        if (newStatus == Status.GripStart)
+    //        {
+    //            _gripTmp = GripPoint;
+    //        }
+
+    //        // При удачном перемещении ручки записываем новые значения в расширенные данные
+    //        // По этим данным я потом получаю экземпляр класса
+    //        if (newStatus == Status.GripEnd)
+    //        {
+    //            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+    //            {
+    //                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+    //                using (var resBuf = LevelPlanMark.GetDataForXData())
+    //                {
+    //                    blkRef.XData = resBuf;
+    //                }
+
+    //                tr.Commit();
+    //            }
+
+    //            LevelPlanMark.Dispose();
+    //        }
+
+    //        // При отмене перемещения возвращаем временные значения
+    //        if (newStatus == Status.GripAbort)
+    //        {
+    //            if (_gripTmp != null)
+    //            {
+    //                if (GripIndex == 0)
+    //                {
+    //                    LevelPlanMark.InsertionPoint = _gripTmp;
+    //                }
+    //            }
+    //        }
+
+    //        base.OnGripStatusChanged(entityId, newStatus);
+    //    }
+    //    catch (Exception exception)
+    //    {
+    //        if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+    //            ExceptionBox.Show(exception);
+    //    }
+    //}
+
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-        try
+        if (newStatus == Status.GripStart)
         {
-            // При начале перемещения запоминаем первоначальное положение ручки
-            // Запоминаем начальные значения
-            if (newStatus == Status.GripStart)
-            {
-                _gripTmp = GripPoint;
-            }
+            AcadUtils.Editor.TurnForcedPickOn();
+            AcadUtils.WriteMessageInDebug($"plus {Status.GripStart} - {LevelPlanMark.InsertionPointOCS}");
+            //AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
+            
+        }
 
-            // При удачном перемещении ручки записываем новые значения в расширенные данные
-            // По этим данным я потом получаю экземпляр класса
-            if (newStatus == Status.GripEnd)
+        var leaderPointsCount = LevelPlanMark.LeaderPoints.Count;
+        if (newStatus == Status.GripEnd)
+        {
+            int i= 0;
+            AcadUtils.Editor.TurnForcedPickOff();
+            AcadUtils.WriteMessageInDebug($"plus {Status.GripEnd} - {LevelPlanMark.InsertionPoint}" );
+            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            using (LevelPlanMark)
             {
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+
+                //if (leaderPointsCount == 0)
+                //{
+                //    leaderPointsCount = -1;
+                //}
+
+                Point3d? newInsertionPoint = new Point3d(5,5,0);
+
+                LevelPlanMark.LeaderPoints[GripIndex-1] = NewPoint;
+                
+                foreach (var leaderPoint in LevelPlanMark.LeaderPoints)
                 {
-                    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = LevelPlanMark.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
+                    AcadUtils.WriteMessageInDebug($"leaderpoints {i}-{leaderPoint} ");
+                    i++;
                 }
 
-                LevelPlanMark.Dispose();
-            }
+                //AcadUtils.WriteMessageInDebug($"{}");
 
-            // При отмене перемещения возвращаем временные значения
-            if (newStatus == Status.GripAbort)
-            {
-                if (_gripTmp != null)
-                {
-                    if (GripIndex == 0)
-                    {
-                        LevelPlanMark.InsertionPoint = _gripTmp;
-                    }
-                }
-            }
+                LevelPlanMark.UpdateEntities();
+                LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+                //using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                //{
+                //    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                //    if (newInsertionPoint.HasValue)
+                //    {
+                //        ((BlockReference)blkRef).Position = newInsertionPoint.Value;
+                //    }
 
-            base.OnGripStatusChanged(entityId, newStatus);
+                //    using (var resBuf = LevelPlanMark.GetDataForXData())
+                //    {
+                //        blkRef.XData = resBuf;
+                //    }
+
+                //    tr.Commit();
+                //}
+            }
         }
-        catch (Exception exception)
+
+        if (newStatus == Status.GripAbort)
         {
-            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-                ExceptionBox.Show(exception);
+            AcadUtils.Editor.TurnForcedPickOff();
+            AcadUtils.WriteMessageInDebug($"plus {Status.GripAbort}");
+            
+            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
         }
+
+        base.OnGripStatusChanged(entityId, newStatus);
     }
 }

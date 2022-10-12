@@ -1,19 +1,20 @@
 ﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
-using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using ModPlusAPI.Windows;
+using System.Windows;
+using System.Windows.Controls;
+using Base.Enums;
+using Base.Overrules.Grips;
 
 /// <summary>
 /// Ручка вершин
 /// </summary>
 public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 {
+    private ContextMenuHost _win;
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
@@ -26,11 +27,8 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp2"); // move
+        return Language.GetItem("gp2"); // TODO type
     }
-
-    // Временное значение ручки
-    private Point3d _gripTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
@@ -45,53 +43,94 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     }
 
     /// <inheritdoc />
-    public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
+    public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
-        try
+        using (LevelPlanMark)
         {
-            // При начале перемещения запоминаем первоначальное положение ручки
-            // Запоминаем начальные значения
-            if (newStatus == Status.GripStart)
-            {
-                _gripTmp = GripPoint;
-            }
+            _win = new ContextMenuHost();
 
-            // При удачном перемещении ручки записываем новые значения в расширенные данные
-            // По этим данным я потом получаю экземпляр класса
-            if (newStatus == Status.GripEnd)
+            ContextMenu cm;
+
+            _win.Loaded += (_, _) =>
             {
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                cm = (ContextMenu)_win.FindResource("Cm");
+                //TODO
+                var menuItem = new MenuItem
                 {
-                    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = LevelPlanMark.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
+                    Name = "Rectangular",
+                    IsCheckable = true,
+                    Header = Language.GetItem("ft2"), // Прямоугольная 
+                    IsChecked = LevelPlanMark.FrameType == FrameType.Rectangular
+                };
+                menuItem.Click += MenuItemOnClick;
+                cm.Items.Add(menuItem);
 
-                    tr.Commit();
-                }
-
-                LevelPlanMark.Dispose();
-            }
-
-            // При отмене перемещения возвращаем временные значения
-            if (newStatus == Status.GripAbort)
-            {
-                if (_gripTmp != null)
+                menuItem = new MenuItem
                 {
-                    if (GripIndex == 0)
-                    {
-                        LevelPlanMark.InsertionPoint = _gripTmp;
-                    }
-                }
-            }
+                    Name = "Line",
+                    IsCheckable = true,
+                    Header = Language.GetItem("ft3"), // Линия
+                    IsChecked = LevelPlanMark.FrameType == FrameType.Line
+                };
+                menuItem.Click += MenuItemOnClick;
+                cm.Items.Add(menuItem);
 
-            base.OnGripStatusChanged(entityId, newStatus);
+                menuItem = new MenuItem
+                {
+                    Name = "None",
+                    IsCheckable = true,
+                    Header = Language.GetItem("ft4"), // Без рамки
+                    IsChecked = LevelPlanMark.FrameType == FrameType.None
+                };
+                menuItem.Click += MenuItemOnClick;
+                cm.Items.Add(menuItem);
+
+
+                cm.MouseMove += (_, _) => _win.Close();
+                cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
+
+                cm.IsOpen = true;
+            };
+            _win.Show();
         }
-        catch (Exception exception)
+
+        return ReturnValue.GetNewGripPoints;
+    }
+
+    private void MenuItemOnClick(object sender, RoutedEventArgs e)
+    {
+        _win?.Close();
+
+        var menuItem = (MenuItem)sender;
+
+        switch (menuItem.Name)
         {
-            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-                ExceptionBox.Show(exception);
+            case "Rectangular":
+                LevelPlanMark.FrameType = FrameType.Rectangular;
+                break;
+            case "Line":
+                LevelPlanMark.FrameType = FrameType.Line;
+                break;
+            case "None":
+                LevelPlanMark.FrameType = FrameType.None;
+                break;
+        }
+
+        LevelPlanMark.UpdateEntities();
+        LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+        using (AcadUtils.Document.LockDocument())
+        {
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+
+                using (var resBuf = LevelPlanMark.GetDataForXData())
+                {
+                    blkRef.XData = resBuf;
+                }
+
+                tr.Commit();
+            }
         }
     }
 }

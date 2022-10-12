@@ -80,13 +80,9 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
             //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
             using (LevelPlanMark)
             {
+                //TODO 
                 Point3d? newInsertionPoint = new Point3d(5,5,0);
                 
-                //if (leaderPointsCount == 0)
-                //{
-                //    leaderPointsCount = -1;
-                //}
-
                 LevelPlanMark.LeaderPoints.Insert(leaderPointsCount, NewPoint);
                 
                 foreach (var leaderPoint in LevelPlanMark.LeaderPoints)

@@ -320,7 +320,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         _leaderLines.AddRange(CreateLeaders(LeaderPointsOCS));
         foreach (var line in _leaderLines)
         {
-            _leaderEndLines.Add(CreateResection(line));
+            _leaderEndLines.Add(CreateHalfArrow(line));
         }
     }
 
@@ -342,7 +342,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    private Polyline CreateResection(Line line)
+    private Polyline CreateResectionArrow(Line line)
     {
         var vector = new Vector3d(0, 0, 1);
         var tmpPoint = line.GetPointAtDist(line.Length - 1.5);
@@ -355,6 +355,40 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0.3, 0.3);
 
         return pline;
+    }
 
+    private Polyline CreateAngleArrow(Line line)
+    {
+        var vector = new Vector3d(0, 0, 1);
+        var tmpPoint = line.GetPointAtDist(line.Length - 2);
+        var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, line.EndPoint);
+        var endPoint = tmpPoint.RotateBy(-45.DegreeToRadian(), vector, line.EndPoint);
+
+        var pline = new Polyline(3);
+
+        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
+        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(line.EndPoint), 0, 0, 0);
+        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
+
+        return pline;
+    }
+
+    private Polyline CreateHalfArrow(Line line)
+    {
+        var vector = new Vector3d(0, 0, 1);
+        var startPoint = line.GetPointAtDist(line.Length - 3);
+        
+        var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, line.EndPoint);
+        
+
+        var pline = new Polyline(3);
+
+        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
+        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(line.EndPoint), 0, 0, 0);
+        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
+        pline.Closed = true;
+        Hatch hatch = new Hatch();
+        //TODO 
+        return pline;
     }
 }
