@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark;
+﻿using mpESKD.Functions.mpLevelPlanMark.Grips;
+
+namespace mpESKD.Functions.mpLevelPlanMark;
 
 using System;
 using System.Collections.Generic;
@@ -156,6 +158,13 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public string DesignationSuffix { get; set; } = string.Empty;
 
     /// <summary>
+    /// Тип линии обрыва: линейный, криволинейный, цилиндрический
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p1", LeaderEndType.Resection, descLocalKey: "d1")] //TODO localization
+    [SaveToXData]
+    public LeaderEndType LeaderEndType { get; set; } = LeaderEndType.Resection;
+
+    /// <summary>
     /// Отображаемое значение
     /// </summary>
     [ValueToSearchBy]
@@ -186,7 +195,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             {
                 entities.AddRange(_leaderLines);
             }
+
             entities.AddRange(_leaderEndLines);
+            entities.AddRange(_hatches);
 
             foreach (var e in entities)
             {
@@ -212,6 +223,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private List<Line> _leaderLines = new();
     private List<Polyline> _leaderEndLines = new();
+    private List<Hatch> _hatches = new();
 
     private List<Point3d> LeaderPointsOCS
     {
@@ -317,23 +329,23 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             }
         }
 
-        _leaderLines.AddRange(CreateLeaders(LeaderPointsOCS));
-        foreach (var line in _leaderLines)
+        //_leaderLines.AddRange(CreateLeaders(LeaderPointsOCS));
+
+        for (int i = 0; i < LeaderPointsOCS.Count; i++)
         {
-            _leaderEndLines.Add(CreateHalfArrow(line));
+            _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i]));
+            var pline = CreateHalfArrow(_leaderLines[i]);
+            _leaderEndLines.Add(pline);
+            _hatches.Add(CreateArrowHatch(pline));
         }
+
     }
 
-    private IEnumerable<Line> CreateLeaders(List<Point3d> points)
+    private Line CreateLeaders(Point3d point)
     {
-        var lines = new List<Line>();
-        foreach (Point3d point in points)
-        {
-            var line = new Line(InsertionPoint, point);
-            lines.Add(line);
-        }
+        var line = new Line(InsertionPoint, point);
 
-        return lines;
+        return line;
     }
 
     private string ReplaceSeparator(string numericValue)
@@ -377,9 +389,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     {
         var vector = new Vector3d(0, 0, 1);
         var startPoint = line.GetPointAtDist(line.Length - 3);
-        
+
         var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, line.EndPoint);
-        
 
         var pline = new Polyline(3);
 
@@ -387,8 +398,29 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(line.EndPoint), 0, 0, 0);
         pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
         pline.Closed = true;
-        Hatch hatch = new Hatch();
+
         //TODO 
         return pline;
+    }
+
+    private Hatch CreateArrowHatch(Polyline pline)
+    {
+        Point2dCollection vertexCollection = new Point2dCollection();
+        for (int index = 0; index < pline.NumberOfVertices; ++index)
+        {
+            vertexCollection.Add(pline.GetPoint2dAt(index));
+        }
+
+        vertexCollection.Add(pline.GetPoint2dAt(0));
+        DoubleCollection bulgeCollection = new DoubleCollection()
+        {
+            0.0, 0.0, 0.0
+        };
+
+        Hatch hatch = new Hatch();
+        hatch.SetHatchPattern((HatchPatternType)1, "SOLID");
+        hatch.AppendLoop((HatchLoopTypes)0, vertexCollection, bulgeCollection);
+
+        return hatch;
     }
 }

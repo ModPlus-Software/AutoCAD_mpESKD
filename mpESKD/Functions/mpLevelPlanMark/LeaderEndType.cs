@@ -3,9 +3,9 @@
 /// <summary>
 /// Тип концов выносок
 /// </summary>
-internal enum LeaderType
+public enum LeaderEndType
 {
-    HalfArrow,
+    HalfArrow = 1,
     Point,
     Resection,
     Angle,

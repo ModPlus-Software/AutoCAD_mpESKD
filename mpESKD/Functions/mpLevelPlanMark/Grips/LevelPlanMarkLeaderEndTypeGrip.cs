@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿using System;
+using System.Linq;
+
+namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Overrules;
@@ -19,6 +22,8 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
+
+    private LeaderEndType leaderType;
 
     /// <summary>
     /// Индекс ручки
@@ -55,36 +60,23 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
             {
                 cm = (ContextMenu)_win.FindResource("Cm");
                 //TODO
-                var menuItem = new MenuItem
-                {
-                    Name = "Rectangular",
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft2"), // Прямоугольная 
-                    IsChecked = LevelPlanMark.FrameType == FrameType.Rectangular
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                MenuItem menuItem;
 
-                menuItem = new MenuItem
-                {
-                    Name = "Line",
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft3"), // Линия
-                    IsChecked = LevelPlanMark.FrameType == FrameType.Line
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                var leaderTypes = Enum.GetValues(typeof(LeaderType)).Cast<mpLevelPlanMark.LeaderEndType>();
 
-                menuItem = new MenuItem
+                foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
-                    Name = "None",
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft4"), // Без рамки
-                    IsChecked = LevelPlanMark.FrameType == FrameType.None
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
-
+                    
+                    menuItem = new MenuItem
+                    {
+                        Name = leaderType.ToString(),
+                        IsCheckable = true,
+                        Header = leaderType.ToString(), //Language.GetItem("ft2"), // Прямоугольная 
+                        IsChecked = LevelPlanMark.LeaderEndType == (LeaderEndType) leaderType
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
 
                 cm.MouseMove += (_, _) => _win.Close();
                 cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
@@ -105,14 +97,26 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 
         switch (menuItem.Name)
         {
-            case "Rectangular":
-                LevelPlanMark.FrameType = FrameType.Rectangular;
+            case "HalfArrow":
+                LevelPlanMark.LeaderEndType = LeaderEndType.HalfArrow;
                 break;
-            case "Line":
-                LevelPlanMark.FrameType = FrameType.Line;
+            case "Point":
+                LevelPlanMark.LeaderEndType = LeaderEndType.Point;
                 break;
-            case "None":
-                LevelPlanMark.FrameType = FrameType.None;
+            case "Resection":
+                LevelPlanMark.LeaderEndType = LeaderEndType.Resection;
+                break;
+            case "Angle":
+                LevelPlanMark.LeaderEndType = LeaderEndType.Angle;
+                break;
+            case "Arrow":
+                LevelPlanMark.LeaderEndType = LeaderEndType.Arrow;
+                break;
+            case "OpenArrow":
+                LevelPlanMark.LeaderEndType = LeaderEndType.OpenArrow;
+                break;
+            case "ClosedArrow":
+                LevelPlanMark.LeaderEndType = LeaderEndType.ClosedArrow;
                 break;
         }
 
