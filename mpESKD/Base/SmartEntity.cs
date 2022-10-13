@@ -412,11 +412,14 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                             var vector = point.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS;
                             propertiesDataDictionary.Add(propertyInfo.Name, vector.AsString());
                             break;
-                        case List<Point3d> list:
+                        case List<Point3d> points:
                             var str = string.Join(
                                 "#",
-                                list.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
+                                points.Select(p => (p.TransformBy(BlockTransform.Inverse()) - InsertionPointOCS).AsString()));
                             propertiesDataDictionary.Add(propertyInfo.Name, str);
+                            break;
+                        case List<int> integers:
+                            propertiesDataDictionary.Add(propertyInfo.Name, string.Join("#", integers));
                             break;
                         case Enum _:
                             propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
@@ -580,6 +583,10 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                     }
 
                     propertyInfo.SetValue(this, points);
+                }
+                else if (propertyInfo.PropertyType == typeof(List<int>))
+                {
+                    propertyInfo.SetValue(this, valueForProperty.Split('#').Select(int.Parse).ToList());
                 }
                 else if (propertyInfo.PropertyType == typeof(int))
                 {
