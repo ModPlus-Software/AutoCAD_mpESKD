@@ -83,9 +83,10 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
                 //TODO 
                 Point3d? newInsertionPoint = new Point3d(5,5,0);
                 
-                LevelPlanMark.LeaderPoints.Insert(leaderPointsCount, NewPoint);
+                LevelPlanMark.LeaderPoints.Add(NewPoint);
+                LevelPlanMark.LeaderTypes.Add(LeaderEndType.Resection);
                 
-                foreach (var leaderPoint in LevelPlanMark.LeaderPoints)
+                foreach (var leaderPoint in LevelPlanMark.LeaderTypes)
                 {
                     AcadUtils.WriteMessageInDebug($"leaderpoints {i}-{leaderPoint} ");
                     i++;

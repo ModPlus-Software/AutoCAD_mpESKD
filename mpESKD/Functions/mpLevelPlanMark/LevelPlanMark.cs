@@ -1,9 +1,5 @@
-﻿using mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
-namespace mpESKD.Functions.mpLevelPlanMark;
-
-using System;
-using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -12,6 +8,8 @@ using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
 using ModPlusAPI.Windows;
+using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Отметка на плане
@@ -219,7 +217,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Составные линии
     /// </summary>
-    private List<Line> _leaderTypes = new();
+    [SaveToXData]
+    public List<LeaderEndType> LeaderTypes { get; set; } = new List<LeaderEndType>();
 
     private List<Line> _leaderLines = new();
     private List<Polyline> _leaderEndLines = new();
@@ -333,10 +332,46 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
         for (int i = 0; i < LeaderPointsOCS.Count; i++)
         {
+            
             _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i]));
-            var pline = CreateHalfArrow(_leaderLines[i]);
+            Polyline pline = new Polyline();
+            if (LeaderTypes.Count <= 0)
+            {
+                pline = CreateResectionArrow(_leaderLines[i]);
+            }
+            //else
+            //{
+            //    switch (LeaderTypes[i])
+            //    {
+            //        case LeaderEndType.HalfArrow:
+            //            pline = CreateHalfArrow(_leaderLines[i]);
+            //            break;
+            //        case LeaderEndType.Arrow:
+                    
+            //            break;
+            //        case LeaderEndType.Resection:
+            //            pline = CreateResectionArrow(_leaderLines[i]);
+            //            break;
+            //        case LeaderEndType.Angle:
+            //            pline = CreateAngleArrow(_leaderLines[i]);
+            //            _hatches.Add(CreateArrowHatch(pline));
+            //            break;
+            //        case LeaderEndType.ClosedArrow:
+                    
+            //            break;
+            //        case LeaderEndType.OpenArrow:
+                    
+            //            break;
+            //        case LeaderEndType.Point:
+                    
+            //            break;
+            //    }
+            //}
+           
+
+            
             _leaderEndLines.Add(pline);
-            _hatches.Add(CreateArrowHatch(pline));
+            
         }
 
     }

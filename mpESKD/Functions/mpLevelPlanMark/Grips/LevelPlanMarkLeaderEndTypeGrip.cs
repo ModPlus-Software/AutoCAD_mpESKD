@@ -62,17 +62,14 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
                 //TODO
                 MenuItem menuItem;
 
-                var leaderTypes = Enum.GetValues(typeof(LeaderType)).Cast<mpLevelPlanMark.LeaderEndType>();
-
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
-                    
                     menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
                         Header = leaderType.ToString(), //Language.GetItem("ft2"), // Прямоугольная 
-                        IsChecked = LevelPlanMark.LeaderEndType == (LeaderEndType) leaderType
+                        IsChecked = LevelPlanMark.LeaderEndType == (LeaderEndType)leaderType
                     };
                     menuItem.Click += MenuItemOnClick;
                     cm.Items.Add(menuItem);
@@ -120,6 +117,8 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
                 break;
         }
 
+        AcadUtils.WriteMessageInDebug($"GripIndex {GripIndex} LeaderEndType {typeof(LeaderEndType)}");
+        LevelPlanMark.LeaderTypes[GripIndex] = LevelPlanMark.LeaderEndType;
         LevelPlanMark.UpdateEntities();
         LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())
