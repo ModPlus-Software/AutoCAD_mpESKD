@@ -1,13 +1,13 @@
 ﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Runtime;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using ModPlusAPI.Windows;
+using System.Linq;
 
 /// <summary>
 /// Ручка вершин
@@ -47,58 +47,8 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         LevelPlanMark = levelPlanMark;
         GripIndex = gripIndex;
         GripType = GripType.Point;
+        RubberBandLineDisabled = true;
     }
-
-    ///// <inheritdoc />
-    //public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
-    //{
-    //    try
-    //    {
-    //        // При начале перемещения запоминаем первоначальное положение ручки
-    //        // Запоминаем начальные значения
-    //        if (newStatus == Status.GripStart)
-    //        {
-    //            _gripTmp = GripPoint;
-    //        }
-
-    //        // При удачном перемещении ручки записываем новые значения в расширенные данные
-    //        // По этим данным я потом получаю экземпляр класса
-    //        if (newStatus == Status.GripEnd)
-    //        {
-    //            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-    //            {
-    //                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-    //                using (var resBuf = LevelPlanMark.GetDataForXData())
-    //                {
-    //                    blkRef.XData = resBuf;
-    //                }
-
-    //                tr.Commit();
-    //            }
-
-    //            LevelPlanMark.Dispose();
-    //        }
-
-    //        // При отмене перемещения возвращаем временные значения
-    //        if (newStatus == Status.GripAbort)
-    //        {
-    //            if (_gripTmp != null)
-    //            {
-    //                if (GripIndex == 0)
-    //                {
-    //                    LevelPlanMark.InsertionPoint = _gripTmp;
-    //                }
-    //            }
-    //        }
-
-    //        base.OnGripStatusChanged(entityId, newStatus);
-    //    }
-    //    catch (Exception exception)
-    //    {
-    //        if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-    //            ExceptionBox.Show(exception);
-    //    }
-    //}
 
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
@@ -106,66 +56,67 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         if (newStatus == Status.GripStart)
         {
             AcadUtils.Editor.TurnForcedPickOn();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripStart} - {LevelPlanMark.InsertionPointOCS}");
-            //AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
-            
+            _gripTmp = GripPoint;
+            AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
         }
 
-        var leaderPointsCount = LevelPlanMark.LeaderPoints.Count;
         if (newStatus == Status.GripEnd)
         {
-            int i= 0;
             AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripEnd} - {LevelPlanMark.InsertionPoint}" );
-            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+
             using (LevelPlanMark)
             {
-
-                //if (leaderPointsCount == 0)
-                //{
-                //    leaderPointsCount = -1;
-                //}
-
-                Point3d? newInsertionPoint = new Point3d(5,5,0);
-
-                LevelPlanMark.LeaderPoints[GripIndex-1] = NewPoint;
-                
-                foreach (var leaderPoint in LevelPlanMark.LeaderPoints)
-                {
-                    AcadUtils.WriteMessageInDebug($"leaderpoints {i}-{leaderPoint} ");
-                    i++;
-                }
-
-                //AcadUtils.WriteMessageInDebug($"{}");
-
+                LevelPlanMark.LeaderPoints[GripIndex] = NewPoint;
                 LevelPlanMark.UpdateEntities();
                 LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
-                //using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                //{
-                //    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-                //    if (newInsertionPoint.HasValue)
-                //    {
-                //        ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                //    }
 
-                //    using (var resBuf = LevelPlanMark.GetDataForXData())
-                //    {
-                //        blkRef.XData = resBuf;
-                //    }
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
 
-                //    tr.Commit();
-                //}
+                    using (var resBuf = LevelPlanMark.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
             }
         }
 
         if (newStatus == Status.GripAbort)
         {
             AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripAbort}");
-            
-            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
+    }
+
+    public void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
+    {
+        try
+        {
+            var borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
+            var borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
+            var points = new[]
+            {
+                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight)
+            };
+            var nearestPoint = points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
+            var line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
+            {
+                ColorIndex = 150
+            };
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
+        }
+        catch
+        {
+            // ignored
+        }
     }
 }

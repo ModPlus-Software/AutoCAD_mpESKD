@@ -1,17 +1,13 @@
-﻿using DocumentFormat.OpenXml.EMMA;
-using mpESKD.Base.Abstractions;
-
-namespace mpESKD.Functions.mpLevelPlanMark;
+﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Windows;
-using System.Windows.Controls;
-using Base.Enums;
-
+using System.Linq;
 
 /// <summary>
 /// Ручка выбора типа рамки, меняющая тип рамки
@@ -26,6 +22,7 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     {
         LevelPlanMark = levelPlanMark;
         GripType = GripType.Plus;
+        RubberBandLineDisabled = true;
     }
 
     /// <summary>
@@ -38,10 +35,6 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     /// </summary>
     public Point3d NewPoint { get; set; }
 
-    // Временное значение ручки
-    private Point3d _gripTmp;
-
-
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -49,61 +42,30 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
         return Language.GetItem("gp4"); // TODO localization
     }
 
-    ///// <inheritdoc />
-    //public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
-    //{
-    //    using (LevelPlanMark)
-    //    {
-    //        AcadUtils.WriteMessageInDebug($"plus ");
-    //    }
-
-    //    return ReturnValue.GetNewGripPoints;
-    //}
-
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
         if (newStatus == Status.GripStart)
         {
             AcadUtils.Editor.TurnForcedPickOn();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripStart} - {LevelPlanMark.InsertionPointOCS}");
-            //AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
-            
+            AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
         }
 
-        var leaderPointsCount = LevelPlanMark.LeaderPoints.Count;
         if (newStatus == Status.GripEnd)
         {
-            int i= 0;
             AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripEnd} - {LevelPlanMark.InsertionPoint}" );
-            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
             using (LevelPlanMark)
             {
-                //TODO 
-                Point3d? newInsertionPoint = new Point3d(5,5,0);
-                
                 LevelPlanMark.LeaderPoints.Add(NewPoint);
-                LevelPlanMark.LeaderTypes.Add(LeaderEndType.Resection);
-                
-                foreach (var leaderPoint in LevelPlanMark.LeaderTypes)
-                {
-                    AcadUtils.WriteMessageInDebug($"leaderpoints {i}-{leaderPoint} ");
-                    i++;
-                }
-
-                //AcadUtils.WriteMessageInDebug($"{}");
+                LevelPlanMark.LeaderTypes.Add(0);
 
                 LevelPlanMark.UpdateEntities();
                 LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-                    if (newInsertionPoint.HasValue)
-                    {
-                        ((BlockReference)blkRef).Position = newInsertionPoint.Value;
-                    }
-
+                    
                     using (var resBuf = LevelPlanMark.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
@@ -117,11 +79,36 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
         if (newStatus == Status.GripAbort)
         {
             AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.WriteMessageInDebug($"plus {Status.GripAbort}");
-            
-            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
+    }
+
+    private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
+    {
+        try
+        {
+            var borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
+            var borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
+            var points = new[]
+            {
+                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight ),
+                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight ),
+                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight ),
+                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight )
+            };
+            var nearestPoint = points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
+
+            var line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
+            {
+                ColorIndex = 150
+            };
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
+        }
+        catch
+        {
+            // ignored
+        }
     }
 }

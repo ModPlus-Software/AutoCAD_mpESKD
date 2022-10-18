@@ -48,7 +48,7 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                     };
                     grips.Add(vertexGrip);
 
-                    // получаем ручку для создания выноскти
+                    // получаем ручку для создания выноски
                     grips.Add(new LevelPlanMarkAddLeaderGrip(levelPlanMark)
                     {
                         GripPoint = new Point3d(
@@ -122,6 +122,10 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                     else if (gripData is LevelPlanMarkAddLeaderGrip addLeaderGrip)
                     {
                         addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                    }
+                    else if (gripData is LevelPlanMarkLeaderMoveGrip moveLeaderGrip)
+                    {
+                        moveLeaderGrip.NewPoint = moveLeaderGrip.GripPoint + offset;
                     }
                     else
                     {

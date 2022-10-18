@@ -5,6 +5,7 @@
 /// </summary>
 public enum LeaderEndType
 {
+    None = 0,
     HalfArrow = 1,
     Point,
     Resection,

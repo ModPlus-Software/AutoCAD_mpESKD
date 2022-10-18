@@ -1,16 +1,14 @@
-﻿using System;
-using System.Linq;
-
-namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Base.Enums;
 using Base.Overrules;
+using Base.Overrules.Grips;
 using Base.Utils;
 using ModPlusAPI;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Base.Enums;
-using Base.Overrules.Grips;
 
 /// <summary>
 /// Ручка вершин
@@ -22,8 +20,6 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
-
-    private LeaderEndType leaderType;
 
     /// <summary>
     /// Индекс ручки
@@ -61,16 +57,21 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
                 cm = (ContextMenu)_win.FindResource("Cm");
                 //TODO
                 MenuItem menuItem;
-
+                
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
+                    int arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
+                    var isChecked = (int)Enum.Parse(typeof(LeaderEndType),leaderType.ToString());
+                    var isItemChecked = isChecked == arrowIndex;
+                    
                     menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
                         Header = leaderType.ToString(), //Language.GetItem("ft2"), // Прямоугольная 
-                        IsChecked = LevelPlanMark.LeaderEndType == (LeaderEndType)leaderType
+                        IsChecked = isItemChecked
                     };
+
                     menuItem.Click += MenuItemOnClick;
                     cm.Items.Add(menuItem);
                 }
@@ -91,34 +92,36 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
         _win?.Close();
 
         var menuItem = (MenuItem)sender;
-
+        var leaderTypeNum = 0;
         switch (menuItem.Name)
         {
+            case "None":
+                leaderTypeNum = 0;
+                break;
             case "HalfArrow":
-                LevelPlanMark.LeaderEndType = LeaderEndType.HalfArrow;
+                leaderTypeNum = 1;
                 break;
             case "Point":
-                LevelPlanMark.LeaderEndType = LeaderEndType.Point;
+                leaderTypeNum = 2;
                 break;
             case "Resection":
-                LevelPlanMark.LeaderEndType = LeaderEndType.Resection;
+                leaderTypeNum = 3;
                 break;
             case "Angle":
-                LevelPlanMark.LeaderEndType = LeaderEndType.Angle;
+                leaderTypeNum = 4;
                 break;
             case "Arrow":
-                LevelPlanMark.LeaderEndType = LeaderEndType.Arrow;
+                leaderTypeNum = 5;
                 break;
             case "OpenArrow":
-                LevelPlanMark.LeaderEndType = LeaderEndType.OpenArrow;
+                leaderTypeNum = 6;
                 break;
             case "ClosedArrow":
-                LevelPlanMark.LeaderEndType = LeaderEndType.ClosedArrow;
+                leaderTypeNum = 7;
                 break;
         }
 
-        AcadUtils.WriteMessageInDebug($"GripIndex {GripIndex} LeaderEndType {typeof(LeaderEndType)}");
-        LevelPlanMark.LeaderTypes[GripIndex] = LevelPlanMark.LeaderEndType;
+        LevelPlanMark.LeaderTypes[GripIndex] = leaderTypeNum;
         LevelPlanMark.UpdateEntities();
         LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())
