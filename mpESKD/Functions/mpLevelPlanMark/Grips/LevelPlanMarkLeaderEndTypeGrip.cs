@@ -18,6 +18,18 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     private ContextMenuHost _win;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
+    /// </summary>
+    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public LevelPlanMarkLeaderEndTypeGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    {
+        LevelPlanMark = levelPlanMark;
+        GripIndex = gripIndex;
+        GripType = GripType.List;
+    }
+
+    /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
@@ -31,18 +43,6 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     public override string GetTooltip()
     {
         return Language.GetItem("gp7"); // Тип стрелки выноски
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
-    /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkLeaderEndTypeGrip(LevelPlanMark levelPlanMark, int gripIndex)
-    {
-        LevelPlanMark = levelPlanMark;
-        GripIndex = gripIndex;
-        GripType = GripType.List;
     }
 
     /// <inheritdoc />
@@ -142,6 +142,4 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
             }
         }
     }
-
-   
 }

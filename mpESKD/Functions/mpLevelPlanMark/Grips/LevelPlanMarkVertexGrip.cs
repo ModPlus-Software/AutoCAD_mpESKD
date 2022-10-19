@@ -14,6 +14,21 @@ using ModPlusAPI.Windows;
 /// </summary>
 public class LevelPlanMarkVertexGrip : SmartEntityGripData
 {
+    // Временное значение ручки
+    private Point3d _gripTmp;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
+    /// </summary>
+    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public LevelPlanMarkVertexGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    {
+        LevelPlanMark = levelPlanMark;
+        GripIndex = gripIndex;
+        GripType = GripType.Point;
+    }
+
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
@@ -28,21 +43,6 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
     public override string GetTooltip()
     {
         return Language.GetItem("gp2"); // move
-    }
-
-    // Временное значение ручки
-    private Point3d _gripTmp;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
-    /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkVertexGrip(LevelPlanMark levelPlanMark, int gripIndex)
-    {
-        LevelPlanMark = levelPlanMark;
-        GripIndex = gripIndex;
-        GripType = GripType.Point;
     }
 
     /// <inheritdoc />

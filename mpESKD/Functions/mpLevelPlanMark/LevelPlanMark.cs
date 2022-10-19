@@ -340,7 +340,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                             _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
                             break;
                         case 2: //Point
-
                             _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
                             break;
                         case 3: //Resection
@@ -445,7 +444,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         };
 
         Hatch hatch = new Hatch();
-        hatch.SetHatchPattern((HatchPatternType)1, "SOLID");
+        hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
         hatch.AppendLoop((HatchLoopTypes)0, vertexCollection, bulgeCollection);
 
         return hatch;

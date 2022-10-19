@@ -14,6 +14,9 @@ using System.Linq;
 /// </summary>
 public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
 {
+    private readonly double _borderHalfLength;
+    private readonly double _borderHalfHeight;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMarkAddLeaderGrip"/> class.
     /// </summary>
@@ -23,6 +26,8 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
         LevelPlanMark = levelPlanMark;
         GripType = GripType.Plus;
         RubberBandLineDisabled = true;
+        _borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
+        _borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
     }
 
     /// <summary>
@@ -89,14 +94,12 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     {
         try
         {
-            var borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
-            var borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
             var points = new[]
             {
-                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight ),
-                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight ),
-                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight ),
-                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight )
+                new Point2d(LevelPlanMark.InsertionPoint.X - _borderHalfLength, LevelPlanMark.InsertionPoint.Y - _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + _borderHalfLength, LevelPlanMark.InsertionPoint.Y - _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + _borderHalfLength, LevelPlanMark.InsertionPoint.Y + _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X - _borderHalfLength, LevelPlanMark.InsertionPoint.Y + _borderHalfHeight)
             };
             var nearestPoint = points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
 

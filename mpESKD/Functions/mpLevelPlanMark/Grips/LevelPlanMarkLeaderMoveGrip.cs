@@ -14,6 +14,24 @@ using System.Linq;
 /// </summary>
 public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
 {
+    private readonly double _borderHalfLength;
+    private readonly double _borderHalfHeight;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
+    /// </summary>
+    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public LevelPlanMarkLeaderMoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    {
+        LevelPlanMark = levelPlanMark;
+        GripIndex = gripIndex;
+        GripType = GripType.Point;
+        RubberBandLineDisabled = true;
+        _borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
+        _borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
+    }
+
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
@@ -32,19 +50,6 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
     public override string GetTooltip()
     {
         return Language.GetItem("gp2"); // move
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
-    /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkLeaderMoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
-    {
-        LevelPlanMark = levelPlanMark;
-        GripIndex = gripIndex;
-        GripType = GripType.Point;
-        RubberBandLineDisabled = true;
     }
 
     /// <inheritdoc />
@@ -90,18 +95,16 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         base.OnGripStatusChanged(entityId, newStatus);
     }
 
-    public void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
+    private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
     {
         try
         {
-            var borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
-            var borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
             var points = new[]
             {
-                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
-                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
-                new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight),
-                new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight)
+                new Point2d(LevelPlanMark.InsertionPoint.X - _borderHalfLength, LevelPlanMark.InsertionPoint.Y - _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + _borderHalfLength, LevelPlanMark.InsertionPoint.Y - _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X + _borderHalfLength, LevelPlanMark.InsertionPoint.Y + _borderHalfHeight),
+                new Point2d(LevelPlanMark.InsertionPoint.X - _borderHalfLength, LevelPlanMark.InsertionPoint.Y + _borderHalfHeight)
             };
             var nearestPoint = points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
             var line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)

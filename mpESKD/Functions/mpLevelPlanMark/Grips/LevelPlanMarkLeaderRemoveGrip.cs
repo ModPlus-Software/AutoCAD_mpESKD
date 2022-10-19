@@ -13,6 +13,18 @@ using ModPlusAPI;
 public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
 {
     /// <summary>
+    /// Initializes a new instance of the <see cref="LevelPlanMarkLeaderRemoveGrip"/> class.
+    /// </summary>
+    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public LevelPlanMarkLeaderRemoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    {
+        LevelPlanMark = levelPlanMark;
+        GripIndex = gripIndex;
+        GripType = GripType.Minus;
+    }
+    
+    /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
@@ -26,18 +38,6 @@ public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
     public override string GetTooltip()
     {
         return Language.GetItem("gp6"); // Удалить выноску
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LevelPlanMarkLeaderRemoveGrip"/> class.
-    /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    /// <param name="gripIndex">Индекс ручки</param>
-    public LevelPlanMarkLeaderRemoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
-    {
-        LevelPlanMark = levelPlanMark;
-        GripIndex = gripIndex;
-        GripType = GripType.Minus;
     }
 
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)

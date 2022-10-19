@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark;
+﻿using System;
+
+namespace mpESKD.Functions.mpLevelPlanMark;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Overrules;
@@ -53,7 +55,7 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 
                 var menuItem = new MenuItem
                 {
-                    Name = "Rectangular",
+                    Name = FrameType.Rectangular.ToString(),
                     IsCheckable = true,
                     Header = Language.GetItem("ft2"), // Прямоугольная 
                     IsChecked = LevelPlanMark.FrameType == FrameType.Rectangular
@@ -63,7 +65,7 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 
                 menuItem = new MenuItem
                 {
-                    Name = "Line",
+                    Name = FrameType.Line.ToString(),
                     IsCheckable = true,
                     Header = Language.GetItem("ft3"), // Линия
                     IsChecked = LevelPlanMark.FrameType == FrameType.Line
@@ -73,7 +75,7 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 
                 menuItem = new MenuItem
                 {
-                    Name = "None",
+                    Name = FrameType.None.ToString(),
                     IsCheckable = true,
                     Header = Language.GetItem("ft4"), // Без рамки
                     IsChecked = LevelPlanMark.FrameType == FrameType.None
@@ -81,10 +83,8 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
                 menuItem.Click += MenuItemOnClick;
                 cm.Items.Add(menuItem);
 
-
                 cm.MouseMove += (_, _) => _win.Close();
                 cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
-
                 cm.IsOpen = true;
             };
             _win.Show();
@@ -99,19 +99,8 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        switch (menuItem.Name)
-        {
-            case "Rectangular":
-                LevelPlanMark.FrameType = FrameType.Rectangular;
-                break;
-            case "Line":
-                LevelPlanMark.FrameType = FrameType.Line;
-                break;
-            case "None":
-                LevelPlanMark.FrameType = FrameType.None;
-                break;
-        }
-
+        LevelPlanMark.FrameType = (FrameType)Enum.Parse(typeof(FrameType), menuItem.Name);
+      
         LevelPlanMark.UpdateEntities();
         LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())

@@ -22,39 +22,39 @@ public class LevelPlanMarkDescriptor : ISmartEntityDescriptor
     public string Description => Language.GetItem("h174");
 
     /// <inheritdoc />
-    // Создание интеллектуального объекта отметки уровня на плане на основе анонимного блока
+    // Создание интеллектуального объекта на основе анонимного блока, описывающего отметку уровня на плане по ГОСТ 2.307
     public string FullDescription => Language.GetItem("h175");
 
     /// <inheritdoc />
     public string ToolTipHelpImage => string.Empty;
 
     /// <inheritdoc />
-    public List<string> SubFunctionsNames => new List<string>
+    public List<string> SubFunctionsNames
     {
-        string.Empty,
-    };
+        get; set;
+    }
 
     /// <inheritdoc />
-    public List<string> SubFunctionsLNames => new List<string>
+    public List<string> SubFunctionsLNames
     {
-        string.Empty,
-    };
+        get; set;
+    }
 
     /// <inheritdoc />
-    public List<string> SubDescriptions => new List<string>
+    public List<string> SubDescriptions
     {
-        string.Empty,
-    };
+        get; set;
+    }
 
     /// <inheritdoc />
-    public List<string> SubFullDescriptions => new List<string>
+    public List<string> SubFullDescriptions 
     {
-        string.Empty,
-    };
+        get; set;
+    }
 
     /// <inheritdoc />
-    public List<string> SubHelpImages => new List<string>
+    public List<string> SubHelpImages 
     {
-        string.Empty,
-    };
+        get; set;
+    }
 }
