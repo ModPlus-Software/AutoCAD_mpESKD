@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using DocumentFormat.OpenXml.Presentation;
 
 namespace mpESKD.Functions.mpLevelPlanMark;
 
@@ -27,7 +28,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private DBText _dbText;
     private Wipeout _dbTextMask;
-    
+
     #endregion
 
     private Polyline _framePolyline;
@@ -139,7 +140,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 13, "p76", 5, 0, 100, descLocalKey: "d67")]
     [SaveToXData]
-    public double ArrowSize { get; set; } = 5;
+    public double ArrowSize { get; set; } = 3;
 
     /// <summary>
     /// Префикс уровня
@@ -267,12 +268,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         _leaderPoints.Clear();
         _hatches.Clear();
 
-
         _dbText = new DBText { TextString = DisplayedValue, Position = insertionPoint };
-        _dbText.SetProperties(TextStyle, TextHeight);
+        _dbText.SetProperties(TextStyle, TextHeight * scale);
         _dbText.Position = _dbText.Position - (Vector3d.XAxis * (_dbText.GetLength() / 2)) - (Vector3d.YAxis * (_dbText.GetHeight() / 2));
-
-        // TODO
 
         if (BorderWidth == 0)
         {
@@ -287,7 +285,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         var borderHalfLength = BorderWidth / 2 * scale;
         var borderHalfHeight = BorderHeight / 2 * scale;
 
-        FramePoints = new List<Point3d>()
+        var points = new List<Point3d>()
         {
             new Point3d(insertionPoint.X - borderHalfLength, insertionPoint.Y - borderHalfHeight, 0),
             new Point3d(insertionPoint.X + borderHalfLength, insertionPoint.Y - borderHalfHeight, 0),
@@ -295,25 +293,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             new Point3d(insertionPoint.X - borderHalfLength, insertionPoint.Y + borderHalfHeight, 0)
         };
 
-        foreach (var point3d in FramePoints)
-        {
-            AcadUtils.WriteMessageInDebug($"insertionPoint {InsertionPoint} - framepoint {point3d}");
-        }
-
-        AcadUtils.WriteMessageInDebug($"FramePoints____________________________________");
-        foreach (var point3d in FramePointsOCS)
-        {
-            AcadUtils.WriteMessageInDebug($"insertionPointOCS {InsertionPointOCS} - framepoint {point3d}");
-        }
-
-        AcadUtils.WriteMessageInDebug($"FramePointsOCS____________________________________");
-        var points = FramePoints;
         if (FrameType == FrameType.None)
         {
             if (HideTextBackground)
             {
-                AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
-
                 _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
             }
         }
@@ -329,7 +312,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
                 if (HideTextBackground)
                 {
-                    AcadUtils.WriteMessageInDebug($"dbText.GeometricExtents {_dbText.GeometricExtents}");
                     _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
                 }
             }
@@ -352,45 +334,46 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
         for (int i = 0; i < LeaderPointsOCS.Count; i++)
         {
-            
             var points2ds = from point in points
-                select point.ToPoint2d();
+                            select point.ToPoint2d();
             _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i], points2ds));
             Polyline pline = new Polyline();
-            if (LeaderTypes.Count <= 0)
+           
+            if (_leaderLines[i].Length - ArrowSize * scale > 0)
             {
-                pline = CreateResectionArrow(_leaderLines[i]);
-            }
-            else
-            {
-                switch (LeaderTypes[i])
+                if (LeaderTypes.Count <= 0)
                 {
-                    case 0: //None
-                        break;
-                    case 1: //HalfArrow
-                        //pline = CreateHalfArrow(_leaderLines[i]);
-                        _hatches.Add(CreateArrowHatch(_leaderLines[i]));
-                        break;
-                    case 2: //Point
-                        pline = CreatePointArrow(_leaderLines[i]);
-                        //CreateArrowHatch(pline);
-                        break;
-                    case 3: //Resection
-                        pline = CreateResectionArrow(_leaderLines[i]);
-                        break;
-                    case 4: //Angle
-                        pline = CreateAngleArrow(_leaderLines[i],45, false);
-                        break;
-                    case 5: //Arrow
-                        //pline = CreateArrow(_leaderLines[i]);
-                        //CreateArrowHatch(pline);
-                        break;
-                    case 6: // OpenArrow
-                        pline = CreateAngleArrow(_leaderLines[i],10, false);
-                        break;
-                    case 7: //ClosedArrow
-                        pline = CreateAngleArrow(_leaderLines[i],10, true);
-                        break;
+                    pline = CreateResectionArrow(_leaderLines[i], scale);
+                }
+                else
+                {
+                    switch (LeaderTypes[i])
+                    {
+                        case 0: //None
+                            break;
+                        case 1: //HalfArrow
+                            _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i], scale)));
+                            break;
+                        case 2: //Point
+
+                            _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i], scale)));
+                            break;
+                        case 3: //Resection
+                            pline = CreateResectionArrow(_leaderLines[i], scale);
+                            break;
+                        case 4: //Angle
+                            pline = CreateAngleArrow(_leaderLines[i], 45, false, scale);
+                            break;
+                        case 5: //Arrow
+                            _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true, scale)));
+                            break;
+                        case 6: // OpenArrow
+                            pline = CreateAngleArrow(_leaderLines[i], 10, false, scale);
+                            break;
+                        case 7: //ClosedArrow
+                            pline = CreateAngleArrow(_leaderLines[i], 10, true, scale);
+                            break;
+                    }
                 }
             }
 
@@ -398,37 +381,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
     }
 
-    [SaveToXData]
-    public List<Point3d> FramePoints { get; set; }
-
-    public List<Point3d> FramePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            FramePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
-
-    private Polyline CreatePointArrow(Line leaderLine)
-    {
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2);
-        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint,leaderLine.Length + ArrowSize / 2);
-        
-        var pline = new Polyline(2);
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
-        pline.AddVertexAt(1, endPoint, 1, 0, 0);
-        pline.Closed = true;
-
-        return pline;
-    }
-
     private Line CreateLeaders(Point3d point, IEnumerable<Point2d> points)
     {
         var nearestPoint = points.OrderBy(p => p.GetDistanceTo(point.ToPoint2d())).First();
         var line = new Line(nearestPoint.ToPoint3d(), point);
-        
+
         return line;
     }
 
@@ -438,10 +395,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    private Polyline CreateResectionArrow(Line leaderLine)
+    private Polyline CreateResectionArrow(Line leaderLine, double scale)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize/2);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * scale);
         var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -453,10 +410,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return pline;
     }
 
-    private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed)
+    private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed, double scale)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * scale);
         var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -471,11 +428,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return pline;
     }
 
-    private Polyline CreateHalfArrow(Line leaderLine)
+    private Polyline CreateHalfArrow(Line leaderLine, double scale)
     {
         var vector = new Vector3d(0, 0, 1);
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize);
-
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * scale);
         var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, leaderLine.EndPoint);
 
         var pline = new Polyline(3);
@@ -485,13 +441,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
         pline.Closed = true;
 
-        //TODO 
         return pline;
     }
 
-    private Hatch CreateArrowHatch(Line leaderLine)
+    private Hatch CreateArrowHatch(Polyline pline)
     {
-        var pline = CreateHalfArrow(leaderLine);
         Point2dCollection vertexCollection = new Point2dCollection();
         for (int index = 0; index < pline.NumberOfVertices; ++index)
         {
@@ -502,6 +456,40 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         DoubleCollection bulgeCollection = new DoubleCollection()
         {
             0.0, 0.0, 0.0
+        };
+
+        Hatch hatch = new Hatch();
+        hatch.SetHatchPattern((HatchPatternType)1, "SOLID");
+        hatch.AppendLoop((HatchLoopTypes)0, vertexCollection, bulgeCollection);
+
+        return hatch;
+    }
+
+    private Polyline CreatePointArrow(Line leaderLine, double scale)
+    {
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * scale);
+        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + ArrowSize / 2);
+
+        var pline = new Polyline(2);
+        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
+        pline.AddVertexAt(1, endPoint, 1, 0, 0);
+        pline.Closed = true;
+
+        return pline;
+    }
+
+    private Hatch CreatePointHatch(Polyline pline)
+    {
+        Point2dCollection vertexCollection = new Point2dCollection();
+        for (int index = 0; index < pline.NumberOfVertices; ++index)
+        {
+            vertexCollection.Add(pline.GetPoint2dAt(index));
+        }
+
+        vertexCollection.Add(pline.GetPoint2dAt(0));
+        DoubleCollection bulgeCollection = new DoubleCollection()
+        {
+            1.0, 1.0
         };
 
         Hatch hatch = new Hatch();
