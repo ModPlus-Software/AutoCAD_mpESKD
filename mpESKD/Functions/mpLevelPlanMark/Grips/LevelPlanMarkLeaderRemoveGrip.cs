@@ -21,10 +21,11 @@ public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp2"); // TODO remove
+        return Language.GetItem("gp6"); // Удалить выноску
     }
 
     /// <summary>
@@ -43,8 +44,6 @@ public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
     {
         using (LevelPlanMark)
         {
-            Point3d? newInsertionPoint = null;
-
             LevelPlanMark.LeaderPoints.RemoveAt(GripIndex);
 
             LevelPlanMark.UpdateEntities();

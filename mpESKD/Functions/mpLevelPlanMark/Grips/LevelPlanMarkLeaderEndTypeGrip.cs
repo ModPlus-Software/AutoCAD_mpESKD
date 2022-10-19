@@ -16,6 +16,7 @@ using System.Windows.Controls;
 public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
+
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
@@ -25,10 +26,11 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp2"); // TODO type
+        return Language.GetItem("gp7"); // Тип стрелки выноски
     }
 
     /// <summary>
@@ -55,25 +57,26 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
             _win.Loaded += (_, _) =>
             {
                 cm = (ContextMenu)_win.FindResource("Cm");
-                //TODO
-                MenuItem menuItem;
                 
+                MenuItem menuItem;
+                var i = 0;
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
                     int arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
-                    var isChecked = (int)Enum.Parse(typeof(LeaderEndType),leaderType.ToString());
-                    var isItemChecked = isChecked == arrowIndex;
-                    
+                    var chekedNumber = (int)Enum.Parse(typeof(LeaderEndType),leaderType.ToString());
+                    var isItemChecked = chekedNumber == arrowIndex;
+                    string headerOfItem = "let" + i;
                     menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
-                        Header = leaderType.ToString(), //Language.GetItem("ft2"), // Прямоугольная 
+                        Header = Language.GetItem(headerOfItem), //Нет,  Полустрелка, Точка, Двойная засечка, Прямой угол, Закрашенная Замкнутая, Разомкнутая, Замкнутая
                         IsChecked = isItemChecked
                     };
 
                     menuItem.Click += MenuItemOnClick;
                     cm.Items.Add(menuItem);
+                    i++;
                 }
 
                 cm.MouseMove += (_, _) => _win.Close();
@@ -139,4 +142,6 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
             }
         }
     }
+
+   
 }

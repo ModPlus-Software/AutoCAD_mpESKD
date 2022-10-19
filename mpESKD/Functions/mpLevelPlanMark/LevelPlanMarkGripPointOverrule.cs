@@ -20,7 +20,7 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
             if (IsApplicable(entity))
             {
                 // Удаляю все ручки - это удалит ручку вставки блока
-                //grips.Clear();
+                
                 var blkRef = (BlockReference)entity;
                 GripData toRemove = null;
 
@@ -68,6 +68,7 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
 
                     for (var i = 0; i < levelPlanMark.LeaderPoints.Count; i++)
                     {
+                        // ручки переноса выносок
                         grips.Add(new LevelPlanMarkLeaderMoveGrip(levelPlanMark, i)
                         {
                             GripPoint = levelPlanMark.LeaderPoints[i]
@@ -76,10 +77,14 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                             levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
                         var leaderEndTypeGripPoint = new Point3d(levelPlanMark.LeaderPoints[i].X - 1,
                             levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
+
+                        // ручки удаления выносок
                         grips.Add(new LevelPlanMarkLeaderRemoveGrip(levelPlanMark, i)
                         {
                             GripPoint = deleteGripPoint
                         });
+                        
+                        // ручки выбора типа выносок
                         grips.Add(new LevelPlanMarkLeaderEndTypeGrip(levelPlanMark, i)
                         {
                             GripPoint = leaderEndTypeGripPoint

@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Linq;
-using DocumentFormat.OpenXml.Presentation;
-
-namespace mpESKD.Functions.mpLevelPlanMark;
+﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -14,12 +10,13 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Отметка на плане
 /// </summary>
-[SmartEntityDisplayNameKey("h151")] //TODO localization
-[SystemStyleDescriptionKey("h152")] //TODO localization
+[SmartEntityDisplayNameKey("h171")] //Отметка уровня на плане
+[SystemStyleDescriptionKey("h172")] //Базовый стиль для обозначения отметки уровня на плане
 
 public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWithDoubleClickEditor
 {
@@ -64,18 +61,25 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public override double MinDistanceBetweenPoints => 1;
 
     /// <summary>
+    /// Тип рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Rectangular)]
+    [SaveToXData]
+    public FrameType FrameType { get; set; } = FrameType.Rectangular;
+
+    /// <summary>
+    /// Размер стрелки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0, 100, descLocalKey: "d67")]
+    [SaveToXData]
+    public double ArrowSize { get; set; } = 3;
+
+    /// <summary>
     /// Высота текста
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
     [SaveToXData]
     public double TextHeight { get; set; } = 3.5;
-
-    /// <summary>
-    /// Тип рамки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p82", FrameType.Rectangular)]
-    [SaveToXData]
-    public FrameType FrameType { get; set; } = FrameType.Rectangular;
 
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
@@ -88,13 +92,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     [SaveToXData]
     public double TextMaskOffset { get; set; }
 
-    /// <summary>
-    /// Обозначение плана
-    /// </summary>
-    [SaveToXData]
-    [ValueToSearchBy]
-    public double PlanMark { get; set; } = 0.000;
-
     /// <inheritdoc />
     [EntityProperty(PropertiesCategory.Content, 6, "p72", NumberSeparator.Dot, descLocalKey: "d72")]
     [SaveToXData]
@@ -103,9 +100,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Показывать плюс
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 8, "p64", true, descLocalKey: "d64")]
+    [EntityProperty(PropertiesCategory.Content, 8, "p64", false, descLocalKey: "d64")]
     [SaveToXData]
-    public bool ShowPlus { get; set; } = true;
+    public bool ShowPlus { get; set; }
 
     /// <summary>
     /// Добавление звездочки
@@ -124,28 +121,29 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Ширина рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 11, "p77", 9, 1, 10, descLocalKey: "d67")]
+    [EntityProperty(PropertiesCategory.Content, 11, "p77", 12, 1, 65, descLocalKey: "d67")]
     [SaveToXData]
     public double BorderWidth { get; set; }
 
     /// <summary>
     /// Высота рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 12, "p76", 3, 0, 10, descLocalKey: "d67")]
+    [EntityProperty(PropertiesCategory.Content, 12, "p76", 5, 0, 10, descLocalKey: "d67")]
     [SaveToXData]
     public double BorderHeight { get; set; }
 
     /// <summary>
-    /// Размер стрелки
+    /// Обозначение плана
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 13, "p76", 5, 0, 100, descLocalKey: "d67")]
+    [EntityProperty(PropertiesCategory.Content, 13, "p110", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [SaveToXData]
-    public double ArrowSize { get; set; } = 3;
+    [ValueToSearchBy]
+    public double PlanMark { get; set; } = 0.000; 
 
     /// <summary>
     /// Префикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 14, "p110", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 14, "p111", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
@@ -154,18 +152,13 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Суффикс уровня
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 15, "p111", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 15, "p112", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
     public string DesignationSuffix { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Тип линии обрыва: линейный, криволинейный, цилиндрический
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p1", LeaderEndType.Resection, descLocalKey: "d1")] //TODO localization
-    [SaveToXData]
-    public LeaderEndType LeaderEndType { get; set; } = LeaderEndType.Resection;
+    private double _scale;
 
     /// <summary>
     /// Отображаемое значение
@@ -211,11 +204,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
     }
 
-    /// <summary>
-    /// Точки мтекста
-    /// </summary>
-    private List<Point3d> _leaderPoints = new();
-
     [SaveToXData]
     public List<Point3d> LeaderPoints { get; set; } = new List<Point3d>();
 
@@ -237,7 +225,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             LeaderPoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
             return points;
         }
-
     }
 
     /// <inheritdoc />
@@ -251,9 +238,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     {
         try
         {
-            AcadUtils.WriteMessageInDebug($" insertionPointOCS {InsertionPointOCS} \n");
-            var scale = GetScale();
-            CreateEntities(InsertionPointOCS, scale);
+            _scale = GetScale();
+            CreateEntities(InsertionPointOCS);
         }
         catch (Exception exception)
         {
@@ -261,31 +247,30 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
     }
 
-    private void CreateEntities(Point3d insertionPoint, double scale)
+    private void CreateEntities(Point3d insertionPoint)
     {
         _leaderLines.Clear();
         _leaderEndLines.Clear();
-        _leaderPoints.Clear();
         _hatches.Clear();
 
         _dbText = new DBText { TextString = DisplayedValue, Position = insertionPoint };
-        _dbText.SetProperties(TextStyle, TextHeight * scale);
+        _dbText.SetProperties(TextStyle, TextHeight * _scale);
         _dbText.Position = _dbText.Position - (Vector3d.XAxis * (_dbText.GetLength() / 2)) - (Vector3d.YAxis * (_dbText.GetHeight() / 2));
 
         if (BorderWidth == 0)
         {
-            BorderWidth = MinDistanceBetweenPoints * scale;
+            BorderWidth = MinDistanceBetweenPoints * _scale;
         }
 
         if (BorderHeight == 0)
         {
-            BorderHeight = MinDistanceBetweenPoints * scale;
+            BorderHeight = MinDistanceBetweenPoints * _scale;
         }
 
-        var borderHalfLength = BorderWidth / 2 * scale;
-        var borderHalfHeight = BorderHeight / 2 * scale;
+        var borderHalfLength = BorderWidth / 2 * _scale;
+        var borderHalfHeight = BorderHeight / 2 * _scale;
 
-        var points = new List<Point3d>()
+        var points = new[]
         {
             new Point3d(insertionPoint.X - borderHalfLength, insertionPoint.Y - borderHalfHeight, 0),
             new Point3d(insertionPoint.X + borderHalfLength, insertionPoint.Y - borderHalfHeight, 0),
@@ -297,28 +282,28 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             if (HideTextBackground)
             {
-                _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
+                _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale);
             }
         }
         else
         {
             if (FrameType == FrameType.Line)
             {
-                _framePolyline = new Polyline(points.Count - 2);
-                for (var i = 0; i < points.Count - 2; i++)
+                _framePolyline = new Polyline(points.Length - 2);
+                for (var i = 0; i < points.Length - 2; i++)
                 {
                     _framePolyline.AddVertexAt(i, points[i].ToPoint2d(), 0, 0.0, 0.0);
                 }
 
                 if (HideTextBackground)
                 {
-                    _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * scale);
+                    _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale);
                 }
             }
             else
             {
-                _framePolyline = new Polyline(points.Count);
-                for (var i = 0; i < points.Count; i++)
+                _framePolyline = new Polyline(points.Length);
+                for (var i = 0; i < points.Length; i++)
                 {
                     _framePolyline.AddVertexAt(i, points[i].ToPoint2d(), 0, 0.0, 0.0);
                 }
@@ -332,18 +317,18 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             }
         }
 
-        for (int i = 0; i < LeaderPointsOCS.Count; i++)
+        for (var i = 0; i < LeaderPointsOCS.Count; i++)
         {
             var points2ds = from point in points
                             select point.ToPoint2d();
             _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i], points2ds));
             Polyline pline = new Polyline();
-           
-            if (_leaderLines[i].Length - ArrowSize * scale > 0)
+
+            if (_leaderLines[i].Length - ArrowSize * _scale > 0)
             {
                 if (LeaderTypes.Count <= 0)
                 {
-                    pline = CreateResectionArrow(_leaderLines[i], scale);
+                    pline = CreateResectionArrow(_leaderLines[i]);
                 }
                 else
                 {
@@ -352,26 +337,26 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                         case 0: //None
                             break;
                         case 1: //HalfArrow
-                            _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i], scale)));
+                            _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
                             break;
                         case 2: //Point
 
-                            _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i], scale)));
+                            _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
                             break;
                         case 3: //Resection
-                            pline = CreateResectionArrow(_leaderLines[i], scale);
+                            pline = CreateResectionArrow(_leaderLines[i]);
                             break;
                         case 4: //Angle
-                            pline = CreateAngleArrow(_leaderLines[i], 45, false, scale);
+                            pline = CreateAngleArrow(_leaderLines[i], 45, false);
                             break;
                         case 5: //Arrow
-                            _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true, scale)));
+                            _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
                             break;
                         case 6: // OpenArrow
-                            pline = CreateAngleArrow(_leaderLines[i], 10, false, scale);
+                            pline = CreateAngleArrow(_leaderLines[i], 10, false);
                             break;
                         case 7: //ClosedArrow
-                            pline = CreateAngleArrow(_leaderLines[i], 10, true, scale);
+                            pline = CreateAngleArrow(_leaderLines[i], 10, true);
                             break;
                     }
                 }
@@ -395,10 +380,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return numericValue.Replace(',', '.').Replace('.', c);
     }
 
-    private Polyline CreateResectionArrow(Line leaderLine, double scale)
+    #region Arrows
+    private Polyline CreateResectionArrow(Line leaderLine)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * scale);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * _scale);
         var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -410,10 +396,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return pline;
     }
 
-    private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed, double scale)
+    private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * scale);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * _scale);
         var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -428,10 +414,10 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return pline;
     }
 
-    private Polyline CreateHalfArrow(Line leaderLine, double scale)
+    private Polyline CreateHalfArrow(Line leaderLine)
     {
         var vector = new Vector3d(0, 0, 1);
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * scale);
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * _scale);
         var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, leaderLine.EndPoint);
 
         var pline = new Polyline(3);
@@ -465,9 +451,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         return hatch;
     }
 
-    private Polyline CreatePointArrow(Line leaderLine, double scale)
+    private Polyline CreatePointArrow(Line leaderLine)
     {
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * scale);
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * _scale);
         var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + ArrowSize / 2);
 
         var pline = new Polyline(2);
@@ -498,4 +484,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
         return hatch;
     }
+
+    #endregion
 }

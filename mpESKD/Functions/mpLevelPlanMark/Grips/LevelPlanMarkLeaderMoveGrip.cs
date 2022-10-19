@@ -34,9 +34,6 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         return Language.GetItem("gp2"); // move
     }
 
-    // Временное значение ручки
-    private Point3d _gripTmp;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
     /// </summary>
@@ -56,7 +53,6 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
         if (newStatus == Status.GripStart)
         {
             AcadUtils.Editor.TurnForcedPickOn();
-            _gripTmp = GripPoint;
             AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
         }
 

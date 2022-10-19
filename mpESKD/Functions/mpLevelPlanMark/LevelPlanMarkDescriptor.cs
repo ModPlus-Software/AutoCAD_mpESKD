@@ -14,16 +14,16 @@ public class LevelPlanMarkDescriptor : ISmartEntityDescriptor
     public string Name => "mpLevelPlanMark";
 
     /// <inheritdoc />
-    // Обозначение уровня
-    public string LName => Language.GetItem("h153"); // TODO localization
+    // Обозначение отметки уровня на плане
+    public string LName => Language.GetItem("h173");
 
     /// <inheritdoc />
-    // Создание обозначения уровня
-    public string Description => Language.GetItem("h154"); // TODO localization
+    // Создание отметки уровня на плане
+    public string Description => Language.GetItem("h174");
 
     /// <inheritdoc />
-    // Создание интеллектуального объекта обозначения вида на основе анонимного блока
-    public string FullDescription => Language.GetItem("h155");// TODO localization
+    // Создание интеллектуального объекта отметки уровня на плане на основе анонимного блока
+    public string FullDescription => Language.GetItem("h175");
 
     /// <inheritdoc />
     public string ToolTipHelpImage => string.Empty;

@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace mpESKD.Functions.mpLevelPlanMark;
+﻿namespace mpESKD.Functions.mpLevelPlanMark;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;

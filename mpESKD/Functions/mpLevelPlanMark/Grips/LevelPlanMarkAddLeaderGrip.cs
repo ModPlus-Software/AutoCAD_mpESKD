@@ -18,7 +18,7 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     /// Initializes a new instance of the <see cref="LevelPlanMarkAddLeaderGrip"/> class.
     /// </summary>
     /// <param name="levelPlanMark">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public LevelPlanMarkAddLeaderGrip(LevelPlanMark levelPlanMark) //TODO
+    public LevelPlanMarkAddLeaderGrip(LevelPlanMark levelPlanMark) 
     {
         LevelPlanMark = levelPlanMark;
         GripType = GripType.Plus;
@@ -26,7 +26,7 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
+    /// Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
 
@@ -38,8 +38,8 @@ public class LevelPlanMarkAddLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Тип рамки
-        return Language.GetItem("gp4"); // TODO localization
+        // Добавить выноску
+        return Language.GetItem("gp5");
     }
 
     /// <inheritdoc />

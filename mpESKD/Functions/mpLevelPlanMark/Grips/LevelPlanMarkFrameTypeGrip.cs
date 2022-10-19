@@ -27,7 +27,7 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpNodalLeader.NodalLeader"/>
+    /// Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public LevelPlanMark LevelPlanMark { get; }
 

@@ -23,6 +23,7 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
+    
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -60,7 +61,6 @@ public class LevelPlanMarkVertexGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                AcadUtils.WriteMessageInDebug($"id грипа {GripIndex}");
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
