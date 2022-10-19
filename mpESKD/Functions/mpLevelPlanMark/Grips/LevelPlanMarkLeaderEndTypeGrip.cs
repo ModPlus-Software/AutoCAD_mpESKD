@@ -57,16 +57,14 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
             _win.Loaded += (_, _) =>
             {
                 cm = (ContextMenu)_win.FindResource("Cm");
-                
-                MenuItem menuItem;
-                var i = 0;
+
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
                     int arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
-                    var chekedNumber = (int)Enum.Parse(typeof(LeaderEndType),leaderType.ToString());
-                    var isItemChecked = chekedNumber == arrowIndex;
-                    string headerOfItem = "let" + i;
-                    menuItem = new MenuItem
+                    var checkedNumber = (int)Enum.Parse(typeof(LeaderEndType), leaderType.ToString());
+                    var isItemChecked = checkedNumber == arrowIndex;
+                    string headerOfItem = "let" + checkedNumber;
+                    var menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
@@ -76,7 +74,6 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 
                     menuItem.Click += MenuItemOnClick;
                     cm.Items.Add(menuItem);
-                    i++;
                 }
 
                 cm.MouseMove += (_, _) => _win.Close();
@@ -95,36 +92,9 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
         _win?.Close();
 
         var menuItem = (MenuItem)sender;
-        var leaderTypeNum = 0;
-        switch (menuItem.Name)
-        {
-            case "None":
-                leaderTypeNum = 0;
-                break;
-            case "HalfArrow":
-                leaderTypeNum = 1;
-                break;
-            case "Point":
-                leaderTypeNum = 2;
-                break;
-            case "Resection":
-                leaderTypeNum = 3;
-                break;
-            case "Angle":
-                leaderTypeNum = 4;
-                break;
-            case "Arrow":
-                leaderTypeNum = 5;
-                break;
-            case "OpenArrow":
-                leaderTypeNum = 6;
-                break;
-            case "ClosedArrow":
-                leaderTypeNum = 7;
-                break;
-        }
 
-        LevelPlanMark.LeaderTypes[GripIndex] = leaderTypeNum;
+        LevelPlanMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+
         LevelPlanMark.UpdateEntities();
         LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())

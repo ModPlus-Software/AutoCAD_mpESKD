@@ -15,12 +15,10 @@ using System.Linq;
 /// <summary>
 /// Отметка на плане
 /// </summary>
-[SmartEntityDisplayNameKey("h171")] //Отметка уровня на плане
-[SystemStyleDescriptionKey("h172")] //Базовый стиль для обозначения отметки уровня на плане
-
+[SmartEntityDisplayNameKey("h171")] // Отметка уровня на плане
+[SystemStyleDescriptionKey("h172")] // Базовый стиль для обозначения отметки уровня на плане
 public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWithDoubleClickEditor
 {
-
     #region Text entities
 
     private DBText _dbText;
@@ -28,7 +26,11 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     #endregion
 
+    private List<Line> _leaderLines = new();
+    private List<Polyline> _leaderEndLines = new();
+    private List<Hatch> _hatches = new();
     private Polyline _framePolyline;
+    private double _scale;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMark"/> class.
@@ -158,8 +160,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     [ValueToSearchBy]
     public string DesignationSuffix { get; set; } = string.Empty;
 
-    private double _scale;
-
     /// <summary>
     /// Отображаемое значение
     /// </summary>
@@ -212,10 +212,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// </summary>
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new List<int>();
-
-    private List<Line> _leaderLines = new();
-    private List<Polyline> _leaderEndLines = new();
-    private List<Hatch> _hatches = new();
 
     private List<Point3d> LeaderPointsOCS
     {
@@ -332,29 +328,29 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                 }
                 else
                 {
-                    switch (LeaderTypes[i])
+                    switch ((LeaderEndType)LeaderTypes[i])
                     {
-                        case 0: //None
+                        case LeaderEndType.None:
                             break;
-                        case 1: //HalfArrow
+                        case LeaderEndType.HalfArrow:
                             _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
                             break;
-                        case 2: //Point
+                        case LeaderEndType.Point:
                             _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
                             break;
-                        case 3: //Resection
+                        case LeaderEndType.Resection:
                             pline = CreateResectionArrow(_leaderLines[i]);
                             break;
-                        case 4: //Angle
+                        case LeaderEndType.Angle:
                             pline = CreateAngleArrow(_leaderLines[i], 45, false);
                             break;
-                        case 5: //Arrow
+                        case LeaderEndType.Arrow:
                             _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
                             break;
-                        case 6: // OpenArrow
+                        case LeaderEndType.OpenArrow:
                             pline = CreateAngleArrow(_leaderLines[i], 10, false);
                             break;
-                        case 7: //ClosedArrow
+                        case LeaderEndType.ClosedArrow:
                             pline = CreateAngleArrow(_leaderLines[i], 10, true);
                             break;
                     }
@@ -443,11 +439,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             0.0, 0.0, 0.0
         };
 
-        Hatch hatch = new Hatch();
-        hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
-        hatch.AppendLoop((HatchLoopTypes)0, vertexCollection, bulgeCollection);
-
-        return hatch;
+        return CreateHatch(vertexCollection, bulgeCollection);
     }
 
     private Polyline CreatePointArrow(Line leaderLine)
@@ -477,9 +469,14 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             1.0, 1.0
         };
 
+        return CreateHatch(vertexCollection, bulgeCollection);
+    }
+
+    private Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
+    {
         Hatch hatch = new Hatch();
-        hatch.SetHatchPattern((HatchPatternType)1, "SOLID");
-        hatch.AppendLoop((HatchLoopTypes)0, vertexCollection, bulgeCollection);
+        hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
+        hatch.AppendLoop(HatchLoopTypes.Default, vertexCollection, bulgeCollection);
 
         return hatch;
     }
