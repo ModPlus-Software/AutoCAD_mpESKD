@@ -1,15 +1,14 @@
-﻿using System;
+﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
-namespace mpESKD.Functions.mpLevelPlanMark;
-
-using Autodesk.AutoCAD.DatabaseServices;
-using Base.Overrules;
-using Base.Utils;
-using ModPlusAPI;
+using System;
 using System.Windows;
 using System.Windows.Controls;
+using Autodesk.AutoCAD.DatabaseServices;
+using ModPlusAPI;
 using Base.Enums;
-using Base.Overrules.Grips;
+using Base.Overrules;
+using mpESKD.Base.Overrules.Grips;
+using Base.Utils;
 
 /// <summary>
 /// Ручка выбора типа рамки, меняющая тип рамки

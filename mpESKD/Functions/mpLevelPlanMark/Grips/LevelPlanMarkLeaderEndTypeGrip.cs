@@ -60,15 +60,15 @@ public class LevelPlanMarkLeaderEndTypeGrip : SmartEntityGripData
 
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
-                    int arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
+                    var arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
                     var checkedNumber = (int)Enum.Parse(typeof(LeaderEndType), leaderType.ToString());
                     var isItemChecked = checkedNumber == arrowIndex;
-                    string headerOfItem = "let" + checkedNumber;
+                    var headerOfItem = "let" + checkedNumber;
                     var menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
-                        Header = Language.GetItem(headerOfItem), //Нет,  Полустрелка, Точка, Двойная засечка, Прямой угол, Закрашенная Замкнутая, Разомкнутая, Замкнутая
+                        Header = Language.GetItem(headerOfItem),
                         IsChecked = isItemChecked
                     };
 

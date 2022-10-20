@@ -15,6 +15,7 @@ using Functions.mpFragmentMarker;
 using Functions.mpGroundLine;
 using Functions.mpLetterLine;
 using Functions.mpLevelMark;
+using Functions.mpLevelPlanMark;
 using Functions.mpNodalLeader;
 using Functions.mpSecantNodalLeader;
 using Functions.mpViewLabel;
@@ -208,6 +209,9 @@ public class RibbonBuilder
 
         // mpLevelMark
         ribRowPanel.Items.Add(GetBigSplitButton(GetDescriptor<LevelMark>()));
+
+        // mpLevelPlanMark
+        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<LevelPlanMark>()));
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }

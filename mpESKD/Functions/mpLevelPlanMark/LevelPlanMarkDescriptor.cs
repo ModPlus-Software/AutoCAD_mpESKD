@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Base.Abstractions;
 using ModPlusAPI;
 
+/// <inheritdoc/>
 public class LevelPlanMarkDescriptor : ISmartEntityDescriptor
 {
     /// <inheritdoc/>
@@ -14,47 +15,32 @@ public class LevelPlanMarkDescriptor : ISmartEntityDescriptor
     public string Name => "mpLevelPlanMark";
 
     /// <inheritdoc />
-    // Обозначение отметки уровня на плане
-    public string LName => Language.GetItem("h173");
+    // Отметка уровня на плане
+    public string LName => Language.GetItem("h171");
 
     /// <inheritdoc />
-    // Создание отметки уровня на плане
-    public string Description => Language.GetItem("h174");
+    // Создание отметки уровня на плане по ГОСТ 2.307
+    public string Description => Language.GetItem("h173");
 
     /// <inheritdoc />
     // Создание интеллектуального объекта на основе анонимного блока, описывающего отметку уровня на плане по ГОСТ 2.307
-    public string FullDescription => Language.GetItem("h175");
+    public string FullDescription => Language.GetItem("h174");
 
     /// <inheritdoc />
     public string ToolTipHelpImage => string.Empty;
 
     /// <inheritdoc />
-    public List<string> SubFunctionsNames
-    {
-        get; set;
-    }
+    public List<string> SubFunctionsNames => new ();
 
     /// <inheritdoc />
-    public List<string> SubFunctionsLNames
-    {
-        get; set;
-    }
+    public List<string> SubFunctionsLNames => new ();
 
     /// <inheritdoc />
-    public List<string> SubDescriptions
-    {
-        get; set;
-    }
+    public List<string> SubDescriptions => new ();
 
     /// <inheritdoc />
-    public List<string> SubFullDescriptions 
-    {
-        get; set;
-    }
+    public List<string> SubFullDescriptions => new ();
 
     /// <inheritdoc />
-    public List<string> SubHelpImages 
-    {
-        get; set;
-    }
+    public List<string> SubHelpImages => new ();
 }

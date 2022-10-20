@@ -26,9 +26,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     #endregion
 
-    private List<Line> _leaderLines = new();
-    private List<Polyline> _leaderEndLines = new();
-    private List<Hatch> _hatches = new();
+    private readonly List<Line> _leaderLines = new ();
+    private readonly List<Polyline> _leaderEndLines = new ();
+    private readonly List<Hatch> _hatches = new ();
     private Polyline _framePolyline;
     private double _scale;
 
@@ -67,7 +67,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Размер стрелки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0, 100)]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0.1, 10)]
     [SaveToXData]
     public double ArrowSize { get; set; } = 3;
 
@@ -204,14 +204,17 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
     }
 
+    /// <summary>
+    /// Точки выносок
+    /// </summary>
     [SaveToXData]
-    public List<Point3d> LeaderPoints { get; set; } = new List<Point3d>();
+    public List<Point3d> LeaderPoints { get; set; } = new ();
 
     /// <summary>
     /// Типы выносок
     /// </summary>
     [SaveToXData]
-    public List<int> LeaderTypes { get; set; } = new List<int>();
+    public List<int> LeaderTypes { get; set; } = new ();
 
     private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
     
@@ -243,8 +246,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
         _dbText = new DBText { TextString = DisplayedValue, Position = insertionPoint };
         _dbText.SetProperties(TextStyle, TextHeight * _scale);
-        _dbText.Position = _dbText.Position - (Vector3d.XAxis * (_dbText.GetLength() / 2)) - (Vector3d.YAxis * (_dbText.GetHeight() / 2));
-
+        _dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+        _dbText.AlignmentPoint = insertionPoint;
+        
         if (BorderWidth == 0)
         {
             BorderWidth = MinDistanceBetweenPoints * _scale;
@@ -310,9 +314,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             var points2ds = from point in points
                             select point.ToPoint2d();
             _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i], points2ds));
-            Polyline pline = new Polyline();
+            var pline = new Polyline();
 
-            if (_leaderLines[i].Length - ArrowSize * _scale > 0)
+            if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
             {
                 if (LeaderTypes.Count <= 0)
                 {
@@ -371,7 +375,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     private Polyline CreateResectionArrow(Line leaderLine)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * _scale);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
         var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -386,7 +390,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * _scale);
+        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize * _scale));
         var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, leaderLine.EndPoint);
         var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, leaderLine.EndPoint);
 
@@ -404,7 +408,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     private Polyline CreateHalfArrow(Line leaderLine)
     {
         var vector = new Vector3d(0, 0, 1);
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize * _scale);
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize * _scale));
         var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, leaderLine.EndPoint);
 
         var pline = new Polyline(3);
@@ -419,14 +423,14 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private Hatch CreateArrowHatch(Polyline pline)
     {
-        Point2dCollection vertexCollection = new Point2dCollection();
-        for (int index = 0; index < pline.NumberOfVertices; ++index)
+        var vertexCollection = new Point2dCollection();
+        for (var index = 0; index < pline.NumberOfVertices; ++index)
         {
             vertexCollection.Add(pline.GetPoint2dAt(index));
         }
 
         vertexCollection.Add(pline.GetPoint2dAt(0));
-        DoubleCollection bulgeCollection = new DoubleCollection()
+        var bulgeCollection = new DoubleCollection()
         {
             0.0, 0.0, 0.0
         };
@@ -436,8 +440,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private Polyline CreatePointArrow(Line leaderLine)
     {
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - ArrowSize / 2 * _scale);
-        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + ArrowSize / 2);
+        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
+        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + (ArrowSize / 2));
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
@@ -449,14 +453,14 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private Hatch CreatePointHatch(Polyline pline)
     {
-        Point2dCollection vertexCollection = new Point2dCollection();
-        for (int index = 0; index < pline.NumberOfVertices; ++index)
+        var vertexCollection = new Point2dCollection();
+        for (var index = 0; index < pline.NumberOfVertices; ++index)
         {
             vertexCollection.Add(pline.GetPoint2dAt(index));
         }
 
         vertexCollection.Add(pline.GetPoint2dAt(0));
-        DoubleCollection bulgeCollection = new DoubleCollection()
+        var bulgeCollection = new DoubleCollection()
         {
             1.0, 1.0
         };
@@ -466,7 +470,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     private Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
     {
-        Hatch hatch = new Hatch();
+        var hatch = new Hatch();
         hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
         hatch.AppendLoop(HatchLoopTypes.Default, vertexCollection, bulgeCollection);
 

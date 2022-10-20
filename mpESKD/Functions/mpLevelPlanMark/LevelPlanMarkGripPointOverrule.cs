@@ -52,8 +52,8 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                     grips.Add(new LevelPlanMarkAddLeaderGrip(levelPlanMark)
                     {
                         GripPoint = new Point3d(
-                            (levelPlanMark.InsertionPoint.X - levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
-                            (levelPlanMark.InsertionPoint.Y + levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
+                            levelPlanMark.InsertionPoint.X - (levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
+                            levelPlanMark.InsertionPoint.Y + (levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
                             levelPlanMark.InsertionPoint.Z)
                     });
 
@@ -61,8 +61,8 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                     grips.Add(new LevelPlanMarkFrameTypeGrip(levelPlanMark)
                     {
                         GripPoint = new Point3d(
-                            (levelPlanMark.InsertionPoint.X + levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
-                            (levelPlanMark.InsertionPoint.Y - levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
+                            levelPlanMark.InsertionPoint.X + (levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),
+                            levelPlanMark.InsertionPoint.Y - (levelPlanMark.BorderHeight / 2 * levelPlanMark.GetFullScale()),
                             levelPlanMark.InsertionPoint.Z)
                     });
 
@@ -73,10 +73,14 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                         {
                             GripPoint = levelPlanMark.LeaderPoints[i]
                         });
-                        var deleteGripPoint = new Point3d(levelPlanMark.LeaderPoints[i].X + 1,
-                            levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
-                        var leaderEndTypeGripPoint = new Point3d(levelPlanMark.LeaderPoints[i].X - 1,
-                            levelPlanMark.LeaderPoints[i].Y, levelPlanMark.LeaderPoints[i].Z);
+                        var deleteGripPoint = new Point3d(
+                            levelPlanMark.LeaderPoints[i].X + 1,
+                            levelPlanMark.LeaderPoints[i].Y, 
+                            levelPlanMark.LeaderPoints[i].Z);
+                        var leaderEndTypeGripPoint = new Point3d(
+                            levelPlanMark.LeaderPoints[i].X - 1,
+                            levelPlanMark.LeaderPoints[i].Y, 
+                            levelPlanMark.LeaderPoints[i].Z);
 
                         // ручки удаления выносок
                         grips.Add(new LevelPlanMarkLeaderRemoveGrip(levelPlanMark, i)

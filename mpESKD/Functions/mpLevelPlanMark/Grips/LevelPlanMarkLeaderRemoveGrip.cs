@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;

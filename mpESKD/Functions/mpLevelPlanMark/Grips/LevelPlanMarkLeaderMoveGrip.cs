@@ -14,7 +14,7 @@ using System.Linq;
 /// </summary>
 public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
 {
-    private Point2d[] _points;
+    private readonly Point2d[] _points;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMarkVertexGrip"/> class.
@@ -54,6 +54,7 @@ public class LevelPlanMarkLeaderMoveGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
+   
     /// <inheritdoc />
     public override string GetTooltip()
     {
