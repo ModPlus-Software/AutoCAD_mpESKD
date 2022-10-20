@@ -5,12 +5,43 @@
 /// </summary>
 public enum LeaderEndType
 {
-    None = 0, // Нет
-    HalfArrow = 1, // Полустрелка
-    Point = 2, // Точка
-    Resection = 3, // Двойная засечка
-    Angle = 4, // Прямой угол 
-    Arrow = 5, // Закрашенная
-    OpenArrow = 6, // Разомкнутая
-    ClosedArrow = 7, // Замкнутая
+    /// <summary>
+    /// Нет
+    /// </summary>
+    None = 0,
+
+    /// <summary>
+    /// Полустрелка
+    /// </summary>
+    HalfArrow = 1,
+
+    /// <summary>
+    /// Точка
+    /// </summary>
+    Point = 2,
+
+    /// <summary>
+    /// Двойная засечка
+    /// </summary>
+    Resection = 3, 
+
+    /// <summary>
+    /// Прямой угол
+    /// </summary>
+    Angle = 4,
+
+    /// <summary>
+    /// Закрашенная
+    /// </summary>
+    Arrow = 5,
+
+    /// <summary>
+    /// Разомкнутая
+    /// </summary>
+    OpenArrow = 6,
+
+    /// <summary>
+    /// Замкнутая
+    /// </summary>
+    ClosedArrow = 7
 }

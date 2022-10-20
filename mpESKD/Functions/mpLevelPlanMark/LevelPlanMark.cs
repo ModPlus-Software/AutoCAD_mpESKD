@@ -53,12 +53,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
-
-    /// <inheritdoc />
-    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
-    [SaveToXData]
-    public override string TextStyle { get; set; }
-
+    
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => 1;
 
@@ -72,10 +67,29 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Размер стрелки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0, 100, descLocalKey: "d67")]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0, 100)]
     [SaveToXData]
     public double ArrowSize { get; set; } = 3;
 
+    /// <summary>
+    /// Ширина рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p77", 12, 1, 65)]
+    [SaveToXData]
+    public double BorderWidth { get; set; }
+
+    /// <summary>
+    /// Высота рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p76", 5, 0, 10)]
+    [SaveToXData]
+    public double BorderHeight { get; set; }
+
+    /// <inheritdoc />
+    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
+    [SaveToXData]
+    public override string TextStyle { get; set; } = "Standard";
+    
     /// <summary>
     /// Высота текста
     /// </summary>
@@ -102,63 +116,49 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// <summary>
     /// Показывать плюс
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 8, "p64", false, descLocalKey: "d64")]
+    [EntityProperty(PropertiesCategory.Content, 7, "p64", false, descLocalKey: "d64")]
     [SaveToXData]
     public bool ShowPlus { get; set; }
 
     /// <summary>
     /// Добавление звездочки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 9, "p75", false, descLocalKey: "d75")]
+    [EntityProperty(PropertiesCategory.Content, 8, "p75", false, descLocalKey: "d75")]
     [SaveToXData]
     public bool AddAsterisk { get; set; }
 
     /// <summary>
     /// Точность
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 10, "p67", 3, 0, 5, descLocalKey: "d67")]
+    [EntityProperty(PropertiesCategory.Content, 9, "p67", 3, 0, 5, descLocalKey: "d67")]
     [SaveToXData]
     public int Accuracy { get; set; } = 3;
 
     /// <summary>
-    /// Ширина рамки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 11, "p77", 12, 1, 65, descLocalKey: "d67")]
-    [SaveToXData]
-    public double BorderWidth { get; set; }
-
-    /// <summary>
-    /// Высота рамки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 12, "p76", 5, 0, 10, descLocalKey: "d67")]
-    [SaveToXData]
-    public double BorderHeight { get; set; }
-
-    /// <summary>
     /// Обозначение плана
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 13, "p110", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 10, "p110", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [SaveToXData]
     [ValueToSearchBy]
     public double PlanMark { get; set; } = 0.000; 
 
     /// <summary>
-    /// Префикс уровня
+    /// Префикс
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 14, "p111", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 11, "p111", "", propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
-    public string DesignationPrefix { get; set; } = string.Empty;
+    public string Prefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Суффикс уровня
+    /// Суффикс
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 15, "p112", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
+    [EntityProperty(PropertiesCategory.Content, 12, "p112", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [RegexInputRestriction("^.{0,10}$")]
     [SaveToXData]
     [ValueToSearchBy]
-    public string DesignationSuffix { get; set; } = string.Empty;
+    public string Suffix { get; set; } = string.Empty;
 
     /// <summary>
     /// Отображаемое значение
@@ -168,8 +168,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     {
         get
         {
-            var prefix = string.IsNullOrEmpty(DesignationPrefix) ? string.Empty : DesignationPrefix;
-            var suffix = string.IsNullOrEmpty(DesignationSuffix) ? string.Empty : DesignationSuffix;
+            var prefix = string.IsNullOrEmpty(Prefix) ? string.Empty : Prefix;
+            var suffix = string.IsNullOrEmpty(Suffix) ? string.Empty : Suffix;
             var asterisk = AddAsterisk ? "*" : string.Empty;
             var plus = ShowPlus ? "+" : string.Empty;
             return ReplaceSeparator($"{plus}{prefix}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{suffix}{asterisk}");
@@ -208,21 +208,13 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public List<Point3d> LeaderPoints { get; set; } = new List<Point3d>();
 
     /// <summary>
-    /// Составные линии
+    /// Типы выносок
     /// </summary>
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new List<int>();
 
-    private List<Point3d> LeaderPointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            LeaderPoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
-
+    private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
+    
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
