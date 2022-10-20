@@ -274,7 +274,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             if (HideTextBackground)
             {
-                _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale);
+                _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale, insertionPoint);
             }
         }
         else
@@ -289,7 +289,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
                 if (HideTextBackground)
                 {
-                    _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale);
+                    _dbTextMask = _dbText.GetBackgroundMask(TextMaskOffset * _scale, insertionPoint);
                 }
             }
             else
