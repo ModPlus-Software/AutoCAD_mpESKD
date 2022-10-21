@@ -65,23 +65,23 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public FrameType FrameType { get; set; } = FrameType.Rectangular;
 
     /// <summary>
-    /// Размер стрелки
+    /// Размер стрелок
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0.1, 10)]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0.1, 10, nameSymbol: "d")]
     [SaveToXData]
     public double ArrowSize { get; set; } = 3;
 
     /// <summary>
     /// Ширина рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p77", 12, 1, 65)]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p77", 12, 1, 65, nameSymbol: "l")]
     [SaveToXData]
     public double BorderWidth { get; set; }
 
     /// <summary>
     /// Высота рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p76", 5, 0, 10)]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p76", 5, 0, 10, nameSymbol: "h2")]
     [SaveToXData]
     public double BorderHeight { get; set; }
 

@@ -183,7 +183,7 @@ public static class EntityUtils
         {
             var minPoint = extents3d.MinPoint;
             var maxPoint = extents3d.MaxPoint;
-            var halfWidth = (Math.Abs(maxPoint.X - minPoint.Y) + (offset * 2)) / 2;
+            var halfWidth = (Math.Abs(maxPoint.X - minPoint.X) + (offset * 2)) / 2;
             var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
             
             var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
