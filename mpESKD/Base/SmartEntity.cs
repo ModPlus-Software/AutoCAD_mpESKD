@@ -695,12 +695,8 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
             return;
         if ((ScaleFactorX >= 0 || MainFunction.Mirroring) && (ScaleFactorX <= 0 || !MainFunction.Mirroring))
             return;
-        var mirrorPoint = new Point3d(
-            dbText.Position.X + (dbText.GetLength() / 2),
-            dbText.Position.Y + (dbText.GetHeight() / 2), 
-            dbText.Position.Z);
-        var mirror = Matrix3d.Mirroring(mirrorPoint);
-        dbText.TransformBy(mirror);
+        
+        dbText.IsMirroredInX = true;
     }
 
     /// <summary>

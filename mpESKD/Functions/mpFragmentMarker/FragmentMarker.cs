@@ -421,6 +421,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _topDbText = new DBText { TextString = MainText };
             _topDbText.SetProperties(TextStyle, mainTextHeight);
+            _topDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             topFirstTextLength = _topDbText.GetLength();
         }
         else
@@ -432,6 +433,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _bottomDbText = new DBText { TextString = SmallText };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();
         }
@@ -446,42 +448,40 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
 
         if (isRight)
         {
-            var nodeNumberPosition =
-                leaderPoint +
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
-
             if (_topDbText != null)
             {
-                _topDbText.Position = nodeNumberPosition;
+                var topTextPosition = new Point3d(leaderPoint.X + topFirstTextLength / 2 + (shelfLength - topTextLength) / 2,
+                    leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
+
+               
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X + bottomTextLength / 2 + (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
         else
         {
-            var sheetNumberEndPoint =
-                leaderPoint -
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
-
             if (_topDbText != null)
             {
-                _topDbText.Position = sheetNumberEndPoint -
-                                      (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
+                var topTextPosition = new Point3d(leaderPoint.X - topFirstTextLength / 2 - (shelfLength - topTextLength) / 2,
+                    leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint -
-                                         (Vector3d.XAxis * shelfLength) +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X - bottomTextLength / 2 - (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
 
@@ -489,11 +489,19 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
 
+        var offset = TextMaskOffset * scale;
         if (HideTextBackground)
         {
-            var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topDbText.GetBackgroundMask(offset);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
+            
+            if (_topDbText != null)
+            {
+                _topFirstTextMask = _topDbText.GetBackgroundMask(offset, _topDbText.Position);
+            }
+
+            if (_bottomDbText != null)
+            {
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
+            }
         }
 
         if (IsTextAlwaysHorizontal && IsRotated)

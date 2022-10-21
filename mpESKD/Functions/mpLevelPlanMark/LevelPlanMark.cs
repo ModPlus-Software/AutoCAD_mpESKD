@@ -441,7 +441,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     private Polyline CreatePointArrow(Line leaderLine)
     {
         var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
-        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + (ArrowSize / 2));
+        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + (ArrowSize / 2 * _scale));
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
