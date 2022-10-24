@@ -697,6 +697,12 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
             return;
         
         dbText.IsMirroredInX = true;
+        //var mirrorPoint = new Point3d(
+        //    dbText.Position.X + (dbText.GetLength() / 2),
+        //    dbText.Position.Y + (dbText.GetHeight() / 2), 
+        //    dbText.Position.Z);
+        //var mirror = Matrix3d.Mirroring(mirrorPoint);
+        //dbText.TransformBy(mirror);
     }
 
     /// <summary>

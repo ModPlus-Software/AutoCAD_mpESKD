@@ -628,31 +628,29 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         _verticalLine = new Line(arrowPoint, shelfPoint);
         _arrowPolyline = GetArrow(objectPoint, arrowPoint, shelfPoint, scale);
 
-        var topTextPosition = isTop
-            ? shelfPoint + (textVerticalOffset * verV) + (textIndent * horV)
-            : shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
-        var bottomTextPosition = isTop
-            ? shelfPoint - (textVerticalOffset * verV) + (textIndent * horV)
-            : shelfPoint + (textVerticalOffset * verV) + (textIndent * horV);
-
-        _topDbText = new DBText
-        {
-            TextString = DisplayedValue,
-            Position = topTextPosition
-        };
-
+        _topDbText = new DBText { TextString = DisplayedValue };
         _topDbText.SetProperties(TextStyle, mainTextHeight);
+        _topDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+        var topTextPosition = isTop
+            ? shelfPoint + ((textVerticalOffset + _topDbText.Height / 2) * verV) + ((textIndent + _topDbText.GetLength() / 2) * horV)
+            : shelfPoint - ((textVerticalOffset + _topDbText.Height / 2) * verV) + ((textIndent + _topDbText.GetLength() / 2) * horV);
+
+        _topDbText.Position = topTextPosition;
+
+        var textBottomPosition = shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
+
+        _topDbText.AlignmentPoint = topTextPosition;
 
         if (!string.IsNullOrEmpty(Note))
         {
-            _bottomDbText = new DBText
-            {
-                TextString = Note,
-                Position = bottomTextPosition
-            };
-
+            _bottomDbText = new DBText { TextString = Note };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-
+            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            var bottomTextPosition = isTop
+                ? shelfPoint - ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV)
+                : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV); ;
+            _bottomDbText.Position = bottomTextPosition;
+            _bottomDbText.AlignmentPoint = bottomTextPosition;
             if (isTop)
                 _bottomDbText.Position -= verV * _bottomDbText.GetHeight();
             else
@@ -720,9 +718,9 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         if (HideTextBackground)
         {
             var maskOffset = TextMaskOffset * scale;
-            _topTextMask = _topDbText.GetBackgroundMask(maskOffset);
+            _topTextMask = _topDbText.GetBackgroundMask(maskOffset, _topDbText.Position);
             if (_bottomDbText != null)
-                _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset);
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset, _bottomDbText.Position);
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
