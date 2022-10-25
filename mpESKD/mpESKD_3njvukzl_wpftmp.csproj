@@ -1,0 +1,252 @@
+<Project>
+  <PropertyGroup>
+    <AssemblyName>mpESKD_2016</AssemblyName>
+    <IntermediateOutputPath>obj\x64\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\</MSBuildProjectExtensionsPath>
+    <_TargetAssemblyProjectName>mpESKD</_TargetAssemblyProjectName>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
+  <PropertyGroup>
+    <Version>1.18.18.0</Version>
+    <RootNamespace>mpESKD</RootNamespace>
+    <Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023</Configurations>
+    <Platforms>x64</Platforms>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Company>modplus.org</Company>
+    <Authors>modplus.org</Authors>
+    <Product>ModPlus</Product>
+    <AssemblyTitle>Plugin for ModPlus software for AutoCAD</AssemblyTitle>
+    <Description>$(AssemblyTitle)</Description>
+    <Copyright>Copyright © ModPlus</Copyright>
+    <CodeAnalysisRuleSet>$(SolutionDir)\ModPlus.ruleset</CodeAnalysisRuleSet>
+    <Platform>x64</Platform>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Optimize>false</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+    <UseWpf>true</UseWpf>
+    <MSBuildWarningsAsMessages>MSB3270</MSBuildWarningsAsMessages>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2013'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2013</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2014'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2014</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2015'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2015</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2016'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2016</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2017'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2017</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2018'">
+    <TargetFramework>net46</TargetFramework>
+    <ExternalVersion>2018</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2019'">
+    <TargetFramework>net47</TargetFramework>
+    <ExternalVersion>2019</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2020'">
+    <TargetFramework>net47</TargetFramework>
+    <ExternalVersion>2020</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2021'">
+    <TargetFramework>net47</TargetFramework>
+    <ExternalVersion>2021</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2022'">
+    <TargetFramework>net48</TargetFramework>
+    <ExternalVersion>2022</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2023'">
+    <TargetFramework>net48</TargetFramework>
+    <ExternalVersion>2023</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <TargetFramework>net45</TargetFramework>
+    <ExternalVersion>2016</ExternalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
+    <DefineConstants>A$(ExternalVersion)</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>mpESKD_$(ExternalVersion)</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <OutputPath>C:\Users\yusufzhon.marasulov\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2013'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2013" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2013" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2014'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2014" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2014" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2015'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2015" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2015" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2016'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2017'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2017" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2017" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2018'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2018" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2018" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2019'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2019" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2019" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2020'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2020" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2020" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2021'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2021" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2021" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2022'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='A2023'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2022" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
+    <PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32.png" />
+    <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32_dark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusAPI" Version="9.8.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlusStyle" Version="4.3.0" ExcludeAssets="runtime" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.api.2016\1.0.0\lib\accoremgd.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.api.2016\1.0.0\lib\AcCui.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.api.2016\1.0.0\lib\acdbmgd.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.api.2016\1.0.0\lib\acmgd.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.api.2016\1.0.0\lib\AdWindows.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\DocumentFormat.OpenXml.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\GongSolutions.Wpf.DragDrop.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\jetbrains.annotations\2022.1.0\lib\net20\JetBrains.Annotations.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\microsoft.xaml.behaviors.wpf\1.1.3\lib\net45\Microsoft.Xaml.Behaviors.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.ClosedXML.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.CSharpFunctionalExtensions.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.ExcelNumberFormat.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.Newtonsoft.Json.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.SharpRaven.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlus.SimpleInjector.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlusAPI.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusapi\9.8.0\lib\ModPlusService.Dto.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplusstyle\4.3.0\lib\ModPlusStyle.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.autocad.module.2016\10.0.0\lib\net45\ModPlus_2016.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpBaseInt.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpConcrete.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpMaterial.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpMetall.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpOther.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpProductInt.dll" />
+    <ReferencePath Include="C:\Users\yusufzhon.marasulov\.nuget\packages\modplus.productdatabase\3.1.0\lib\mpWood.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Drawing.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.IO.Compression.FileSystem.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Numerics.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Controls.Ribbon.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\UIAutomationClient.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\UIAutomationClientsideProviders.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\UIAutomationProvider.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\UIAutomationTypes.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsBase.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsFormsIntegration.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\Controls\ControlStyles.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\Controls\ControlStylesForEditor.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\Overrules\Grips\ContextMenuHost.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\Properties\PropertiesPalette.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\View\DoubleClickEditor.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\View\PaletteSettings.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Base\View\StyleEditor.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpAxis\AxisDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpFragmentMarker\FragmentMarkerDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpLetterLine\LetterLineDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpLevelMark\LevelMarkAlignSetup.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpLevelMark\LevelMarkDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpNodalLeader\NodalLeaderDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpSection\SectionDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpViewLabel\ViewLabelDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\mpView\ViewDoubleClickEditControl.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\SearchEntitiesByValues\SearchEntitiesByValuesWindow.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\Functions\SearchEntities\SearchEntitiesSettings.g.cs" />
+    <Compile Include="C:\Users\yusufzhon.marasulov\source\repos\modplus\AutoCAD_mpESKD\mpESKD\obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="C:\Users\yusufzhon.marasulov\.nuget\packages\stylecop.analyzers\1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="C:\Users\yusufzhon.marasulov\.nuget\packages\stylecop.analyzers\1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk.WindowsDesktop" />
+</Project>

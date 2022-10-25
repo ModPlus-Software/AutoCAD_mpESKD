@@ -464,6 +464,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _topFirstDbText = new DBText { TextString = NodeNumber };
             _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+            _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             topFirstTextLength = _topFirstDbText.GetLength();
         }
         else
@@ -475,6 +476,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
             _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
+            
             topSecondTextLength = _topSecondDbText.GetLength();
         }
         else
@@ -486,6 +488,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _bottomDbText = new DBText { TextString = NodeAddress };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();
         }
@@ -500,53 +503,75 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         if (isRight)
         {
-            var nodeNumberPosition =
-                leaderPoint +
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
+            //var nodeNumberPosition =
+            //    leaderPoint +
+            //    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+            //    (Vector3d.YAxis * textVerticalOffset);
+            var topFirstTextPosition = new Point3d(leaderPoint.X + topFirstTextLength / 2 + (shelfLength - topTextLength) / 2,
+                leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+            
+            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
 
             if (_topFirstDbText != null)
             {
-                _topFirstDbText.Position = nodeNumberPosition;
+                _topFirstDbText.Position = topFirstTextPosition;
             }
 
             if (_topSecondDbText != null)
-            {
-                _topSecondDbText.Position = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
+            { 
+                var secondTextPosition = new Point3d(topFirstTextPosition.X + topFirstTextLength / 2,
+                    topFirstTextPosition.Y, 0);
+                _topSecondDbText.Position = secondTextPosition;
+                _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                    //topFirstTextPosition + (Vector3d.XAxis * topFirstTextLength);
+                _topFirstDbText.AlignmentPoint = secondTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X + bottomTextLength / 2 + (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+
+                //_bottomDbText.Position = leaderPoint +
+                //                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                //                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
             }
         }
         else
         {
-            var sheetNumberEndPoint =
-                leaderPoint -
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
+            //var sheetNumberEndPoint =
+            //    leaderPoint -
+            //    (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
+            //    (Vector3d.YAxis * textVerticalOffset);
 
             if (_topFirstDbText != null)
             {
-                _topFirstDbText.Position = sheetNumberEndPoint -
-                                           (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
+                var topTextPosition = new Point3d(leaderPoint.X - topFirstTextLength / 2 - (shelfLength - topTextLength) / 2,
+                    leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+                _topFirstDbText.Position = topTextPosition;
+                _topFirstDbText.AlignmentPoint = topTextPosition;
+                //_topFirstDbText.Position = sheetNumberEndPoint -
+                //                           (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
             }
 
             if (_topSecondDbText != null)
             {
-                _topSecondDbText.Position = sheetNumberEndPoint -
+                _topSecondDbText.Position = _topFirstDbText.Position -
                                             (Vector3d.XAxis * topSecondTextLength);
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint -
-                                         (Vector3d.XAxis * shelfLength) +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X - bottomTextLength / 2 - (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+                //_bottomDbText.Position = leaderPoint -
+                //                         (Vector3d.XAxis * shelfLength) +
+                //                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
+                //                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
             }
         }
 
@@ -557,9 +582,9 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset);
-            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
+            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, _topFirstDbText.Position);
+            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, _topSecondDbText.Position);
+            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
         }
 
         if (IsTextAlwaysHorizontal && IsRotated)
