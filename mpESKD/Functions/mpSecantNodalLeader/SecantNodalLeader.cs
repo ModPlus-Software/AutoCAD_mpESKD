@@ -327,6 +327,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         {
             _topFirstDbText = new DBText { TextString = NodeNumber };
             _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+            _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             topFirstTextLength = _topFirstDbText.GetLength();
         }
         else
@@ -338,6 +339,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         {
             _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
             _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
+            _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             topSecondTextLength = _topSecondDbText.GetLength();
         }
         else
@@ -349,6 +351,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         {
             _bottomDbText = new DBText { TextString = NodeAddress };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();
         }
@@ -363,53 +366,55 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
         if (isRight)
         {
-            var nodeNumberPosition =
-                leaderPoint +
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
+            var topFirstTextPosition = new Point3d(leaderPoint.X + topFirstTextLength / 2 + (shelfLength - topTextLength) / 2,
+                leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
 
             if (_topFirstDbText != null)
             {
-                _topFirstDbText.Position = nodeNumberPosition;
+                _topFirstDbText.Position = topFirstTextPosition;
+                _topFirstDbText.AlignmentPoint = topFirstTextPosition;
             }
 
             if (_topSecondDbText != null)
             {
-                _topSecondDbText.Position = nodeNumberPosition + (Vector3d.XAxis * topFirstTextLength);
+                var secondTextPosition = new Point3d(_topFirstDbText.Position.X + topFirstTextLength / 2 + topSecondTextLength / 2,
+                    topFirstTextPosition.Y, 0);
+                _topSecondDbText.Position = secondTextPosition;
+                _topSecondDbText.AlignmentPoint = secondTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X + bottomTextLength / 2 + (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
         else
         {
-            var sheetNumberEndPoint =
-                leaderPoint -
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
-
             if (_topFirstDbText != null)
             {
-                _topFirstDbText.Position = sheetNumberEndPoint -
-                                           (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
+                var topTextPosition = new Point3d(leaderPoint.X - topFirstTextLength / 2 - topSecondTextLength - (shelfLength - topTextLength) / 2,
+                    leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+                _topFirstDbText.Position = topTextPosition;
+                _topFirstDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_topSecondDbText != null)
             {
-                _topSecondDbText.Position = sheetNumberEndPoint -
-                                            (Vector3d.XAxis * topSecondTextLength);
+                var secondTextPosition = new Point3d(_topFirstDbText.Position.X + topFirstTextLength / 2 + topSecondTextLength / 2,
+                    _topFirstDbText.Position.Y, 0);
+                _topSecondDbText.Position = secondTextPosition;
+                _topSecondDbText.AlignmentPoint = secondTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint -
-                                         (Vector3d.XAxis * shelfLength) +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                var bottomTextPosition = new Point3d(leaderPoint.X - bottomTextLength / 2 - (shelfLength - bottomTextLength) / 2,
+                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
 
@@ -420,9 +425,20 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset);
-            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
+            if (_topFirstDbText != null)
+            {
+                _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, _topFirstDbText.Position);
+            }
+
+            if (_topSecondDbText != null)
+            {
+                _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, _topSecondDbText.Position);
+            }
+
+            if (_bottomDbText != null)
+            {
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
+            }
         }
 
         if (IsTextAlwaysHorizontal && IsRotated)

@@ -561,9 +561,20 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, _topFirstDbText.Position);
-            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, _topSecondDbText.Position);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
+            if (_topFirstDbText != null)
+            {
+                _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, _topFirstDbText.Position);
+            }
+
+            if (_topSecondDbText != null)
+            {
+                _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, _topSecondDbText.Position);
+            }
+
+            if (_bottomDbText != null)
+            {
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
+            }
         }
 
         if (IsTextAlwaysHorizontal && IsRotated)
