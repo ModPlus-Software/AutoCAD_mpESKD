@@ -766,7 +766,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 _bottomFirstDBText = new DBText();
                 _bottomFirstDBText.SetProperties(TextStyle, textHeight);
+                _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
                 _bottomFirstDBText.Position = firstMarkerCenter;
+                _bottomFirstDBText.AlignmentPoint = firstMarkerCenter;
             }
             else
             {
@@ -801,7 +803,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _bottomSecondDBText = new DBText();
                     _bottomSecondDBText.SetProperties(TextStyle, textHeight);
-                    _bottomSecondDBText.Position = secondMarkerCenter;
+                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                    _bottomFirstDBText.Position = secondMarkerCenter;
+                    _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
                 }
                 else
                 {
@@ -835,7 +839,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     {
                         _bottomThirdDBText = new DBText();
                         _bottomThirdDBText.SetProperties(TextStyle, textHeight);
-                        _bottomThirdDBText.Position = thirdMarkerCenter;
+                        _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                        _bottomFirstDBText.Position = thirdMarkerCenter;
+                        _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
                     }
                     else
                     {
@@ -900,7 +906,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _bottomOrientDBText = new DBText();
                     _bottomOrientDBText.SetProperties(TextStyle, textHeight);
-                    _bottomOrientDBText.Position = bottomOrientMarkerCenter;
+                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                    _bottomFirstDBText.Position = bottomOrientMarkerCenter;
+                    _bottomFirstDBText.AlignmentPoint = bottomOrientMarkerCenter;
                 }
                 else
                 {
@@ -981,7 +989,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 _topFirstDBText = new DBText();
                 _topFirstDBText.SetProperties(TextStyle, textHeight);
-                _topFirstDBText.Position = firstMarkerCenter;
+                _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                _bottomFirstDBText.Position = firstMarkerCenter;
+                _bottomFirstDBText.AlignmentPoint = firstMarkerCenter;
             }
             else
             {
@@ -1016,7 +1026,10 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _topSecondDBText = new DBText();
                     _topSecondDBText.SetProperties(TextStyle, textHeight);
-                    _topSecondDBText.Position = secondMarkerCenter;
+                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                    _bottomFirstDBText.Position = secondMarkerCenter;
+                    _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
+
                 }
                 else
                 {
@@ -1050,7 +1063,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     {
                         _topThirdDBText = new DBText();
                         _topThirdDBText.SetProperties(TextStyle, textHeight);
-                        _topThirdDBText.Position = thirdMarkerCenter;
+                        _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+                        _bottomFirstDBText.Position = thirdMarkerCenter;
+                        _bottomFirstDBText.AlignmentPoint = thirdMarkerCenter;
                     }
                     else
                     {
@@ -1116,7 +1131,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _topOrientDBText = new DBText();
                     _topOrientDBText.SetProperties(TextStyle, textHeight);
+                    _topOrientDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
                     _topOrientDBText.Position = topOrientMarkerCenter;
+                    _topOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                 }
                 else
                 {
@@ -1213,18 +1230,18 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var maskOffset = TextMaskOffset * GetScale();
         var textRotation = TextRotationAngle.DegreeToRadian();
         dbText.TextString = textString;
-        var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
-        dbText.Position = dbText.Position -
-                          (Vector3d.XAxis * (dbText.GetLength() / 2)) -
-                          (Vector3d.YAxis * (dbText.GetHeight() / 2));
-        if (textRotation != 0.0)
-            dbText.TransformBy(rotationMatrix);
+        //var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
+        //dbText.Position = dbText.Position -
+        //                  (Vector3d.XAxis * (dbText.GetLength() / 2)) -
+        //                  (Vector3d.YAxis * (dbText.GetHeight() / 2));
+        //if (textRotation != 0.0)
+        //    dbText.TransformBy(rotationMatrix);
 
         if (HideTextBackground)
         {
             mask = dbText.GetBackgroundMask(maskOffset);
-            if (textRotation != 0.0)
-                mask.TransformBy(rotationMatrix);
+            //if (textRotation != 0.0)
+            //    mask.TransformBy(rotationMatrix);
         }
     }
 
