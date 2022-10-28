@@ -766,10 +766,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 _bottomFirstDBText = new DBText();
                 _bottomFirstDBText.SetProperties(TextStyle, textHeight);
-                _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                _bottomFirstDBText.Position = firstMarkerCenter;
-                _bottomFirstDBText.AlignmentPoint = firstMarkerCenter;
-                AcadUtils.WriteMessageInDebug($"firstMarkerCenter {firstMarkerCenter} - {_bottomFirstDBText.Position}");
             }
             else
             {
@@ -804,10 +800,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _bottomSecondDBText = new DBText();
                     _bottomSecondDBText.SetProperties(TextStyle, textHeight);
-                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                    _bottomFirstDBText.Position = secondMarkerCenter;
-                    _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
-                    AcadUtils.WriteMessageInDebug($"secondMarkerCenter {secondMarkerCenter} - _bottomSecondDBText.Position {_bottomSecondDBText.Position} - Text - {_bottomSecondDBText.TextString}");
                 }
                 else
                 {
@@ -841,9 +833,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     {
                         _bottomThirdDBText = new DBText();
                         _bottomThirdDBText.SetProperties(TextStyle, textHeight);
-                        _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                        _bottomFirstDBText.Position = thirdMarkerCenter;
-                        _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
                     }
                     else
                     {
@@ -907,10 +896,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 if (!string.IsNullOrEmpty(BottomOrientText))
                 {
                     _bottomOrientDBText = new DBText();
-                    _bottomOrientDBText.SetProperties(TextStyle, textHeight);
-                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                    _bottomFirstDBText.Position = bottomOrientMarkerCenter;
-                    _bottomFirstDBText.AlignmentPoint = bottomOrientMarkerCenter;
                 }
                 else
                 {
@@ -1026,10 +1011,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _topSecondDBText = new DBText();
                     _topSecondDBText.SetProperties(TextStyle, textHeight);
-                    _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                    _bottomFirstDBText.Position = secondMarkerCenter;
-                    _bottomFirstDBText.AlignmentPoint = secondMarkerCenter;
-
                 }
                 else
                 {
@@ -1063,9 +1044,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     {
                         _topThirdDBText = new DBText();
                         _topThirdDBText.SetProperties(TextStyle, textHeight);
-                        _bottomFirstDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                        _bottomFirstDBText.Position = thirdMarkerCenter;
-                        _bottomFirstDBText.AlignmentPoint = thirdMarkerCenter;
                     }
                     else
                     {
@@ -1131,9 +1109,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     _topOrientDBText = new DBText();
                     _topOrientDBText.SetProperties(TextStyle, textHeight);
-                    _topOrientDBText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-                    _topOrientDBText.Position = topOrientMarkerCenter;
-                    _topOrientDBText.AlignmentPoint = topOrientMarkerCenter;
                 }
                 else
                 {
@@ -1191,15 +1166,13 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (_bottomSecondMarker != null)
         {
             UpdateTextEntity(
-                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _bottomSecondMarker.Center,
-                ref _bottomSecondTextMask);
+                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _bottomSecondMarker.Center, ref _bottomSecondTextMask);
         }
 
         if (_bottomThirdMarker != null)
         {
             UpdateTextEntity(
-                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center,
-                ref _bottomThirdTextMask);
+                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center, ref _bottomThirdTextMask);
         }
 
         if (_topFirstMarker != null)
@@ -1211,21 +1184,18 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (_topSecondMarker != null)
         {
             UpdateTextEntity(
-                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center,
-                ref _topSecondTextMask);
+                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center, ref _topSecondTextMask);
         }
 
         if (_topThirdMarker != null)
         {
             UpdateTextEntity(
-                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center,
-                ref _topThirdTextMask);
+                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center, ref _topThirdTextMask);
         }
 
         if (_bottomOrientMarker != null)
         {
-            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, _bottomOrientMarker.Center,
-                ref _bottomOrientTextMask);
+            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, _bottomOrientMarker.Center, ref _bottomOrientTextMask);
         }
 
         if (_topOrientMarker != null)
