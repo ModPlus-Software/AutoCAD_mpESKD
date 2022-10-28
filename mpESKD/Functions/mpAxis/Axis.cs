@@ -991,7 +991,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 _topFirstDBText = new DBText();
                 _topFirstDBText.SetProperties(TextStyle, textHeight);
-                
+
             }
             else
             {
@@ -1188,28 +1188,50 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         UpdateTextEntity(
             _bottomFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _bottomFirstMarker.Center, ref _bottomFirstTextMask);
 
-        UpdateTextEntity(
-            _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix,_bottomSecondMarker.Center, ref _bottomSecondTextMask);
+        if (_bottomSecondMarker != null)
+        {
+            UpdateTextEntity(
+                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _bottomSecondMarker.Center,
+                ref _bottomSecondTextMask);
+        }
 
-        UpdateTextEntity(
-            _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center, ref _bottomThirdTextMask);
+        if (_bottomThirdMarker != null)
+        {
+            UpdateTextEntity(
+                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center,
+                ref _bottomThirdTextMask);
+        }
 
         if (_topFirstMarker != null)
         {
             UpdateTextEntity(
                 _topFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _topFirstMarker.Center, ref _topFirstTextMask);
         }
-        
 
-        UpdateTextEntity(
-            _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center, ref _topSecondTextMask);
+        if (_topSecondMarker != null)
+        {
+            UpdateTextEntity(
+                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center,
+                ref _topSecondTextMask);
+        }
 
-        UpdateTextEntity(
-            _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center, ref _topThirdTextMask);
+        if (_topThirdMarker != null)
+        {
+            UpdateTextEntity(
+                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center,
+                ref _topThirdTextMask);
+        }
 
-        UpdateTextEntity(_bottomOrientDBText, BottomOrientText,_bottomOrientMarker.Center, ref _bottomOrientTextMask);
+        if (_bottomOrientMarker != null)
+        {
+            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, _bottomOrientMarker.Center,
+                ref _bottomOrientTextMask);
+        }
 
-        UpdateTextEntity(_topOrientDBText, TopOrientText,_topOrientMarker.Center, ref _topOrientTextMask);
+        if (_topOrientMarker != null)
+        {
+            UpdateTextEntity(_topOrientDBText, TopOrientText, _topOrientMarker.Center, ref _topOrientTextMask);
+        }
 
         MirrorIfNeed(new[]
         {
@@ -1235,7 +1257,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var textRotation = TextRotationAngle.DegreeToRadian();
         dbText.TextString = textString;
         var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
-        //dbText.Position = dbTextPosition;
         dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         dbText.Position = dbTextPosition;
         dbText.AlignmentPoint = dbTextPosition;
@@ -1244,9 +1265,9 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         if (HideTextBackground)
         {
-            mask = dbText.GetBackgroundMask(maskOffset);
-            //if (textRotation != 0.0)
-            //    mask.TransformBy(rotationMatrix);
+            mask = dbText.GetBackgroundMask(maskOffset, dbText.Position);
+            if (textRotation != 0.0)
+                mask.TransformBy(rotationMatrix);
         }
     }
 
