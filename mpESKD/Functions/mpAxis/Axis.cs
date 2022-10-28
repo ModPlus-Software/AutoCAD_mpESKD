@@ -1217,6 +1217,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     /// <param name="dbText">Изменяемый экземпляр <see cref="DBText"/></param>
     /// <param name="textString">Текстовое значение</param>
+    /// <param name="dbTextPosition">Положение текста</param>
     /// <param name="mask">Маскировка фона</param>
     private void UpdateTextEntity(DBText dbText, string textString, Point3d dbTextPosition, ref Wipeout mask)
     {

@@ -363,15 +363,15 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         var shelfLength = textIndent + largestTextLength + shelfLedge;
-        var topFirstTextPosition = new Point3d();
-        var topSecondTextPosition = new Point3d();
-        var bottomTextPosition = new Point3d();
+        var topFirstTextPosition = default(Point3d);
+        var topSecondTextPosition = default(Point3d);
+        var bottomTextPosition = default(Point3d);
 
         if (isRight)
         {
             topFirstTextPosition = new Point3d(
-                leaderPoint.X + topFirstTextLength / 2 + (shelfLength - topTextLength) / 2,
-                leaderPoint.Y + textVerticalOffset + mainTextHeight / 2,
+                leaderPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
+                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
 
             if (_topFirstDbText != null)
@@ -382,7 +382,8 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
             if (_topSecondDbText != null)
             {
-                topSecondTextPosition = new Point3d(_topFirstDbText.Position.X + topFirstTextLength / 2 + topSecondTextLength / 2,
+                topSecondTextPosition = new Point3d(
+                    _topFirstDbText.Position.X + (topFirstTextLength / 2) + (topSecondTextLength / 2),
                     topFirstTextPosition.Y, 0);
                 _topSecondDbText.Position = topSecondTextPosition;
                 _topSecondDbText.AlignmentPoint = topSecondTextPosition;
@@ -390,8 +391,9 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
             if (_bottomDbText != null)
             {
-                bottomTextPosition = new Point3d(leaderPoint.X + bottomTextLength / 2 + (shelfLength - bottomTextLength) / 2,
-                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                bottomTextPosition = new Point3d(
+                    leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
                 _bottomDbText.Position = bottomTextPosition;
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
@@ -400,15 +402,17 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         {
             if (_topFirstDbText != null)
             {
-                topFirstTextPosition = new Point3d(leaderPoint.X - topFirstTextLength / 2 - topSecondTextLength - (shelfLength - topTextLength) / 2,
-                    leaderPoint.Y + textVerticalOffset + mainTextHeight / 2, 0);
+                topFirstTextPosition = new Point3d(
+                    leaderPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
+                    leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
                 _topFirstDbText.Position = topFirstTextPosition;
                 _topFirstDbText.AlignmentPoint = topFirstTextPosition;
             }
 
             if (_topSecondDbText != null)
             {
-                topSecondTextPosition = new Point3d(_topFirstDbText.Position.X + topFirstTextLength / 2 + topSecondTextLength / 2,
+                topSecondTextPosition = new Point3d(
+                    _topFirstDbText.Position.X + (topFirstTextLength / 2) + (topSecondTextLength / 2),
                     _topFirstDbText.Position.Y, 0);
                 _topSecondDbText.Position = topSecondTextPosition;
                 _topSecondDbText.AlignmentPoint = topSecondTextPosition;
@@ -416,8 +420,9 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
             if (_bottomDbText != null)
             {
-                bottomTextPosition = new Point3d(leaderPoint.X - bottomTextLength / 2 - (shelfLength - bottomTextLength) / 2,
-                    leaderPoint.Y - textVerticalOffset - bottomTextHeight / 2, 0);
+                bottomTextPosition = new Point3d(
+                    leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
                 _bottomDbText.Position = bottomTextPosition;
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }

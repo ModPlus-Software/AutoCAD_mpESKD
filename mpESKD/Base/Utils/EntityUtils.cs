@@ -216,7 +216,6 @@ public static class EntityUtils
     /// </summary>
     /// <param name="extents3d">Крайние границы</param>
     /// <param name="offset">Отступ</param>
-    [Obsolete]
     private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset)
     {
         try
