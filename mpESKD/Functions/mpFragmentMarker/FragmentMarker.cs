@@ -235,11 +235,10 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     private Point3d _leaderFirstPoint;
 
     /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-    public Point3d MiddlePoint =>
-        new Point3d(
-            (InsertionPoint.X + EndPoint.X) / 2,
-            (InsertionPoint.Y + EndPoint.Y) / 2,
-            (InsertionPoint.Z + EndPoint.Z) / 2);
+    public Point3d MiddlePoint => new (
+        (InsertionPoint.X + EndPoint.X) / 2,
+        (InsertionPoint.Y + EndPoint.Y) / 2,
+        (InsertionPoint.Z + EndPoint.Z) / 2);
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -412,8 +411,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         var shelfLedge = ShelfLedge * scale;
         var isRight = ShelfPosition == ShelfPosition.Right;
 
-        var topFirstTextLength = 0.0;
-        var topSecondTextLength = 0.0;
+        var topTextLength = 0.0;
         var bottomTextLength = 0.0;
         var bottomTextHeight = 0.0;
 
@@ -421,7 +419,8 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _topDbText = new DBText { TextString = MainText };
             _topDbText.SetProperties(TextStyle, mainTextHeight);
-            topFirstTextLength = _topDbText.GetLength();
+            _topDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            topTextLength = _topDbText.GetLength();
         }
         else
         {
@@ -432,6 +431,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _bottomDbText = new DBText { TextString = SmallText };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();
         }
@@ -440,48 +440,48 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             _bottomDbText = null;
         }
 
-        var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         var shelfLength = textIndent + largestTextLength + shelfLedge;
-
+        var topTextPosition = default(Point3d);
+        var bottomTextPosition = default(Point3d);
         if (isRight)
         {
-            var nodeNumberPosition =
-                leaderPoint +
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
-
             if (_topDbText != null)
             {
-                _topDbText.Position = nodeNumberPosition;
+                topTextPosition = new Point3d(
+                    leaderPoint.X + (topTextLength / 2) + ((shelfLength - topTextLength) / 2),
+                    leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                bottomTextPosition = new Point3d(
+                    leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
         else
         {
-            var sheetNumberEndPoint =
-                leaderPoint -
-                (Vector3d.XAxis * (shelfLength - topTextLength) / 2) +
-                (Vector3d.YAxis * textVerticalOffset);
-
             if (_topDbText != null)
             {
-                _topDbText.Position = sheetNumberEndPoint -
-                                      (Vector3d.XAxis * (topSecondTextLength + topFirstTextLength));
+                topTextPosition = new Point3d(
+                    leaderPoint.X - (topTextLength / 2) - ((shelfLength - topTextLength) / 2),
+                    leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                _bottomDbText.Position = leaderPoint -
-                                         (Vector3d.XAxis * shelfLength) +
-                                         (Vector3d.XAxis * (shelfLength - bottomTextLength) / 2) -
-                                         (Vector3d.YAxis * (textVerticalOffset + bottomTextHeight));
+                bottomTextPosition = new Point3d(
+                    leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
 
@@ -489,11 +489,11 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
 
+        var offset = TextMaskOffset * scale;
         if (HideTextBackground)
         {
-            var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topDbText.GetBackgroundMask(offset);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset);
+            _topFirstTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
+            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
 
         if (IsTextAlwaysHorizontal && IsRotated)

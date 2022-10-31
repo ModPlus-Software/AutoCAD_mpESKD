@@ -148,6 +148,10 @@
 		<PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
 		<PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32.png" />
+	  <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32_dark.png" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
@@ -193,6 +197,8 @@
 		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMarkAlign_32x32_dark.png" />
 		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32.png" />
 		<Resource Include="Functions\mpLevelMark\Icons\mpLevelMark_32x32_dark.png" />
+		<Resource Include="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32.png" />
+		<Resource Include="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32_dark.png" />
 		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
 		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
@@ -251,6 +257,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Functions\mpLevelPlanMark\LevelPlanMark.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
 		<Page Update="Functions\mpViewLabel\ViewLabel.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>

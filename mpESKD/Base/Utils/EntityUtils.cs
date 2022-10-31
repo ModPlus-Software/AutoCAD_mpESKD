@@ -47,7 +47,7 @@ public static class EntityUtils
         if (attachmentPoint.HasValue)
             dbText.Justify = attachmentPoint.Value;
     }
-        
+
     /// <summary>
     /// Редактирование свойств для интеллектуального объекта в специальном окне. Применяется для интеллектуальных
     /// объектов, содержащих текстовые значения
@@ -116,10 +116,24 @@ public static class EntityUtils
     {
         if (dbText == null)
             return null;
-            
+        AcadUtils.WriteMessageInDebug($"\n dbText.TextString {dbText.TextString} dbText.GeometricExtents {dbText.GeometricExtents} \n");
         return GetBackgroundMask(dbText.GeometricExtents, offset);
     }
-        
+
+    /// <summary>
+    /// Возвращает маскировку, созданную по контуру текста с указанным отступом
+    /// </summary>
+    /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
+    /// <param name="offset">Отступ</param>
+    /// <param name="center">Средняя точка прямоугольной маскировки</param>
+    public static Wipeout GetBackgroundMask(this DBText dbText, double offset, Point3d center)
+    {
+        if (dbText == null)
+            return null;
+        AcadUtils.WriteMessageInDebug($"\n dbText.TextString {dbText.TextString} dbText.GeometricExtents {dbText.GeometricExtents} \n");
+        return GetBackgroundMask(dbText.GeometricExtents, offset, center);
+    }
+
     /// <summary>
     /// Возвращает маскировку, созданную по контуру текста с указанным отступом
     /// </summary>
@@ -134,6 +148,70 @@ public static class EntityUtils
     }
 
     /// <summary>
+    /// Возвращает маскировку, созданную по контуру полилини
+    /// </summary>
+    /// <param name="polyline">Экземпляр <see cref="Polyline"/></param>
+    public static Wipeout GetBackgroundMask(this Polyline polyline)
+    {
+        if (polyline == null)
+            return null;
+
+        var vertexCollection = new Point2dCollection();
+
+        for (int i = 0; i < polyline.NumberOfVertices; i++)
+        {
+            var vertex = polyline.GetPoint2dAt(i);
+            vertexCollection.Add(vertex);
+        }
+
+        vertexCollection.Add(vertexCollection[0]);
+
+        var wipeout = new Wipeout();
+        wipeout.SetFrom(vertexCollection, Vector3d.ZAxis);
+        return wipeout;
+    }
+
+    /// <summary>
+    /// Возвращает маскировку, созданную по контуру с указанным отступом
+    /// </summary>
+    /// <param name="extents3d">Крайние границы</param>
+    /// <param name="offset">Отступ</param>
+    /// <param name="center">Средняя точка прямоугольной маскировки</param>
+    private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset, Point3d center)
+    {
+        try
+        {
+            var minPoint = extents3d.MinPoint;
+            var maxPoint = extents3d.MaxPoint;
+            var halfWidth = (Math.Abs(maxPoint.X - minPoint.X) + (offset * 2)) / 2;
+            var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
+            
+            var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
+            var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
+            var topRightPoint = new Point2d(center.X + halfWidth, center.Y + halfHeight);
+            var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
+            
+            var wipeout = new Wipeout();
+            wipeout.SetFrom(
+                new Point2dCollection
+                {
+                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
+                }, Vector3d.ZAxis);
+            
+            return wipeout;
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+        {
+            if (ex.Message == "eNullExtents")
+            {
+                return null;
+            }
+
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Возвращает маскировку, созданную по контуру с указанным отступом
     /// </summary>
     /// <param name="extents3d">Крайние границы</param>
@@ -144,17 +222,19 @@ public static class EntityUtils
         {
             var minPoint = extents3d.MinPoint;
             var maxPoint = extents3d.MaxPoint;
+            AcadUtils.WriteMessageInDebug($"minPoint {minPoint} maxPoint {maxPoint} \n");
             var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
             var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
             var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
             var bottomRightPoint = new Point2d(maxPoint.X + offset, minPoint.Y - offset);
-
+            AcadUtils.WriteMessageInDebug($"\n bottomLeftPoint {bottomLeftPoint}, topLeftPoint {topLeftPoint}, topRightPoint {topRightPoint}, bottomRightPoint {bottomRightPoint} \n");
             var wipeout = new Wipeout();
             wipeout.SetFrom(
                 new Point2dCollection
                 {
                     bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
                 }, Vector3d.ZAxis);
+            AcadUtils.WriteMessageInDebug($"wipeout.Bounds {wipeout.Bounds} \n");
             return wipeout;
         }
         catch (Autodesk.AutoCAD.Runtime.Exception ex)
@@ -163,11 +243,11 @@ public static class EntityUtils
             {
                 return null;
             }
-                
+
             throw;
         }
     }
-        
+
     /// <summary>
     /// Возвращает номер узла в зависимости от номера узла последнего созданного объекта
     /// </summary>
