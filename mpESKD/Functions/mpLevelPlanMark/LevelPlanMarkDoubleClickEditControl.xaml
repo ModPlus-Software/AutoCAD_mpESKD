@@ -15,20 +15,15 @@
     </UserControl.Resources>
  <mps:Card>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             
-            <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p51}"/>
+            <TextBlock Grid.Column="0"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p110}"/>
             
-            <mps:NumericBox Grid.Row="1" 
-                            Grid.Column="1"
+            <mps:NumericBox Grid.Column="1"
                             Name="LevelNumBox"/>
         </Grid>
     </mps:Card>
