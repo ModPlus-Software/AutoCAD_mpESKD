@@ -44,6 +44,7 @@ public class LevelPlanMarkLeaderRemoveGrip : SmartEntityGripData
         using (LevelPlanMark)
         {
             LevelPlanMark.LeaderPoints.RemoveAt(GripIndex);
+            LevelPlanMark.LeaderTypes.RemoveAt(GripIndex);
 
             LevelPlanMark.UpdateEntities();
             LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
