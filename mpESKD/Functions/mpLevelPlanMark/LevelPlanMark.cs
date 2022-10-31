@@ -98,12 +98,12 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public double TextHeight { get; set; } = 3.5;
 
     /// <inheritdoc/>
-    [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85")]
+    [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85-1")]
     [SaveToXData]
     public bool HideTextBackground { get; set; }
 
     /// <inheritdoc/>
-    [EntityProperty(PropertiesCategory.Content, 5, "p86", 0.5, 0.0, 5.0)]
+    [EntityProperty(PropertiesCategory.Content, 5, "p86", 0.5, 0.0, 5.0, descLocalKey: "d86")]
     [PropertyVisibilityDependency(new[] { nameof(FrameType.None) }, new[] { nameof(FrameType.Rectangular) })]
     [SaveToXData]
     public double TextMaskOffset { get; set; }
@@ -114,20 +114,6 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public NumberSeparator NumberSeparator { get; set; } = NumberSeparator.Dot;
 
     /// <summary>
-    /// Показывать плюс
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p64", false, descLocalKey: "d64")]
-    [SaveToXData]
-    public bool ShowPlus { get; set; }
-
-    /// <summary>
-    /// Добавление звездочки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 8, "p75", false, descLocalKey: "d75")]
-    [SaveToXData]
-    public bool AddAsterisk { get; set; }
-
-    /// <summary>
     /// Точность
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 9, "p67", 3, 0, 5, descLocalKey: "d67")]
@@ -135,7 +121,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     public int Accuracy { get; set; } = 3;
 
     /// <summary>
-    /// Обозначение плана
+    /// Отметка уровня
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 10, "p110", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [SaveToXData]
@@ -170,9 +156,8 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             var prefix = string.IsNullOrEmpty(Prefix) ? string.Empty : Prefix;
             var suffix = string.IsNullOrEmpty(Suffix) ? string.Empty : Suffix;
-            var asterisk = AddAsterisk ? "*" : string.Empty;
-            var plus = ShowPlus ? "+" : string.Empty;
-            return ReplaceSeparator($"{plus}{prefix}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{suffix}{asterisk}");
+            
+            return ReplaceSeparator($"{prefix}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{suffix}");
         }
     }
 
