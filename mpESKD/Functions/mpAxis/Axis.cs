@@ -1160,8 +1160,11 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         SetFirstTextOnCreation();
 
-        UpdateTextEntity(
+        if (_bottomFirstDBText != null)
+        {
+            UpdateTextEntity(
             _bottomFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _bottomFirstMarker.Center, ref _bottomFirstTextMask);
+        }
 
         if (_bottomSecondMarker != null)
         {
