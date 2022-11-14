@@ -257,6 +257,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Page Update="Functions\mpChainLeader\ChainLeaderDoubleClickEditControl.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
 		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
 		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
