@@ -66,7 +66,7 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
 
             using (ChainLeader)
             {
-                ChainLeader.LeaderPoints[GripIndex] = NewPoint;
+                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 

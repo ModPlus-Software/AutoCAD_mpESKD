@@ -43,7 +43,7 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
     {
         using (ChainLeader)
         {
-            ChainLeader.LeaderPoints.RemoveAt(GripIndex);
+            ChainLeader.ArrowPoints.RemoveAt(GripIndex);
             ChainLeader.LeaderTypes.RemoveAt(GripIndex);
 
             ChainLeader.UpdateEntities();

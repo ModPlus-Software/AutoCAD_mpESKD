@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpChainLeader;
+﻿using Autodesk.AutoCAD.Internal.Calculator;
+using ControlzEx.Standard;
+
+namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -69,7 +72,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
 
-    
+
     /// <summary>
     /// Главная полилиния примитива
     /// </summary>
@@ -77,10 +80,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     //private Point3d _leaderFirstPoint;
 
-    //private readonly List<Line> _leaderLines = new();
-    //private readonly List<Polyline> _leaderEndLines = new();
+
+
     //private readonly List<Hatch> _hatches = new();
     //private Polyline _framePolyline;
+    private List<Polyline> _leaderEndLines;
     private double _scale;
 
     #endregion
@@ -271,13 +275,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точка выноски
     /// </summary>
     [SaveToXData]
-    public Point3d LeaderPoint{ get; set; } = new();
+    public Point3d LeaderPoint { get; set; } = new();
 
     /// <summary>
     /// Точка выноски
     /// </summary>
     [SaveToXData]
-    public List<Point3d> LeaderPoints{ get; set; } = new();
+    public List<Point3d> ArrowPoints { get; set; } = new();
 
     /// <summary>
     /// Типы выносок
@@ -287,7 +291,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     public Vector3d MainNormal { get; set; } = new();
 
-    
+
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -313,7 +317,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     InsertionPointOCS.Z);
                 var normal = (tempEndPoint - InsertionPointOCS).GetNormal();
                 var vectorLength = normal * MinDistanceBetweenPoints;
-                var tempPoint2 = tempEndPoint + vectorLength.RotateBy(Math.PI*-0.25, Vector3d.ZAxis);
+                var tempPoint2 = tempEndPoint + vectorLength.RotateBy(Math.PI * -0.25, Vector3d.ZAxis);
 
                 AcadUtils.WriteMessageInDebug($"JigState == ChainLeaderJigState InsertionPointOCS {InsertionPointOCS} - {tempEndPoint}");
                 CreateEntities(InsertionPointOCS, tempPoint2, scale);
@@ -346,18 +350,43 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         Point3d leaderPoint,
         double scale)
     {
-        
-        var arrowSize = ArrowSize * scale;
-        var v = (leaderPoint - insertionPoint).GetNormal();
 
-        var secantEnd = insertionPoint + (v * arrowSize);
+        var arrowSize = ArrowSize * scale;
+        MainNormal = (leaderPoint - insertionPoint).GetNormal();
+
+        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
         //_secantPolyline = new Polyline(2);
         //_secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
         //_secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, 0, 0);
 
-        if (secantEnd.DistanceTo(leaderPoint) > 0.0)
-            _leaderLine = new Line(insertionPoint, leaderPoint);
+        var mainLineStartPoint = default(Point3d);
+        var mainLineEndPoint = default(Point3d);
 
+        if (ArrowPoints.Count > 0)
+        {
+            var tempPoints = new List<Point3d>();
+            tempPoints.AddRange(ArrowPoints);
+            tempPoints.Add(insertionPoint);
+            tempPoints.Add(leaderPoint);
+
+            var furthestPoints = GetFurthestPoints(tempPoints);
+            _leaderLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+        }
+        else
+        {
+            if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
+                _leaderLine = new Line(insertionPoint, leaderPoint);
+        }
+
+        var pline = new Polyline();
+        foreach (var arrowPoint in ArrowPoints)
+        {
+            var tempArrowPoint = _leaderLine.GetClosestPointTo(arrowPoint,false);
+
+            pline = CreateAngleArrowOnPoint(tempArrowPoint, 10, true);
+        }
+
+        _leaderEndLines.Add(pline);
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
@@ -433,7 +462,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _topFirstDbText.Position = topFirstTextPosition;
                 _topFirstDbText.AlignmentPoint = topFirstTextPosition;
             }
-            
+
             if (_bottomDbText != null)
             {
                 _bottomDbText.Position = bottomTextPosition;
@@ -506,7 +535,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     //    var mainNormal = (leaderPoint - insertionPoint).GetNormal();
 
-        
+
     //    //var secantLength = ArrowSize * scale;
     //    //var v = (leaderPoint - insertionPoint).GetNormal();
 
@@ -598,7 +627,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     //            _topFirstDbText.Position = topFirstTextPosition;
     //            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
     //        }
-            
+
     //        if (_bottomDbText != null)
     //        {
     //            _bottomDbText.Position = bottomTextPosition;
@@ -754,6 +783,25 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         return pline;
     }
 
+    private Polyline CreateAngleArrowOnPoint(Point3d arrowPoint, int angle, bool closed)
+    {
+        var vector = new Vector3d(0, 0, 1);
+        
+        var startPoint = arrowPoint.RotateBy(angle.DegreeToRadian(), vector, arrowPoint);
+        var endPoint = arrowPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, arrowPoint);
+
+        var pline = new Polyline(3);
+
+        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
+        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowPoint), 0, 0, 0);
+        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
+
+        pline.Closed = closed;
+
+        return pline;
+    }
+
+
     private Polyline CreateHalfArrow(Line leaderLine)
     {
         var vector = new Vector3d(0, 0, 1);
@@ -826,5 +874,52 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         return hatch;
     }
 
+    //private Hatch CreateArrowHatchOnPoint(Point3d arrowPoint)
+    //{
+        
+    //    var vertexCollection = new Point2dCollection();
+    //    for (var index = 0; index < pline.NumberOfVertices; ++index)
+    //    {
+    //        vertexCollection.Add(pline.GetPoint2dAt(index));
+    //    }
+
+    //    vertexCollection.Add(pline.GetPoint2dAt(0));
+    //    var bulgeCollection = new DoubleCollection()
+    //    {
+    //        0.0, 0.0, 0.0
+    //    };
+
+    //    return CreateHatch(vertexCollection, bulgeCollection);
+    //}
+
+
     #endregion
+    /// <summary>
+    /// Возвращает пару наиболее удаленных друг от друга точек
+    /// </summary>
+    /// <param name="points">Коллекция точек</param>
+    /// <returns></returns>
+    public static Tuple<Point3d, Point3d> GetFurthestPoints(IList<Point3d> points)
+    {
+        Tuple<Point3d, Point3d> result = default;
+        var dist = double.NaN;
+        for (int i = 0; i < points.Count; i++)
+        {
+            var pt1 = points[i];
+            for (int j = 0; j < points.Count; j++)
+            {
+                if(i == j)
+                    continue;
+                var pt2 = points[j];
+                var d = pt1.DistanceTo(pt2);
+                if (double.IsNaN(dist) || d > dist)
+                {
+                    result = new Tuple<Point3d, Point3d>(pt1,pt2);
+                    dist = d;
+                }
+            }
+        }
+
+        return result;
+    }
 }

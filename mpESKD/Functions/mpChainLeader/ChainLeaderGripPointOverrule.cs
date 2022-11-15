@@ -70,21 +70,21 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             chainLeader.EndPoint.Z)
                     });
 
-                    for (var i = 0; i < chainLeader.LeaderPoints.Count; i++)
+                    for (var i = 0; i < chainLeader.ArrowPoints.Count; i++)
                     {
                         // ручки переноса выносок
                         grips.Add(new ChainLeaderMoveGrip(chainLeader, i)
                         {
-                            GripPoint = chainLeader.LeaderPoints[i]
+                            GripPoint = chainLeader.ArrowPoints[i]
                         });
                         var deleteGripPoint = new Point3d(
-                            chainLeader.LeaderPoints[i].X + 1,
-                            chainLeader.LeaderPoints[i].Y, 
-                            chainLeader.LeaderPoints[i].Z);
+                            chainLeader.ArrowPoints[i].X + 1,
+                            chainLeader.ArrowPoints[i].Y, 
+                            chainLeader.ArrowPoints[i].Z);
                         var leaderEndTypeGripPoint = new Point3d(
-                            chainLeader.LeaderPoints[i].X - 1,
-                            chainLeader.LeaderPoints[i].Y, 
-                            chainLeader.LeaderPoints[i].Z);
+                            chainLeader.ArrowPoints[i].X - 1,
+                            chainLeader.ArrowPoints[i].Y, 
+                            chainLeader.ArrowPoints[i].Z);
 
                         // ручки удаления выносок
                         grips.Add(new ChainLeaderRemoveGrip(chainLeader, i)
@@ -125,21 +125,22 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         if (vertexGrip.GripIndex == 0)
                         {
                             ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                            //chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
                         if (vertexGrip.GripIndex == 1)
                         {
-                            
                             chainLeader.EndPoint = vertexGrip.GripPoint + offset;
                         }
 
-                        // Вот тут происходит перерисовка примитивов внутри блока
                         chainLeader.UpdateEntities();
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else if (gripData is ChainLeaderAddLeaderGrip addLeaderGrip)
                     {
+                        var chainLeader = addLeaderGrip.ChainLeader;
+                        var newPoint = addLeaderGrip.GripPoint + offset;
+                        chainLeader.
                         addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
                     }
                     else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
