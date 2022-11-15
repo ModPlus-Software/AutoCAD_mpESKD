@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Enums;
@@ -20,11 +20,11 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
     /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderEndTypeGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    public ChainLeaderEndTypeGrip(ChainLeader chainLeader, int gripIndex)
     {
-        LevelPlanMark = levelPlanMark;
+        ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.List;
     }
@@ -32,7 +32,7 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
-    public LevelPlanMark LevelPlanMark { get; }
+    public ChainLeader ChainLeader { get; }
 
     /// <summary>
     /// Индекс ручки
@@ -48,7 +48,7 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
-        using (LevelPlanMark)
+        using (ChainLeader)
         {
             _win = new ContextMenuHost();
 
@@ -60,7 +60,7 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
 
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
-                    var arrowIndex = LevelPlanMark.LeaderTypes[GripIndex];
+                    var arrowIndex = ChainLeader.LeaderTypes[GripIndex];
                     var checkedNumber = (int)Enum.Parse(typeof(LeaderEndType), leaderType.ToString());
                     var isItemChecked = checkedNumber == arrowIndex;
                     var headerOfItem = "let" + checkedNumber;
@@ -93,17 +93,17 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        LevelPlanMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+        ChainLeader.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
 
-        LevelPlanMark.UpdateEntities();
-        LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+        ChainLeader.UpdateEntities();
+        ChainLeader.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())
         {
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
 
-                using (var resBuf = LevelPlanMark.GetDataForXData())
+                using (var resBuf = ChainLeader.GetDataForXData())
                 {
                     blkRef.XData = resBuf;
                 }

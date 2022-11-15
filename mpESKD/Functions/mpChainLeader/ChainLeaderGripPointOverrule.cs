@@ -6,6 +6,7 @@ using Autodesk.AutoCAD.Runtime;
 using Base;
 using Base.Enums;
 using Base.Overrules;
+using Grips;
 using ModPlusAPI.Windows;
 
 public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLeader>
@@ -43,46 +44,61 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                 // т.е. правила построения графики внутри блока
                 // Информация собирается по XData и свойствам самого блока
                 var chainLeader = EntityReaderService.Instance.GetFromEntity<ChainLeader>(entity);
-                    
-                //if (chainLeader != null)
-                //{
-                //    // Получаем первую ручку (совпадает с точкой вставки блока)
-                //    var gp = new ChainLeaderGripPointOverrule(chainLeader, GripName.StartGrip)
-                //    {
-                //        GripPoint = chainLeader.InsertionPoint
-                //    };
-                //    grips.Add(gp);
 
-                //    // получаем среднюю ручку
-                //    gp = new ChainLeaderGripPointOverrule(chainLeader, GripName.MiddleGrip)
-                //    {
-                //        GripPoint = chainLeader.MiddlePoint
-                //    };
-                //    grips.Add(gp);
+                if (chainLeader != null)
+                {
+                    // Получаем первую ручку на первой точке
+                    var gp = new ChainLeaderVertexGrip(chainLeader, 0)
+                    {
+                        GripPoint = chainLeader.InsertionPoint
+                    };
+                    grips.Add(gp);
 
-                //    // получаем конечную ручку
-                //    gp = new ChainLeaderGripPointOverrule(chainLeader, GripName.EndGrip)
-                //    {
-                //        GripPoint = chainLeader.EndPoint
-                //    };
-                //    grips.Add(gp);
+                    // Получаем первую ручку на первой точке
+                    gp = new ChainLeaderVertexGrip(chainLeader, 1)
+                    {
+                        GripPoint = chainLeader.EndPoint
+                    };
+                    grips.Add(gp);
 
-                //    // получаем ручку выноски
-                //    if (!(!string.IsNullOrEmpty(chainLeader.MainText) |
-                //          !string.IsNullOrEmpty(chainLeader.SmallText)))
-                //        return;
-                //    gp = new ChainLeaderGripPointOverrule(chainLeader, GripName.LeaderGrip)
-                //    {
-                //        GripPoint = chainLeader.LeaderPoint
-                //    };
-                //    grips.Add(gp);
-                //    grips.Add(new FragmentMarkerShelfPositionGrip(chainLeader)
-                //    {
-                //        GripPoint = chainLeader.LeaderPoint +
-                //                    (Vector3d.YAxis * ((chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) * chainLeader.GetFullScale())),
-                //        GripType = GripType.TwoArrowsLeftRight
-                //    });
-                //}
+                    // получаем ручку для создания выноски
+                    grips.Add(new ChainLeaderAddLeaderGrip(chainLeader)
+                    {
+                        GripPoint = new Point3d(
+                            chainLeader.EndPoint.X - 2, 
+                            chainLeader.EndPoint.Y, 
+                            chainLeader.EndPoint.Z)
+                    });
+
+                    for (var i = 0; i < chainLeader.LeaderPoints.Count; i++)
+                    {
+                        // ручки переноса выносок
+                        grips.Add(new ChainLeaderMoveGrip(chainLeader, i)
+                        {
+                            GripPoint = chainLeader.LeaderPoints[i]
+                        });
+                        var deleteGripPoint = new Point3d(
+                            chainLeader.LeaderPoints[i].X + 1,
+                            chainLeader.LeaderPoints[i].Y, 
+                            chainLeader.LeaderPoints[i].Z);
+                        var leaderEndTypeGripPoint = new Point3d(
+                            chainLeader.LeaderPoints[i].X - 1,
+                            chainLeader.LeaderPoints[i].Y, 
+                            chainLeader.LeaderPoints[i].Z);
+
+                        // ручки удаления выносок
+                        grips.Add(new ChainLeaderRemoveGrip(chainLeader, i)
+                        {
+                            GripPoint = deleteGripPoint
+                        });
+                        
+                        // ручки выбора типа выносок
+                        grips.Add(new ChainLeaderEndTypeGrip(chainLeader, i)
+                        {
+                            GripPoint = leaderEndTypeGripPoint
+                        });
+                    }
+                }
             }
         }
         catch (Exception exception)
@@ -92,109 +108,59 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
         }
     }
 
-    // <inheritdoc/>
-    //public override void MoveGripPointsAt(
-    //    Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
-    //{
-    //    try
-    //    {
-    //        if (IsApplicable(entity))
-    //        {
-    //            // Проходим по коллекции ручек
-    //            foreach (var gripData in grips)
-    //            {
-    //                if (gripData is ChainLeaderGripPointOverrule fragmentMarkerGrip)
-    //                {
-    //                    var gripPoint = fragmentMarkerGrip.GripPoint;
-    //                    var fragmentMarker = fragmentMarkerGrip.FragmentMarker;
-    //                    var scale = fragmentMarker.GetFullScale();
+     // <inheritdoc/>
+    public override void MoveGripPointsAt(
+        Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+    {
+        try
+        {
+            if (IsApplicable(entity))
+            {
+                foreach (var gripData in grips)
+                {
+                    if (gripData is ChainLeaderVertexGrip vertexGrip)
+                    {
+                        var chainLeader = vertexGrip.ChainLeader;
 
-    //                    // Далее, в зависимости от имени ручки произвожу действия
-    //                    if (fragmentMarkerGrip.GripName == GripName.StartGrip)
-    //                    {
-    //                        // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
-    //                        // Все точки всегда совпадают (+ ручка)
-    //                        ((BlockReference)entity).Position = gripPoint + offset;
-    //                        var newPt = fragmentMarkerGrip.GripPoint + offset;
-    //                        var length = fragmentMarker.EndPoint.DistanceTo(newPt);
+                        if (vertexGrip.GripIndex == 0)
+                        {
+                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
+                            //chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                        }
 
-    //                        if (length < fragmentMarker.MinDistanceBetweenPoints * scale)
-    //                        {
-    //                            /* Если новая точка получается на расстоянии меньше минимального, то
-    //                             * переносим ее в направлении между двумя точками на минимальное расстояние
-    //                             */
-    //                            var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-    //                                fragmentMarker.EndPoint, newPt, fragmentMarker.EndPoint,
-    //                                fragmentMarker.MinDistanceBetweenPoints * scale);
-
-    //                            if (fragmentMarker.EndPoint.Equals(newPt))
-    //                            {
-    //                                // Если точки совпали, то задаем минимальное значение
-    //                                tmpInsertionPoint = new Point3d(
-    //                                    fragmentMarker.EndPoint.X + (fragmentMarker.MinDistanceBetweenPoints * scale),
-    //                                    fragmentMarker.EndPoint.Y, fragmentMarker.EndPoint.Z);
-    //                            }
-
-    //                            ((BlockReference)entity).Position = tmpInsertionPoint;
-    //                            fragmentMarker.InsertionPoint = tmpInsertionPoint;
-    //                        }
-    //                        else
-    //                        {
-    //                            ((BlockReference)entity).Position = fragmentMarkerGrip.GripPoint + offset;
-    //                            fragmentMarker.InsertionPoint = fragmentMarkerGrip.GripPoint + offset;
-    //                        }
-    //                    }
-
-    //                    if (fragmentMarkerGrip.GripName == GripName.MiddleGrip)
-    //                    {
-    //                        // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
-    //                        // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
-    //                        // точку вставки
-    //                        var lengthVector = (fragmentMarker.InsertionPoint - fragmentMarker.EndPoint) / 2;
-    //                        ((BlockReference)entity).Position = fragmentMarkerGrip.GripPoint + offset + lengthVector;
-    //                    }
-
-    //                    if (fragmentMarkerGrip.GripName == GripName.EndGrip)
-    //                    {
-    //                        var newPt = fragmentMarkerGrip.GripPoint + offset;
-    //                        if (newPt.Equals(((BlockReference)entity).Position))
-    //                        {
-    //                            fragmentMarker.EndPoint = new Point3d(
-    //                                ((BlockReference)entity).Position.X + (fragmentMarker.MinDistanceBetweenPoints * scale),
-    //                                ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
-    //                        }
-
-    //                        // С конечной точкой все просто
-    //                        else
-    //                        {
-    //                            fragmentMarker.EndPoint = fragmentMarkerGrip.GripPoint + offset;
-    //                        }
-    //                    }
+                        if (vertexGrip.GripIndex == 1)
+                        {
                             
-    //                    if (fragmentMarkerGrip.GripName == GripName.LeaderGrip)
-    //                    {
-    //                        fragmentMarker.LeaderPoint = gripPoint + offset;
-    //                    }
+                            chainLeader.EndPoint = vertexGrip.GripPoint + offset;
+                        }
 
-    //                    // Вот тут происходит перерисовка примитивов внутри блока
-    //                    fragmentMarker.UpdateEntities();
-    //                    fragmentMarker.BlockRecord.UpdateAnonymousBlocks();
-    //                }
-    //                else
-    //                {
-    //                    base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-    //                }
-    //            }
-    //        }
-    //        else
-    //        {
-    //            base.MoveGripPointsAt(entity, grips, offset, bitFlags);
-    //        }
-    //    }
-    //    catch (Exception exception)
-    //    {
-    //        if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-    //            ExceptionBox.Show(exception);
-    //    }
-    //}
+                        // Вот тут происходит перерисовка примитивов внутри блока
+                        chainLeader.UpdateEntities();
+                        chainLeader.BlockRecord.UpdateAnonymousBlocks();
+                    }
+                    else if (gripData is ChainLeaderAddLeaderGrip addLeaderGrip)
+                    {
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                    }
+                    else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
+                    {
+                        moveLeaderGrip.NewPoint = moveLeaderGrip.GripPoint + offset;
+                    }
+                    else
+                    {
+                        base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+                    }
+                }
+            }
+            else
+            {
+                base.MoveGripPointsAt(entity, grips, offset, bitFlags);
+            }
+        }
+        catch (Exception exception)
+        {
+            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                ExceptionBox.Show(exception);
+        }
+    }
 }

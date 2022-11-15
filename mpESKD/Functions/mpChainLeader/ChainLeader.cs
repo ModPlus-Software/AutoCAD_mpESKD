@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Отметка на плане
+/// Цепная выноска
 /// </summary>
 [SmartEntityDisplayNameKey("h171")] // TODO Цепная выноска 
 [SystemStyleDescriptionKey("h172")] // TODO Базовый стиль для обозначения цепной выноски
@@ -22,36 +22,12 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
 
-    #region Text entities
-
-    /// <summary>
-    /// Верхний текст 
-    /// </summary>
-    private DBText _topDbText;
-
-    /// <summary>
-    /// Маскировка фона верхнего текста 
-    /// </summary>
-    private Wipeout _topFirstTextMask;
-
-    /// <summary>
-    /// Нижний текст 
-    /// </summary>
-    private DBText _bottomDbText;
-
-    /// <summary>
-    /// Маскировка нижнего текста
-    /// </summary>
-    private Wipeout _bottomTextMask;
-
-    #endregion
-
     #region Entities
 
     /// <summary>
-    /// Главная полилиния примитива
+    /// Секущая часть
     /// </summary>
-    private Polyline _mainPolyline;
+    private Polyline _secantPolyline;
 
     /// <summary>
     /// Линия выноски
@@ -63,12 +39,48 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Line _shelfLine;
 
-    private Point3d _leaderFirstPoint;
+    /// <summary>
+    /// Верхний первый текст (номер узла)
+    /// </summary>
+    private DBText _topFirstDbText;
 
-    private readonly List<Line> _leaderLines = new();
-    private readonly List<Polyline> _leaderEndLines = new();
-    private readonly List<Hatch> _hatches = new();
-    private Polyline _framePolyline;
+    /// <summary>
+    /// Маскировка фона верхнего первого текста (номер узла)
+    /// </summary>
+    private Wipeout _topFirstTextMask;
+
+    /// <summary>
+    /// Верхний второй текст (номер листа)
+    /// </summary>
+    private DBText _topSecondDbText;
+
+    /// <summary>
+    /// Маскировка фона верхнего второго текста (номер листа)
+    /// </summary>
+    private Wipeout _topSecondTextMask;
+
+    /// <summary>
+    /// Нижний текст (адрес узла)
+    /// </summary>
+    private DBText _bottomDbText;
+
+    /// <summary>
+    /// Маскировка нижнего текста (адрес узла)
+    /// </summary>
+    private Wipeout _bottomTextMask;
+
+    
+    /// <summary>
+    /// Главная полилиния примитива
+    /// </summary>
+    //private Polyline _mainPolyline;
+
+    //private Point3d _leaderFirstPoint;
+
+    //private readonly List<Line> _leaderLines = new();
+    //private readonly List<Polyline> _leaderEndLines = new();
+    //private readonly List<Hatch> _hatches = new();
+    //private Polyline _framePolyline;
     private double _scale;
 
     #endregion
@@ -83,10 +95,58 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeader"/> class.
     /// </summary>
+    /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
+    public ChainLeader(ObjectId objectId)
+        : base(objectId)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ChainLeader"/> class.
+    /// </summary>
     /// <param name="lastNodeNumber">Номер узла последней созданной узловой выноски</param>
     public ChainLeader(string lastNodeNumber)
     {
         _lastNodeNumber = lastNodeNumber;
+    }
+
+    /// <summary>
+    /// Состояние Jig при создании узловой выноски
+    /// </summary>
+    public ChainLeaderJigState? JigState { get; set; }
+
+    /// <inheritdoc />
+    public override double MinDistanceBetweenPoints => ArrowSize + 1;
+
+    /// <inheritdoc />
+    public override IEnumerable<Entity> Entities
+    {
+        get
+        {
+            var entities = new List<Entity>
+            {
+                _topFirstTextMask,
+                _topSecondTextMask,
+                _bottomTextMask,
+
+                _secantPolyline,
+                _leaderLine,
+                _shelfLine,
+                _topFirstDbText,
+                _topSecondDbText,
+                _bottomDbText,
+            };
+
+            //entities.AddRange(_leaderEndLines);
+            //entities.AddRange(_hatches);
+
+            foreach (var e in entities)
+            {
+                SetImmutablePropertiesToNestedEntity(e);
+            }
+
+            return entities;
+        }
     }
 
     /// <inheritdoc />
@@ -95,13 +155,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
 
-    /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => 1;
 
     /// <summary>
-    /// Состояние Jig при создании узловой выноски
+    /// Длина секущего элемента
     /// </summary>
-    public ChainLeaderJigState? JigState { get; set; }
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p88", 10, 5, 20, nameSymbol: "s")]
+    [SaveToXData]
+    public int SecantLength { get; set; } = 10;
 
     /// <summary>
     /// Отступ текста
@@ -152,21 +212,41 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public bool IsTextAlwaysHorizontal { get; set; }
 
-    /// <summary>
-    /// Основной текст
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p101", "", propertyScope: PropertyScope.Palette)]
+    /// <inheritdoc/>
+    [EntityProperty(PropertiesCategory.Content, 5, "p85", false, descLocalKey: "d85")]
+    [PropertyVisibilityDependency(new[] { nameof(TextMaskOffset) })]
     [SaveToXData]
-    [ValueToSearchBy]
-    public string MainText { get; set; } = string.Empty;
+    public bool HideTextBackground { get; set; }
+
+    /// <inheritdoc/>
+    [EntityProperty(PropertiesCategory.Content, 6, "p86", 0.5, 0.0, 5.0)]
+    [SaveToXData]
+    public double TextMaskOffset { get; set; } = 0.5;
 
     /// <summary>
-    /// Малый текст
+    /// Номер узла
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 9, "p102", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 7, "p79", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
-    public string SmallText { get; set; } = string.Empty;
+    public string NodeNumber { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Номер листа
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 8, "p80", "", propertyScope: PropertyScope.Palette)]
+    [SaveToXData]
+    [ValueToSearchBy]
+    public string SheetNumber { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Адрес узла
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 9, "p81", "", propertyScope: PropertyScope.Palette)]
+    [SaveToXData]
+    [ValueToSearchBy]
+    public string NodeAddress { get; set; } = string.Empty;
+
 
     /// <summary>
     /// Размер стрелок
@@ -181,62 +261,23 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public override string TextStyle { get; set; } = "Standard";
 
     /// <summary>
-    /// Высота текста
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
-    [SaveToXData]
-    public double TextHeight { get; set; } = 3.5;
-
-    /// <inheritdoc/>
-    [EntityProperty(PropertiesCategory.Content, 4, "p85", false, descLocalKey: "d85-1")]
-    [SaveToXData]
-    public bool HideTextBackground { get; set; }
-
-    /// <inheritdoc/>
-    [EntityProperty(PropertiesCategory.Content, 5, "p86", 0.5, 0.0, 5.0, descLocalKey: "d86")]
-    [SaveToXData]
-    public double TextMaskOffset { get; set; }
-
-    /// <summary>
     /// Выноска
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 9, "p104", true, descLocalKey: "d104")]
     [SaveToXData]
     public bool Leader { get; set; } = true;
 
-    /// <inheritdoc />
-    public override IEnumerable<Entity> Entities
-    {
-        get
-        {
-            var entities = new List<Entity>
-            {
-                _topFirstTextMask,
-                _bottomTextMask,
-                _mainPolyline,
-                _leaderLine,
-                _shelfLine,
-                _topDbText,
-                _bottomDbText
-            };
-
-            entities.AddRange(_leaderEndLines);
-            entities.AddRange(_hatches);
-
-            foreach (var e in entities)
-            {
-                SetImmutablePropertiesToNestedEntity(e);
-            }
-
-            return entities;
-        }
-    }
+    /// <summary>
+    /// Точка выноски
+    /// </summary>
+    [SaveToXData]
+    public Point3d LeaderPoint{ get; set; } = new();
 
     /// <summary>
     /// Точка выноски
     /// </summary>
     [SaveToXData]
-    public Point3d LeaderPoint { get; set; } = new();
+    public List<Point3d> LeaderPoints{ get; set; } = new();
 
     /// <summary>
     /// Типы выносок
@@ -244,17 +285,15 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new();
 
-    /// <summary>
-    /// Точка выноски в внутренней системе координат блока
-    /// </summary>
-    private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
-
     public Vector3d MainNormal { get; set; } = new();
+
+    
+
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
         yield return InsertionPoint;
-        yield return EndPoint;
+        yield return LeaderPoint;
     }
 
     /// <inheritdoc />
@@ -262,36 +301,39 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         try
         {
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+            var scale = GetScale();
             _scale = GetScale();
+
+            //// Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == ChainLeaderJigState.InsertionPoint)
             {
                 var tempEndPoint = new Point3d(
                     InsertionPointOCS.X,
-                    InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
+                    InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
                     InsertionPointOCS.Z);
+                var normal = (tempEndPoint - InsertionPointOCS).GetNormal();
+                var vectorLength = normal * MinDistanceBetweenPoints;
+                var tempPoint2 = tempEndPoint + vectorLength.RotateBy(Math.PI*-0.25, Vector3d.ZAxis);
 
-                //CreateEntities(InsertionPointOCS, tempEndPoint, _scale);
-
-                // Задание точки вставки (т.е. второй точки еще нет)
-                MakeSimplyEntity(_scale);
+                AcadUtils.WriteMessageInDebug($"JigState == ChainLeaderJigState InsertionPointOCS {InsertionPointOCS} - {tempEndPoint}");
+                CreateEntities(InsertionPointOCS, tempPoint2, scale);
             }
-            else 
+            //// Указание точки выноски
+            else
             {
-                if (length < MinDistanceBetweenPoints * _scale)
+                // Если конечная точка на расстоянии, менее допустимого
+                if (EndPointOCS.DistanceTo(InsertionPointOCS) < MinDistanceBetweenPoints * scale)
                 {
                     var v = (EndPointOCS - InsertionPointOCS).GetNormal();
-                    var tempEndPoint = InsertionPointOCS + (MinDistanceBetweenPoints * _scale * v);
-                    MakeSimplyEntity(_scale);
-                    //_mainPolyline = new Line(InsertionPoint, tempEndPoint);
+                    var tempEndPoint = InsertionPointOCS + (MinDistanceBetweenPoints * scale * v);
+
+                    CreateEntities(InsertionPointOCS, tempEndPoint, scale);
                 }
                 else
                 {
-                    MakeSimplyEntity(_scale);
-                    //_mainPolyline = new Line(InsertionPoint, EndPointOCS);
+                    // Прочие случаи
+                    CreateEntities(InsertionPointOCS, EndPointOCS, scale);
                 }
-
-                CreateEntities(InsertionPointOCS, EndPointOCS, _scale);
             }
         }
         catch (Exception exception)
@@ -299,41 +341,24 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ExceptionBox.Show(exception);
         }
     }
-
-    private void MakeSimplyEntity(double scale)
+    private void CreateEntities(
+        Point3d insertionPoint,
+        Point3d leaderPoint,
+        double scale)
     {
-        var tmpEndPoint = JigState == ChainLeaderJigState.InsertionPoint ?
-            new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
-            ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-
-
-        _mainPolyline = new Polyline(2);
-        _mainPolyline.AddVertexAt(0, InsertionPoint.ToPoint2d(), 0.0, 0, 0);
-        _mainPolyline.AddVertexAt(1, tmpEndPoint.ToPoint2d(), 0.0, 0, 0);
-
-        //_leaderFirstPoint = tmpEndPoint;
-        EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-
-        //CreateEntities(scale);
-    }
-
-    private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
-    {
-        //_leaderLines.Clear();
-        //_leaderEndLines.Clear();
-        //_hatches.Clear();
+        
         var arrowSize = ArrowSize * scale;
+        var v = (leaderPoint - insertionPoint).GetNormal();
 
-        var mainNormal = (leaderPoint - insertionPoint).GetNormal();
-        //_mainPolyline = new Line(InsertionPoint, leaderPoint);
-        //_leaderLine = new Line(insertionPoint, leaderSecondPoint);
-        //if (!Leader || (string.IsNullOrEmpty(MainText) && string.IsNullOrEmpty(SmallText)))
-        //{
-        //    _leaderLine = null;
-        //    _shelfLine = null;
-        //}
+        var secantEnd = insertionPoint + (v * arrowSize);
+        //_secantPolyline = new Polyline(2);
+        //_secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
+        //_secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, 0, 0);
 
-        //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
+        if (secantEnd.DistanceTo(leaderPoint) > 0.0)
+            _leaderLine = new Line(insertionPoint, leaderPoint);
+
+        //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
 
@@ -344,25 +369,38 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var shelfLedge = ShelfLedge * scale;
         var isRight = ShelfPosition == ShelfPosition.Right;
 
-        var topTextLength = 0.0;
+        var topFirstTextLength = 0.0;
+        var topSecondTextLength = 0.0;
         var bottomTextLength = 0.0;
         var bottomTextHeight = 0.0;
 
-        if (!string.IsNullOrEmpty(MainText))
+        if (!string.IsNullOrEmpty(NodeNumber))
         {
-            _topDbText = new DBText { TextString = MainText };
-            _topDbText.SetProperties(TextStyle, mainTextHeight);
-            _topDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-            topTextLength = _topDbText.GetLength();
+            _topFirstDbText = new DBText { TextString = NodeNumber };
+            _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+            _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            topFirstTextLength = _topFirstDbText.GetLength();
         }
         else
         {
-            _topDbText = null;
+            _topFirstDbText = null;
         }
 
-        if (!string.IsNullOrEmpty(SmallText))
+        if (!string.IsNullOrEmpty(SheetNumber))
         {
-            _bottomDbText = new DBText { TextString = SmallText };
+            _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
+            _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
+            _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            topSecondTextLength = _topSecondDbText.GetLength();
+        }
+        else
+        {
+            _topSecondDbText = null;
+        }
+
+        if (!string.IsNullOrEmpty(NodeAddress))
+        {
+            _bottomDbText = new DBText { TextString = NodeAddress };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
@@ -373,59 +411,74 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomDbText = null;
         }
 
+        var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         var shelfLength = textIndent + largestTextLength + shelfLedge;
-        var topTextPosition = default(Point3d);
-        var bottomTextPosition = default(Point3d);
+        Point3d topFirstTextPosition;
+        var topSecondTextPosition = default(Point3d);
+        Point3d bottomTextPosition;
+
         if (isRight)
         {
-            if (_topDbText != null)
-            {
-                topTextPosition = new Point3d(
-                    leaderPoint.X + (topTextLength / 2) + ((shelfLength - topTextLength) / 2),
-                    leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
-                _topDbText.Position = topTextPosition;
-                _topDbText.AlignmentPoint = topTextPosition;
-            }
+            topFirstTextPosition = new Point3d(
+                leaderPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
+                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2),
+                0);
+            bottomTextPosition = new Point3d(
+                leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+                leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
+            if (_topFirstDbText != null)
+            {
+                _topFirstDbText.Position = topFirstTextPosition;
+                _topFirstDbText.AlignmentPoint = topFirstTextPosition;
+            }
+            
             if (_bottomDbText != null)
             {
-                bottomTextPosition = new Point3d(
-                    leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
-                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
                 _bottomDbText.Position = bottomTextPosition;
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
         else
         {
-            if (_topDbText != null)
+            topFirstTextPosition = new Point3d(
+                leaderPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
+                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+            bottomTextPosition = new Point3d(
+                leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+                leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+
+            if (_topFirstDbText != null)
             {
-                topTextPosition = new Point3d(
-                    leaderPoint.X - (topTextLength / 2) - ((shelfLength - topTextLength) / 2),
-                    leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
-                _topDbText.Position = topTextPosition;
-                _topDbText.AlignmentPoint = topTextPosition;
+                _topFirstDbText.Position = topFirstTextPosition;
+                _topFirstDbText.AlignmentPoint = topFirstTextPosition;
             }
 
             if (_bottomDbText != null)
             {
-                bottomTextPosition = new Point3d(
-                    leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
-                    leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
                 _bottomDbText.Position = bottomTextPosition;
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
+        }
+
+        if (_topSecondDbText != null)
+        {
+            topSecondTextPosition = new Point3d(
+                topFirstTextPosition.X + (topFirstTextLength / 2) + (topSecondTextLength / 2), topFirstTextPosition.Y, 0);
+            _topSecondDbText.Position = topSecondTextPosition;
+            _topSecondDbText.AlignmentPoint = topSecondTextPosition;
         }
 
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
 
-        var offset = TextMaskOffset * scale;
         if (HideTextBackground)
         {
-            _topFirstTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
+            var offset = TextMaskOffset * scale;
+            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, topFirstTextPosition);
+            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, topSecondTextPosition);
             _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
 
@@ -433,71 +486,238 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
-            _topDbText?.TransformBy(backRotationMatrix);
+            _topFirstDbText?.TransformBy(backRotationMatrix);
             _topFirstTextMask?.TransformBy(backRotationMatrix);
+            _topSecondDbText?.TransformBy(backRotationMatrix);
+            _topSecondTextMask?.TransformBy(backRotationMatrix);
             _bottomDbText?.TransformBy(backRotationMatrix);
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
 
-        //if (_leaderLine != null && (_bottomDbText != null || _topDbText != null))
-        //{
-            _shelfLine = new Line(EndPointOCS, shelfEndPoint);
-        //}
-
-        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
-
-        //for (var i = 0; i < LeaderPointsOCS.Count; i++)
-        //{
-
-        //    var pline = new Polyline();
-
-        //    if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
-        //    {
-        //        if (LeaderTypes.Count <= 0)
-        //        {
-        //            pline = CreateResectionArrow(_leaderLines[i]);
-        //        }
-        //        else
-        //        {
-        //            switch ((LeaderEndType)LeaderTypes[i])
-        //            {
-        //                case LeaderEndType.None:
-        //                    break;
-        //                case LeaderEndType.HalfArrow:
-        //                    _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
-        //                    break;
-        //                case LeaderEndType.Point:
-        //                    _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
-        //                    break;
-        //                case LeaderEndType.Resection:
-        //                    pline = CreateResectionArrow(_leaderLines[i]);
-        //                    break;
-        //                case LeaderEndType.Angle:
-        //                    pline = CreateAngleArrow(_leaderLines[i], 45, false);
-        //                    break;
-        //                case LeaderEndType.Arrow:
-        //                    _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
-        //                    break;
-        //                case LeaderEndType.OpenArrow:
-        //                    pline = CreateAngleArrow(_leaderLines[i], 10, false);
-        //                    break;
-        //                case LeaderEndType.ClosedArrow:
-        //                    pline = CreateAngleArrow(_leaderLines[i], 10, true);
-        //                    break;
-        //            }
-        //        }
-        //    }
-
-        //    _leaderEndLines.Add(pline);
-        //}
+        _shelfLine = new Line(leaderPoint, shelfEndPoint);
     }
+    //private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
+    //{
+    //    //_leaderLines.Clear();
+    //    //_leaderEndLines.Clear();
+    //    //_hatches.Clear()
+
+    //    var arrowSize = ArrowSize * scale;
+
+    //    var mainNormal = (leaderPoint - insertionPoint).GetNormal();
+
+        
+    //    //var secantLength = ArrowSize * scale;
+    //    //var v = (leaderPoint - insertionPoint).GetNormal();
+
+    //    //var secantEnd = insertionPoint + (v * secantLength);
+
+    //    //_mainPolyline = new Polyline(2);
+    //    //_mainPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
+    //    //_mainPolyline.AddVertexAt(1, leaderPoint.ToPoint2d(), 0.0, 0, 0);
+    //    //AcadUtils.WriteMessageInDebug($"startpoint {_mainPolyline.StartPoint} endpoint {_mainPolyline.EndPoint}");
+    //    _leaderLine = new Line(insertionPoint, leaderPoint);
+    //    //if (!Leader || (string.IsNullOrEmpty(MainText) && string.IsNullOrEmpty(SmallText)))
+    //    //{
+    //    //    _leaderLine = null;
+    //    //    _shelfLine = null;
+    //    //}
+
+    //    //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
+
+    //    SetNodeNumberOnCreation();
+
+    //    var mainTextHeight = MainTextHeight * scale;
+    //    var secondTextHeight = SecondTextHeight * scale;
+    //    var textIndent = TextIndent * scale;
+    //    var textVerticalOffset = TextVerticalOffset * scale;
+    //    var shelfLedge = ShelfLedge * scale;
+    //    var isRight = ShelfPosition == ShelfPosition.Right;
+
+    //    var topFirstTextLength = 0.0;
+    //    var topSecondTextLength = 0.0;
+    //    var bottomTextLength = 0.0;
+    //    var bottomTextHeight = 0.0;
+
+    //    if (!string.IsNullOrEmpty(NodeNumber))
+    //    {
+    //        _topFirstDbText = new DBText { TextString = NodeNumber };
+    //        _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
+    //        _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+    //        topFirstTextLength = _topFirstDbText.GetLength();
+    //    }
+    //    else
+    //    {
+    //        _topFirstDbText = null;
+    //    }
+
+    //    if (!string.IsNullOrEmpty(SheetNumber))
+    //    {
+    //        _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
+    //        _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
+    //        _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+    //        topSecondTextLength = _topSecondDbText.GetLength();
+    //    }
+    //    else
+    //    {
+    //        _topSecondDbText = null;
+    //    }
+
+    //    if (!string.IsNullOrEmpty(NodeAddress))
+    //    {
+    //        _bottomDbText = new DBText { TextString = NodeAddress };
+    //        _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+    //        _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+    //        bottomTextLength = _bottomDbText.GetLength();
+    //        bottomTextHeight = _bottomDbText.GetHeight();
+    //    }
+    //    else
+    //    {
+    //        _bottomDbText = null;
+    //    }
+
+    //    var topTextLength = topFirstTextLength + topSecondTextLength;
+    //    var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+    //    var shelfLength = textIndent + largestTextLength + shelfLedge;
+    //    Point3d topFirstTextPosition;
+    //    var topSecondTextPosition = default(Point3d);
+    //    Point3d bottomTextPosition;
+
+    //    if (isRight)
+    //    {
+    //        topFirstTextPosition = new Point3d(
+    //            leaderPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
+    //            leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2),
+    //            0);
+    //        bottomTextPosition = new Point3d(
+    //            leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+    //            leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+
+    //        if (_topFirstDbText != null)
+    //        {
+    //            _topFirstDbText.Position = topFirstTextPosition;
+    //            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
+    //        }
+            
+    //        if (_bottomDbText != null)
+    //        {
+    //            _bottomDbText.Position = bottomTextPosition;
+    //            _bottomDbText.AlignmentPoint = bottomTextPosition;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        topFirstTextPosition = new Point3d(
+    //            leaderPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
+    //            leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+    //        bottomTextPosition = new Point3d(
+    //            leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+    //            leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+
+    //        if (_topFirstDbText != null)
+    //        {
+    //            _topFirstDbText.Position = topFirstTextPosition;
+    //            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
+    //        }
+
+    //        if (_bottomDbText != null)
+    //        {
+    //            _bottomDbText.Position = bottomTextPosition;
+    //            _bottomDbText.AlignmentPoint = bottomTextPosition;
+    //        }
+    //    }
+
+    //    if (_topSecondDbText != null)
+    //    {
+    //        topSecondTextPosition = new Point3d(
+    //            topFirstTextPosition.X + (topFirstTextLength / 2) + (topSecondTextLength / 2), topFirstTextPosition.Y, 0);
+    //        _topSecondDbText.Position = topSecondTextPosition;
+    //        _topSecondDbText.AlignmentPoint = topSecondTextPosition;
+    //    }
+
+    //    var shelfEndPoint = ShelfPosition == ShelfPosition.Right
+    //        ? leaderPoint + (Vector3d.XAxis * shelfLength)
+    //        : leaderPoint - (Vector3d.XAxis * shelfLength);
+
+    //    if (HideTextBackground)
+    //    {
+    //        var offset = TextMaskOffset * scale;
+    //        _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, topFirstTextPosition);
+    //        _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, topSecondTextPosition);
+    //        _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
+    //    }
+
+    //    if (IsTextAlwaysHorizontal && IsRotated)
+    //    {
+    //        var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
+    //        shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
+    //        _topFirstDbText?.TransformBy(backRotationMatrix);
+    //        _topFirstTextMask?.TransformBy(backRotationMatrix);
+    //        _topSecondDbText?.TransformBy(backRotationMatrix);
+    //        _topSecondTextMask?.TransformBy(backRotationMatrix);
+    //        _bottomDbText?.TransformBy(backRotationMatrix);
+    //        _bottomTextMask?.TransformBy(backRotationMatrix);
+    //    }
+
+    //    //if (_leaderLine != null && (_bottomDbText != null || _topDbText != null))
+    //    //{
+    //        _shelfLine = new Line(EndPointOCS, shelfEndPoint);
+    //    //}
+
+    //    MirrorIfNeed(new[] {_topFirstDbText, _topSecondDbText, _bottomDbText });
+
+    //    //for (var i = 0; i < LeaderPointsOCS.Count; i++)
+    //    //{
+
+    //    //    var pline = new Polyline();
+
+    //    //    if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
+    //    //    {
+    //    //        if (LeaderTypes.Count <= 0)
+    //    //        {
+    //    //            pline = CreateResectionArrow(_leaderLines[i]);
+    //    //        }
+    //    //        else
+    //    //        {
+    //    //            switch ((LeaderEndType)LeaderTypes[i])
+    //    //            {
+    //    //                case LeaderEndType.None:
+    //    //                    break;
+    //    //                case LeaderEndType.HalfArrow:
+    //    //                    _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
+    //    //                    break;
+    //    //                case LeaderEndType.Point:
+    //    //                    _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
+    //    //                    break;
+    //    //                case LeaderEndType.Resection:
+    //    //                    pline = CreateResectionArrow(_leaderLines[i]);
+    //    //                    break;
+    //    //                case LeaderEndType.Angle:
+    //    //                    pline = CreateAngleArrow(_leaderLines[i], 45, false);
+    //    //                    break;
+    //    //                case LeaderEndType.Arrow:
+    //    //                    _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
+    //    //                    break;
+    //    //                case LeaderEndType.OpenArrow:
+    //    //                    pline = CreateAngleArrow(_leaderLines[i], 10, false);
+    //    //                    break;
+    //    //                case LeaderEndType.ClosedArrow:
+    //    //                    pline = CreateAngleArrow(_leaderLines[i], 10, true);
+    //    //                    break;
+    //    //            }
+    //    //        }
+    //    //    }
+
+    //    //    _leaderEndLines.Add(pline);
+    //    //}
+    //}
 
     private void SetNodeNumberOnCreation()
     {
         if (!IsValueCreated)
             return;
 
-        MainText = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
+        NodeNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
     }
 
     #region Arrows

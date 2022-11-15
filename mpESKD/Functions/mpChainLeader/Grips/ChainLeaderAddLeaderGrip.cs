@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -19,29 +19,18 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderAddLeaderGrip"/> class.
     /// </summary>
-    /// <param name="levelPlanMark">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public ChainLeaderAddLeaderGrip(LevelPlanMark levelPlanMark) 
+    /// <param name="chainLeader">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    public ChainLeaderAddLeaderGrip(ChainLeader chainLeader) 
     {
-        LevelPlanMark = levelPlanMark;
+        ChainLeader = chainLeader;
         GripType = GripType.Plus;
         RubberBandLineDisabled = true;
-
-        var borderHalfLength = LevelPlanMark.BorderWidth / 2 * LevelPlanMark.GetScale();
-        var borderHalfHeight = LevelPlanMark.BorderHeight / 2 * LevelPlanMark.GetScale();
-
-        _points = new[]
-        {
-            new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
-            new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y - borderHalfHeight),
-            new Point2d(LevelPlanMark.InsertionPoint.X + borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight),
-            new Point2d(LevelPlanMark.InsertionPoint.X - borderHalfLength, LevelPlanMark.InsertionPoint.Y + borderHalfHeight)
-        };
     }
 
     /// <summary>
     /// Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
-    public LevelPlanMark LevelPlanMark { get; }
+    public ChainLeader ChainLeader { get; }
 
     /// <summary>
     /// Новое значение точки вершины
@@ -68,18 +57,18 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
         {
             AcadUtils.Editor.TurnForcedPickOff();
             AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-            using (LevelPlanMark)
+            using (ChainLeader)
             {
-                LevelPlanMark.LeaderPoints.Add(NewPoint);
-                LevelPlanMark.LeaderTypes.Add(0);
+                ChainLeader.LeaderPoints.Add(NewPoint);
+                ChainLeader.LeaderTypes.Add(0);
 
-                LevelPlanMark.UpdateEntities();
-                LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+                ChainLeader.UpdateEntities();
+                ChainLeader.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                    var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
                     
-                    using (var resBuf = LevelPlanMark.GetDataForXData())
+                    using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }

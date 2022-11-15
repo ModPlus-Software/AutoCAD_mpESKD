@@ -38,10 +38,11 @@ public class ChainLeaderFunction: ISmartEntityFunction
 
             ExtendedDataUtils.AddRegAppTableRecord<ChainLeader>();
 
-            var chainLeader = new ChainLeader(FindLastNodeNumber());
+            var lastNodeNumber = FindLastNodeNumber();
+            var chainLeader = new ChainLeader(lastNodeNumber);
             var blockReference = MainFunction.CreateBlock(chainLeader);
-
             chainLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+
             InsertChainLeaderWithJig(chainLeader, blockReference);
         }
         catch (System.Exception exception)
@@ -83,6 +84,7 @@ public class ChainLeaderFunction: ISmartEntityFunction
 
             var blockReference = MainFunction.CreateBlock(chainLeader);
             chainLeader.ApplyStyle(style, true);
+            
             InsertChainLeaderWithJig(chainLeader, blockReference);
         }
         catch (System.Exception exception)
@@ -100,8 +102,8 @@ public class ChainLeaderFunction: ISmartEntityFunction
         // <msg1>Укажите точку вставки:</msg1>
         var insertionPointPrompt = Language.GetItem("msg1");
 
-        // <msg17>Укажите точку рамки:</msg17> // <-- TODO другой текст. Про вторую точку
-        var endPointPrompt = Language.GetItem("msg18");
+        // <msg17>Укажите точку выноски:</msg17> // <-- TODO другой текст. Про вторую точку
+        var leaderPointPrompt = Language.GetItem("msg18");
 
         //// <msg18>Укажите точку выноски:</msg18>
         //var leaderPointPrompt = Language.GetItem("msg18");
@@ -109,17 +111,8 @@ public class ChainLeaderFunction: ISmartEntityFunction
         {
             PromptForInsertionPoint = insertionPointPrompt
         };
-        //var entityJig = new DefaultEntityJig(chainLeader, blockReference, new Point3d(0, 0, 0)); 
-        //    point3d =>
-        //{
-        //    chainLeader.LeaderPoint = point3d;
-        //})
-        //{
-        //    PromptForInsertionPoint = insertionPointPrompt
-        //};
-
+        
         chainLeader.JigState = ChainLeaderJigState.InsertionPoint;
-
         do
         {
             var status = AcadUtils.Editor.Drag(entityJig).Status;
@@ -130,7 +123,7 @@ public class ChainLeaderFunction: ISmartEntityFunction
                     AcadUtils.WriteMessageInDebug(chainLeader.JigState.Value.ToString());
 
                     chainLeader.JigState = ChainLeaderJigState.LeaderPoint;
-                    entityJig.PromptForNextPoint = endPointPrompt;
+                    entityJig.PromptForNextPoint = leaderPointPrompt;
                     entityJig.PreviousPoint = chainLeader.InsertionPoint;
                         
                     //entityJig.JigState = JigState.PromptNextPoint;
@@ -150,6 +143,7 @@ public class ChainLeaderFunction: ISmartEntityFunction
                 {
                     break;
                 }
+
                 entityJig.JigState = JigState.PromptNextPoint;
             }
             else
@@ -186,13 +180,13 @@ public class ChainLeaderFunction: ISmartEntityFunction
     /// </summary>
     private static string FindLastNodeNumber()
     {
-        if (!MainSettings.Instance.FragmentMarkerContinueNodeNumber)
+        if (!MainSettings.Instance.ChainLeaderContinueNodeNumber)
             return string.Empty;
 
         var allValues = new List<string>();
         AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<ChainLeader>(typeof(ChainLeader)).ForEach(a =>
         {
-            allValues.Add(a.MainText);
+            allValues.Add(a.NodeNumber);
         });
 
         return allValues.OrderBy(s => s, new OrdinalStringComparer()).LastOrDefault();

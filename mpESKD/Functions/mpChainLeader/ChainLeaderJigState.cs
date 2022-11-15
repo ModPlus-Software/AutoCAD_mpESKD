@@ -11,11 +11,6 @@ public enum ChainLeaderJigState
     InsertionPoint,
 
     /// <summary>
-    /// Происходит указание точки рамки
-    /// </summary>
-    EndPoint,
-
-    /// <summary>
     /// Указание конечной точки (точка выноски)
     /// </summary>
     LeaderPoint

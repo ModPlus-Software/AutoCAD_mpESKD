@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -20,19 +20,19 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
     /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="chainLeader">Экземпляр класса <see cref="mpChainLeader.ChainLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderVertexGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    public ChainLeaderVertexGrip(ChainLeader chainLeader, int gripIndex)
     {
-        LevelPlanMark = levelPlanMark;
+        ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
     }
 
     /// <summary>
-    /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
+    /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
-    public LevelPlanMark LevelPlanMark { get; }
+    public ChainLeader ChainLeader { get; }
 
     /// <summary>
     /// Индекс ручки
@@ -63,8 +63,8 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
             {
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = LevelPlanMark.GetDataForXData())
+                    var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
+                    using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
                     }
@@ -72,7 +72,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                     tr.Commit();
                 }
 
-                LevelPlanMark.Dispose();
+                ChainLeader.Dispose();
             }
 
             // При отмене перемещения возвращаем временные значения
@@ -82,7 +82,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 {
                     if (GripIndex == 0)
                     {
-                        LevelPlanMark.InsertionPoint = _gripTmp;
+                        ChainLeader.InsertionPoint = _gripTmp;
                     }
                 }
             }

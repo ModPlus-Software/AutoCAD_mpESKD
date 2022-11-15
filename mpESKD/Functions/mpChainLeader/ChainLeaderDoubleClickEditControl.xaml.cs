@@ -30,14 +30,14 @@ public partial class ChainLeaderDoubleClickEditControl : IDoubleClickEditControl
 
         _chainLeader = chainLeader;
         
-        TbNodeNumber.Text = _chainLeader.MainText;
-        TbNodeAddress.Text = _chainLeader.SmallText;
+        TbNodeNumber.Text = _chainLeader.NodeAddress;
+        TbNodeAddress.Text = _chainLeader.NodeNumber;
     }
 
     /// <inheritdoc/>
     public void OnAccept()
     {
-        _chainLeader.MainText = TbNodeNumber.Text;
-        _chainLeader.SmallText = TbNodeAddress.Text;
+        _chainLeader.NodeNumber = TbNodeNumber.Text;
+        _chainLeader.NodeAddress = TbNodeAddress.Text;
     }
 }

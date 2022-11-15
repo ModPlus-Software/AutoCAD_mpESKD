@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Enums;
@@ -14,11 +14,11 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderRemoveGrip"/> class.
     /// </summary>
-    /// <param name="levelPlanMark">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderRemoveGrip(LevelPlanMark levelPlanMark, int gripIndex)
+    public ChainLeaderRemoveGrip(ChainLeader chainLeader, int gripIndex)
     {
-        LevelPlanMark = levelPlanMark;
+        ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.Minus;
     }
@@ -26,7 +26,7 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
-    public LevelPlanMark LevelPlanMark { get; }
+    public ChainLeader ChainLeader { get; }
 
     /// <summary>
     /// Индекс ручки
@@ -41,18 +41,18 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
 
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
-        using (LevelPlanMark)
+        using (ChainLeader)
         {
-            LevelPlanMark.LeaderPoints.RemoveAt(GripIndex);
-            LevelPlanMark.LeaderTypes.RemoveAt(GripIndex);
+            ChainLeader.LeaderPoints.RemoveAt(GripIndex);
+            ChainLeader.LeaderTypes.RemoveAt(GripIndex);
 
-            LevelPlanMark.UpdateEntities();
-            LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+            ChainLeader.UpdateEntities();
+            ChainLeader.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
 
-                using (var resBuf = LevelPlanMark.GetDataForXData())
+                using (var resBuf = ChainLeader.GetDataForXData())
                 {
                     blkRef.XData = resBuf;
                 }

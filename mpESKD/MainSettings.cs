@@ -326,4 +326,22 @@ public class MainSettings : ObservableObject
 
     #endregion
 
+    #region ChainLeader
+
+    /// <summary>
+    /// Продолжать нумерацию фрагмента при создании нового фрагмента
+    /// </summary>
+    public bool ChainLeaderContinueNodeNumber
+    {
+        get => !bool.TryParse(
+            UserConfigFile.GetValue(PName, nameof(ChainLeaderContinueNodeNumber)), out var b) || b; // true
+        set
+        {
+            UserConfigFile.SetValue(PName, nameof(ChainLeaderContinueNodeNumber), value.ToString(), true);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
 }
