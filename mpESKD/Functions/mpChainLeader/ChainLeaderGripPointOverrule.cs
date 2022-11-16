@@ -127,7 +127,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         if (vertexGrip.GripIndex == 0)
                         {
                             ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                            //chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
                         if (vertexGrip.GripIndex == 1)

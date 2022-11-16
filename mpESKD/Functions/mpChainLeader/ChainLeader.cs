@@ -359,39 +359,42 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         //_secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
         //_secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, 0, 0);
 
-        var mainLineStartPoint = default(Point3d);
-        var mainLineEndPoint = default(Point3d);
-        var pline = new Polyline();
-        if (ArrowPoints.Count > 0)
-        {
-            var tempPoints = new List<Point3d>();
-            tempPoints.AddRange(ArrowPoints);
-            tempPoints.Add(insertionPoint);
-            tempPoints.Add(leaderPoint);
+        if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
+            _leaderLine = new Line(insertionPoint, leaderPoint);
 
-            var furthestPoints = GetFurthestPoints(tempPoints);
-            MainLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
-            foreach (var arrowPoint in ArrowPoints)
-            {
-                //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
+        //var mainLineStartPoint = default(Point3d);
+        //var mainLineEndPoint = default(Point3d);
+        //var pline = new Polyline();
+        //if (ArrowPoints.Count > 0)
+        //{
+        //    var tempPoints = new List<Point3d>();
+        //    tempPoints.AddRange(ArrowPoints);
+        //    tempPoints.Add(insertionPoint);
+        //    tempPoints.Add(leaderPoint);
 
-                pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
-            }
-        }
-        else
-        {
-            //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
-            //{
+        //    var furthestPoints = GetFurthestPoints(tempPoints);
+        //    MainLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+        //    foreach (var arrowPoint in ArrowPoints)
+        //    {
+        //        //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
 
-            //}
-                MainLine = new Line(insertionPoint, leaderPoint);
-            pline = CreateAngleArrowOnPoint(leaderPoint, 10, false);
-        }
+        //        pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
+        //    }
+        //}
+        //else
+        //{
+        //    //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
+        //    //{
+
+        //    //}
+        //        MainLine = new Line(insertionPoint, leaderPoint);
+        //    pline = CreateAngleArrowOnPoint(leaderPoint, 10, false);
+        //}
 
        
         
 
-        _leaderEndLines.Add(pline);
+        //_leaderEndLines.Add(pline);
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
