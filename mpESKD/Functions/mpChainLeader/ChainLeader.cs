@@ -84,7 +84,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     //private readonly List<Hatch> _hatches = new();
     //private Polyline _framePolyline;
-    private List<Polyline> _leaderEndLines;
+    private List<Polyline> _leaderEndLines = new List<Polyline>();
     private double _scale;
 
     #endregion
@@ -139,6 +139,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _topFirstDbText,
                 _topSecondDbText,
                 _bottomDbText,
+                MainLine
             };
 
             //entities.AddRange(_leaderEndLines);
@@ -158,14 +159,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
-
-
-    /// <summary>
-    /// Длина секущего элемента
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p88", 10, 5, 20, nameSymbol: "s")]
-    [SaveToXData]
-    public int SecantLength { get; set; } = 10;
 
     /// <summary>
     /// Отступ текста
@@ -251,7 +244,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [ValueToSearchBy]
     public string NodeAddress { get; set; } = string.Empty;
 
-
     /// <summary>
     /// Размер стрелок
     /// </summary>
@@ -290,6 +282,14 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public List<int> LeaderTypes { get; set; } = new();
 
     public Vector3d MainNormal { get; set; } = new();
+
+    [SaveToXData]
+    public Line MainLine
+    {
+        get;
+        set;
+    }
+
 
 
 
@@ -350,7 +350,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         Point3d leaderPoint,
         double scale)
     {
-
+        AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
         MainNormal = (leaderPoint - insertionPoint).GetNormal();
 
@@ -361,7 +361,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         var mainLineStartPoint = default(Point3d);
         var mainLineEndPoint = default(Point3d);
-
+        var pline = new Polyline();
         if (ArrowPoints.Count > 0)
         {
             var tempPoints = new List<Point3d>();
@@ -370,21 +370,26 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             tempPoints.Add(leaderPoint);
 
             var furthestPoints = GetFurthestPoints(tempPoints);
-            _leaderLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+            MainLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+            foreach (var arrowPoint in ArrowPoints)
+            {
+                //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
+
+                pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
+            }
         }
         else
         {
-            if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
-                _leaderLine = new Line(insertionPoint, leaderPoint);
+            //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
+            //{
+
+            //}
+                MainLine = new Line(insertionPoint, leaderPoint);
+            pline = CreateAngleArrowOnPoint(leaderPoint, 10, false);
         }
 
-        var pline = new Polyline();
-        foreach (var arrowPoint in ArrowPoints)
-        {
-            var tempArrowPoint = _leaderLine.GetClosestPointTo(arrowPoint,false);
-
-            pline = CreateAngleArrowOnPoint(tempArrowPoint, 10, true);
-        }
+       
+        
 
         _leaderEndLines.Add(pline);
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений

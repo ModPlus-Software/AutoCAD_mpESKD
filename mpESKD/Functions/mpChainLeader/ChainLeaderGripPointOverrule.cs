@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpChainLeader;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -130,7 +132,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                         if (vertexGrip.GripIndex == 1)
                         {
-                            chainLeader.EndPoint = vertexGrip.GripPoint + offset;
+                            chainLeader.LeaderPoint = vertexGrip.GripPoint + offset;
                         }
 
                         chainLeader.UpdateEntities();
@@ -140,8 +142,20 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         var chainLeader = addLeaderGrip.ChainLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
-                        chainLeader.
-                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+
+                        //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
+
+                        Ray tempRay = new Ray();
+                        tempRay.BasePoint = chainLeader.InsertionPointOCS;
+                        tempRay.UnitDir = chainLeader.MainNormal;
+                        
+
+                        AcadUtils.WriteMessageInDebug($"tempRay.BasePoint {tempRay.BasePoint} - tempRay.SecondPoint  {tempRay.UnitDir }");
+                        
+
+                        addLeaderGrip.NewPoint = tempRay.GetClosestPointTo(newPoint,true);
+
+
                     }
                     else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
                     {
