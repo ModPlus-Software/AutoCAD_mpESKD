@@ -1,4 +1,5 @@
-﻿using mpESKD.Base.Utils;
+﻿using System;
+using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpChainLeader;
 
@@ -67,8 +68,8 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     grips.Add(new ChainLeaderAddLeaderGrip(chainLeader)
                     {
                         GripPoint = new Point3d(
-                            chainLeader.EndPoint.X - 2, 
-                            chainLeader.EndPoint.Y, 
+                            chainLeader.EndPoint.X - 2,
+                            chainLeader.EndPoint.Y,
                             chainLeader.EndPoint.Z)
                     });
 
@@ -81,11 +82,11 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         });
                         var deleteGripPoint = new Point3d(
                             chainLeader.ArrowPoints[i].X + 1,
-                            chainLeader.ArrowPoints[i].Y, 
+                            chainLeader.ArrowPoints[i].Y,
                             chainLeader.ArrowPoints[i].Z);
                         var leaderEndTypeGripPoint = new Point3d(
                             chainLeader.ArrowPoints[i].X - 1,
-                            chainLeader.ArrowPoints[i].Y, 
+                            chainLeader.ArrowPoints[i].Y,
                             chainLeader.ArrowPoints[i].Z);
 
                         // ручки удаления выносок
@@ -93,7 +94,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         {
                             GripPoint = deleteGripPoint
                         });
-                        
+
                         // ручки выбора типа выносок
                         grips.Add(new ChainLeaderEndTypeGrip(chainLeader, i)
                         {
@@ -110,7 +111,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
         }
     }
 
-     // <inheritdoc/>
+    // <inheritdoc/>
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
@@ -140,20 +141,19 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     }
                     else if (gripData is ChainLeaderAddLeaderGrip addLeaderGrip)
                     {
-                        //var chainLeader = addLeaderGrip.ChainLeader;
-                        //var newPoint = addLeaderGrip.GripPoint + offset;
+                        var chainLeader = addLeaderGrip.ChainLeader;
+                        var newPoint = addLeaderGrip.GripPoint + offset;
 
-                        ////var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
+                        var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
+                            chainLeader.EndPoint, newPoint);
 
-                        //Ray tempRay = new Ray();
-                        //tempRay.BasePoint = chainLeader.InsertionPointOCS;
-                        //tempRay.UnitDir = chainLeader.MainNormal;
-                        
-
-                        //AcadUtils.WriteMessageInDebug($"tempRay.BasePoint {tempRay.BasePoint} - tempRay.SecondPoint  {tempRay.UnitDir }");
-                        
-
-                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                        AcadUtils.WriteMessageInDebug($"insertionPointOCS {chainLeader.InsertionPointOCS} - leaderPointOCS {chainLeader.EndPointOCS}");
+                        AcadUtils.WriteMessageInDebug($"insertionPoint {chainLeader.InsertionPoint} - leaderPoint {chainLeader.EndPoint}");
+                        AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y}");
+                        //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
+                        //var newplpoint = new Point3d(-14970, 2230, 0);
+                
+                        addLeaderGrip.NewPoint = pointOnPolyline;
 
 
                     }
@@ -178,4 +178,35 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                 ExceptionBox.Show(exception);
         }
     }
+
+    public Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
+    {
+
+        Point3d a = varStart;
+        Point3d b = varEnd;
+        Point3d c = varBase;
+        //double X, Y;
+
+        double[] d = new double[3];
+        double[] F = new double[3];
+        double k2;
+
+        F[0] = c.X - (b.Y - a.Y);
+        F[1] = c.Y + (b.X - a.X);
+        k2 = ((c.X - a.X) * (b.Y - a.Y) - (b.X - a.X) * (c.Y - a.Y)) /
+                 (double)((b.X - a.X) * (F[1] - c.Y) - (F[0] - c.X) * (b.Y - a.Y));
+        d[0] = (F[0] - c.X) * k2 + c.X;
+        d[1] = (F[1] - c.Y) * k2 + c.Y;
+
+        var x = (c.X * Math.Pow(b.X - a.X, 2) + c.Y * (a.X - b.X) * (a.Y - b.Y) + a.X * Math.Pow(b.Y, 2) +
+                b.X * Math.Pow(a.Y, 2) - a.Y * b.Y * (a.X + b.X))
+            / (Math.Pow(a.X - b.X, 2) + Math.Pow(b.Y - a.Y, 2));
+
+        var y = (x * (b.Y - a.Y) + b.X * a.Y - a.X * b.Y) / (b.X - a.X);
+
+        return new Point3d(x, y,0);
+
+        //return new Point3d(d[0], d[1], 0);
+    }
+
 }

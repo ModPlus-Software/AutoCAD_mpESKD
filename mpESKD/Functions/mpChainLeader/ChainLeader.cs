@@ -281,17 +281,12 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new();
 
-    public Vector3d MainNormal { get; set; } = new();
-
     [SaveToXData]
     public Line MainLine
     {
         get;
         set;
     }
-
-
-
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -322,7 +317,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 AcadUtils.WriteMessageInDebug($"JigState == ChainLeaderJigState InsertionPointOCS {InsertionPointOCS} - {tempEndPoint}");
                 CreateEntities(InsertionPointOCS, tempPoint2, scale);
             }
-            //// Указание точки выноски
+            // Указание точки выноски
             else
             {
                 // Если конечная точка на расстоянии, менее допустимого
@@ -352,9 +347,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
-        MainNormal = (leaderPoint - insertionPoint).GetNormal();
+        var normal = (leaderPoint - insertionPoint).GetNormal();
 
-        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
+        var leaderMinPoint = insertionPoint + (normal * arrowSize);
         //_secantPolyline = new Polyline(2);
         //_secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
         //_secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, 0, 0);
