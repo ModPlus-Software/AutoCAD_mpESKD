@@ -127,12 +127,12 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         if (vertexGrip.GripIndex == 0)
                         {
                             ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                            //chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
                         if (vertexGrip.GripIndex == 1)
                         {
-                            chainLeader.LeaderPoint = vertexGrip.GripPoint + offset;
+                            chainLeader.EndPoint = vertexGrip.GripPoint + offset;
                         }
 
                         chainLeader.UpdateEntities();
@@ -140,20 +140,20 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     }
                     else if (gripData is ChainLeaderAddLeaderGrip addLeaderGrip)
                     {
-                        var chainLeader = addLeaderGrip.ChainLeader;
-                        var newPoint = addLeaderGrip.GripPoint + offset;
+                        //var chainLeader = addLeaderGrip.ChainLeader;
+                        //var newPoint = addLeaderGrip.GripPoint + offset;
 
-                        //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
+                        ////var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
 
-                        Ray tempRay = new Ray();
-                        tempRay.BasePoint = chainLeader.InsertionPointOCS;
-                        tempRay.UnitDir = chainLeader.MainNormal;
+                        //Ray tempRay = new Ray();
+                        //tempRay.BasePoint = chainLeader.InsertionPointOCS;
+                        //tempRay.UnitDir = chainLeader.MainNormal;
                         
 
-                        AcadUtils.WriteMessageInDebug($"tempRay.BasePoint {tempRay.BasePoint} - tempRay.SecondPoint  {tempRay.UnitDir }");
+                        //AcadUtils.WriteMessageInDebug($"tempRay.BasePoint {tempRay.BasePoint} - tempRay.SecondPoint  {tempRay.UnitDir }");
                         
 
-                        addLeaderGrip.NewPoint = tempRay.GetClosestPointTo(newPoint,true);
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
 
 
                     }
