@@ -7,6 +7,7 @@ namespace mpESKD.Base;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -424,9 +425,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                             propertiesDataDictionary.Add(propertyInfo.Name, string.Join("#", integers));
                             break;
                         case List<double> doubles:
-                            var d = doubles.Select(d => d.ToString(CultureInfo.InvariantCulture));
-                            var dd = string.Join("#", d);
-                            propertiesDataDictionary.Add(propertyInfo.Name, dd);
+                            propertiesDataDictionary.Add(propertyInfo.Name, string.Join("#", doubles.Select(d => Math.Round(d, 6))));
                             break;
                         case Enum _:
                             propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
@@ -456,7 +455,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 {
                     var length = (int)Math.Min(ms.Length - i, kMaxChunkSize);
                     var dataChunk = new byte[length];
-                    ms.Read(dataChunk, 0, length);
+                    _ = ms.Read(dataChunk, 0, length);
                     resultBuffer.Add(new TypedValue((int)DxfCode.ExtendedDataBinaryChunk, dataChunk));
                 }
             }
@@ -594,14 +593,6 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 else if (propertyInfo.PropertyType == typeof(List<int>))
                 {
                     propertyInfo.SetValue(this, valueForProperty.Split('#').Select(int.Parse).ToList());
-                }
-                else if (propertyInfo.PropertyType == typeof(List<double>))
-                {
-
-                    var v = valueForProperty.Split('#').Select(s => double.Parse(s, CultureInfo.InvariantCulture));
-                    var vv = v.ToList();
-                    propertyInfo.SetValue(this, vv);
-
                 }
                 else if (propertyInfo.PropertyType == typeof(int))
                 {
