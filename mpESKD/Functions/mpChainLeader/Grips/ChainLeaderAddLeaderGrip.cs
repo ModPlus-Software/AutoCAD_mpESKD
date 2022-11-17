@@ -59,7 +59,7 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
             AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
             using (ChainLeader)
             {
-                //ChainLeader.ArrowPoints.Add(NewPoint);
+                ChainLeader.ArrowPoints.Add(NewPoint);
                 //ChainLeader.LeaderTypes.Add(0);
 
                 ChainLeader.UpdateEntities();

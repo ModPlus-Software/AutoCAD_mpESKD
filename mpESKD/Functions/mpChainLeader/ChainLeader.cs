@@ -339,6 +339,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         Point3d leaderPoint,
         double scale)
     {
+        _leaderEndLines.Clear();
+        
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
         MainNormal = (leaderPoint - insertionPoint).GetNormal();
@@ -381,9 +383,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _leaderLine = new Line(insertionPoint, leaderPoint);
             pline = CreatePointArrow(insertionPoint);
         }
-
-
-
 
         _leaderEndLines.Add(pline);
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений

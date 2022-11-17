@@ -154,7 +154,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
                         //var newplpoint = new Point3d(-14970, 2230, 0);
 
-                        //addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                        addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
 
 
                     }
