@@ -35,7 +35,7 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
     /// <summary>
     /// Новое значение точки вершины
     /// </summary>
-    public Point3d NewPoint { get; set; }
+    public double NewPoint { get; set; }
 
     /// <inheritdoc />
     public override string GetTooltip()
@@ -59,7 +59,7 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
             AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
             using (ChainLeader)
             {
-                ChainLeader.ArrowPoints.Add(NewPoint);
+                //ChainLeader.ArrowPoints.Add(NewPoint);
                 //ChainLeader.LeaderTypes.Add(0);
 
                 ChainLeader.UpdateEntities();

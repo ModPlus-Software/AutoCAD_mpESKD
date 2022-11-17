@@ -72,22 +72,23 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             chainLeader.EndPoint.Y,
                             chainLeader.EndPoint.Z)
                     });
-
+                    var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
                     for (var i = 0; i < chainLeader.ArrowPoints.Count; i++)
                     {
                         // ручки переноса выносок
                         grips.Add(new ChainLeaderMoveGrip(chainLeader, i)
                         {
-                            GripPoint = chainLeader.ArrowPoints[i]
+                            GripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal)
                         });
+                        var gripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal);
                         var deleteGripPoint = new Point3d(
-                            chainLeader.ArrowPoints[i].X + 1,
-                            chainLeader.ArrowPoints[i].Y,
-                            chainLeader.ArrowPoints[i].Z);
+                            gripPoint.X + 1,
+                            gripPoint.Y,
+                            gripPoint.Z);
                         var leaderEndTypeGripPoint = new Point3d(
-                            chainLeader.ArrowPoints[i].X - 1,
-                            chainLeader.ArrowPoints[i].Y,
-                            chainLeader.ArrowPoints[i].Z);
+                            gripPoint.X - 1,
+                            gripPoint.Y,
+                            gripPoint.Z);
 
                         // ручки удаления выносок
                         grips.Add(new ChainLeaderRemoveGrip(chainLeader, i)
@@ -152,14 +153,16 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y}");
                         //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
                         //var newplpoint = new Point3d(-14970, 2230, 0);
-                
-                        addLeaderGrip.NewPoint = pointOnPolyline;
+
+                        //addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
 
 
                     }
+
                     else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
                     {
-                        moveLeaderGrip.NewPoint = moveLeaderGrip.GripPoint + offset;
+                        var chainLeader = moveLeaderGrip.ChainLeader;
+                        moveLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
                     }
                     else
                     {
@@ -181,32 +184,18 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
     public Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
     {
-
         Point3d a = varStart;
         Point3d b = varEnd;
         Point3d c = varBase;
-        //double X, Y;
 
-        double[] d = new double[3];
-        double[] F = new double[3];
-        double k2;
+        var F0 = c.X - (b.Y - a.Y);
+        var F1 = c.Y + (b.X - a.X);
+        var k2 = ((c.X - a.X) * (b.Y - a.Y) - (b.X - a.X) * (c.Y - a.Y)) /
+                 (double)((b.X - a.X) * (F1 - c.Y) - (F0 - c.X) * (b.Y - a.Y));
+        var xPoint = (F0 - c.X) * k2 + c.X;
+        var yPoint = (F1 - c.Y) * k2 + c.Y;
 
-        F[0] = c.X - (b.Y - a.Y);
-        F[1] = c.Y + (b.X - a.X);
-        k2 = ((c.X - a.X) * (b.Y - a.Y) - (b.X - a.X) * (c.Y - a.Y)) /
-                 (double)((b.X - a.X) * (F[1] - c.Y) - (F[0] - c.X) * (b.Y - a.Y));
-        d[0] = (F[0] - c.X) * k2 + c.X;
-        d[1] = (F[1] - c.Y) * k2 + c.Y;
-
-        var x = (c.X * Math.Pow(b.X - a.X, 2) + c.Y * (a.X - b.X) * (a.Y - b.Y) + a.X * Math.Pow(b.Y, 2) +
-                b.X * Math.Pow(a.Y, 2) - a.Y * b.Y * (a.X + b.X))
-            / (Math.Pow(a.X - b.X, 2) + Math.Pow(b.Y - a.Y, 2));
-
-        var y = (x * (b.Y - a.Y) + b.X * a.Y - a.X * b.Y) / (b.X - a.X);
-
-        return new Point3d(x, y,0);
-
-        //return new Point3d(d[0], d[1], 0);
+        return new Point3d(xPoint, yPoint, 0);
     }
 
 }

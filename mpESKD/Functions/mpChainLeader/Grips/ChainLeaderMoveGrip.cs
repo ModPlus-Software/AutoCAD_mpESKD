@@ -37,7 +37,7 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
     /// <summary>
     /// Новое значение точки вершины
     /// </summary>
-    public Point3d NewPoint { get; set; }
+    public double NewPoint { get; set; }
 
     /// <summary>
     /// Индекс ручки
@@ -66,7 +66,7 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
 
             using (ChainLeader)
             {
-                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                //ChainLeader.ArrowPoints[GripIndex] = NewPoint;
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 

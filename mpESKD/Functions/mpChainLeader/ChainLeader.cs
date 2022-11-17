@@ -139,10 +139,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _topFirstDbText,
                 _topSecondDbText,
                 _bottomDbText,
-                MainLine
             };
 
-            //entities.AddRange(_leaderEndLines);
+            entities.AddRange(_leaderEndLines);
             //entities.AddRange(_hatches);
 
             foreach (var e in entities)
@@ -273,20 +272,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точка выноски
     /// </summary>
     [SaveToXData]
-    public List<Point3d> ArrowPoints { get; set; } = new();
+    public List<double> ArrowPoints { get; set; } = new();
 
     /// <summary>
     /// Типы выносок
     /// </summary>
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new();
-
-    [SaveToXData]
-    public Line MainLine
-    {
-        get;
-        set;
-    }
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -317,6 +309,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 AcadUtils.WriteMessageInDebug($"JigState == ChainLeaderJigState InsertionPointOCS {InsertionPointOCS} - {tempEndPoint}");
                 CreateEntities(InsertionPointOCS, tempPoint2, scale);
             }
+
             // Указание точки выноски
             else
             {
@@ -340,6 +333,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ExceptionBox.Show(exception);
         }
     }
+
     private void CreateEntities(
         Point3d insertionPoint,
         Point3d leaderPoint,
@@ -347,49 +341,51 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
-        var normal = (leaderPoint - insertionPoint).GetNormal();
+        MainNormal = (leaderPoint - insertionPoint).GetNormal();
 
-        var leaderMinPoint = insertionPoint + (normal * arrowSize);
-        //_secantPolyline = new Polyline(2);
-        //_secantPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
-        //_secantPolyline.AddVertexAt(1, secantEnd.ToPoint2d(), 0.0, 0, 0);
+        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
 
         if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, leaderPoint);
 
-        //var mainLineStartPoint = default(Point3d);
-        //var mainLineEndPoint = default(Point3d);
-        //var pline = new Polyline();
-        //if (ArrowPoints.Count > 0)
-        //{
-        //    var tempPoints = new List<Point3d>();
-        //    tempPoints.AddRange(ArrowPoints);
-        //    tempPoints.Add(insertionPoint);
-        //    tempPoints.Add(leaderPoint);
+        var mainLineStartPoint = default(Point3d);
+        var mainLineEndPoint = default(Point3d);
+        var pline = new Polyline();
+        if (ArrowPoints.Count > 0)
+        {
+            var tempPoints = new List<Point3d>();
 
-        //    var furthestPoints = GetFurthestPoints(tempPoints);
-        //    MainLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
-        //    foreach (var arrowPoint in ArrowPoints)
-        //    {
-        //        //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
+            //tempPoints.AddRange(ArrowPoints);
 
-        //        pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
-        //    }
-        //}
-        //else
-        //{
-        //    //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
-        //    //{
+            tempPoints.Add(insertionPoint);
+            tempPoints.Add(leaderPoint);
 
-        //    //}
-        //        MainLine = new Line(insertionPoint, leaderPoint);
-        //    pline = CreateAngleArrowOnPoint(leaderPoint, 10, false);
-        //}
+            foreach (var arrowPoint in ArrowPoints)
+            {
+                var tempPoint = leaderPoint + (MainNormal * arrowPoint);
+                tempPoints.Add(tempPoint);
+                //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
 
-       
-        
+                //pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
+            }
 
-        //_leaderEndLines.Add(pline);
+            var furthestPoints = GetFurthestPoints(tempPoints);
+            _leaderLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+        }
+        else
+        {
+            //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
+            //{
+
+            //}
+            _leaderLine = new Line(insertionPoint, leaderPoint);
+            pline = CreatePointArrow(insertionPoint);
+        }
+
+
+
+
+        _leaderEndLines.Add(pline);
         //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
@@ -528,221 +524,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         _shelfLine = new Line(leaderPoint, shelfEndPoint);
     }
-    //private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
-    //{
-    //    //_leaderLines.Clear();
-    //    //_leaderEndLines.Clear();
-    //    //_hatches.Clear()
 
-    //    var arrowSize = ArrowSize * scale;
-
-    //    var mainNormal = (leaderPoint - insertionPoint).GetNormal();
-
-
-    //    //var secantLength = ArrowSize * scale;
-    //    //var v = (leaderPoint - insertionPoint).GetNormal();
-
-    //    //var secantEnd = insertionPoint + (v * secantLength);
-
-    //    //_mainPolyline = new Polyline(2);
-    //    //_mainPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0, 0);
-    //    //_mainPolyline.AddVertexAt(1, leaderPoint.ToPoint2d(), 0.0, 0, 0);
-    //    //AcadUtils.WriteMessageInDebug($"startpoint {_mainPolyline.StartPoint} endpoint {_mainPolyline.EndPoint}");
-    //    _leaderLine = new Line(insertionPoint, leaderPoint);
-    //    //if (!Leader || (string.IsNullOrEmpty(MainText) && string.IsNullOrEmpty(SmallText)))
-    //    //{
-    //    //    _leaderLine = null;
-    //    //    _shelfLine = null;
-    //    //}
-
-    //    //// Дальше код идентичен коду в SecantNodalLeader! Учесть при внесении изменений
-
-    //    SetNodeNumberOnCreation();
-
-    //    var mainTextHeight = MainTextHeight * scale;
-    //    var secondTextHeight = SecondTextHeight * scale;
-    //    var textIndent = TextIndent * scale;
-    //    var textVerticalOffset = TextVerticalOffset * scale;
-    //    var shelfLedge = ShelfLedge * scale;
-    //    var isRight = ShelfPosition == ShelfPosition.Right;
-
-    //    var topFirstTextLength = 0.0;
-    //    var topSecondTextLength = 0.0;
-    //    var bottomTextLength = 0.0;
-    //    var bottomTextHeight = 0.0;
-
-    //    if (!string.IsNullOrEmpty(NodeNumber))
-    //    {
-    //        _topFirstDbText = new DBText { TextString = NodeNumber };
-    //        _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
-    //        _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-    //        topFirstTextLength = _topFirstDbText.GetLength();
-    //    }
-    //    else
-    //    {
-    //        _topFirstDbText = null;
-    //    }
-
-    //    if (!string.IsNullOrEmpty(SheetNumber))
-    //    {
-    //        _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
-    //        _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
-    //        _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-    //        topSecondTextLength = _topSecondDbText.GetLength();
-    //    }
-    //    else
-    //    {
-    //        _topSecondDbText = null;
-    //    }
-
-    //    if (!string.IsNullOrEmpty(NodeAddress))
-    //    {
-    //        _bottomDbText = new DBText { TextString = NodeAddress };
-    //        _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-    //        _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-    //        bottomTextLength = _bottomDbText.GetLength();
-    //        bottomTextHeight = _bottomDbText.GetHeight();
-    //    }
-    //    else
-    //    {
-    //        _bottomDbText = null;
-    //    }
-
-    //    var topTextLength = topFirstTextLength + topSecondTextLength;
-    //    var largestTextLength = Math.Max(topTextLength, bottomTextLength);
-    //    var shelfLength = textIndent + largestTextLength + shelfLedge;
-    //    Point3d topFirstTextPosition;
-    //    var topSecondTextPosition = default(Point3d);
-    //    Point3d bottomTextPosition;
-
-    //    if (isRight)
-    //    {
-    //        topFirstTextPosition = new Point3d(
-    //            leaderPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
-    //            leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2),
-    //            0);
-    //        bottomTextPosition = new Point3d(
-    //            leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
-    //            leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
-
-    //        if (_topFirstDbText != null)
-    //        {
-    //            _topFirstDbText.Position = topFirstTextPosition;
-    //            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
-    //        }
-
-    //        if (_bottomDbText != null)
-    //        {
-    //            _bottomDbText.Position = bottomTextPosition;
-    //            _bottomDbText.AlignmentPoint = bottomTextPosition;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        topFirstTextPosition = new Point3d(
-    //            leaderPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
-    //            leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
-    //        bottomTextPosition = new Point3d(
-    //            leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
-    //            leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
-
-    //        if (_topFirstDbText != null)
-    //        {
-    //            _topFirstDbText.Position = topFirstTextPosition;
-    //            _topFirstDbText.AlignmentPoint = topFirstTextPosition;
-    //        }
-
-    //        if (_bottomDbText != null)
-    //        {
-    //            _bottomDbText.Position = bottomTextPosition;
-    //            _bottomDbText.AlignmentPoint = bottomTextPosition;
-    //        }
-    //    }
-
-    //    if (_topSecondDbText != null)
-    //    {
-    //        topSecondTextPosition = new Point3d(
-    //            topFirstTextPosition.X + (topFirstTextLength / 2) + (topSecondTextLength / 2), topFirstTextPosition.Y, 0);
-    //        _topSecondDbText.Position = topSecondTextPosition;
-    //        _topSecondDbText.AlignmentPoint = topSecondTextPosition;
-    //    }
-
-    //    var shelfEndPoint = ShelfPosition == ShelfPosition.Right
-    //        ? leaderPoint + (Vector3d.XAxis * shelfLength)
-    //        : leaderPoint - (Vector3d.XAxis * shelfLength);
-
-    //    if (HideTextBackground)
-    //    {
-    //        var offset = TextMaskOffset * scale;
-    //        _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, topFirstTextPosition);
-    //        _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, topSecondTextPosition);
-    //        _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
-    //    }
-
-    //    if (IsTextAlwaysHorizontal && IsRotated)
-    //    {
-    //        var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
-    //        shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
-    //        _topFirstDbText?.TransformBy(backRotationMatrix);
-    //        _topFirstTextMask?.TransformBy(backRotationMatrix);
-    //        _topSecondDbText?.TransformBy(backRotationMatrix);
-    //        _topSecondTextMask?.TransformBy(backRotationMatrix);
-    //        _bottomDbText?.TransformBy(backRotationMatrix);
-    //        _bottomTextMask?.TransformBy(backRotationMatrix);
-    //    }
-
-    //    //if (_leaderLine != null && (_bottomDbText != null || _topDbText != null))
-    //    //{
-    //        _shelfLine = new Line(EndPointOCS, shelfEndPoint);
-    //    //}
-
-    //    MirrorIfNeed(new[] {_topFirstDbText, _topSecondDbText, _bottomDbText });
-
-    //    //for (var i = 0; i < LeaderPointsOCS.Count; i++)
-    //    //{
-
-    //    //    var pline = new Polyline();
-
-    //    //    if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
-    //    //    {
-    //    //        if (LeaderTypes.Count <= 0)
-    //    //        {
-    //    //            pline = CreateResectionArrow(_leaderLines[i]);
-    //    //        }
-    //    //        else
-    //    //        {
-    //    //            switch ((LeaderEndType)LeaderTypes[i])
-    //    //            {
-    //    //                case LeaderEndType.None:
-    //    //                    break;
-    //    //                case LeaderEndType.HalfArrow:
-    //    //                    _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
-    //    //                    break;
-    //    //                case LeaderEndType.Point:
-    //    //                    _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
-    //    //                    break;
-    //    //                case LeaderEndType.Resection:
-    //    //                    pline = CreateResectionArrow(_leaderLines[i]);
-    //    //                    break;
-    //    //                case LeaderEndType.Angle:
-    //    //                    pline = CreateAngleArrow(_leaderLines[i], 45, false);
-    //    //                    break;
-    //    //                case LeaderEndType.Arrow:
-    //    //                    _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
-    //    //                    break;
-    //    //                case LeaderEndType.OpenArrow:
-    //    //                    pline = CreateAngleArrow(_leaderLines[i], 10, false);
-    //    //                    break;
-    //    //                case LeaderEndType.ClosedArrow:
-    //    //                    pline = CreateAngleArrow(_leaderLines[i], 10, true);
-    //    //                    break;
-    //    //            }
-    //    //        }
-    //    //    }
-
-    //    //    _leaderEndLines.Add(pline);
-    //    //}
-    //}
+    public Vector3d MainNormal { get; set; }
 
     private void SetNodeNumberOnCreation()
     {
@@ -789,7 +572,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Polyline CreateAngleArrowOnPoint(Point3d arrowPoint, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
-        
+
         var startPoint = arrowPoint.RotateBy(angle.DegreeToRadian(), vector, arrowPoint);
         var endPoint = arrowPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, arrowPoint);
 
@@ -838,14 +621,14 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         return CreateHatch(vertexCollection, bulgeCollection);
     }
 
-    private Polyline CreatePointArrow(Line leaderLine)
+    private Polyline CreatePointArrow(Point3d arrowPoint)
     {
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
-        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + (ArrowSize / 2 * _scale));
+        var startPoint = arrowPoint - (ArrowSize / 2 * MainNormal * _scale);
+        var endPoint = arrowPoint + (ArrowSize / 2 * MainNormal * _scale);
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
-        pline.AddVertexAt(1, endPoint, 1, 0, 0);
+        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 1, 0, 0);
         pline.Closed = true;
 
         return pline;
@@ -879,7 +662,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     //private Hatch CreateArrowHatchOnPoint(Point3d arrowPoint)
     //{
-        
+
     //    var vertexCollection = new Point2dCollection();
     //    for (var index = 0; index < pline.NumberOfVertices; ++index)
     //    {
@@ -911,13 +694,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             var pt1 = points[i];
             for (int j = 0; j < points.Count; j++)
             {
-                if(i == j)
+                if (i == j)
                     continue;
                 var pt2 = points[j];
                 var d = pt1.DistanceTo(pt2);
                 if (double.IsNaN(dist) || d > dist)
                 {
-                    result = new Tuple<Point3d, Point3d>(pt1,pt2);
+                    result = new Tuple<Point3d, Point3d>(pt1, pt2);
                     dist = d;
                 }
             }
