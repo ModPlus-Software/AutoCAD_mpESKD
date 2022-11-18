@@ -281,6 +281,12 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public List<int> LeaderTypes { get; set; } = new();
 
     public double TempNewArrowPoint { get; set; } = double.NaN;
+    /// <summary>
+    /// Тип рамки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Arrow)]
+    [SaveToXData]
+    public LeaderEndType ArrowType { get; set; } = LeaderEndType.Arrow;
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -369,6 +375,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             var furthestPoints = GetFurthestPoints(tempPoints);
             var secondPoint = furthestPoints.Item2;
+            //TODO 
             if (double.IsNaN(TempNewArrowPoint) | TempNewArrowPoint == 0)
             {
                 secondPoint = furthestPoints.Item2;

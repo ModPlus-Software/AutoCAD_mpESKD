@@ -60,16 +60,16 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
 
                 foreach (var leaderType in Enum.GetValues(typeof(LeaderEndType)))
                 {
-                    var arrowIndex = ChainLeader.LeaderTypes[GripIndex];
+                    var arrowIndex = ChainLeader.ArrowType.ToString();
                     var checkedNumber = (int)Enum.Parse(typeof(LeaderEndType), leaderType.ToString());
-                    var isItemChecked = checkedNumber == arrowIndex;
+                    var isItemChecked = (Enum.Parse(typeof(LeaderEndType) , leaderType.ToString())).ToString();
                     var headerOfItem = "let" + checkedNumber;
                     var menuItem = new MenuItem
                     {
                         Name = leaderType.ToString(),
                         IsCheckable = true,
                         Header = Language.GetItem(headerOfItem),
-                        IsChecked = isItemChecked
+                        IsChecked = arrowIndex == isItemChecked
                     };
 
                     menuItem.Click += MenuItemOnClick;
@@ -93,7 +93,7 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        ChainLeader.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+        ChainLeader.ArrowType = (LeaderEndType)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
 
         ChainLeader.UpdateEntities();
         ChainLeader.BlockRecord.UpdateAnonymousBlocks();

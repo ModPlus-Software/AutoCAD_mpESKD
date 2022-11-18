@@ -1,4 +1,5 @@
 ﻿using System;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpChainLeader;
@@ -77,7 +78,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         GripPoint = new Point3d(
                             chainLeader.EndPoint.X + 2,
-                            chainLeader.EndPoint. Y + 2,
+                            chainLeader.EndPoint.Y,
                             chainLeader.EndPoint.Z)
                     });
                     var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
@@ -88,13 +89,10 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         {
                             GripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal)
                         });
+
                         var gripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal);
                         var deleteGripPoint = new Point3d(
                             gripPoint.X + 1,
-                            gripPoint.Y,
-                            gripPoint.Z);
-                        var leaderEndTypeGripPoint = new Point3d(
-                            gripPoint.X - 1,
                             gripPoint.Y,
                             gripPoint.Z);
 
@@ -146,17 +144,32 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         var chainLeader = addLeaderGrip.ChainLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
-                        
+
                         var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                             chainLeader.EndPoint, newPoint);
 
-                        chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-                        
-                        AcadUtils.WriteMessageInDebug($"insertionPoint {chainLeader.InsertionPoint} - leaderPoint {chainLeader.EndPoint}");
-                        AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y}");
-                        
-                        addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-                        
+
+
+                        var isleft = isLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+
+                        var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
+                            chainLeader.EndPoint);
+                        AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y} " +
+                                                      $"- chainLeader.TempNewArrowPoint {chainLeader.TempNewArrowPoint} - isleft {isleft} - isOnSegment {isOnSegment}");
+
+
+                        if (!isleft && !isOnSegment)
+                        {
+                            chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                        }
+                        else
+                        {
+                            chainLeader.TempNewArrowPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            addLeaderGrip.NewPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                        }
+
+
                         chainLeader.UpdateEntities();
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
@@ -188,6 +201,25 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                 ExceptionBox.Show(exception);
         }
     }
+
+
+    private bool isLeft(Point3d insertionPoint, Point3d endPoint, Point3d pointOnLine)
+    {
+        var v1 = (insertionPoint - endPoint).GetNormal();
+        var v2 = (pointOnLine - endPoint).GetNormal();
+
+        return v1.DotProduct(v2) > 0;
+    }
+
+    bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
+    {
+        var segment = new LineSegment3d(startPt, endPt);
+        return segment.IsOn(point);
+    }
+    //public bool isLeft(Point3d a, Point3d b, Point3d c)
+    //{
+    //    return ((b.X - a.X) * (c.Y - a.Y) - (b.Y - a.Y) * (c.X - a.X)) > 0;
+    //}
 
     public Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
     {

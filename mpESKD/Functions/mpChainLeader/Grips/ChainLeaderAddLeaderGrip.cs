@@ -59,7 +59,7 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
             using (ChainLeader)
             {
                 ChainLeader.ArrowPoints.Add(NewPoint);
-
+                AcadUtils.WriteMessageInDebug($"NewPoint {NewPoint} \n");
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
