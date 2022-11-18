@@ -594,6 +594,10 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 {
                     propertyInfo.SetValue(this, valueForProperty.Split('#').Select(int.Parse).ToList());
                 }
+                else if (propertyInfo.PropertyType == typeof(List<double>))
+                {
+                    propertyInfo.SetValue(this, valueForProperty.Split('#').Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToList());
+                }
                 else if (propertyInfo.PropertyType == typeof(int))
                 {
                     propertyInfo.SetValue(this, Convert.ToInt32(valueForProperty));

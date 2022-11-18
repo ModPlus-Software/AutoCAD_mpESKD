@@ -50,14 +50,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                 if (chainLeader != null)
                 {
-                    // Получаем первую ручку на первой точке
+                    // Получаем ручку на первой точке
                     var gp = new ChainLeaderVertexGrip(chainLeader, 0)
                     {
                         GripPoint = chainLeader.InsertionPoint
                     };
                     grips.Add(gp);
 
-                    // Получаем первую ручку на первой точке
+                    // Получаем ручку на второй точке
                     gp = new ChainLeaderVertexGrip(chainLeader, 1)
                     {
                         GripPoint = chainLeader.EndPoint
@@ -70,6 +70,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         GripPoint = new Point3d(
                             chainLeader.EndPoint.X - 2,
                             chainLeader.EndPoint.Y,
+                            chainLeader.EndPoint.Z)
+                    });
+                    // ручки выбора типа выносок
+                    grips.Add(new ChainLeaderEndTypeGrip(chainLeader, 2)
+                    {
+                        GripPoint = new Point3d(
+                            chainLeader.EndPoint.X + 2,
+                            chainLeader.EndPoint. Y + 2,
                             chainLeader.EndPoint.Z)
                     });
                     var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
@@ -94,12 +102,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         grips.Add(new ChainLeaderRemoveGrip(chainLeader, i)
                         {
                             GripPoint = deleteGripPoint
-                        });
-
-                        // ручки выбора типа выносок
-                        grips.Add(new ChainLeaderEndTypeGrip(chainLeader, i)
-                        {
-                            GripPoint = leaderEndTypeGripPoint
                         });
                     }
                 }
@@ -144,25 +146,30 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         var chainLeader = addLeaderGrip.ChainLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
-
+                        
                         var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                             chainLeader.EndPoint, newPoint);
 
-                        AcadUtils.WriteMessageInDebug($"insertionPointOCS {chainLeader.InsertionPointOCS} - leaderPointOCS {chainLeader.EndPointOCS}");
+                        chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                        
                         AcadUtils.WriteMessageInDebug($"insertionPoint {chainLeader.InsertionPoint} - leaderPoint {chainLeader.EndPoint}");
                         AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y}");
-                        //var pointOnMainLine = chainLeader.MainLine.GetClosestPointTo(newPoint, false);
-                        //var newplpoint = new Point3d(-14970, 2230, 0);
-
+                        
                         addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-
-
+                        
+                        chainLeader.UpdateEntities();
+                        chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
 
                     else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
                     {
                         var chainLeader = moveLeaderGrip.ChainLeader;
+                        chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
+
                         moveLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
+
+                        chainLeader.UpdateEntities();
+                        chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else
                     {

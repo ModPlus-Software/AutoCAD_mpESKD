@@ -280,6 +280,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public List<int> LeaderTypes { get; set; } = new();
 
+    public double TempNewArrowPoint { get; set; } = double.NaN;
+
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
@@ -340,7 +342,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         double scale)
     {
         _leaderEndLines.Clear();
-        
+
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
         MainNormal = (leaderPoint - insertionPoint).GetNormal();
@@ -350,15 +352,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, leaderPoint);
 
-        var mainLineStartPoint = default(Point3d);
-        var mainLineEndPoint = default(Point3d);
         var pline = new Polyline();
         if (ArrowPoints.Count > 0)
         {
             var tempPoints = new List<Point3d>();
-
-            //tempPoints.AddRange(ArrowPoints);
-
+            
             tempPoints.Add(insertionPoint);
             tempPoints.Add(leaderPoint);
 
@@ -366,26 +364,38 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 var tempPoint = leaderPoint + (MainNormal * arrowPoint);
                 tempPoints.Add(tempPoint);
-                //var tempArrowPoint = MainLine.GetClosestPointTo(arrowPoint,false);
 
-                //pline = CreateAngleArrowOnPoint(arrowPoint, 10, true);
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
-            _leaderLine = new Line(furthestPoints.Item1, furthestPoints.Item2);
+            var secondPoint = furthestPoints.Item2;
+            if (double.IsNaN(TempNewArrowPoint) | TempNewArrowPoint == 0)
+            {
+                secondPoint = furthestPoints.Item2;
+            }
+            else
+            {
+                var tempPoint = leaderPoint + (MainNormal * TempNewArrowPoint);
+                if (furthestPoints.Item2.DistanceTo(leaderPoint) < tempPoint.DistanceTo(leaderPoint))
+                {
+                    secondPoint = tempPoint;
+                }
+            }
+
+            _leaderLine = new Line(furthestPoints.Item1, secondPoint);
+
+            AcadUtils.WriteMessageInDebug($"дальняя точка {furthestPoints.Item2} \n");
         }
         else
         {
-            //if (leaderMinPoint.DistanceTo(leaderPoint) > 0.0)
-            //{
-
-            //}
             _leaderLine = new Line(insertionPoint, leaderPoint);
             pline = CreatePointArrow(insertionPoint);
         }
 
         _leaderEndLines.Add(pline);
-        //// Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
+
+
+        // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
 
         SetNodeNumberOnCreation();
 

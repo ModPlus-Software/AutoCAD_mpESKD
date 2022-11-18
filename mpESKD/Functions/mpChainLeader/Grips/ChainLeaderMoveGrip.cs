@@ -55,15 +55,12 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
-            AcadUtils.Editor.TurnForcedPickOn();
-            AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
+            ChainLeader.TempNewArrowPoint = NewPoint;
+            ChainLeader.UpdateEntities();
         }
 
         if (newStatus == Status.GripEnd)
         {
-            AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
-
             using (ChainLeader)
             {
                 ChainLeader.ArrowPoints[GripIndex] = NewPoint;
@@ -86,27 +83,9 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
-            AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            ChainLeader.TempNewArrowPoint = double.NaN;
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
-    }
-
-    private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
-    {
-        try
-        {
-            var nearestPoint = _points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
-            var line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
-            {
-                ColorIndex = 150
-            };
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
-        }
-        catch
-        {
-            // ignored
-        }
     }
 }
