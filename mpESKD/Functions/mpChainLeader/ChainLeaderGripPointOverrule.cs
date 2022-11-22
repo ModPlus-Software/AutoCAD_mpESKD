@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms.VisualStyles;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using mpESKD.Base.Utils;
 
@@ -148,38 +149,62 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                             chainLeader.EndPoint, newPoint);
 
-
-
                         var isleft = isLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
 
-                        var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
-                            chainLeader.EndPoint);
-                        AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y} " +
-                                                      $"- chainLeader.TempNewArrowPoint {chainLeader.TempNewArrowPoint} - isleft {isleft} - isOnSegment {isOnSegment}");
+                        var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
+                            chainLeader.SecondPoint);
+                        //AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y} " +
+                        //                              $"- chainLeader.TempNewArrowPoint {chainLeader.TempNewArrowPoint} - isleft {isleft} - isOnSegment {isOnSegment}");
 
-
-                        if (!isleft && !isOnSegment)
+                        if (!isOnSegment)
                         {
-                            chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-                            addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            if (!isleft)
+                            {
+                                chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                                addLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            }
+                            else
+                            {
+                                chainLeader.TempNewArrowPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                                addLeaderGrip.NewPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            }
                         }
-                        else
-                        {
-                            chainLeader.TempNewArrowPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-                            addLeaderGrip.NewPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-                        }
-
 
                         chainLeader.UpdateEntities();
+
+                        AcadUtils.WriteMessageInDebug($"UpdateEntities called");
+
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
 
                     else if (gripData is ChainLeaderMoveGrip moveLeaderGrip)
                     {
                         var chainLeader = moveLeaderGrip.ChainLeader;
-                        chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
+                        //chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
 
-                        moveLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
+                        //moveLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(moveLeaderGrip.GripPoint + offset);
+
+                        var pointOnPolyline = moveLeaderGrip.GripPoint + offset;
+                        var isleft = isLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+
+                        var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
+                            chainLeader.SecondPoint);
+                        //AcadUtils.WriteMessageInDebug($" pointOnPolyline.X {pointOnPolyline.X} - pointOnPolyline.Y {pointOnPolyline.Y} " +
+                        //                              $"- chainLeader.TempNewArrowPoint {chainLeader.TempNewArrowPoint} - isleft {isleft} - isOnSegment {isOnSegment}");
+
+                        if (!isOnSegment)
+                        {
+                            if (!isleft)
+                            {
+                                chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                                moveLeaderGrip.NewPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            }
+                            else
+                            {
+                                chainLeader.TempNewArrowPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                                moveLeaderGrip.NewPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
+                            }
+                        }
 
                         chainLeader.UpdateEntities();
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();

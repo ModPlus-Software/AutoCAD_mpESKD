@@ -24,6 +24,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
+    private readonly List<Hatch> _hatches = new ();
 
     #region Entities
 
@@ -72,18 +73,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
 
-
-    /// <summary>
-    /// Главная полилиния примитива
-    /// </summary>
-    //private Polyline _mainPolyline;
-
-    //private Point3d _leaderFirstPoint;
-
-
-
-    //private readonly List<Hatch> _hatches = new();
-    //private Polyline _framePolyline;
     private List<Polyline> _leaderEndLines = new List<Polyline>();
     private double _scale;
 
@@ -142,7 +131,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             };
 
             entities.AddRange(_leaderEndLines);
-            //entities.AddRange(_hatches);
+            entities.AddRange(_hatches);
 
             foreach (var e in entities)
             {
@@ -176,7 +165,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Выступ полки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 3, descLocalKey: "d63", nameSymbol: "l")]
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 10, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
     public int ShelfLedge { get; set; } = 1;
 
@@ -263,6 +252,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public bool Leader { get; set; } = true;
 
     /// <summary>
+    /// Отступ полки //TODO
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 10, "p104", 5, descLocalKey: "d104")]
+    [SaveToXData]
+    public double ShelfOffset { get; set; } = 5;
+
+    /// <summary>
     /// Точка выноски
     /// </summary>
     [SaveToXData]
@@ -274,17 +270,20 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public List<double> ArrowPoints { get; set; } = new();
 
-    /// <summary>
-    /// Типы выносок
-    /// </summary>
-    [SaveToXData]
-    public List<int> LeaderTypes { get; set; } = new();
-
     public double TempNewArrowPoint { get; set; } = double.NaN;
+
+    public bool IsBeforeEndPOint { get; set; }
+
+    [SaveToXData]
+    public Point3d FirstPoint { get; set; } = new();
+
+    [SaveToXData]
+    public Point3d SecondPoint { get; set; } = new();
+
     /// <summary>
-    /// Тип рамки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Arrow)]
+    /// Тип стрелки
+    /// </summary> 
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Arrow)] //TODO
     [SaveToXData]
     public LeaderEndType ArrowType { get; set; } = LeaderEndType.Arrow;
 
@@ -333,6 +332,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     // Прочие случаи
                     CreateEntities(InsertionPointOCS, EndPointOCS, scale);
+                    AcadUtils.WriteMessageInDebug($"Прочие случаи, TempNewArrowPoint {TempNewArrowPoint}");
                 }
             }
         }
@@ -342,12 +342,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
     }
 
-    private void CreateEntities(
-        Point3d insertionPoint,
-        Point3d leaderPoint,
-        double scale)
+    private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
     {
         _leaderEndLines.Clear();
+        _hatches.Clear();
 
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {leaderPoint}");
         var arrowSize = ArrowSize * scale;
@@ -359,50 +357,105 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _leaderLine = new Line(insertionPoint, leaderPoint);
 
         var pline = new Polyline();
+
         if (ArrowPoints.Count > 0)
         {
             var tempPoints = new List<Point3d>();
-            
+
             tempPoints.Add(insertionPoint);
             tempPoints.Add(leaderPoint);
 
             foreach (var arrowPoint in ArrowPoints)
             {
-                var tempPoint = leaderPoint + (MainNormal * arrowPoint);
-                tempPoints.Add(tempPoint);
-
+                var arrow = leaderPoint + (MainNormal * arrowPoint);
+                tempPoints.Add(leaderPoint + (MainNormal * arrowPoint));
+                
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
-            var secondPoint = furthestPoints.Item2;
+            FirstPoint = furthestPoints.Item1;
+            SecondPoint = furthestPoints.Item2;
+
+            AcadUtils.WriteMessageInDebug($"TempNewArrowPoint {TempNewArrowPoint} in Update \n");
+            var tempPoint = leaderPoint + (MainNormal * TempNewArrowPoint);
+
             //TODO 
-            if (double.IsNaN(TempNewArrowPoint) | TempNewArrowPoint == 0)
+            if (TempNewArrowPoint < 0)
             {
-                secondPoint = furthestPoints.Item2;
+                FirstPoint = tempPoint;
+                SecondPoint = furthestPoints.Item2;
+
+                _hatches.Add(CreatePointHatch(CreatePointArrow(FirstPoint)));
+
+                AcadUtils.WriteMessageInDebug($"список не пустой, тянем влево ArrowPoints {ArrowPoints.Count}  FirstPoint- {FirstPoint} SecondPOint - {SecondPoint} \n");
             }
+            else if (TempNewArrowPoint > 0)
+            {
+                FirstPoint = furthestPoints.Item1;
+                SecondPoint = tempPoint;
+                _hatches.Add(CreatePointHatch(CreatePointArrow(tempPoint)));
+                AcadUtils.WriteMessageInDebug($"список не пустой, тянем вправо, ArrowPoints {ArrowPoints.Count} FirstPoint- {FirstPoint} SecondPOint - {SecondPoint} \n");
+            }
+
             else
             {
-                var tempPoint = leaderPoint + (MainNormal * TempNewArrowPoint);
-                if (furthestPoints.Item2.DistanceTo(leaderPoint) < tempPoint.DistanceTo(leaderPoint))
-                {
-                    secondPoint = tempPoint;
-                }
+                FirstPoint = furthestPoints.Item1;
+                SecondPoint = furthestPoints.Item2;
+                _hatches.Add(CreatePointHatch(CreatePointArrow(FirstPoint)));
             }
-
-            _leaderLine = new Line(furthestPoints.Item1, secondPoint);
-
-            AcadUtils.WriteMessageInDebug($"дальняя точка {furthestPoints.Item2} \n");
         }
         else
         {
-            _leaderLine = new Line(insertionPoint, leaderPoint);
-            pline = CreatePointArrow(insertionPoint);
+            if (!double.IsNaN(TempNewArrowPoint))
+            {
+                var tempPoint = leaderPoint + (MainNormal * TempNewArrowPoint);
+                if (TempNewArrowPoint > 0)
+                {
+
+                    FirstPoint = insertionPoint;
+                    SecondPoint = tempPoint;
+                    _hatches.Add(CreatePointHatch(CreatePointArrow(FirstPoint)));
+                    AcadUtils.WriteMessageInDebug($"список пуст но сработала жига в право TempNewArrowPoint > 0 , SecondPOint - {SecondPoint} \n");
+                }
+                else
+                {
+                    FirstPoint = tempPoint;
+                    SecondPoint = leaderPoint;
+                    _hatches.Add(CreatePointHatch(CreatePointArrow(FirstPoint)));
+                    AcadUtils.WriteMessageInDebug($"список пуст но сработала жига в влево  , FirstPoint {FirstPoint} \n");
+                   
+                }
+            }
+            else
+            {
+                // только первый запуск
+                FirstPoint = insertionPoint;
+                SecondPoint = leaderPoint;
+                //_leaderLine = new Line(insertionPoint, leaderPoint);
+                
+
+                AcadUtils.WriteMessageInDebug($"else когда список стрелок пуст \n");
+            }
+
         }
 
-        _leaderEndLines.Add(pline);
+        _leaderLine = new Line(FirstPoint, SecondPoint);
 
+        pline = CreatePointArrow(insertionPoint);
+        var hatch = CreatePointHatch(pline);
+
+        //_leaderEndLines.Add(pline);
+        _hatches.Add(hatch);
+        foreach (var arrowPoint in ArrowPoints)
+        {
+            var tempPoint = leaderPoint + (MainNormal * arrowPoint);
+
+            _hatches.Add(CreatePointHatch(CreatePointArrow(tempPoint)));
+        }
 
         // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
+
+        
 
         SetNodeNumberOnCreation();
 
@@ -639,8 +692,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     private Polyline CreatePointArrow(Point3d arrowPoint)
     {
-        var startPoint = arrowPoint - (ArrowSize / 2 * MainNormal * _scale);
-        var endPoint = arrowPoint + (ArrowSize / 2 * MainNormal * _scale);
+        var startPoint = arrowPoint - (ArrowSize / 4 * MainNormal * _scale);
+        var endPoint = arrowPoint + (ArrowSize / 4 * MainNormal * _scale);
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);

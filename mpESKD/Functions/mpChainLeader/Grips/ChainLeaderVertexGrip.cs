@@ -84,6 +84,11 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                     {
                         ChainLeader.InsertionPoint = _gripTmp;
                     }
+
+                    if (GripIndex == 1)
+                    {
+                        ChainLeader.EndPoint = _gripTmp;
+                    }
                 }
             }
 

@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpChainLeader.Grips;
+﻿using System;
+
+namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -47,11 +49,15 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
-            using (ChainLeader)
-            {
-                ChainLeader.TempNewArrowPoint = NewPoint;
-                ChainLeader.UpdateEntities();
-            }
+            ChainLeader.TempNewArrowPoint = NewPoint;
+            ChainLeader.UpdateEntities();
+        }
+
+        if (newStatus == Status.Move)
+        {
+            ChainLeader.TempNewArrowPoint = NewPoint;
+            ChainLeader.UpdateEntities();
+            AcadUtils.WriteMessageInDebug($"OnGripStatusChanged if (newStatus == Status.Move) TempNewArrowPoint {ChainLeader.TempNewArrowPoint} \n");
         }
 
         if (newStatus == Status.GripEnd)
@@ -59,7 +65,8 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
             using (ChainLeader)
             {
                 ChainLeader.ArrowPoints.Add(NewPoint);
-                AcadUtils.WriteMessageInDebug($"NewPoint {NewPoint} \n");
+                ChainLeader.TempNewArrowPoint = double.NaN;
+                AcadUtils.WriteMessageInDebug($"NewPoint {NewPoint} -  ChainLeader.TempNewArrowPoint {ChainLeader.TempNewArrowPoint}\n");
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

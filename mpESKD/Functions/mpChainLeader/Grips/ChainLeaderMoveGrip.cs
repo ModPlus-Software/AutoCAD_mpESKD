@@ -55,15 +55,24 @@ public class ChainLeaderMoveGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
+            //TODO
             ChainLeader.TempNewArrowPoint = NewPoint;
             ChainLeader.UpdateEntities();
         }
 
+        if (newStatus == Status.Move)
+        {
+            ChainLeader.TempNewArrowPoint = NewPoint;
+            ChainLeader.UpdateEntities();
+            AcadUtils.WriteMessageInDebug($"OnGripStatusChanged if (newStatus == Status.Move) TempNewArrowPoint {ChainLeader.TempNewArrowPoint} \n");
+        }
         if (newStatus == Status.GripEnd)
         {
             using (ChainLeader)
             {
                 ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                ChainLeader.TempNewArrowPoint = double.NaN;
+                
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 
