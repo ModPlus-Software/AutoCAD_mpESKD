@@ -345,7 +345,23 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
         var tempPoint = new Point3d();
-        if (ArrowPoints.Count > 0)
+        if (!double.IsNaN(TempNewArrowPoint))
+        {
+            tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
+            if (TempNewArrowPoint > 0)
+            {
+                FirstPoint = insertionPoint;
+                SecondPoint = tempPoint;
+                CreateArrows(tempPoint);
+            }
+            else
+            {
+                FirstPoint = tempPoint;
+                SecondPoint = endPoint;
+                CreateArrows(tempPoint);
+            }
+        }
+        else if (ArrowPoints.Count > 0)
         {
             var tempPoints = new List<Point3d>();
 
@@ -358,54 +374,16 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
+           
             FirstPoint = furthestPoints.Item1;
             SecondPoint = furthestPoints.Item2;
-
-            tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
-
-            if (TempNewArrowPoint < 0)
-            {
-                FirstPoint = tempPoint;
-                SecondPoint = furthestPoints.Item2;
-                CreateArrows(FirstPoint);
-            }
-            else if (TempNewArrowPoint > 0)
-            {
-                FirstPoint = furthestPoints.Item1;
-                SecondPoint = tempPoint;
-                CreateArrows(tempPoint);
-            }
-            else
-            {
-                FirstPoint = furthestPoints.Item1;
-                SecondPoint = furthestPoints.Item2;
-                CreateArrows(FirstPoint);
-            }
+            CreateArrows(FirstPoint);
         }
         else
         {
-            if (!double.IsNaN(TempNewArrowPoint))
-            {
-                tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
-                if (TempNewArrowPoint > 0)
-                {
-                    FirstPoint = insertionPoint;
-                    SecondPoint = tempPoint;
-                    CreateArrows(tempPoint);
-                }
-                else
-                {
-                    FirstPoint = tempPoint;
-                    SecondPoint = endPoint;
-                    CreateArrows(tempPoint);
-                }
-            }
-            else
-            {
-                // только первый запуск
-                FirstPoint = insertionPoint;
-                SecondPoint = endPoint;
-            }
+            // только первый запуск
+            FirstPoint = insertionPoint;
+            SecondPoint = endPoint;
         }
 
         _leaderLine = new Line(FirstPoint, SecondPoint);
