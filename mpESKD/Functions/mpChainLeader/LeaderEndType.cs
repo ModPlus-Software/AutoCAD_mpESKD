@@ -21,27 +21,32 @@ public enum LeaderEndType
     Point = 2,
 
     /// <summary>
+    /// Засечка
+    /// </summary>
+    Section = 3, 
+
+    /// <summary>
     /// Двойная засечка
     /// </summary>
-    Resection = 3, 
+    Resection = 4, 
 
     /// <summary>
     /// Прямой угол
     /// </summary>
-    Angle = 4,
+    Angle = 5,
 
     /// <summary>
     /// Закрашенная
     /// </summary>
-    Arrow = 5,
+    Arrow = 6,
 
     /// <summary>
     /// Разомкнутая
     /// </summary>
-    OpenArrow = 6,
+    OpenArrow = 7,
 
     /// <summary>
     /// Замкнутая
     /// </summary>
-    ClosedArrow = 7
+    ClosedArrow = 8
 }
