@@ -63,7 +63,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     grips.Add(gp);
 
                     // Получаем ручку на второй точке
-                    gp = new ChainLeaderVertexGrip(chainLeader, 1)
+                    gp = new ChainLeaderVertexGrip(chainLeader, 2)
                     {
                         GripPoint = chainLeader.LeaderPoint 
                     };
@@ -154,7 +154,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                         if (vertexGrip.GripIndex == 2)
                         {
-                            chainLeader.EndPoint = vertexGrip.GripPoint + offset;
+                            chainLeader.LeaderPoint = vertexGrip.GripPoint + offset;
                         }
 
                         chainLeader.UpdateEntities();

@@ -30,11 +30,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     #region Entities
 
     /// <summary>
-    /// Секущая часть
-    /// </summary>
-    private Polyline _secantPolyline;
-
-    /// <summary>
     /// Линия выноски
     /// </summary>
     private Line _leaderLine;
@@ -42,7 +37,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Полка выноски
     /// </summary>
-    private Line _shelfLine;
+    private Polyline _shelfLine;
 
     /// <summary>
     /// Верхний первый текст (номер узла)
@@ -74,6 +69,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
     private double _scale;
+    private Vector3d _mainNormal;
 
     #endregion
 
@@ -120,8 +116,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _topFirstTextMask,
                 _topSecondTextMask,
                 _bottomTextMask,
-
-                _secantPolyline,
                 _leaderLine,
                 _shelfLine,
                 _topFirstDbText,
@@ -162,7 +156,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public double TextVerticalOffset { get; set; } = 1.0;
 
     /// <summary>
-    /// Выступ полки //TODO
+    /// Выступ полки 
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 10, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
@@ -254,7 +248,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точка выноски
     /// </summary>
     [SaveToXData]
-    public Point3d LeaderPoint { get; set; } = new();
+    public Point3d LeaderPoint { get; set; }
 
     /// <summary>
     /// Точки стрелок
@@ -270,7 +264,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public Point3d SecondPoint { get; set; } = new();
 
-    public Vector3d MainNormal { get; set; }
+
 
     /// <summary>
     /// Тип стрелки
@@ -342,13 +336,15 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {endPoint}");
         var arrowSize = ArrowSize * scale;
-        MainNormal = (endPoint - insertionPoint).GetNormal();
+        _mainNormal = (endPoint - insertionPoint).GetNormal();
 
-        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
+        LeaderPoint = endPoint + (_mainNormal * 2);
+
+        var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
 
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
-
+        var tempPoint = new Point3d();
         if (ArrowPoints.Count > 0)
         {
             var tempPoints = new List<Point3d>();
@@ -358,32 +354,27 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             foreach (var arrowPoint in ArrowPoints)
             {
-                tempPoints.Add(endPoint + (MainNormal * arrowPoint));
+                tempPoints.Add(endPoint + (_mainNormal * arrowPoint));
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
             FirstPoint = furthestPoints.Item1;
             SecondPoint = furthestPoints.Item2;
 
-            var tempPoint = endPoint + (MainNormal * TempNewArrowPoint);
+            tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
 
             if (TempNewArrowPoint < 0)
             {
                 FirstPoint = tempPoint;
                 SecondPoint = furthestPoints.Item2;
-
                 CreateArrows(FirstPoint);
-
-                AcadUtils.WriteMessageInDebug($"список не пустой, тянем влево ArrowPoints {ArrowPoints.Count}  FirstPoint- {FirstPoint} SecondPOint - {SecondPoint} \n");
             }
             else if (TempNewArrowPoint > 0)
             {
                 FirstPoint = furthestPoints.Item1;
                 SecondPoint = tempPoint;
                 CreateArrows(tempPoint);
-                AcadUtils.WriteMessageInDebug($"список не пустой, тянем вправо, ArrowPoints {ArrowPoints.Count} FirstPoint- {FirstPoint} SecondPOint - {SecondPoint} \n");
             }
-
             else
             {
                 FirstPoint = furthestPoints.Item1;
@@ -395,7 +386,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             if (!double.IsNaN(TempNewArrowPoint))
             {
-                var tempPoint = endPoint + (MainNormal * TempNewArrowPoint);
+                tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
                 if (TempNewArrowPoint > 0)
                 {
                     FirstPoint = insertionPoint;
@@ -407,7 +398,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     FirstPoint = tempPoint;
                     SecondPoint = endPoint;
                     CreateArrows(tempPoint);
-                    AcadUtils.WriteMessageInDebug($"список пуст, TempNewArrowPoint ");
                 }
             }
             else
@@ -424,7 +414,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         foreach (var arrowPoint in ArrowPoints)
         {
-            var tempPoint = endPoint + (MainNormal * arrowPoint);
+             tempPoint = endPoint + (_mainNormal * arrowPoint);
 
             CreateArrows(tempPoint);
         }
@@ -565,7 +555,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
 
-        _shelfLine = new Line(endPoint, shelfEndPoint);
+        _shelfLine = new Polyline(3);
+        _shelfLine.AddVertexAt(0, endPoint.ToPoint2d(), 0, 0, 0);
+        _shelfLine.AddVertexAt(0, LeaderPoint.ToPoint2d(), 0, 0, 0);
+        _shelfLine.AddVertexAt(0, shelfEndPoint.ToPoint2d(), 0, 0, 0);
     }
 
     private void SetNodeNumberOnCreation()
@@ -618,7 +611,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         var vector = new Vector3d(0, 0, 1);
 
-        var tmpPoint = arrowPoint - (MainNormal * ArrowSize / 2 * _scale);
+        var tmpPoint = arrowPoint - (_mainNormal * ArrowSize / 2 * _scale);
         var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, arrowPoint);
         var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, arrowPoint);
 
@@ -633,7 +626,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Polyline CreateAngleArrow(Point3d arrowPoint, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
+        var tmpPoint = arrowPoint + (_mainNormal * ArrowSize * _scale);
         var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, arrowPoint);
         var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, arrowPoint);
 
@@ -651,7 +644,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Polyline CreateHalfArrow(Point3d arrowPoint)
     {
         var vector = new Vector3d(0, 0, 1);
-        var arrowEndPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
+        var arrowEndPoint = arrowPoint + (_mainNormal * ArrowSize * _scale);
         var endPoint = arrowEndPoint.RotateBy(10.DegreeToRadian(), vector, arrowPoint);
 
         var pline = new Polyline(3);
@@ -683,8 +676,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     private Polyline CreatePointArrow(Point3d arrowPoint)
     {
-        var startPoint = arrowPoint - (ArrowSize / 4 * MainNormal * _scale);
-        var endPoint = arrowPoint + (ArrowSize / 4 * MainNormal * _scale);
+        var startPoint = arrowPoint - (ArrowSize / 4 * _mainNormal * _scale);
+        var endPoint = arrowPoint + (ArrowSize / 4 * _mainNormal * _scale);
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
