@@ -344,10 +344,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
-        var tempPoint = new Point3d();
+
         if (!double.IsNaN(TempNewArrowPoint))
         {
-            tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
+            var tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
             if (TempNewArrowPoint > 0)
             {
                 FirstPoint = insertionPoint;
@@ -374,10 +374,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
-           
+
             FirstPoint = furthestPoints.Item1;
             SecondPoint = furthestPoints.Item2;
-            CreateArrows(FirstPoint);
         }
         else
         {
@@ -392,9 +391,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         foreach (var arrowPoint in ArrowPoints)
         {
-             tempPoint = endPoint + (_mainNormal * arrowPoint);
+            var tempPoint1 = endPoint + (_mainNormal * arrowPoint);
 
-            CreateArrows(tempPoint);
+            CreateArrows(tempPoint1);
         }
 
         // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
