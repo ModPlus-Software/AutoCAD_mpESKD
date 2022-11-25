@@ -54,7 +54,22 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                _gripTmp = GripPoint;
+                //_gripTmp = GripPoint;
+
+                if (GripIndex == 0)
+                {
+                    _gripTmp = ChainLeader.InsertionPoint;
+                }
+
+                if (GripIndex == 1)
+                {
+                    _gripTmp = ChainLeader.EndPoint;
+                }
+
+                if (GripIndex == 2)
+                {
+                    _gripTmp = ChainLeader.LeaderPoint;
+                }
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные

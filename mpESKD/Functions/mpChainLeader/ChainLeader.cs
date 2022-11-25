@@ -37,7 +37,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Полка выноски
     /// </summary>
-    private Polyline _shelfLine;
+    private Line _shelfLine;
 
     /// <summary>
     /// Верхний первый текст (номер узла)
@@ -70,6 +70,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Wipeout _bottomTextMask;
     private double _scale;
     private Vector3d _mainNormal;
+    private Line _shelfLineFromEndPoint;
 
     #endregion
 
@@ -117,6 +118,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _topSecondTextMask,
                 _bottomTextMask,
                 _leaderLine,
+                _shelfLineFromEndPoint,
                 _shelfLine,
                 _topFirstDbText,
                 _topSecondDbText,
@@ -160,7 +162,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 10, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
-    public int ShelfLedge { get; set; } = 1;
+    public double ShelfLedge { get; set; } = 1;
 
     /// <summary>
     /// Положение полки
@@ -264,8 +266,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public Point3d SecondPoint { get; set; } = new();
 
-
-
     /// <summary>
     /// Тип стрелки
     /// </summary> 
@@ -295,12 +295,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                     InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
                     InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
                     InsertionPointOCS.Z);
-                var normal = (tempEndPoint - InsertionPointOCS).GetNormal();
 
-
-                //var tempPoint2 = tempEndPoint + vectorLength.RotateBy(Math.PI * -0.30, Vector3d.ZAxis);
-
-                AcadUtils.WriteMessageInDebug($"JigState == ChainInsertionPointOCS {InsertionPointOCS} - {tempEndPoint}");
                 CreateEntities(InsertionPointOCS, tempEndPoint, scale);
             }
 
@@ -337,8 +332,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {endPoint}");
         var arrowSize = ArrowSize * scale;
         _mainNormal = (endPoint - insertionPoint).GetNormal();
-
-        LeaderPoint = endPoint + (_mainNormal * 2);
 
         var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
 
@@ -384,7 +377,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             FirstPoint = insertionPoint;
             SecondPoint = endPoint;
         }
-
+        AcadUtils.WriteMessageInDebug($"SecondPoint {SecondPoint} \n");
         _leaderLine = new Line(FirstPoint, SecondPoint);
 
         CreateArrows(insertionPoint);
@@ -532,10 +525,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
 
-        _shelfLine = new Polyline(3);
-        _shelfLine.AddVertexAt(0, endPoint.ToPoint2d(), 0, 0, 0);
-        _shelfLine.AddVertexAt(0, LeaderPoint.ToPoint2d(), 0, 0, 0);
-        _shelfLine.AddVertexAt(0, shelfEndPoint.ToPoint2d(), 0, 0, 0);
+        AcadUtils.WriteMessageInDebug($"LeaderPoint {LeaderPoint}");
+        _shelfLineFromEndPoint = new Line(endPoint, shelfEndPoint);
+
+        AcadUtils.WriteMessageInDebug($" _shelfLineFromEndPoint.StartPoint- {_shelfLineFromEndPoint.StartPoint}  \n");
     }
 
     private void SetNodeNumberOnCreation()
@@ -691,6 +684,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     }
 
     #endregion
+
     /// <summary>
     /// Возвращает пару наиболее удаленных друг от друга точек
     /// </summary>

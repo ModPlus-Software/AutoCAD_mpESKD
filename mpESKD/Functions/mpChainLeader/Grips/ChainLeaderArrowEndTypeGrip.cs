@@ -13,7 +13,7 @@ using System.Windows.Controls;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class ChainLeaderEndTypeGrip : SmartEntityGripData
+public class ChainLeaderArrowEndTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
 
@@ -22,7 +22,7 @@ public class ChainLeaderEndTypeGrip : SmartEntityGripData
     /// </summary>
     /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderEndTypeGrip(ChainLeader chainLeader, int gripIndex)
+    public ChainLeaderArrowEndTypeGrip(ChainLeader chainLeader, int gripIndex)
     {
         ChainLeader = chainLeader;
         GripIndex = gripIndex;

@@ -1,34 +1,31 @@
-﻿using System;
-
-namespace mpESKD.Functions.mpChainLeader.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 
 /// <summary>
-/// Ручка выбора типа рамки, меняющая тип рамки
+/// Ручка вершин
 /// </summary>
-public class ChainLeaderAddLeaderGrip : SmartEntityGripData
+public class ChainLeaderMoveGrip : SmartEntityGripData
 {
-    private Point2d[] _points;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChainLeaderAddLeaderGrip"/> class.
+    /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
     /// </summary>
-    /// <param name="chainLeader">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public ChainLeaderAddLeaderGrip(ChainLeader chainLeader) 
+    /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public ChainLeaderMoveGrip(ChainLeader chainLeader, int gripIndex)
     {
         ChainLeader = chainLeader;
-        GripType = GripType.Plus;
+        GripIndex = gripIndex;
+        GripType = GripType.Point;
         RubberBandLineDisabled = true;
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/>
+    /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public ChainLeader ChainLeader { get; }
 
@@ -37,11 +34,15 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
     /// </summary>
     public double NewPoint { get; set; }
 
+    /// <summary>
+    /// Индекс ручки
+    /// </summary>
+    public int GripIndex { get; }
+   
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Добавить выноску
-        return Language.GetItem("gp5");
+        return Language.GetItem("gp2"); // move
     }
 
     /// <inheritdoc />
@@ -49,30 +50,22 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
-            ChainLeader.TempNewArrowPoint = NewPoint;
+            
             ChainLeader.UpdateEntities();
-        }
-
-        if (newStatus == Status.Move)
-        {
-            ChainLeader.TempNewArrowPoint = NewPoint;
-            ChainLeader.UpdateEntities();
-            AcadUtils.WriteMessageInDebug($"OnGripStatusChanged if (newStatus == Status.Move) TempNewArrowPoint {ChainLeader.TempNewArrowPoint} \n");
         }
 
         if (newStatus == Status.GripEnd)
         {
             using (ChainLeader)
             {
-                ChainLeader.ArrowPoints.Add(NewPoint);
-                ChainLeader.TempNewArrowPoint = double.NaN;
-                AcadUtils.WriteMessageInDebug($"NewPoint {NewPoint} -  ChainLeader.TempNewArrowPoint {ChainLeader.TempNewArrowPoint}\n");
+               
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
+
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
-                    
+
                     using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
@@ -85,7 +78,7 @@ public class ChainLeaderAddLeaderGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
-            ChainLeader.TempNewArrowPoint = double.NaN;
+            
         }
 
         base.OnGripStatusChanged(entityId, newStatus);

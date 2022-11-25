@@ -9,14 +9,14 @@ using ModPlusAPI;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class ChainLeaderRemoveGrip : SmartEntityGripData
+public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChainLeaderRemoveGrip"/> class.
+    /// Initializes a new instance of the <see cref="ChainLeaderArrowRemoveGrip"/> class.
     /// </summary>
-    /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="chainLeader">Экземпляр класса <see cref="mpChainLeader.ChainLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderRemoveGrip(ChainLeader chainLeader, int gripIndex)
+    public ChainLeaderArrowRemoveGrip(ChainLeader chainLeader, int gripIndex)
     {
         ChainLeader = chainLeader;
         GripIndex = gripIndex;
@@ -24,7 +24,7 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
     }
     
     /// <summary>
-    /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
+    /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
     public ChainLeader ChainLeader { get; }
 
@@ -43,7 +43,15 @@ public class ChainLeaderRemoveGrip : SmartEntityGripData
     {
         using (ChainLeader)
         {
-            ChainLeader.ArrowPoints.RemoveAt(GripIndex);
+            if (GripPoint == ChainLeader.InsertionPoint)
+            {
+                ChainLeader.InsertionPoint = ChainLeader.FirstPoint;
+            }
+            else
+            {
+                ChainLeader.ArrowPoints.RemoveAt(GripIndex);
+            } 
+                
 
             ChainLeader.UpdateEntities();
             ChainLeader.BlockRecord.UpdateAnonymousBlocks();
