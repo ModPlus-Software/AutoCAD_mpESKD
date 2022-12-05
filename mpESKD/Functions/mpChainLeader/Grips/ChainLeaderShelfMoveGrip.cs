@@ -9,25 +9,28 @@ using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
-/// <summary>
-/// Ручка вершин
-/// </summary>
-public class ChainLeaderVertexGrip : SmartEntityGripData
+public class ChainLeaderShelfMoveGrip : SmartEntityGripData
 {
     // Временное значение ручки
-    private Point3d _gripTmp;
+    private double _gripTmp;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
+    /// Initializes a new instance of the <see cref="ChainLeaderShelfMoveGrip"/> class.
     /// </summary>
     /// <param name="chainLeader">Экземпляр класса <see cref="mpChainLeader.ChainLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderVertexGrip(ChainLeader chainLeader, int gripIndex)
+    public ChainLeaderShelfMoveGrip(ChainLeader chainLeader, int gripIndex)
     {
         ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
     }
+
+    /// <summary>
+    /// Новое значение точки вершины
+    /// </summary>
+    public double NewPoint { get; set; }
+
 
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
@@ -38,7 +41,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
-    
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -52,42 +55,34 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
         {
             // При начале перемещения запоминаем первоначальное положение ручки
             // Запоминаем начальные значения
-            if (newStatus == Status.GripStart)
+            if (newStatus == Status.GripStart | newStatus == Status.Stretch)
             {
-                //_gripTmp = GripPoint;
-
-                if (GripIndex == 0)
-                {
-                    _gripTmp = ChainLeader.InsertionPoint;
-                }
-
-                if (GripIndex == 1)
-                {
-                    _gripTmp = ChainLeader.EndPoint;
-                }
-
-                //if (GripIndex == 2)
-                //{
-                //    _gripTmp = ChainLeader.LeaderPoint;
-                //}
+                ChainLeader.ShelfLedge += NewPoint;
+                ChainLeader.UpdateEntities();
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                using (ChainLeader)
                 {
-                    var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = ChainLeader.GetDataForXData())
+                    ChainLeader.ShelfLedge = _gripTmp + NewPoint;
+                    AcadUtils.WriteMessageInDebug($"ShelfLedge in grip end {ChainLeader.ShelfLedge}");
+                    ChainLeader.UpdateEntities();
+                    ChainLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        blkRef.XData = resBuf;
+                        var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = ChainLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
                     }
-
-                    tr.Commit();
                 }
-
-                ChainLeader.Dispose();
             }
 
             // При отмене перемещения возвращаем временные значения
@@ -95,20 +90,9 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
             {
                 if (_gripTmp != null)
                 {
-                    if (GripIndex == 0)
-                    {
-                        ChainLeader.InsertionPoint = _gripTmp;
-                    }
 
-                    if (GripIndex == 1)
-                    {
-                        ChainLeader.EndPoint = _gripTmp;
-                    }
+                    ChainLeader.ShelfLedge = _gripTmp;
 
-                    //if (GripIndex == 2)
-                    //{
-                    //    ChainLeader.LeaderPoint = _gripTmp;
-                    //}
                 }
             }
 

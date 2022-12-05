@@ -69,7 +69,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     private Wipeout _bottomTextMask;
     private double _scale;
-    private Vector3d _mainNormal;
+    public Vector3d _mainNormal;
     private Line _shelfLineFromEndPoint;
 
     #endregion
@@ -160,9 +160,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Выступ полки 
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 1, 0, 10, descLocalKey: "d63", nameSymbol: "l")]
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 10, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
-    public double ShelfLedge { get; set; } = 1;
+    public double ShelfLedge { get; set; }
 
     /// <summary>
     /// Положение полки
@@ -261,15 +261,23 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public double TempNewArrowPoint { get; set; } = double.NaN;
 
     [SaveToXData]
-    public Point3d FirstPoint { get; set; } = new();
-
-    [SaveToXData]
-    public Point3d SecondPoint { get; set; } = new();
+    public Point3d FirstPoint { get; set; }
 
     /// <summary>
+    /// Точка выноски в внутренней системе координат блока
+    /// </summary>
+    public Point3d FirstPointOCS => FirstPoint.TransformBy(BlockTransform);
+
+    [SaveToXData]
+    public Point3d SecondPoint { get; set; } = Point3d.Origin;
+
+    public Point3d SecondPointOCS => SecondPoint.TransformBy(BlockTransform);
+    public bool IsLeft { get; set; }
+    public bool IsOnSegment { get; set; }
+    /// <summary>
     /// Тип стрелки
-    /// </summary> 
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Arrow)] //TODO
+    /// </summary> insertionPoint
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Point)] //TODO
     [SaveToXData]
     public LeaderEndType ArrowType { get; set; } = LeaderEndType.Point;
 
@@ -278,6 +286,22 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
+    }
+
+    private double LastDistance
+    {
+        get
+        {
+            var q = ArrowPoints.OrderByDescending(x => x);
+            var result = q.FirstOrDefault();
+            if (result > 0)
+            {
+                result = q.LastOrDefault();
+            }
+
+            AcadUtils.WriteMessageInDebug($" result - {result} \n");
+            return result;
+        }
     }
 
     /// <inheritdoc />
@@ -314,7 +338,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 {
                     // Прочие случаи
                     CreateEntities(InsertionPointOCS, EndPointOCS, scale);
-                    AcadUtils.WriteMessageInDebug($"Прочие случаи, TempNewArrowPoint {TempNewArrowPoint}");
                 }
             }
         }
@@ -329,15 +352,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         _leaderEndLines.Clear();
         _hatches.Clear();
 
-        AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} - leaderPoint {endPoint}");
         var arrowSize = ArrowSize * scale;
         _mainNormal = (endPoint - insertionPoint).GetNormal();
 
         var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
-
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
-
+        
         if (!double.IsNaN(TempNewArrowPoint))
         {
             var tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
@@ -377,8 +398,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             FirstPoint = insertionPoint;
             SecondPoint = endPoint;
         }
-        AcadUtils.WriteMessageInDebug($"SecondPoint {SecondPoint} \n");
+
+        AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} -  EndPoint {endPoint},   FirstPoint {FirstPoint} - FirstPointOCS {FirstPointOCS}, SecondPoint {SecondPoint} -  SecondPointOCS {SecondPointOCS}");
+
         _leaderLine = new Line(FirstPoint, SecondPoint);
+        AcadUtils.WriteMessageInDebug($"_leaderLine.StartPoint {_leaderLine.StartPoint}, _leaderLine.EndPoint {_leaderLine.EndPoint}");
 
         CreateArrows(insertionPoint);
 
@@ -445,6 +469,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         var shelfLength = textIndent + largestTextLength + shelfLedge;
+        ShelfLength = shelfLength;
+        ShelfLedge = shelfLedge;
         Point3d topFirstTextPosition;
         var topSecondTextPosition = default(Point3d);
         Point3d bottomTextPosition;
@@ -525,11 +551,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
 
-        AcadUtils.WriteMessageInDebug($"LeaderPoint {LeaderPoint}");
         _shelfLineFromEndPoint = new Line(endPoint, shelfEndPoint);
-
-        AcadUtils.WriteMessageInDebug($" _shelfLineFromEndPoint.StartPoint- {_shelfLineFromEndPoint.StartPoint}  \n");
     }
+
+    [SaveToXData]
+    public double ShelfLength { get; set; }
 
     private void SetNodeNumberOnCreation()
     {

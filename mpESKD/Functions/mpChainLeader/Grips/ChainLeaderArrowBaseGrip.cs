@@ -1,38 +1,27 @@
-﻿using System.Collections.Generic;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
-namespace mpESKD.Functions.mpChainLeader.Grips;
-
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Linq;
 
-/// <summary>
-/// Ручка вершин
-/// </summary>
-public class ChainLeaderArrowMoveGrip : SmartEntityGripData
+public class ChainLeaderArrowBaseGrip : SmartEntityGripData
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
-    /// </summary>
-    /// <param name="chainLeader">Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderArrowMoveGrip(ChainLeader chainLeader, int gripIndex, BlockReference entity)
+    public ChainLeaderArrowBaseGrip(ChainLeader chainLeader, BlockReference entity)
     {
         ChainLeader = chainLeader;
-        GripIndex = gripIndex;
-        GripType = GripType.Point;
+        GripType = GripType.Plus;
         RubberBandLineDisabled = true;
         Entity = entity;
     }
 
     public BlockReference Entity { get; }
     /// <summary>
-    /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
+    /// Экземпляр <see cref="mpChainLeader.ChainLeaderArrowBaseGrip"/>
     /// </summary>
     public ChainLeader ChainLeader { get; }
 
@@ -41,24 +30,17 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
     /// </summary>
     public double NewPoint { get; set; }
 
-    /// <summary>
-    /// Индекс ручки
-    /// </summary>
-    public int GripIndex { get; }
-   
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp2"); // move
+        // Добавить выноску
+        return Language.GetItem("gp5");
     }
 
-    /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-       
         //if (newStatus == Status.GripStart)
         //{
-        //    //TODO
         //    ChainLeader.TempNewArrowPoint = NewPoint;
         //    ChainLeader.UpdateEntities();
         //}
@@ -74,31 +56,28 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
         {
             using (ChainLeader)
             {
+                ChainLeader.ArrowPoints.Add(NewPoint);
+                var distFromInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                 var tempList = new List<double>();
-                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                tempList.Add(distFromInsPoint);
                 tempList.AddRange(ChainLeader.ArrowPoints);
-
                 var q = tempList.OrderBy(x => x);
                 var result = q.FirstOrDefault();
                 if (result > 0)
                 {
                     result = q.LastOrDefault();
                 }
-
+                
                 var tempInsPoint = ChainLeader.EndPoint + (ChainLeader._mainNormal * result);
+                ChainLeader.ArrowPoints.Add(distFromInsPoint);
                 ChainLeader.InsertionPoint = tempInsPoint;
                 
-                
-                AcadUtils.WriteMessageInDebug($"ChainLeader.InsertionPoint {ChainLeader.InsertionPoint}, ChainLeader.InsertionPointOCS {ChainLeader.InsertionPointOCS},ChainLeader.EndPointOCS {ChainLeader.EndPointOCS}");
-                
                 ChainLeader.TempNewArrowPoint = double.NaN;
-                
+                AcadUtils.WriteMessageInDebug($"NewPoint {NewPoint} -  ChainLeader.InsertionPoint {ChainLeader.InsertionPoint}\n");
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
-
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
                     Entity.Position = tempInsPoint;
                     using (var resBuf = ChainLeader.GetDataForXData())

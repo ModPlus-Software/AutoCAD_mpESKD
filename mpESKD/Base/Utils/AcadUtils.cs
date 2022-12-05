@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Base.Utils;
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace mpESKD.Base.Utils;
 
 using System;
 using System.Collections.Generic;
@@ -553,5 +555,19 @@ public static class AcadUtils
     {
         // https://spiderinnet1.typepad.com/blog/2014/05/autocad-net-detect-current-space-model-or-paper-and-viewport.html
         return AcApp.DocumentManager.MdiActiveDocument.Database.TileMode;
+    }
+
+    public static bool IsLeft(Point3d insertionPoint, Point3d endPoint, Point3d pointOnLine)
+    {
+        var v1 = (insertionPoint - endPoint).GetNormal();
+        var v2 = (pointOnLine - endPoint).GetNormal();
+
+        return v1.DotProduct(v2) > 0;
+    }
+
+    public static bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
+    {
+        var segment = new LineSegment3d(startPt, endPt);
+        return segment.IsOn(point);
     }
 }
