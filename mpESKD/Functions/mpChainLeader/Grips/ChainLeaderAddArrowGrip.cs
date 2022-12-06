@@ -61,7 +61,7 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                     tempList.Add(distFromEndPointToInsPoint);
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
-                    
+
                     //когда тянем вправо
                     if (ChainLeader.TempNewArrowPoint > 0)
                     {
@@ -69,11 +69,11 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                         if (result > 0)
                         {
                             result = tempList.OrderBy(x => x).LastOrDefault();
+
                             // если последняя больше чем текущая
                             if (result > ChainLeader.TempNewArrowPoint)
                             {
                                 // текущую добавлеям в список, inspoint не меняем
-                                tempInsPoint = ChainLeader.InsertionPoint;
                                 ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                             }
                             else
@@ -85,27 +85,19 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                         else
                         {
                             ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
-                            tempInsPoint = ChainLeader.InsertionPoint;
                         }
                     }
 
                     // когда тянем влево, значения отрицательные
-                    else 
+                    else
                     {
-                        //если первая положительная, значит слева нет точек
-                        if (result > 0)
-                        {
-                            tempInsPoint = ChainLeader.InsertionPoint;
-                            ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
-                        }
-                        else if (result > ChainLeader.TempNewArrowPoint)
+                        if (result > ChainLeader.TempNewArrowPoint)
                         {
                             tempInsPoint = ChainLeader.EndPoint + (mainNormal * ChainLeader.TempNewArrowPoint);
                             ChainLeader.ArrowPoints.Add(-1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint));
                         }
                         else
                         {
-                            tempInsPoint = ChainLeader.InsertionPoint;
                             ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                         }
                     }
@@ -113,7 +105,7 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
 
                 ChainLeader.InsertionPoint = tempInsPoint;
                 ChainLeader.TempNewArrowPoint = double.NaN;
-                
+
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
