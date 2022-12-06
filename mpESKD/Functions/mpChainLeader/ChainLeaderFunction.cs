@@ -105,8 +105,6 @@ public class ChainLeaderFunction: ISmartEntityFunction
         // <msg17>Укажите точку выноски:</msg17> // <-- TODO другой текст. Про вторую точку
         var leaderPointPrompt = Language.GetItem("msg18");
 
-        //// <msg18>Укажите точку выноски:</msg18>
-        //var leaderPointPrompt = Language.GetItem("msg18");
         var entityJig = new DefaultEntityJig(chainLeader, blockReference, new Point3d(0, 0, 0))
         {
             PromptForInsertionPoint = insertionPointPrompt
@@ -125,20 +123,7 @@ public class ChainLeaderFunction: ISmartEntityFunction
                     chainLeader.JigState = ChainLeaderJigState.LeaderPoint;
                     entityJig.PromptForNextPoint = leaderPointPrompt;
                     entityJig.PreviousPoint = chainLeader.InsertionPoint;
-                        
-                    //entityJig.JigState = JigState.PromptNextPoint;
                 }
-                //else if (chainLeader.JigState == ChainLeaderJigState.EndPoint)
-                //{
-                //    AcadUtils.WriteMessageInDebug(chainLeader.JigState.Value.ToString());
-                        
-                //    chainLeader.JigState = ChainLeaderJigState.LeaderPoint;
-                //    entityJig.PromptForCustomPoint = leaderPointPrompt;
-                        
-                //    // Тут не нужна привязка к предыдущей точке
-                //    entityJig.PreviousPoint = chainLeader.InsertionPoint;
-                //    entityJig.JigState = JigState.CustomPoint;
-                //}
                 else
                 {
                     break;

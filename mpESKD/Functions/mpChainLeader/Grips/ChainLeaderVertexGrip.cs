@@ -22,13 +22,15 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     /// </summary>
     /// <param name="chainLeader">Экземпляр класса <see cref="mpChainLeader.ChainLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public ChainLeaderVertexGrip(ChainLeader chainLeader, int gripIndex)
+    public ChainLeaderVertexGrip(ChainLeader chainLeader, int gripIndex, BlockReference entity)
     {
         ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
+        Entity = entity;
     }
 
+    public BlockReference Entity { get; }
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
@@ -54,8 +56,6 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                //_gripTmp = GripPoint;
-
                 if (GripIndex == 0)
                 {
                     _gripTmp = ChainLeader.InsertionPoint;
@@ -65,20 +65,40 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 {
                     _gripTmp = ChainLeader.EndPoint;
                 }
-
-                //if (GripIndex == 2)
-                //{
-                //    _gripTmp = ChainLeader.LeaderPoint;
-                //}
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
+                var tempInsPoint = ChainLeader.InsertionPoint;
+                using (ChainLeader)
+                {
+                    double result;
+                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
+                    result = ChainLeader.ArrowPoints.OrderBy(x=>x).FirstOrDefault();
+                    var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+                    
+                    if (ChainLeader.IsLeft)
+                    {
+                        distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+
+                        if (result < distFromEndPointToInsPoint)
+                        {
+                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
+                            ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
+                        }
+                    }
+
+                    ChainLeader.InsertionPoint = tempInsPoint;
+                    ChainLeader.UpdateEntities();
+                    ChainLeader.BlockRecord.UpdateAnonymousBlocks();
+                }
+
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
+                    Entity.Position = tempInsPoint;
                     using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;

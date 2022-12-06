@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Base.Enums;
 using Base.Overrules;
@@ -53,22 +52,17 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
     {
         try
         {
-            // При начале перемещения запоминаем первоначальное положение ручки
-            // Запоминаем начальные значения
             if (newStatus == Status.GripStart | newStatus == Status.Stretch)
             {
-                ChainLeader.ShelfLedge += NewPoint;
+                ChainLeader.TextIndent += NewPoint;
                 ChainLeader.UpdateEntities();
             }
 
-            // При удачном перемещении ручки записываем новые значения в расширенные данные
-            // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
                 using (ChainLeader)
                 {
-                    ChainLeader.ShelfLedge = _gripTmp + NewPoint;
-                    AcadUtils.WriteMessageInDebug($"ShelfLedge in grip end {ChainLeader.ShelfLedge}");
+                    ChainLeader.TextIndent = _gripTmp + NewPoint;
                     ChainLeader.UpdateEntities();
                     ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -90,9 +84,7 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
             {
                 if (_gripTmp != null)
                 {
-
                     ChainLeader.ShelfLedge = _gripTmp;
-
                 }
             }
 

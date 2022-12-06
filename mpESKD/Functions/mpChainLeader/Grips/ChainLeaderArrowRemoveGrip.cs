@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autodesk.AutoCAD.Geometry;
-
-namespace mpESKD.Functions.mpChainLeader.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using System.Linq;
 
 /// <summary>
 /// Ручка вершин
@@ -50,41 +47,27 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
     {
         using (ChainLeader)
         {
-
             var tempInsPoint = new Point3d();
-            if (ChainLeader.ArrowPoints.Count != 0)
+            double result;
+            if (GripIndex == 4)
             {
-                ChainLeader.ArrowPoints.RemoveAt(GripIndex);
-                var tempList = new List<double>();
-                //ChainLeader.ArrowPoints.RemoveAt(GripIndex);
-                tempList.AddRange(ChainLeader.ArrowPoints);
-                tempList.Add(ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint));
-                var q = tempList.OrderBy(x => x);
-                var result = q.FirstOrDefault();
-                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result;
+                result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
 
                 if (result > 0)
                 {
-                    result = q.LastOrDefault();
-                    
-                }
-                else if (result == 0)
-                {
-                    tempInsPoint = ChainLeader.InsertionPoint;
-                }
-                else
-                {
-                    ChainLeader.InsertionPoint = tempInsPoint;
+                    result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
                 }
 
-                ChainLeader.InsertionPoint = tempInsPoint;
+                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result;
+                ChainLeader.ArrowPoints.Remove(result);
+            }
+            else if (ChainLeader.ArrowPoints.Count != 0)
+            {
+                ChainLeader.ArrowPoints.RemoveAt(GripIndex);
+                tempInsPoint = ChainLeader.InsertionPoint;
             }
 
-
-            
-            
-            
-
+            ChainLeader.InsertionPoint = tempInsPoint;
             ChainLeader.UpdateEntities();
             ChainLeader.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

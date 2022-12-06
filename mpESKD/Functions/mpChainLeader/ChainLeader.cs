@@ -1,7 +1,4 @@
-﻿using Autodesk.AutoCAD.Internal.Calculator;
-using ControlzEx.Standard;
-
-namespace mpESKD.Functions.mpChainLeader;
+﻿namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -13,7 +10,6 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Цепная выноска
@@ -26,6 +22,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private string _cachedNodeNumber;
     private readonly List<Hatch> _hatches = new();
     private readonly List<Polyline> _leaderEndLines = new();
+    private double _scale;
+    private Vector3d _mainNormal;
+    private Line _shelfLineFromEndPoint;
 
     #region Entities
 
@@ -68,9 +67,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Маскировка нижнего текста (адрес узла)
     /// </summary>
     private Wipeout _bottomTextMask;
-    private double _scale;
-    public Vector3d _mainNormal;
-    private Line _shelfLineFromEndPoint;
 
     #endregion
 
@@ -146,7 +142,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 3.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 10.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 
@@ -272,8 +268,12 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public Point3d SecondPoint { get; set; } = Point3d.Origin;
 
     public Point3d SecondPointOCS => SecondPoint.TransformBy(BlockTransform);
+
+    [SaveToXData]
+    public double ShelfLength { get; set; }
+
     public bool IsLeft { get; set; }
-    public bool IsOnSegment { get; set; }
+
     /// <summary>
     /// Тип стрелки
     /// </summary> insertionPoint
@@ -286,22 +286,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
-    }
-
-    private double LastDistance
-    {
-        get
-        {
-            var q = ArrowPoints.OrderByDescending(x => x);
-            var result = q.FirstOrDefault();
-            if (result > 0)
-            {
-                result = q.LastOrDefault();
-            }
-
-            AcadUtils.WriteMessageInDebug($" result - {result} \n");
-            return result;
-        }
     }
 
     /// <inheritdoc />
@@ -322,8 +306,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
                 CreateEntities(InsertionPointOCS, tempEndPoint, scale);
             }
-
-            // Указание точки выноски
             else
             {
                 // Если конечная точка на расстоянии, менее допустимого
@@ -468,9 +450,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
-        var shelfLength = textIndent + largestTextLength + shelfLedge;
-        ShelfLength = shelfLength;
-        ShelfLedge = shelfLedge;
+        ShelfLength = textIndent + largestTextLength + shelfLedge;
+
         Point3d topFirstTextPosition;
         var topSecondTextPosition = default(Point3d);
         Point3d bottomTextPosition;
@@ -478,11 +459,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (isRight)
         {
             topFirstTextPosition = new Point3d(
-                endPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
+                endPoint.X + (topFirstTextLength / 2) + ((ShelfLength - topTextLength) / 2),
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                endPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+                endPoint.X + (bottomTextLength / 2) + ((ShelfLength - bottomTextLength) / 2),
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topFirstDbText != null)
@@ -500,10 +481,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         else
         {
             topFirstTextPosition = new Point3d(
-                endPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
+                endPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((ShelfLength - topTextLength) / 2),
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                endPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+                endPoint.X - (bottomTextLength / 2) - ((ShelfLength - bottomTextLength) / 2),
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topFirstDbText != null)
@@ -528,8 +509,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
 
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
-            ? endPoint + (Vector3d.XAxis * shelfLength)
-            : endPoint - (Vector3d.XAxis * shelfLength);
+            ? endPoint + (Vector3d.XAxis * ShelfLength)
+            : endPoint - (Vector3d.XAxis * ShelfLength);
 
         if (HideTextBackground)
         {
@@ -553,9 +534,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         _shelfLineFromEndPoint = new Line(endPoint, shelfEndPoint);
     }
-
-    [SaveToXData]
-    public double ShelfLength { get; set; }
 
     private void SetNodeNumberOnCreation()
     {

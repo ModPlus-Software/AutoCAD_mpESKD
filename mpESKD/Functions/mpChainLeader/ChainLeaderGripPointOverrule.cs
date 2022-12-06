@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpChainLeader;
 
-using mpESKD.Base.Utils;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -9,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLeader>
@@ -50,14 +50,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                 if (chainLeader != null)
                 {
                     // Получаем ручку на первой точке
-                    var gp = new ChainLeaderVertexGrip(chainLeader, 0)
+                    var gp = new ChainLeaderVertexGrip(chainLeader, 0, (BlockReference)entity)
                     {
                         GripPoint = chainLeader.InsertionPoint
                     };
                     grips.Add(gp);
 
                     // Получаем ручку на второй точке
-                    gp = new ChainLeaderVertexGrip(chainLeader, 1)
+                    gp = new ChainLeaderVertexGrip(chainLeader, 1, (BlockReference)entity)
                     {
                         GripPoint = chainLeader.EndPoint
                     };
@@ -78,7 +78,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         grips.Add(new ChainLeaderShelfMoveGrip(chainLeader,2)
                         {
                             GripPoint = new Point3d(
-                                chainLeader.EndPoint.X + chainLeader.ShelfLedge,
+                                chainLeader.EndPoint.X + chainLeader.TextIndent,
                                 chainLeader.EndPoint.Y,
                                 chainLeader.EndPoint.Z)
                         });
@@ -97,7 +97,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         grips.Add(new ChainLeaderShelfMoveGrip(chainLeader,2)
                         {
                             GripPoint = new Point3d(
-                                chainLeader.EndPoint.X - chainLeader.ShelfLedge,
+                                chainLeader.EndPoint.X - chainLeader.TextIndent,
                                 chainLeader.EndPoint.Y,
                                 chainLeader.EndPoint.Z)
                         });
@@ -121,8 +121,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         chainLeader.InsertionPoint.Z)
                     });
 
-                    AcadUtils.WriteMessageInDebug($"chainLeader.ShelfLength-{chainLeader.ShelfLedge}");
-                    
                     if (chainLeader.ArrowPoints.Count >= 1)
                     {
                         // ручки удаления стрелки с insertionPoint
@@ -180,8 +178,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                         if (vertexGrip.GripIndex == 0)
                         {
-                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                            var newPoint = vertexGrip.GripPoint + offset;
+
+                            var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
+                                chainLeader.EndPoint, newPoint);
+                            var isleft = AcadUtils.IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+                            if (isleft) chainLeader.IsLeft = true;
+                            ((BlockReference)entity).Position = pointOnPolyline;
+                            chainLeader.InsertionPoint = pointOnPolyline;
                         }
                         else if (vertexGrip.GripIndex == 1)
                         {
@@ -194,8 +198,18 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     else if (gripData is ChainLeaderShelfMoveGrip shelfMoveGrip)
                     {
                         var chainLeader = shelfMoveGrip.ChainLeader;
-                        chainLeader.ShelfLedge = shelfMoveGrip.GripPoint.X - chainLeader.EndPoint.X + offset.X;
-                        shelfMoveGrip.NewPoint = chainLeader.ShelfLedge;
+                        if (chainLeader.ShelfPosition == ShelfPosition.Right)
+                        {
+                            chainLeader.TextIndent = shelfMoveGrip.GripPoint.X - chainLeader.EndPoint.X + offset.X;
+                            AcadUtils.WriteMessageInDebug($"{chainLeader.ShelfPosition} - {shelfMoveGrip.GripPoint.X } - {chainLeader.EndPoint.X} + {offset.X}");
+                        }
+                        else
+                        {
+                            chainLeader.TextIndent = chainLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
+                            AcadUtils.WriteMessageInDebug($"{chainLeader.ShelfPosition} - {chainLeader.EndPoint.X} -  {shelfMoveGrip.GripPoint.X } - {offset.X}");
+                        }
+
+                        shelfMoveGrip.NewPoint = chainLeader.TextIndent;
                         chainLeader.UpdateEntities();
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
@@ -226,8 +240,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                                 
                                 chainLeader.IsLeft = true;
                             }
-
-                            //addLeaderGrip.NewPoint = chainLeader.TempNewArrowPoint;
                         }
 
                         chainLeader.UpdateEntities();
@@ -279,8 +291,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
         }
     }
 
-    
-    
     public Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
     {
         Point3d a = varStart;

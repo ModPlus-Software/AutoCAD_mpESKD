@@ -1,14 +1,12 @@
-﻿using System.Collections.Generic;
-
-namespace mpESKD.Functions.mpChainLeader.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -45,7 +43,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
-   
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -55,50 +53,93 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-       
-        //if (newStatus == Status.GripStart)
-        //{
-        //    //TODO
-        //    ChainLeader.TempNewArrowPoint = NewPoint;
-        //    ChainLeader.UpdateEntities();
-        //}
-
-        //if (newStatus == Status.Move)
-        //{
-        //    ChainLeader.TempNewArrowPoint = NewPoint;
-        //    ChainLeader.UpdateEntities();
-        //    AcadUtils.WriteMessageInDebug($"OnGripStatusChanged if (newStatus == Status.Move) TempNewArrowPoint {ChainLeader.TempNewArrowPoint} \n");
-        //}
-
         if (newStatus == Status.GripEnd)
         {
             using (ChainLeader)
             {
-                var tempList = new List<double>();
-                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
-                tempList.AddRange(ChainLeader.ArrowPoints);
+                var tempInsPoint = new Point3d();
 
-                var q = tempList.OrderBy(x => x);
-                var result = q.FirstOrDefault();
-                if (result > 0)
+                if (!ChainLeader.ArrowPoints.Contains(NewPoint))
                 {
-                    result = q.LastOrDefault();
+                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
+                    var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+                    if (ChainLeader.IsLeft)
+                    {
+                        distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+                    }
+
+                    double result;
+                    var tempList = new List<double>();
+                    tempList.Add(distFromEndPointToInsPoint);
+                    tempList.AddRange(ChainLeader.ArrowPoints);
+                    if (NewPoint > 0)
+                    {
+                        result = tempList.OrderBy(x => x).FirstOrDefault();
+
+                        // если в списке есть значения и они положительные, то берем последнюю
+                        if (result > 0)
+                        {
+                            result = tempList.OrderBy(x => x).LastOrDefault();
+
+                            // если последняя больше чем текущая
+                            if (result > NewPoint)
+                            {
+                                // текущую добавляем в список, inspoint не меняем
+                                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                                tempInsPoint = ChainLeader.InsertionPoint;
+                            }
+                            else
+                            { // если текущая больше чем последняя она должна быть insPoint
+                                tempInsPoint = ChainLeader.EndPoint + (mainNormal * NewPoint);
+
+                                ChainLeader.ArrowPoints[GripIndex] = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+                            }
+                        }
+                        else
+                        {
+                            ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                            tempInsPoint = ChainLeader.InsertionPoint;
+                        }
+                    }
+                    else // когда тянем влево, значения отрицательные
+                    {
+                        // ищем первую
+                        result = tempList.OrderBy(x => x).FirstOrDefault();
+
+                        //если первая положительная, значит слева нет точек
+                        if (result > 0)
+                        {
+                            // тогда 
+
+                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * NewPoint);
+                            result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
+                            ChainLeader.ArrowPoints[GripIndex] = result;
+                        }
+                        else if (NewPoint > distFromEndPointToInsPoint)
+                        {
+                            ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                            tempInsPoint = ChainLeader.InsertionPoint;
+                        }
+                        else
+                        {
+                            ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
+                            tempInsPoint = ChainLeader.EndPoint + mainNormal * NewPoint;
+                        }
+                    }
+                }
+                else
+                {
+                    tempInsPoint = ChainLeader.InsertionPoint;
                 }
 
-                var tempInsPoint = ChainLeader.EndPoint + (ChainLeader._mainNormal * result);
                 ChainLeader.InsertionPoint = tempInsPoint;
-                
-                
-                AcadUtils.WriteMessageInDebug($"ChainLeader.InsertionPoint {ChainLeader.InsertionPoint}, ChainLeader.InsertionPointOCS {ChainLeader.InsertionPointOCS},ChainLeader.EndPointOCS {ChainLeader.EndPointOCS}");
-                
                 ChainLeader.TempNewArrowPoint = double.NaN;
-                
+
                 ChainLeader.UpdateEntities();
                 ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
-                    
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
                     Entity.Position = tempInsPoint;
                     using (var resBuf = ChainLeader.GetDataForXData())
