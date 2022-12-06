@@ -8,6 +8,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using System.Linq;
 
 /// <summary>
 /// Ручка вершин
@@ -31,6 +32,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     }
 
     public BlockReference Entity { get; }
+
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
@@ -52,8 +54,6 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     {
         try
         {
-            // При начале перемещения запоминаем первоначальное положение ручки
-            // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
                 if (GripIndex == 0)
@@ -67,16 +67,13 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 }
             }
 
-            // При удачном перемещении ручки записываем новые значения в расширенные данные
-            // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 using (ChainLeader)
                 {
-                    double result;
                     var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
-                    result = ChainLeader.ArrowPoints.OrderBy(x=>x).FirstOrDefault();
+                    var result = ChainLeader.ArrowPoints.OrderBy(x=>x).FirstOrDefault();
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     
                     if (ChainLeader.IsLeft)
@@ -124,11 +121,6 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                     {
                         ChainLeader.EndPoint = _gripTmp;
                     }
-
-                    //if (GripIndex == 2)
-                    //{
-                    //    ChainLeader.LeaderPoint = _gripTmp;
-                    //}
                 }
             }
 

@@ -27,6 +27,7 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
     }
 
     public BlockReference Entity { get; }
+
     /// <summary>
     /// Экземпляр <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
@@ -46,7 +47,7 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
         {
             using (ChainLeader)
             {
-                var tempInsPoint = new Point3d();
+                var tempInsPoint = ChainLeader.InsertionPoint;
                 if (!ChainLeader.ArrowPoints.Contains(ChainLeader.TempNewArrowPoint))
                 {
                     var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
@@ -56,14 +57,14 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
 
-                    double result;
                     var tempList = new List<double>();
                     tempList.Add(distFromEndPointToInsPoint);
                     tempList.AddRange(ChainLeader.ArrowPoints);
+                    var result = tempList.OrderBy(x => x).FirstOrDefault();
+                    
                     //когда тянем вправо
                     if (ChainLeader.TempNewArrowPoint > 0)
                     {
-                        result = tempList.OrderBy(x => x).FirstOrDefault();
                         // если в списке есть значения и они положительные, то берем последнюю
                         if (result > 0)
                         {
@@ -72,14 +73,12 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                             if (result > ChainLeader.TempNewArrowPoint)
                             {
                                 // текущую добавлеям в список, inspoint не меняем
-                                ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
-                                //ChainLeader.ArrowPoints.Remove(result);
                                 tempInsPoint = ChainLeader.InsertionPoint;
+                                ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                             }
                             else
                             { // если текущая больше чем последняя она должна быть insPoint
                                 tempInsPoint = ChainLeader.EndPoint + (mainNormal * ChainLeader.TempNewArrowPoint);
-
                                 ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
                             }
                         }
@@ -89,18 +88,14 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                             tempInsPoint = ChainLeader.InsertionPoint;
                         }
                     }
-                    else // когда тянем влево, значения отрицательные
-                    {
-                        // ищем первую
-                        result = tempList.OrderBy(x => x).FirstOrDefault();
 
+                    // когда тянем влево, значения отрицательные
+                    else 
+                    {
                         //если первая положительная, значит слева нет точек
                         if (result > 0)
                         {
-                            // тогда 
-
                             tempInsPoint = ChainLeader.InsertionPoint;
-                            result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
                             ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                         }
                         else if (result > ChainLeader.TempNewArrowPoint)
@@ -114,10 +109,6 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                             ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                         }
                     }
-                }
-                else
-                {
-                    tempInsPoint = ChainLeader.InsertionPoint;
                 }
 
                 ChainLeader.InsertionPoint = tempInsPoint;
