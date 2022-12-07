@@ -47,24 +47,21 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
     {
         using (ChainLeader)
         {
-            var tempInsPoint = new Point3d();
-            double result;
+            var tempInsPoint = ChainLeader.InsertionPoint;
+            var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
             if (GripIndex == 4)
             {
-                result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-
                 if (result > 0)
                 {
                     result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
                 }
 
-                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result;
+                tempInsPoint = ChainLeader.EndPoint + ChainLeader.MainNormal * result;
                 ChainLeader.ArrowPoints.Remove(result);
             }
             else if (ChainLeader.ArrowPoints.Count != 0)
             {
                 ChainLeader.ArrowPoints.RemoveAt(GripIndex);
-                tempInsPoint = ChainLeader.InsertionPoint;
             }
 
             ChainLeader.InsertionPoint = tempInsPoint;

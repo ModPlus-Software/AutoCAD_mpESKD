@@ -245,12 +245,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public bool Leader { get; set; } = true;
 
     /// <summary>
-    /// Точка выноски
-    /// </summary>
-    [SaveToXData]
-    public Point3d LeaderPoint { get; set; }
-
-    /// <summary>
     /// Точки стрелок
     /// </summary>
     [SaveToXData]
