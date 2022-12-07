@@ -72,7 +72,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 using (ChainLeader)
                 {
-                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
+                    //var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
                     var result = ChainLeader.ArrowPoints.OrderBy(x=>x).FirstOrDefault();
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     
@@ -82,8 +82,9 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
 
                         if (result < distFromEndPointToInsPoint)
                         {
-                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
-                            ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
+                            tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * result);
+                            ChainLeader.ArrowPoints.Remove(result);
+                            ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
                         }
                     }
 

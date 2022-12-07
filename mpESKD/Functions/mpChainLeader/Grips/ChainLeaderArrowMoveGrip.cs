@@ -57,25 +57,24 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
         {
             using (ChainLeader)
             {
-                var tempInsPoint = new Point3d();
+                var tempInsPoint = ChainLeader.InsertionPoint;
 
                 if (!ChainLeader.ArrowPoints.Contains(NewPoint))
                 {
-                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
+                    
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     if (ChainLeader.IsLeft)
                     {
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
 
-                    double result;
                     var tempList = new List<double>();
                     tempList.Add(distFromEndPointToInsPoint);
                     tempList.AddRange(ChainLeader.ArrowPoints);
+                    var result = tempList.OrderBy(x => x).FirstOrDefault();
+                    
                     if (NewPoint > 0)
                     {
-                        result = tempList.OrderBy(x => x).FirstOrDefault();
-
                         // если в списке есть значения и они положительные, то берем последнюю
                         if (result > 0)
                         {
@@ -86,36 +85,27 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                             {
                                 // текущую добавляем в список, inspoint не меняем
                                 ChainLeader.ArrowPoints[GripIndex] = NewPoint;
-                                tempInsPoint = ChainLeader.InsertionPoint;
                             }
                             else
-                            { // если текущая больше чем последняя она должна быть insPoint
-                                tempInsPoint = ChainLeader.EndPoint + (mainNormal * NewPoint);
-
+                            { 
+                                // если текущая больше чем последняя она должна быть insPoint
+                                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * NewPoint);
                                 ChainLeader.ArrowPoints[GripIndex] = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                             }
                         }
                         else
                         {
                             ChainLeader.ArrowPoints[GripIndex] = NewPoint;
-                            tempInsPoint = ChainLeader.InsertionPoint;
                         }
                     }
-                    else // когда тянем влево, значения отрицательные
+                    else 
                     {
                         // ищем первую
-                        result = tempList.OrderBy(x => x).FirstOrDefault();
+                        tempInsPoint = ChainLeader.EndPoint + ChainLeader.MainNormal * NewPoint;
 
                         //если первая положительная, значит слева нет точек
-                        if (result > 0)
-                        {
-                            // тогда 
-
-                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * NewPoint);
-                            result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
-                            ChainLeader.ArrowPoints[GripIndex] = result;
-                        }
-                        else if (NewPoint > distFromEndPointToInsPoint)
+                       
+                        if (NewPoint > distFromEndPointToInsPoint)
                         {
                             ChainLeader.ArrowPoints[GripIndex] = NewPoint;
                             tempInsPoint = ChainLeader.InsertionPoint;
@@ -123,15 +113,10 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                         else
                         {
                             ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
-                            tempInsPoint = ChainLeader.EndPoint + mainNormal * NewPoint;
                         }
                     }
                 }
-                else
-                {
-                    tempInsPoint = ChainLeader.InsertionPoint;
-                }
-
+                
                 ChainLeader.InsertionPoint = tempInsPoint;
                 ChainLeader.TempNewArrowPoint = double.NaN;
 

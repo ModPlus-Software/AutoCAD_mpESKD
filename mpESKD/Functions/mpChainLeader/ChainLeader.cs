@@ -23,7 +23,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private readonly List<Hatch> _hatches = new();
     private readonly List<Polyline> _leaderEndLines = new();
     private double _scale;
-    private Vector3d _mainNormal;
+    
     private Line _shelfLineFromEndPoint;
 
     #region Entities
@@ -138,6 +138,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
+
+    public Vector3d MainNormal { get; set; }
 
     /// <summary>
     /// Отступ текста
@@ -259,15 +261,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public Point3d FirstPoint { get; set; }
 
-    /// <summary>
-    /// Точка выноски в внутренней системе координат блока
-    /// </summary>
-    public Point3d FirstPointOCS => FirstPoint.TransformBy(BlockTransform);
-
     [SaveToXData]
     public Point3d SecondPoint { get; set; } = Point3d.Origin;
-
-    public Point3d SecondPointOCS => SecondPoint.TransformBy(BlockTransform);
 
     [SaveToXData]
     public double ShelfLength { get; set; }
@@ -335,15 +330,15 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         _hatches.Clear();
 
         var arrowSize = ArrowSize * scale;
-        _mainNormal = (endPoint - insertionPoint).GetNormal();
+        MainNormal = (endPoint - insertionPoint).GetNormal();
 
-        var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
+        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
         
         if (!double.IsNaN(TempNewArrowPoint))
         {
-            var tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
+            var tempPoint = endPoint + (MainNormal * TempNewArrowPoint);
             if (TempNewArrowPoint > 0)
             {
                 FirstPoint = insertionPoint;
@@ -366,7 +361,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             foreach (var arrowPoint in ArrowPoints)
             {
-                tempPoints.Add(endPoint + (_mainNormal * arrowPoint));
+                tempPoints.Add(endPoint + (MainNormal * arrowPoint));
             }
 
             var furthestPoints = GetFurthestPoints(tempPoints);
@@ -381,16 +376,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             SecondPoint = endPoint;
         }
 
-        AcadUtils.WriteMessageInDebug($"insertionPoint {insertionPoint} -  EndPoint {endPoint},   FirstPoint {FirstPoint} - FirstPointOCS {FirstPointOCS}, SecondPoint {SecondPoint} -  SecondPointOCS {SecondPointOCS}");
-
         _leaderLine = new Line(FirstPoint, SecondPoint);
-        AcadUtils.WriteMessageInDebug($"_leaderLine.StartPoint {_leaderLine.StartPoint}, _leaderLine.EndPoint {_leaderLine.EndPoint}");
-
+        
         CreateArrows(insertionPoint);
 
         foreach (var arrowPoint in ArrowPoints)
         {
-            var tempPoint1 = endPoint + (_mainNormal * arrowPoint);
+            var tempPoint1 = endPoint + (MainNormal * arrowPoint);
 
             CreateArrows(tempPoint1);
         }
@@ -585,7 +577,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         var vector = new Vector3d(0, 0, 1);
 
-        var tmpPoint = arrowPoint - (_mainNormal * ArrowSize / 2 * _scale);
+        var tmpPoint = arrowPoint - (MainNormal * ArrowSize / 2 * _scale);
         var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, arrowPoint);
         var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, arrowPoint);
 
@@ -600,7 +592,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Polyline CreateAngleArrow(Point3d arrowPoint, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = arrowPoint + (_mainNormal * ArrowSize * _scale);
+        var tmpPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
         var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, arrowPoint);
         var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, arrowPoint);
 
@@ -618,7 +610,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Polyline CreateHalfArrow(Point3d arrowPoint)
     {
         var vector = new Vector3d(0, 0, 1);
-        var arrowEndPoint = arrowPoint + (_mainNormal * ArrowSize * _scale);
+        var arrowEndPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
         var endPoint = arrowEndPoint.RotateBy(10.DegreeToRadian(), vector, arrowPoint);
 
         var pline = new Polyline(3);
@@ -650,8 +642,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     private Polyline CreatePointArrow(Point3d arrowPoint)
     {
-        var startPoint = arrowPoint - (ArrowSize / 4 * _mainNormal * _scale);
-        var endPoint = arrowPoint + (ArrowSize / 4 * _mainNormal * _scale);
+        var startPoint = arrowPoint - (ArrowSize / 4 * MainNormal * _scale);
+        var endPoint = arrowPoint + (ArrowSize / 4 * MainNormal * _scale);
 
         var pline = new Polyline(2);
         pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
