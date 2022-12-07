@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace mpESKD.Functions.mpChainLeader.Grips;
+﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -71,13 +69,12 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
 
             if (newStatus == Status.GripEnd)
             {
-
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 using (ChainLeader)
                 {
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
 
-                    //var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
+                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
                     var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
 
                     if (ChainLeader.IsLeft)
@@ -86,7 +83,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
 
                         if (result < distFromEndPointToInsPoint)
                         {
-                            tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * result);
+                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
                             ChainLeader.ArrowPoints.Remove(result);
                             ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
                         }
