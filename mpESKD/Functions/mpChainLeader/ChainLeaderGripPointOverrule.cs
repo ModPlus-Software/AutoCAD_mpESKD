@@ -182,8 +182,9 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                             var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                                 chainLeader.EndPoint, newPoint);
-                            var isleft = AcadUtils.IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
-                            if (isleft) chainLeader.IsLeft = true;
+                            
+                            chainLeader.IsLeft = AcadUtils.IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+                            
                             ((BlockReference)entity).Position = pointOnPolyline;
                             chainLeader.InsertionPoint = pointOnPolyline;
                         }
