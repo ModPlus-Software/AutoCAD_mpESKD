@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
@@ -44,6 +43,7 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
         return Language.GetItem("gp6"); // Удалить выноску
     }
 
+    /// <inheritdoc />
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
         using (ChainLeader)
@@ -59,7 +59,7 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
                     result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
                 }
 
-                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result;
+                tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result);
                 ChainLeader.ArrowPoints.Remove(result);
             }
             else if (ChainLeader.ArrowPoints.Count != 0)

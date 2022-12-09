@@ -55,12 +55,14 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
 
-                    var tempList = new List<double>();
-                    tempList.Add(distFromEndPointToInsPoint);
+                    var tempList = new List<double>
+                    {
+                        distFromEndPointToInsPoint
+                    };
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
 
-                    //когда тянем вправо
+                    // когда тянем вправо
                     if (ChainLeader.TempNewArrowPoint > 0)
                     {
                         // если в списке есть значения и они положительные, то берем последнюю
@@ -71,7 +73,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                             // если последняя больше чем текущая
                             if (result > ChainLeader.TempNewArrowPoint)
                             {
-                                // текущую добавлеям в список, inspoint не меняем
+                                // текущую добавляем в список, inspoint не меняем
                                 ChainLeader.ArrowPoints.Add(ChainLeader.TempNewArrowPoint);
                             }
                             else

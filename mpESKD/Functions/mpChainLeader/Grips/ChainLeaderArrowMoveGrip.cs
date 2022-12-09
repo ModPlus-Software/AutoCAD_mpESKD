@@ -62,8 +62,10 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
 
-                    var tempList = new List<double>();
-                    tempList.Add(distFromEndPointToInsPoint);
+                    var tempList = new List<double>
+                    {
+                        distFromEndPointToInsPoint
+                    };
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
                     
@@ -95,9 +97,9 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                     else 
                     {
                         // ищем первую
-                        tempInsPoint = ChainLeader.EndPoint + ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint;
+                        tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
 
-                        //если первая положительная, значит слева нет точек
+                        // если первая положительная, значит слева нет точек
                        
                         if (ChainLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
                         {

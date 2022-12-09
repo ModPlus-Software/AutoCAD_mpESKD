@@ -8,9 +8,9 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
+/// <inheritdoc />
 public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLeader>
 {
     /// <inheritdoc />
@@ -276,16 +276,15 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
     private Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
     {
-        Point3d a = varStart;
-        Point3d b = varEnd;
-        Point3d c = varBase;
+        var a = varStart;
+        var b = varEnd;
+        var c = varBase;
 
-        var F0 = c.X - (b.Y - a.Y);
-        var F1 = c.Y + (b.X - a.X);
-        var k2 = ((c.X - a.X) * (b.Y - a.Y) - (b.X - a.X) * (c.Y - a.Y)) /
-                 (double)((b.X - a.X) * (F1 - c.Y) - (F0 - c.X) * (b.Y - a.Y));
-        var xPoint = (F0 - c.X) * k2 + c.X;
-        var yPoint = (F1 - c.Y) * k2 + c.Y;
+        var f0 = c.X - (b.Y - a.Y);
+        var f1 = c.Y + (b.X - a.X);
+        var k2 = (((c.X - a.X) * (b.Y - a.Y)) - ((b.X - a.X) * (c.Y - a.Y))) / (((b.X - a.X) * (f1 - c.Y)) - ((f0 - c.X) * (b.Y - a.Y)));
+        var xPoint = ((f0 - c.X) * k2) + c.X;
+        var yPoint = ((f1 - c.Y) * k2) + c.Y;
 
         return new Point3d(xPoint, yPoint, 0);
     }

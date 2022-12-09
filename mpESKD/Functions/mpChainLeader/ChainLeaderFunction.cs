@@ -16,7 +16,8 @@ using ModPlusAPI.Windows;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ChainLeaderFunction: ISmartEntityFunction
+/// <inheritdoc />
+public class ChainLeaderFunction : ISmartEntityFunction
 {
     /// <inheritdoc />
     public void Initialize()

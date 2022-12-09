@@ -20,8 +20,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
-    private readonly List<Hatch> _hatches = new();
-    private readonly List<Polyline> _leaderEndLines = new();
+    private readonly List<Hatch> _hatches = new ();
+    private readonly List<Polyline> _leaderEndLines = new ();
     private double _scale;
     
     private Line _shelfLineFromEndPoint;
@@ -251,7 +251,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точки стрелок
     /// </summary>
     [SaveToXData]
-    public List<double> ArrowPoints { get; set; } = new();
+    public List<double> ArrowPoints { get; set; } = new ();
     
     public double TempNewArrowPoint { get; set; } = double.NaN;
 
@@ -344,10 +344,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
         else if (ArrowPoints.Count > 0)
         {
-            var tempPoints = new List<Point3d>();
-
-            tempPoints.Add(insertionPoint);
-            tempPoints.Add(endPoint);
+            var tempPoints = new List<Point3d>
+            {
+                insertionPoint,
+                endPoint
+            };
 
             foreach (var arrowPoint in ArrowPoints)
             {

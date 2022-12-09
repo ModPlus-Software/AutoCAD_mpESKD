@@ -322,11 +322,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool ChainLeaderContinueNodeNumber
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(ChainLeaderContinueNodeNumber)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(ChainLeaderContinueNodeNumber), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }

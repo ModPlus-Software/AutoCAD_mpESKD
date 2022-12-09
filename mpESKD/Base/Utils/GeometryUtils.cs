@@ -3,7 +3,6 @@
 using System;
 using System.Globalization;
 using Autodesk.AutoCAD.Geometry;
-using ModPlusAPI.Exceptions;
 
 /// <summary>
 /// Утилиты работы с геометрией
