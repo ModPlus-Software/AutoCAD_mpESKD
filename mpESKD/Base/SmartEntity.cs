@@ -1,7 +1,4 @@
 ﻿// ReSharper disable RedundantNameQualifier
-
-using System.Globalization;
-
 namespace mpESKD.Base;
 
 using System;

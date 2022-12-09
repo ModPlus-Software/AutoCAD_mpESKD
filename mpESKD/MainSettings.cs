@@ -329,7 +329,7 @@ public class MainSettings : ObservableObject
     #region ChainLeader
 
     /// <summary>
-    /// Продолжать нумерацию фрагмента при создании нового фрагмента
+    /// Продолжать нумерацию выноски при создании новой выноски
     /// </summary>
     public bool ChainLeaderContinueNodeNumber
     {

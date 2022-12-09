@@ -182,7 +182,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                                 chainLeader.EndPoint, newPoint);
 
-                            chainLeader.IsLeft = AcadUtils.IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+                            chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
 
                             ((BlockReference)entity).Position = pointOnPolyline;
                             chainLeader.InsertionPoint = pointOnPolyline;
@@ -254,9 +254,9 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
     private double SetChainLeaderTempNewArrowPoint(ChainLeader chainLeader, Point3d pointOnPolyline)
     {
-        chainLeader.IsLeft = AcadUtils.IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+        chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
 
-        var isOnSegment = AcadUtils.IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
+        var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
             chainLeader.SecondPoint);
 
         if (!isOnSegment)
@@ -288,5 +288,19 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
         var yPoint = (F1 - c.Y) * k2 + c.Y;
 
         return new Point3d(xPoint, yPoint, 0);
+    }
+
+    private bool IsLeft(Point3d insertionPoint, Point3d endPoint, Point3d pointOnLine)
+    {
+        var v1 = (insertionPoint - endPoint).GetNormal();
+        var v2 = (pointOnLine - endPoint).GetNormal();
+
+        return v1.DotProduct(v2) > 0;
+    }
+
+    private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
+    {
+        var segment = new LineSegment3d(startPt, endPt);
+        return segment.IsOn(point);
     }
 }
