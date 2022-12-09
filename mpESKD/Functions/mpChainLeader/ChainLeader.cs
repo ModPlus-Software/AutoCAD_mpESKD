@@ -34,11 +34,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Line _leaderLine;
 
     /// <summary>
-    /// Полка выноски
-    /// </summary>
-    private Line _shelfLine;
-
-    /// <summary>
     /// Верхний первый текст (номер узла)
     /// </summary>
     private DBText _topFirstDbText;
@@ -115,7 +110,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 _bottomTextMask,
                 _leaderLine,
                 _shelfLineFromEndPoint,
-                _shelfLine,
                 _topFirstDbText,
                 _topSecondDbText,
                 _bottomDbText,
@@ -147,7 +141,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p61", 1.0, 0.0, 10.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p61", 1.0, 1.0, 10.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 
@@ -182,7 +176,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Тип стрелки
     /// </summary> 
-    [EntityProperty(PropertiesCategory.Geometry, 6, "gp7", LeaderEndType.Point)] //TODO
+    [EntityProperty(PropertiesCategory.Geometry, 6, "gp7", LeaderEndType.Point)]
     [SaveToXData]
     public LeaderEndType ArrowType { get; set; } = LeaderEndType.Point;
     
@@ -252,18 +246,33 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     [SaveToXData]
     public List<double> ArrowPoints { get; set; } = new();
-    
+
+    /// <summary>
+    /// Расстояние от Endpoint для отображения при растягивании
+    /// </summary>
     public double TempNewArrowPoint { get; set; } = double.NaN;
 
+    /// <summary>
+    /// Первая точка основной полилинии
+    /// </summary>
     [SaveToXData]
     public Point3d FirstPoint { get; set; }
 
+    /// <summary>
+    /// Вторая точка основной полилинии
+    /// </summary>
     [SaveToXData]
     public Point3d SecondPoint { get; set; } = Point3d.Origin;
 
+    /// <summary>
+    /// Длина полки
+    /// </summary>
     [SaveToXData]
     public double ShelfLength { get; set; }
 
+    /// <summary>
+    /// Свойство определяющая сторону выноски
+    /// </summary>
     public bool IsLeft { get; set; }
 
     /// <inheritdoc />
@@ -333,14 +342,14 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             {
                 FirstPoint = insertionPoint;
                 SecondPoint = tempPoint;
-                CreateArrows(tempPoint);
             }
             else
             {
                 FirstPoint = tempPoint;
                 SecondPoint = endPoint;
-                CreateArrows(tempPoint);
             }
+
+            CreateArrows(tempPoint, MainNormal, ArrowSize, _scale);
         }
         else if (ArrowPoints.Count > 0)
         {
@@ -354,7 +363,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 tempPoints.Add(endPoint + (MainNormal * arrowPoint));
             }
 
-            var furthestPoints = GetFurthestPoints(tempPoints);
+            var furthestPoints = tempPoints.GetFurthestPoints();
 
             FirstPoint = furthestPoints.Item1;
             SecondPoint = furthestPoints.Item2;
@@ -368,13 +377,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         _leaderLine = new Line(FirstPoint, SecondPoint);
         
-        CreateArrows(insertionPoint);
+        CreateArrows(insertionPoint, MainNormal, ArrowSize, _scale);
 
         foreach (var arrowPoint in ArrowPoints)
         {
             var tempPoint1 = endPoint + (MainNormal * arrowPoint);
 
-            CreateArrows(tempPoint1);
+            CreateArrows(tempPoint1, MainNormal, ArrowSize, _scale);
         }
 
         // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
@@ -533,176 +542,42 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     #region Arrows
 
-    private void CreateArrows(Point3d point3d)
+    private void CreateArrows(Point3d point3d, Vector3d mainNormal, double arrowSize, double scale)
     {
         var pline = new Polyline();
+        ArrowTypes arrowTypes = new ArrowTypes(mainNormal, arrowSize, scale);
         switch (ArrowType)
         {
             case LeaderEndType.None:
                 break;
             case LeaderEndType.HalfArrow:
-                _hatches.Add(CreateArrowHatch(CreateHalfArrow(point3d)));
+                _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateHalfArrow(point3d)));
                 break;
             case LeaderEndType.Point:
-                _hatches.Add(CreatePointHatch(CreatePointArrow(point3d)));
+                _hatches.Add(arrowTypes.CreatePointHatch(arrowTypes.CreatePointArrow(point3d)));
                 break;
             case LeaderEndType.Section:
-                pline = CreateResectionArrow(point3d, 0);
+                pline = arrowTypes.CreateResectionArrow(point3d, 0);
                 break;
             case LeaderEndType.Resection:
-                pline = CreateResectionArrow(point3d, 0.3);
+                pline = arrowTypes.CreateResectionArrow(point3d, 0.3);
                 break;
             case LeaderEndType.Angle:
-                pline = CreateAngleArrow(point3d, 45, false);
+                pline = arrowTypes.CreateAngleArrow(point3d, 45, false);
                 break;
             case LeaderEndType.Arrow:
-                _hatches.Add(CreateArrowHatch(CreateAngleArrow(point3d, 10, true)));
+                _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateAngleArrow(point3d, 10, true)));
                 break;
             case LeaderEndType.OpenArrow:
-                pline = CreateAngleArrow(point3d, 10, false);
+                pline = arrowTypes.CreateAngleArrow(point3d, 10, false);
                 break;
             case LeaderEndType.ClosedArrow:
-                pline = CreateAngleArrow(point3d, 10, true);
+                pline = arrowTypes.CreateAngleArrow(point3d, 10, true);
                 break;
         }
 
         _leaderEndLines.Add(pline);
     }
 
-    private Polyline CreateResectionArrow(Point3d arrowPoint, double plineWidth)
-    {
-        var vector = new Vector3d(0, 0, 1);
-
-        var tmpPoint = arrowPoint - (MainNormal * ArrowSize / 2 * _scale);
-        var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, arrowPoint);
-        var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, arrowPoint);
-
-        var pline = new Polyline(2);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, plineWidth, plineWidth);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, plineWidth, plineWidth);
-
-        return pline;
-    }
-
-    private Polyline CreateAngleArrow(Point3d arrowPoint, int angle, bool closed)
-    {
-        var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
-        var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, arrowPoint);
-        var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, arrowPoint);
-
-        var pline = new Polyline(3);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowPoint), 0, 0, 0);
-        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
-
-        pline.Closed = closed;
-
-        return pline;
-    }
-
-    private Polyline CreateHalfArrow(Point3d arrowPoint)
-    {
-        var vector = new Vector3d(0, 0, 1);
-        var arrowEndPoint = arrowPoint + (MainNormal * ArrowSize * _scale);
-        var endPoint = arrowEndPoint.RotateBy(10.DegreeToRadian(), vector, arrowPoint);
-
-        var pline = new Polyline(3);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowPoint), 0, 0, 0);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(arrowEndPoint), 0, 0, 0);
-        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
-        pline.Closed = true;
-
-        return pline;
-    }
-
-    private Hatch CreateArrowHatch(Polyline pline)
-    {
-        var vertexCollection = new Point2dCollection();
-        for (var index = 0; index < pline.NumberOfVertices; ++index)
-        {
-            vertexCollection.Add(pline.GetPoint2dAt(index));
-        }
-
-        vertexCollection.Add(pline.GetPoint2dAt(0));
-        var bulgeCollection = new DoubleCollection()
-        {
-            0.0, 0.0, 0.0
-        };
-
-        return CreateHatch(vertexCollection, bulgeCollection);
-    }
-
-    private Polyline CreatePointArrow(Point3d arrowPoint)
-    {
-        var startPoint = arrowPoint - (ArrowSize / 4 * MainNormal * _scale);
-        var endPoint = arrowPoint + (ArrowSize / 4 * MainNormal * _scale);
-
-        var pline = new Polyline(2);
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 1, 0, 0);
-        pline.Closed = true;
-
-        return pline;
-    }
-
-    private Hatch CreatePointHatch(Polyline pline)
-    {
-        var vertexCollection = new Point2dCollection();
-        for (var index = 0; index < pline.NumberOfVertices; ++index)
-        {
-            vertexCollection.Add(pline.GetPoint2dAt(index));
-        }
-
-        vertexCollection.Add(pline.GetPoint2dAt(0));
-        var bulgeCollection = new DoubleCollection()
-        {
-            1.0, 1.0
-        };
-
-        return CreateHatch(vertexCollection, bulgeCollection);
-    }
-
-    private Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
-    {
-        var hatch = new Hatch();
-        hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
-        hatch.AppendLoop(HatchLoopTypes.Default, vertexCollection, bulgeCollection);
-
-        return hatch;
-    }
-
     #endregion
-
-    /// <summary>
-    /// Возвращает пару наиболее удаленных друг от друга точек
-    /// </summary>
-    /// <param name="points">Коллекция точек</param>
-    /// <returns></returns>
-    public static Tuple<Point3d, Point3d> GetFurthestPoints(IList<Point3d> points)
-    {
-        Tuple<Point3d, Point3d> result = default;
-        var dist = double.NaN;
-        for (int i = 0; i < points.Count; i++)
-        {
-            var pt1 = points[i];
-            for (int j = 0; j < points.Count; j++)
-            {
-                if (i == j)
-                    continue;
-                var pt2 = points[j];
-                var d = pt1.DistanceTo(pt2);
-                if (double.IsNaN(dist) || d > dist)
-                {
-                    result = new Tuple<Point3d, Point3d>(pt1, pt2);
-                    dist = d;
-                }
-            }
-        }
-
-        return result;
-    }
 }

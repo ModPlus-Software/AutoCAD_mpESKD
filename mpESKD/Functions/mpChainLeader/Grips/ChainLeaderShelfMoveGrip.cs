@@ -8,11 +8,11 @@ using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
+/// <summary>
+/// Ручка изменения длины полки
+/// </summary>
 public class ChainLeaderShelfMoveGrip : SmartEntityGripData
 {
-    // Временное значение ручки
-    private double _gripTmp;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderShelfMoveGrip"/> class.
     /// </summary>
@@ -51,17 +51,17 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
     {
         try
         {
-            if (newStatus == Status.GripStart | newStatus == Status.Stretch)
-            {
-                ChainLeader.TextIndent += NewPoint;
-                ChainLeader.UpdateEntities();
-            }
-
             if (newStatus == Status.GripEnd)
             {
                 using (ChainLeader)
                 {
-                    ChainLeader.TextIndent = _gripTmp + NewPoint;
+                    if (NewPoint < 1)
+                    {
+                        NewPoint = 1;
+                    }
+
+                    ChainLeader.TextIndent = NewPoint;
+                    
                     ChainLeader.UpdateEntities();
                     ChainLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -75,15 +75,6 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
 
                         tr.Commit();
                     }
-                }
-            }
-
-            // При отмене перемещения возвращаем временные значения
-            if (newStatus == Status.GripAbort)
-            {
-                if (_gripTmp != null)
-                {
-                    ChainLeader.ShelfLedge = _gripTmp;
                 }
             }
 

@@ -18,6 +18,9 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     // Временное значение ручки
     private Point3d _gripTmp;
 
+    // Экземпляр анонимного блока
+    private readonly BlockReference _entity;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
     /// </summary>
@@ -28,10 +31,8 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
         ChainLeader = chainLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
-        Entity = entity;
+        _entity = entity;
     }
-
-    public BlockReference Entity { get; }
 
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
@@ -72,21 +73,16 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 using (ChainLeader)
                 {
-                    var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
-
-                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();       
+                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
                     var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
 
-                    if (ChainLeader.IsLeft)
-                    {
-                        distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+                    var distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
 
-                        if (result < distFromEndPointToInsPoint)
-                        {
-                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
-                            ChainLeader.ArrowPoints.Remove(result);
-                            ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
-                        }
+                    if (result < distFromEndPointToInsPoint)
+                    {
+                        tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
+                        ChainLeader.ArrowPoints.Remove(result);
+                        ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
                     }
 
                     ChainLeader.InsertionPoint = tempInsPoint;
@@ -97,7 +93,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
-                    Entity.Position = tempInsPoint;
+                    _entity.Position = tempInsPoint;
                     using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;

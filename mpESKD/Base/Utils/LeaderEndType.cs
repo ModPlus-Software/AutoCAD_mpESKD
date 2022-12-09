@@ -1,4 +1,4 @@
-﻿namespace mpESKD.Functions.mpLevelPlanMark;
+﻿namespace mpESKD.Base.Utils;
 
 /// <summary>
 /// Тип концов выносок
@@ -21,32 +21,32 @@ public enum LeaderEndType
     Point = 2,
 
     /// <summary>
-    /// Засечка
-    /// </summary>
-    Section = 3, 
-
-    /// <summary>
     /// Двойная засечка
     /// </summary>
-    Resection = 4, 
+    Resection = 3,
 
     /// <summary>
     /// Прямой угол
     /// </summary>
-    Angle = 5,
+    Angle = 4,
 
     /// <summary>
     /// Закрашенная
     /// </summary>
-    Arrow = 6,
+    Arrow = 5,
 
     /// <summary>
     /// Разомкнутая
     /// </summary>
-    OpenArrow = 7,
+    OpenArrow = 6,
 
     /// <summary>
     /// Замкнутая
     /// </summary>
-    ClosedArrow = 8
+    ClosedArrow = 7,
+
+    /// <summary>
+    /// Засечка
+    /// </summary>
+    Section = 8
 }

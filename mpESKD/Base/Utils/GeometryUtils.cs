@@ -1,9 +1,9 @@
 ﻿namespace mpESKD.Base.Utils;
 
-using System;
-using System.Globalization;
 using Autodesk.AutoCAD.Geometry;
-using ModPlusAPI.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 /// <summary>
 /// Утилиты работы с геометрией
@@ -97,5 +97,34 @@ public static class GeometryUtils
     public static Point3d ToPoint3d(this Point2d point2d)
     {
         return new Point3d(point2d.X, point2d.Y, 0.0);
+    }
+
+    /// <summary>
+    /// Возвращает пару наиболее удаленных друг от друга точек
+    /// </summary>
+    /// <param name="points">Коллекция точек</param>
+    /// <returns></returns>
+    public static Tuple<Point3d, Point3d> GetFurthestPoints(this IList<Point3d> points)
+    {
+        Tuple<Point3d, Point3d> result = default;
+        var dist = double.NaN;
+        for (int i = 0; i < points.Count; i++)
+        {
+            var pt1 = points[i];
+            for (int j = 0; j < points.Count; j++)
+            {
+                if (i == j)
+                    continue;
+                var pt2 = points[j];
+                var d = pt1.DistanceTo(pt2);
+                if (double.IsNaN(dist) || d > dist)
+                {
+                    result = new Tuple<Point3d, Point3d>(pt1, pt2);
+                    dist = d;
+                }
+            }
+        }
+
+        return result;
     }
 }

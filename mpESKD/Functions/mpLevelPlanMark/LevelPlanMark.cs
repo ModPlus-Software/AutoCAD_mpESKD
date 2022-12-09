@@ -298,42 +298,48 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             var points2ds = from point in points
                             select point.ToPoint2d();
-            _leaderLines.Add(CreateLeaders(LeaderPointsOCS[i], points2ds));
+            var curLeader = CreateLeaders(LeaderPointsOCS[i], points2ds);
+            _leaderLines.Add(curLeader);
             var pline = new Polyline();
+            var mainNormal = (curLeader.StartPoint - curLeader.EndPoint).GetNormal();
+            ArrowTypes arrowTypes = new ArrowTypes(mainNormal, ArrowSize, _scale);
 
             if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
             {
                 if (LeaderTypes.Count <= 0)
                 {
-                    pline = CreateResectionArrow(_leaderLines[i]);
+                    pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0);
                 }
                 else
                 {
                     switch ((LeaderEndType)LeaderTypes[i])
                     {
                         case LeaderEndType.None:
-                            break;
+                        break;
                         case LeaderEndType.HalfArrow:
-                            _hatches.Add(CreateArrowHatch(CreateHalfArrow(_leaderLines[i])));
-                            break;
+                        _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateHalfArrow(_leaderLines[i].EndPoint)));
+                        break;
                         case LeaderEndType.Point:
-                            _hatches.Add(CreatePointHatch(CreatePointArrow(_leaderLines[i])));
-                            break;
+                        _hatches.Add(arrowTypes.CreatePointHatch(arrowTypes.CreatePointArrow(_leaderLines[i].EndPoint)));
+                        break;
+                        case LeaderEndType.Section:
+                        pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0);
+                        break;
                         case LeaderEndType.Resection:
-                            pline = CreateResectionArrow(_leaderLines[i]);
-                            break;
+                        pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0.3);
+                        break;
                         case LeaderEndType.Angle:
-                            pline = CreateAngleArrow(_leaderLines[i], 45, false);
-                            break;
+                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 45, false);
+                        break;
                         case LeaderEndType.Arrow:
-                            _hatches.Add(CreateArrowHatch(CreateAngleArrow(_leaderLines[i], 10, true)));
-                            break;
+                        _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, true)));
+                        break;
                         case LeaderEndType.OpenArrow:
-                            pline = CreateAngleArrow(_leaderLines[i], 10, false);
-                            break;
+                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, false);
+                        break;
                         case LeaderEndType.ClosedArrow:
-                            pline = CreateAngleArrow(_leaderLines[i], 10, true);
-                            break;
+                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, true);
+                        break;
                     }
                 }
             }
@@ -355,112 +361,4 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
     }
-
-    #region Arrows
-    private Polyline CreateResectionArrow(Line leaderLine)
-    {
-        var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
-        var startPoint = tmpPoint.RotateBy(45.DegreeToRadian(), vector, leaderLine.EndPoint);
-        var endPoint = tmpPoint.RotateBy(225.DegreeToRadian(), vector, leaderLine.EndPoint);
-
-        var pline = new Polyline(2);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0.3, 0.3);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0.3, 0.3);
-
-        return pline;
-    }
-
-    private Polyline CreateAngleArrow(Line leaderLine, int angle, bool closed)
-    {
-        var vector = new Vector3d(0, 0, 1);
-        var tmpPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize * _scale));
-        var startPoint = tmpPoint.RotateBy(angle.DegreeToRadian(), vector, leaderLine.EndPoint);
-        var endPoint = tmpPoint.RotateBy((-1) * angle.DegreeToRadian(), vector, leaderLine.EndPoint);
-
-        var pline = new Polyline(3);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(leaderLine.EndPoint), 0, 0, 0);
-        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
-
-        pline.Closed = closed;
-
-        return pline;
-    }
-
-    private Polyline CreateHalfArrow(Line leaderLine)
-    {
-        var vector = new Vector3d(0, 0, 1);
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize * _scale));
-        var endPoint = startPoint.RotateBy(10.DegreeToRadian(), vector, leaderLine.EndPoint);
-
-        var pline = new Polyline(3);
-
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 0, 0, 0);
-        pline.AddVertexAt(1, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(leaderLine.EndPoint), 0, 0, 0);
-        pline.AddVertexAt(2, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(endPoint), 0, 0, 0);
-        pline.Closed = true;
-
-        return pline;
-    }
-
-    private Hatch CreateArrowHatch(Polyline pline)
-    {
-        var vertexCollection = new Point2dCollection();
-        for (var index = 0; index < pline.NumberOfVertices; ++index)
-        {
-            vertexCollection.Add(pline.GetPoint2dAt(index));
-        }
-
-        vertexCollection.Add(pline.GetPoint2dAt(0));
-        var bulgeCollection = new DoubleCollection()
-        {
-            0.0, 0.0, 0.0
-        };
-
-        return CreateHatch(vertexCollection, bulgeCollection);
-    }
-
-    private Polyline CreatePointArrow(Line leaderLine)
-    {
-        var startPoint = leaderLine.GetPointAtDist(leaderLine.Length - (ArrowSize / 2 * _scale));
-        var endPoint = ModPlus.Helpers.GeometryHelpers.GetPointToExtendLine(leaderLine.StartPoint, leaderLine.EndPoint, leaderLine.Length + (ArrowSize / 2 * _scale));
-
-        var pline = new Polyline(2);
-        pline.AddVertexAt(0, ModPlus.Helpers.GeometryHelpers.ConvertPoint3dToPoint2d(startPoint), 1, 0, 0);
-        pline.AddVertexAt(1, endPoint, 1, 0, 0);
-        pline.Closed = true;
-
-        return pline;
-    }
-
-    private Hatch CreatePointHatch(Polyline pline)
-    {
-        var vertexCollection = new Point2dCollection();
-        for (var index = 0; index < pline.NumberOfVertices; ++index)
-        {
-            vertexCollection.Add(pline.GetPoint2dAt(index));
-        }
-
-        vertexCollection.Add(pline.GetPoint2dAt(0));
-        var bulgeCollection = new DoubleCollection()
-        {
-            1.0, 1.0
-        };
-
-        return CreateHatch(vertexCollection, bulgeCollection);
-    }
-
-    private Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
-    {
-        var hatch = new Hatch();
-        hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
-        hatch.AppendLoop(HatchLoopTypes.Default, vertexCollection, bulgeCollection);
-
-        return hatch;
-    }
-
-    #endregion
 }

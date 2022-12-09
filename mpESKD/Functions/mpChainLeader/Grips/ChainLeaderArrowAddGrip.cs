@@ -13,19 +13,20 @@ using System.Linq;
 /// </summary>
 public class ChainLeaderArrowAddGrip : SmartEntityGripData
 {
+    private readonly BlockReference _entity;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderArrowAddGrip"/> class.
     /// </summary>
     /// <param name="chainLeader">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="entity">Экземпляр анонимного блока/></param>
     public ChainLeaderArrowAddGrip(ChainLeader chainLeader, BlockReference entity)
     {
         ChainLeader = chainLeader;
         GripType = GripType.Plus;
         RubberBandLineDisabled = true;
-        Entity = entity;
+        _entity = entity;
     }
-
-    public BlockReference Entity { get; }
 
     /// <summary>
     /// Экземпляр <see cref="mpChainLeader.ChainLeader"/>
@@ -109,7 +110,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(ChainLeader.BlockId, OpenMode.ForWrite, true, true);
-                    Entity.Position = tempInsPoint;
+                    _entity.Position = tempInsPoint;
                     using (var resBuf = ChainLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
