@@ -18,7 +18,6 @@ using System.Linq;
 
 public class ChainLeaderFunction: ISmartEntityFunction
 {
-    
     /// <inheritdoc />
     public void Initialize()
     {
@@ -102,7 +101,7 @@ public class ChainLeaderFunction: ISmartEntityFunction
         // <msg1>Укажите точку вставки:</msg1>
         var insertionPointPrompt = Language.GetItem("msg1");
 
-        // <msg17>Укажите точку выноски:</msg17> // <-- TODO другой текст. Про вторую точку
+        // <msg17>Укажите точку выноски:</msg17> 
         var leaderPointPrompt = Language.GetItem("msg18");
 
         var entityJig = new DefaultEntityJig(chainLeader, blockReference, new Point3d(0, 0, 0))

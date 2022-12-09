@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
@@ -12,13 +11,13 @@ using System.Linq;
 /// <summary>
 /// Ручка выбора типа рамки, меняющая тип рамки
 /// </summary>
-public class ChainLeaderAddArrowGrip : SmartEntityGripData
+public class ChainLeaderArrowAddGrip : SmartEntityGripData
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChainLeaderAddArrowGrip"/> class.
+    /// Initializes a new instance of the <see cref="ChainLeaderArrowAddGrip"/> class.
     /// </summary>
     /// <param name="chainLeader">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public ChainLeaderAddArrowGrip(ChainLeader chainLeader, BlockReference entity)
+    public ChainLeaderArrowAddGrip(ChainLeader chainLeader, BlockReference entity)
     {
         ChainLeader = chainLeader;
         GripType = GripType.Plus;
@@ -50,7 +49,6 @@ public class ChainLeaderAddArrowGrip : SmartEntityGripData
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 if (!ChainLeader.ArrowPoints.Contains(ChainLeader.TempNewArrowPoint))
                 {
-                    //var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     if (ChainLeader.IsLeft)
                     {

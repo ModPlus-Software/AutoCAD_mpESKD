@@ -30,7 +30,6 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
     /// </summary>
     public double NewPoint { get; set; }
 
-
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>

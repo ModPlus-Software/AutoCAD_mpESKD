@@ -260,6 +260,9 @@
 		<Page Update="Functions\mpChainLeader\ChainLeaderDoubleClickEditControl.xaml">
 		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>
+		<Page Update="Functions\mpChainLeader\ChainLeader.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
 		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
 		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>

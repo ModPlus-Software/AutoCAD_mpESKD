@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// <summary>
 /// Цепная выноска
 /// </summary>
-[SmartEntityDisplayNameKey("h171")] // TODO Цепная выноска 
-[SystemStyleDescriptionKey("h172")] // TODO Базовый стиль для обозначения цепной выноски
+[SmartEntityDisplayNameKey("h175")] // Цепная выноска 
+[SystemStyleDescriptionKey("h176")] // Базовый стиль для обозначения цепной выноски
 public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
@@ -139,35 +139,57 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
 
+    /// <summary>
+    /// Основной единичный вектор
+    /// </summary>
     public Vector3d MainNormal { get; set; }
 
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 10.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p61", 1.0, 0.0, 10.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 
     /// <summary>
     /// Вертикальный отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 6, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
     [SaveToXData]
     public double TextVerticalOffset { get; set; } = 1.0;
 
     /// <summary>
     /// Выступ полки 
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 7, "p63", 10, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p63", 10, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
     public double ShelfLedge { get; set; }
 
     /// <summary>
     /// Положение полки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 8, "p78", ShelfPosition.Right)]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p78", ShelfPosition.Right)]
     [SaveToXData]
     public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
+
+    /// <summary>
+    /// Размер стрелок
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p29", 5, 0.1, 10, nameSymbol: "d")]
+    [SaveToXData]
+    public double ArrowSize { get; set; } = 3;
+
+    /// <summary>
+    /// Тип стрелки
+    /// </summary> 
+    [EntityProperty(PropertiesCategory.Geometry, 6, "gp7", LeaderEndType.Point)] //TODO
+    [SaveToXData]
+    public LeaderEndType ArrowType { get; set; } = LeaderEndType.Point;
+    
+    /// <inheritdoc />
+    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
+    [SaveToXData]
+    public override string TextStyle { get; set; } = "Standard";
 
     /// <summary>
     /// Высота текста
@@ -226,30 +248,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public string NodeAddress { get; set; } = string.Empty;
 
     /// <summary>
-    /// Размер стрелок
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p29", 5, 0.1, 10, nameSymbol: "d")]
-    [SaveToXData]
-    public double ArrowSize { get; set; } = 3;
-
-    /// <inheritdoc />
-    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
-    [SaveToXData]
-    public override string TextStyle { get; set; } = "Standard";
-
-    /// <summary>
-    /// Выноска
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 9, "p104", true, descLocalKey: "d104")]
-    [SaveToXData]
-    public bool Leader { get; set; } = true;
-
-    /// <summary>
     /// Точки стрелок
     /// </summary>
     [SaveToXData]
     public List<double> ArrowPoints { get; set; } = new();
-
+    
     public double TempNewArrowPoint { get; set; } = double.NaN;
 
     [SaveToXData]
@@ -262,13 +265,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public double ShelfLength { get; set; }
 
     public bool IsLeft { get; set; }
-
-    /// <summary>
-    /// Тип стрелки
-    /// </summary> insertionPoint
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", LeaderEndType.Point)] //TODO
-    [SaveToXData]
-    public LeaderEndType ArrowType { get; set; } = LeaderEndType.Point;
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -401,7 +397,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _topFirstDbText = new DBText { TextString = NodeNumber };
             _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
-            _topFirstDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            _topFirstDbText.SetPosition(
+                TextHorizontalMode.TextCenter, 
+                TextVerticalMode.TextVerticalMid, 
+                AttachmentPoint.MiddleCenter);
             topFirstTextLength = _topFirstDbText.GetLength();
         }
         else
@@ -425,7 +424,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             _bottomDbText = new DBText { TextString = NodeAddress };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
-            _bottomDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            _bottomDbText.SetPosition(
+                TextHorizontalMode.TextCenter, 
+                TextVerticalMode.TextVerticalMid, 
+                AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();
         }

@@ -27,6 +27,7 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
     }
 
     public BlockReference Entity { get; }
+
     /// <summary>
     /// Экземпляр класса <see cref="mpChainLeader.ChainLeader"/>
     /// </summary>
@@ -47,11 +48,11 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
     {
         using (ChainLeader)
         {
-            var tempInsPoint = new Point3d();
-            double result;
+            var tempInsPoint = ChainLeader.InsertionPoint;
+            
             if (GripIndex == 4)
             {
-                result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
 
                 if (result > 0)
                 {
@@ -64,7 +65,6 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
             else if (ChainLeader.ArrowPoints.Count != 0)
             {
                 ChainLeader.ArrowPoints.RemoveAt(GripIndex);
-                tempInsPoint = ChainLeader.InsertionPoint;
             }
 
             ChainLeader.InsertionPoint = tempInsPoint;

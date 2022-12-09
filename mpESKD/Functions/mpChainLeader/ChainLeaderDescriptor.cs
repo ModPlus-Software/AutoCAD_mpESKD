@@ -15,16 +15,15 @@ public class ChainLeaderDescriptor : ISmartEntityDescriptor
     public string Name => "mpChainLeader";
 
     /// <inheritdoc />
-    /// Обозначение цепной выноски
-    public string LName => Language.GetItem("h145"); //TODO Обозначение цепной выноски
+    /// Цепная выноска
+    public string LName => Language.GetItem("h175");
 
     /// <inheritdoc />
-    /// Создание цепной выноски
-    public string Description => Language.GetItem("h147"); // TODO Создание цепной выноски
-
+    /// Создание цепной выноске по ГОСТ 2.307
+    public string Description => Language.GetItem("h177");
     /// <inheritdoc />
-    // Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску
-    public string FullDescription => Language.GetItem("h148"); // TODO Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску
+    /// Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску по ГОСТ 2.307
+    public string FullDescription => Language.GetItem("h178");
 
     /// <inheritdoc />
     public string ToolTipHelpImage => string.Empty;

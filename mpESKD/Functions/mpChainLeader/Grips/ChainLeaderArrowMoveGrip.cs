@@ -1,7 +1,6 @@
 ﻿namespace mpESKD.Functions.mpChainLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
@@ -29,15 +28,11 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
     }
 
     public BlockReference Entity { get; }
+
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
     public ChainLeader ChainLeader { get; }
-
-    /// <summary>
-    /// Новое значение точки вершины
-    /// </summary>
-    public double NewPoint { get; set; }
 
     /// <summary>
     /// Индекс ручки
@@ -59,9 +54,8 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
             {
                 var tempInsPoint = ChainLeader.InsertionPoint;
 
-                if (!ChainLeader.ArrowPoints.Contains(NewPoint))
+                if (!ChainLeader.ArrowPoints.Contains(ChainLeader.TempNewArrowPoint))
                 {
-                    
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     if (ChainLeader.IsLeft)
                     {
@@ -73,7 +67,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
                     
-                    if (NewPoint > 0)
+                    if (ChainLeader.TempNewArrowPoint > 0)
                     {
                         // если в списке есть значения и они положительные, то берем последнюю
                         if (result > 0)
@@ -81,33 +75,33 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                             result = tempList.OrderBy(x => x).LastOrDefault();
 
                             // если последняя больше чем текущая
-                            if (result > NewPoint)
+                            if (result > ChainLeader.TempNewArrowPoint)
                             {
                                 // текущую добавляем в список, inspoint не меняем
-                                ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                                ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             }
                             else
                             { 
                                 // если текущая больше чем последняя она должна быть insPoint
-                                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * NewPoint);
+                                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
                                 ChainLeader.ArrowPoints[GripIndex] = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                             }
                         }
                         else
                         {
-                            ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                            ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                         }
                     }
                     else 
                     {
                         // ищем первую
-                        tempInsPoint = ChainLeader.EndPoint + ChainLeader.MainNormal * NewPoint;
+                        tempInsPoint = ChainLeader.EndPoint + ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint;
 
                         //если первая положительная, значит слева нет точек
                        
-                        if (NewPoint > distFromEndPointToInsPoint)
+                        if (ChainLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
                         {
-                            ChainLeader.ArrowPoints[GripIndex] = NewPoint;
+                            ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             tempInsPoint = ChainLeader.InsertionPoint;
                         }
                         else
