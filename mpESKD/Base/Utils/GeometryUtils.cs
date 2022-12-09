@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using ModPlusAPI.Exceptions;
 
 /// <summary>
 /// Утилиты работы с геометрией

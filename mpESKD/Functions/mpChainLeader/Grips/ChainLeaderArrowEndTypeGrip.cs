@@ -62,7 +62,7 @@ public class ChainLeaderArrowEndTypeGrip : SmartEntityGripData
                 {
                     var arrowIndex = ChainLeader.ArrowType.ToString();
                     var checkedNumber = (int)Enum.Parse(typeof(LeaderEndType), leaderType.ToString());
-                    var isItemChecked = (Enum.Parse(typeof(LeaderEndType) , leaderType.ToString())).ToString();
+                    var isItemChecked = Enum.Parse(typeof(LeaderEndType), leaderType.ToString()).ToString();
                     var headerOfItem = "let" + checkedNumber;
                     var menuItem = new MenuItem
                     {

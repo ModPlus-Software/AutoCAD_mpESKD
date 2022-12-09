@@ -21,6 +21,7 @@ public class ChainLeaderDescriptor : ISmartEntityDescriptor
     /// <inheritdoc />
     /// Создание цепной выноске по ГОСТ 2.307
     public string Description => Language.GetItem("h177");
+    
     /// <inheritdoc />
     /// Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску по ГОСТ 2.307
     public string FullDescription => Language.GetItem("h178");

@@ -1,6 +1,5 @@
 ﻿namespace mpESKD;
 
-using System;
 using Base.Enums;
 using ModPlusAPI;
 using ModPlusAPI.Mvvm;
@@ -10,8 +9,13 @@ using ModPlusAPI.Mvvm;
 /// </summary>
 public class MainSettings : ObservableObject
 {
-    private const string PName = "mpESKD";
+    private readonly UserConfigFileUtils _userConfigFileUtils;
     private static MainSettings _instance;
+
+    private MainSettings()
+    {
+        _userConfigFileUtils = new UserConfigFileUtils(ModPlusConnector.Instance);
+    }
 
     /// <summary>
     /// Singleton
@@ -25,10 +29,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool AutoLoad
     {
-        get => !bool.TryParse(UserConfigFile.GetValue(PName, nameof(AutoLoad)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(AutoLoad), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -38,10 +42,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool AddToMpPalette
     {
-        get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(AddToMpPalette)), out var b) && b; // false
+        get => _userConfigFileUtils.GetValue(false);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(AddToMpPalette), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -51,10 +55,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool UseScaleFromStyle
     {
-        get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(UseScaleFromStyle)), out var b) && b; // false
+        get => _userConfigFileUtils.GetValue(false);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(UseScaleFromStyle), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -64,10 +68,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool UseLayerFromStyle
     {
-        get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(UseLayerFromStyle)), out var b) && b; // false
+        get => _userConfigFileUtils.GetValue(false);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(UseLayerFromStyle), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -77,11 +81,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public int IfNoLayer
     {
-        get => int.TryParse(UserConfigFile.GetValue(PName, nameof(IfNoLayer)), out var i) ? i
-            : 0;
+        get => _userConfigFileUtils.GetValue(0);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(IfNoLayer), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -91,10 +94,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool UseTextStyleFromStyle
     {
-        get => bool.TryParse(UserConfigFile.GetValue(PName, nameof(UseTextStyleFromStyle)), out var b) && b; // false
+        get => _userConfigFileUtils.GetValue(false);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(UseTextStyleFromStyle), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -104,10 +107,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public int IfNoTextStyle
     {
-        get => int.TryParse(UserConfigFile.GetValue(PName, nameof(IfNoTextStyle)), out var i) ? i : 0;
+        get => _userConfigFileUtils.GetValue(0);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(IfNoTextStyle), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -117,10 +120,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public int MaxSelectedObjects
     {
-        get => int.TryParse(UserConfigFile.GetValue(PName, nameof(MaxSelectedObjects)), out var i) ? i : 100;
+        get => _userConfigFileUtils.GetValue(100);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(MaxSelectedObjects), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -130,12 +133,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public LayerActionOnCreateAnalog LayerActionOnCreateAnalog
     {
-        get => Enum.TryParse(
-            UserConfigFile.GetValue(PName, nameof(LayerActionOnCreateAnalog)),
-            out LayerActionOnCreateAnalog e) ? e : LayerActionOnCreateAnalog.Ask;
+        get => _userConfigFileUtils.GetValue(LayerActionOnCreateAnalog.Ask);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(LayerActionOnCreateAnalog), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -146,12 +147,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public GlobalNumberSeparator GlobalNumberSeparator
     {
-        get => Enum.TryParse(
-            UserConfigFile.GetValue(PName, nameof(GlobalNumberSeparator)),
-            out GlobalNumberSeparator s) ? s : GlobalNumberSeparator.FromStyle;
+        get => _userConfigFileUtils.GetValue(GlobalNumberSeparator.FromStyle);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(GlobalNumberSeparator), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -165,11 +164,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool AxisLineTypeScaleProportionScale
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(AxisLineTypeScaleProportionScale)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(AxisLineTypeScaleProportionScale), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -179,11 +177,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool AxisSaveLastTextAndContinueNew
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(AxisSaveLastTextAndContinueNew)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(AxisSaveLastTextAndContinueNew), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -197,11 +194,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool SectionSaveLastTextAndContinueNew
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(SectionSaveLastTextAndContinueNew)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(SectionSaveLastTextAndContinueNew), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -211,11 +207,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool SectionShowHelpLineOnSelection
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(SectionShowHelpLineOnSelection)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(SectionShowHelpLineOnSelection), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -225,11 +220,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool SectionDependentTextMovement
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(SectionDependentTextMovement)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(SectionDependentTextMovement), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -243,11 +237,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool ViewLabelSaveLastTextAndContinueNew
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(ViewLabelSaveLastTextAndContinueNew)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(ViewLabelSaveLastTextAndContinueNew), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -261,11 +254,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool LevelMarkShowHelpLinesOnSelection
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(LevelMarkShowHelpLinesOnSelection)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(LevelMarkShowHelpLinesOnSelection), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -279,11 +271,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool NodalLeaderContinueNodeNumber
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(NodalLeaderContinueNodeNumber)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(NodalLeaderContinueNodeNumber), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -297,11 +288,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool SecantNodalLeaderContinueNodeNumber
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(SecantNodalLeaderContinueNodeNumber)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(SecantNodalLeaderContinueNodeNumber), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -315,11 +305,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool FragmentMarkerContinueNodeNumber
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(FragmentMarkerContinueNodeNumber)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(FragmentMarkerContinueNodeNumber), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
@@ -333,11 +322,10 @@ public class MainSettings : ObservableObject
     /// </summary>
     public bool ChainLeaderContinueNodeNumber
     {
-        get => !bool.TryParse(
-            UserConfigFile.GetValue(PName, nameof(ChainLeaderContinueNodeNumber)), out var b) || b; // true
+        get => _userConfigFileUtils.GetValue(true);
         set
         {
-            UserConfigFile.SetValue(PName, nameof(ChainLeaderContinueNodeNumber), value.ToString(), true);
+            _userConfigFileUtils.SetValue(value);
             OnPropertyChanged();
         }
     }
