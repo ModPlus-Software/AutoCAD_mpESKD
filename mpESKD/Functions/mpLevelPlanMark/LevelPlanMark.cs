@@ -26,9 +26,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     #endregion
 
-    private readonly List<Line> _leaderLines = new();
-    private readonly List<Polyline> _leaderEndLines = new();
-    private readonly List<Hatch> _hatches = new();
+    private readonly List<Line> _leaderLines = new ();
+    private readonly List<Polyline> _leaderEndLines = new ();
+    private readonly List<Hatch> _hatches = new ();
     private Polyline _framePolyline;
     private double _scale;
 
@@ -193,13 +193,13 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// Точки выносок
     /// </summary>
     [SaveToXData]
-    public List<Point3d> LeaderPoints { get; set; } = new();
+    public List<Point3d> LeaderPoints { get; set; } = new ();
 
     /// <summary>
     /// Типы выносок
     /// </summary>
     [SaveToXData]
-    public List<int> LeaderTypes { get; set; } = new();
+    public List<int> LeaderTypes { get; set; } = new ();
 
     private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
 
