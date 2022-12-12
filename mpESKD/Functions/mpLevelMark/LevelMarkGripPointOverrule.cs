@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpLevelMark;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Functions.mpLevelMark;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -104,6 +106,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                                     levelMark.ObjectPoint.Z);
                                 levelMark.EndPoint =
                                     levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale);
+                                
                             }
                         }
                         else if (levelMarkGrip.GripName == GripName.ArrowPoint)
@@ -114,7 +117,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         {
                             levelMark.ShelfPoint = gripPoint + offset;
                         }
-
+                        AcadUtils.WriteMessageInDebug($"двигаем levelMarkGrip.GripName {levelMarkGrip.GripName} \n");
                         // Вот тут происходит перерисовка примитивов внутри блока
                         levelMark.UpdateEntities();
                         levelMark.BlockRecord.UpdateAnonymousBlocks();
