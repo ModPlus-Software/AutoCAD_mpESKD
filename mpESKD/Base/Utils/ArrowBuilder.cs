@@ -10,6 +10,12 @@ public class ArrowBuilder
     private readonly double _arrowSize;
     private readonly double _scale;
     
+    /// <summary>
+    /// Класс для создания стрелок выноски
+    /// </summary>
+    /// <param name="mainNormal">Нормаль по которой строится стрелка</param>
+    /// <param name="arrowSize">Размер стрелки</param>
+    /// <param name="scale">Масштаб объекта</param>
     public ArrowBuilder(Vector3d mainNormal, double arrowSize, double scale)
     {
         _mainNormal = mainNormal;
@@ -17,6 +23,13 @@ public class ArrowBuilder
         _scale = scale;
     }
 
+    /// <summary>
+    /// Метод создающий стрелки для выносок, в зависимости от типа выбранной стрелки
+    /// </summary>
+    /// <param name="arrowType">Тип стрелки</param>
+    /// <param name="point3d">Точка расположения стрелки</param>
+    /// <param name="hatches">Штриховка стрелки, если стрелка состоит из штриховки</param>
+    /// <param name="plines">Полилиния стрелки, если стрелка состоит из полилинии </param>
     public void BuildArrow(LeaderEndType arrowType, Point3d point3d, List<Hatch> hatches, List<Polyline> plines)
     {
         switch (arrowType)
