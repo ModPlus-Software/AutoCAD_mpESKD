@@ -26,6 +26,7 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     /// </summary>
     /// <param name="chainLeader">Экземпляр класса <see cref="mpChainLeader.ChainLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
+    /// <param name="entity">Экземпляр анонимного блока/></param>
     public ChainLeaderVertexGrip(ChainLeader chainLeader, int gripIndex, BlockReference entity)
     {
         ChainLeader = chainLeader;
