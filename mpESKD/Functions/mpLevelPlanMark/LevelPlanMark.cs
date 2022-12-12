@@ -26,9 +26,9 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     #endregion
 
-    private readonly List<Line> _leaderLines = new ();
-    private readonly List<Polyline> _leaderEndLines = new ();
-    private readonly List<Hatch> _hatches = new ();
+    private readonly List<Line> _leaderLines = new();
+    private readonly List<Polyline> _leaderEndLines = new();
+    private readonly List<Hatch> _hatches = new();
     private Polyline _framePolyline;
     private double _scale;
 
@@ -53,7 +53,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
 
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
-    
+
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => 1;
 
@@ -89,7 +89,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
     [SaveToXData]
     public override string TextStyle { get; set; } = "Standard";
-    
+
     /// <summary>
     /// Высота текста
     /// </summary>
@@ -126,7 +126,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     [EntityProperty(PropertiesCategory.Content, 10, "p110", "", 0, 5, propertyScope: PropertyScope.Palette, stringMaxLength: 10)]
     [SaveToXData]
     [ValueToSearchBy]
-    public double PlanMark { get; set; } = 0.000; 
+    public double PlanMark { get; set; } = 0.000;
 
     /// <summary>
     /// Префикс
@@ -156,7 +156,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         {
             var prefix = string.IsNullOrEmpty(Prefix) ? string.Empty : Prefix;
             var suffix = string.IsNullOrEmpty(Suffix) ? string.Empty : Suffix;
-            
+
             return ReplaceSeparator($"{prefix}{Math.Round(PlanMark, Accuracy).ToString($"F{Accuracy}")}{suffix}");
         }
     }
@@ -193,16 +193,16 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
     /// Точки выносок
     /// </summary>
     [SaveToXData]
-    public List<Point3d> LeaderPoints { get; set; } = new ();
+    public List<Point3d> LeaderPoints { get; set; } = new();
 
     /// <summary>
     /// Типы выносок
     /// </summary>
     [SaveToXData]
-    public List<int> LeaderTypes { get; set; } = new ();
+    public List<int> LeaderTypes { get; set; } = new();
 
     private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
-    
+
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
@@ -233,7 +233,7 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         _dbText.SetProperties(TextStyle, TextHeight * _scale);
         _dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         _dbText.AlignmentPoint = insertionPoint;
-        
+
         if (BorderWidth == 0)
         {
             BorderWidth = MinDistanceBetweenPoints * _scale;
@@ -302,19 +302,12 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             _leaderLines.Add(curLeader);
 
             var mainNormal = (curLeader.StartPoint - curLeader.EndPoint).GetNormal();
-            
+
             var arrowTypes = new ArrowBuilder(mainNormal, ArrowSize, _scale);
 
             if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
             {
-                if (LeaderTypes.Count <= 0)
-                {
-                    _leaderEndLines.Add(arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0));
-                }
-                else
-                {
-                    arrowTypes.BuildArrow((LeaderEndType)LeaderTypes[i], _leaderLines[i].EndPoint, _hatches, _leaderEndLines);
-                }
+                arrowTypes.BuildArrow((LeaderEndType)LeaderTypes[i], _leaderLines[i].EndPoint, _hatches, _leaderEndLines);
             }
         }
     }
