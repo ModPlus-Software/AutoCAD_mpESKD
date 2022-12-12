@@ -545,39 +545,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     private void CreateArrows(Point3d point3d, Vector3d mainNormal, double arrowSize, double scale)
     {
-        var pline = new Polyline();
-        ArrowTypes arrowTypes = new ArrowTypes(mainNormal, arrowSize, scale);
-        switch (ArrowType)
-        {
-            case LeaderEndType.None:
-                break;
-            case LeaderEndType.HalfArrow:
-                _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateHalfArrow(point3d)));
-                break;
-            case LeaderEndType.Point:
-                _hatches.Add(arrowTypes.CreatePointHatch(arrowTypes.CreatePointArrow(point3d)));
-                break;
-            case LeaderEndType.Section:
-                pline = arrowTypes.CreateResectionArrow(point3d, 0);
-                break;
-            case LeaderEndType.Resection:
-                pline = arrowTypes.CreateResectionArrow(point3d, 0.3);
-                break;
-            case LeaderEndType.Angle:
-                pline = arrowTypes.CreateAngleArrow(point3d, 45, false);
-                break;
-            case LeaderEndType.Arrow:
-                _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateAngleArrow(point3d, 10, true)));
-                break;
-            case LeaderEndType.OpenArrow:
-                pline = arrowTypes.CreateAngleArrow(point3d, 10, false);
-                break;
-            case LeaderEndType.ClosedArrow:
-                pline = arrowTypes.CreateAngleArrow(point3d, 10, true);
-                break;
-        }
-
-        _leaderEndLines.Add(pline);
+        new ArrowBuilder(mainNormal, arrowSize, scale).BuildArrow(ArrowType, point3d, _hatches, _leaderEndLines);
     }
 
     #endregion

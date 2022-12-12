@@ -1,21 +1,53 @@
 ﻿namespace mpESKD.Base.Utils;
 
+using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-public class ArrowTypes
+public class ArrowBuilder
 {
-
-    private Vector3d _mainNormal;
-    private double _arrowSize;
-    private double _scale;
-    #region Arrows
-
-    public ArrowTypes(Vector3d mainNormal, double arrowSize, double scale)
+    private readonly Vector3d _mainNormal;
+    private readonly double _arrowSize;
+    private readonly double _scale;
+    
+    public ArrowBuilder(Vector3d mainNormal, double arrowSize, double scale)
     {
         _mainNormal = mainNormal;
         _arrowSize = arrowSize;
         _scale = scale;
+    }
+
+    public void BuildArrow(LeaderEndType arrowType, Point3d point3d, List<Hatch> hatches, List<Polyline> plines)
+    {
+        switch (arrowType)
+        {
+            case LeaderEndType.None:
+                break;
+            case LeaderEndType.HalfArrow:
+                hatches.Add(CreateArrowHatch(CreateHalfArrow(point3d)));
+                break;
+            case LeaderEndType.Point:
+                hatches.Add(CreatePointHatch(CreatePointArrow(point3d)));
+                break;
+            case LeaderEndType.Section:
+                plines.Add(CreateResectionArrow(point3d, 0));
+                break;
+            case LeaderEndType.Resection:
+                plines.Add(CreateResectionArrow(point3d, 0.3));
+                break;
+            case LeaderEndType.Angle:
+                plines.Add(CreateAngleArrow(point3d, 45, false));
+                break;
+            case LeaderEndType.Arrow:
+                hatches.Add(CreateArrowHatch(CreateAngleArrow(point3d, 10, true)));
+                break;
+            case LeaderEndType.OpenArrow:
+                plines.Add(CreateAngleArrow(point3d, 10, false));
+                break;
+            case LeaderEndType.ClosedArrow:
+                plines.Add(CreateAngleArrow(point3d, 10, true));
+                break;
+        }
     }
 
     public Polyline CreateResectionArrow(Point3d arrowPoint, double plineWidth)
@@ -34,7 +66,7 @@ public class ArrowTypes
         return pline;
     }
 
-    public Polyline CreateAngleArrow(Point3d arrowPoint, int angle, bool closed)
+    private Polyline CreateAngleArrow(Point3d arrowPoint, int angle, bool closed)
     {
         var vector = new Vector3d(0, 0, 1);
         var tmpPoint = arrowPoint + (_mainNormal * _arrowSize * _scale);
@@ -52,7 +84,7 @@ public class ArrowTypes
         return pline;
     }
 
-    public Polyline CreateHalfArrow(Point3d arrowPoint)
+    private Polyline CreateHalfArrow(Point3d arrowPoint)
     {
         var vector = new Vector3d(0, 0, 1);
         var arrowEndPoint = arrowPoint + (_mainNormal * _arrowSize * _scale);
@@ -68,7 +100,7 @@ public class ArrowTypes
         return pline;
     }
 
-    public Hatch CreateArrowHatch(Polyline pline)
+    private Hatch CreateArrowHatch(Polyline pline)
     {
         var vertexCollection = new Point2dCollection();
         for (var index = 0; index < pline.NumberOfVertices; ++index)
@@ -85,7 +117,7 @@ public class ArrowTypes
         return CreateHatch(vertexCollection, bulgeCollection);
     }
 
-    public Polyline CreatePointArrow(Point3d arrowPoint)
+    private Polyline CreatePointArrow(Point3d arrowPoint)
     {
         var startPoint = arrowPoint - (_arrowSize / 4 * _mainNormal * _scale);
         var endPoint = arrowPoint + (_arrowSize/ 4 * _mainNormal * _scale);
@@ -98,7 +130,7 @@ public class ArrowTypes
         return pline;
     }
 
-    public Hatch CreatePointHatch(Polyline pline)
+    private Hatch CreatePointHatch(Polyline pline)
     {
         var vertexCollection = new Point2dCollection();
         for (var index = 0; index < pline.NumberOfVertices; ++index)
@@ -115,7 +147,7 @@ public class ArrowTypes
         return CreateHatch(vertexCollection, bulgeCollection);
     }
 
-    public Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
+    private Hatch CreateHatch(Point2dCollection vertexCollection, DoubleCollection bulgeCollection)
     {
         var hatch = new Hatch();
         hatch.SetHatchPattern(HatchPatternType.PreDefined, "SOLID");
@@ -123,6 +155,4 @@ public class ArrowTypes
 
         return hatch;
     }
-
-    #endregion
 }

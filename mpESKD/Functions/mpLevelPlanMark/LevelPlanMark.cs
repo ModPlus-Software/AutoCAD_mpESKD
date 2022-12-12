@@ -300,51 +300,22 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
                             select point.ToPoint2d();
             var curLeader = CreateLeaders(LeaderPointsOCS[i], points2ds);
             _leaderLines.Add(curLeader);
-            var pline = new Polyline();
+
             var mainNormal = (curLeader.StartPoint - curLeader.EndPoint).GetNormal();
-            ArrowTypes arrowTypes = new ArrowTypes(mainNormal, ArrowSize, _scale);
+            
+            var arrowTypes = new ArrowBuilder(mainNormal, ArrowSize, _scale);
 
             if (_leaderLines[i].Length - (ArrowSize * _scale) > 0)
             {
                 if (LeaderTypes.Count <= 0)
                 {
-                    pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0);
+                    _leaderEndLines.Add(arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0));
                 }
                 else
                 {
-                    switch ((LeaderEndType)LeaderTypes[i])
-                    {
-                        case LeaderEndType.None:
-                        break;
-                        case LeaderEndType.HalfArrow:
-                        _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateHalfArrow(_leaderLines[i].EndPoint)));
-                        break;
-                        case LeaderEndType.Point:
-                        _hatches.Add(arrowTypes.CreatePointHatch(arrowTypes.CreatePointArrow(_leaderLines[i].EndPoint)));
-                        break;
-                        case LeaderEndType.Section:
-                        pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0);
-                        break;
-                        case LeaderEndType.Resection:
-                        pline = arrowTypes.CreateResectionArrow(_leaderLines[i].EndPoint, 0.3);
-                        break;
-                        case LeaderEndType.Angle:
-                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 45, false);
-                        break;
-                        case LeaderEndType.Arrow:
-                        _hatches.Add(arrowTypes.CreateArrowHatch(arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, true)));
-                        break;
-                        case LeaderEndType.OpenArrow:
-                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, false);
-                        break;
-                        case LeaderEndType.ClosedArrow:
-                        pline = arrowTypes.CreateAngleArrow(_leaderLines[i].EndPoint, 10, true);
-                        break;
-                    }
+                    arrowTypes.BuildArrow((LeaderEndType)LeaderTypes[i], _leaderLines[i].EndPoint, _hatches, _leaderEndLines);
                 }
             }
-
-            _leaderEndLines.Add(pline);
         }
     }
 
