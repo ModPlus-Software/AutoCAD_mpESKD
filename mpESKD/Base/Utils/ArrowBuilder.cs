@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
+/// <summary>
+/// Класс создающий стрелки
+/// </summary>
 public class ArrowBuilder
 {
     private readonly Vector3d _mainNormal;
@@ -63,7 +66,7 @@ public class ArrowBuilder
         }
     }
 
-    public Polyline CreateResectionArrow(Point3d arrowPoint, double plineWidth)
+    private Polyline CreateResectionArrow(Point3d arrowPoint, double plineWidth)
     {
         var vector = new Vector3d(0, 0, 1);
 
