@@ -183,10 +183,10 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                             var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                                 chainLeader.EndPoint, newPoint);
-
+                            
                             if (pointOnPolyline.DistanceTo(chainLeader.EndPoint) <= chainLeader.MinDistanceBetweenPoints)
                             {
-                                pointOnPolyline = chainLeader.EndPoint + (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                                pointOnPolyline = chainLeader.EndPoint + ((chainLeader.EndPoint-chainLeader.InsertionPoint) * chainLeader.MinDistanceBetweenPoints);
                             }
 
                             chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);

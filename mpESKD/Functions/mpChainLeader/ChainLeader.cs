@@ -96,7 +96,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public ChainLeaderJigState? JigState { get; set; }
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => ArrowSize + 1;
+    public override double MinDistanceBetweenPoints => 1;
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -155,7 +155,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Выступ полки 
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p63", 10, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p63", 2, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
     public double ShelfLedge { get; set; }
 
@@ -287,33 +287,32 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         try
         {
-            var scale = GetScale();
             _scale = GetScale();
 
             // Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == ChainLeaderJigState.InsertionPoint)
             {
                 var tempEndPoint = new Point3d(
-                    InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
-                    InsertionPointOCS.Y + (MinDistanceBetweenPoints * scale),
+                    InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale),
+                    InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
                     InsertionPointOCS.Z);
 
-                CreateEntities(InsertionPointOCS, tempEndPoint, scale);
+                CreateEntities(InsertionPointOCS, tempEndPoint, _scale);
             }
             else
             {
                 // Если конечная точка на расстоянии, менее допустимого
-                if (EndPointOCS.DistanceTo(InsertionPointOCS) < MinDistanceBetweenPoints * scale)
+                if (EndPointOCS.DistanceTo(InsertionPointOCS) < MinDistanceBetweenPoints * _scale)
                 {
                     var v = (EndPointOCS - InsertionPointOCS).GetNormal();
-                    var tempEndPoint = InsertionPointOCS + (MinDistanceBetweenPoints * scale * v);
+                    var tempEndPoint = InsertionPointOCS + (MinDistanceBetweenPoints * _scale * v);
 
-                    CreateEntities(InsertionPointOCS, tempEndPoint, scale);
+                    CreateEntities(InsertionPointOCS, tempEndPoint, _scale);
                 }
                 else
                 {
                     // Прочие случаи
-                    CreateEntities(InsertionPointOCS, EndPointOCS, scale);
+                    CreateEntities(InsertionPointOCS, EndPointOCS, _scale);
                 }
             }
         }
