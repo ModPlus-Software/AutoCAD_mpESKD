@@ -12,7 +12,7 @@ public class MainSettings : ObservableObject
     private readonly UserConfigFileUtils _userConfigFileUtils;
     private static MainSettings _instance;
 
-    private MainSettings()
+    public MainSettings()
     {
         _userConfigFileUtils = new UserConfigFileUtils(ModPlusConnector.Instance);
     }

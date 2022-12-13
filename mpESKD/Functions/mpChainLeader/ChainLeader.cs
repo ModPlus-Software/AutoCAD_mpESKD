@@ -135,14 +135,14 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Вертикальный отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p62", 1.0, 0.0, 3.0, nameSymbol: "h2")]
     [SaveToXData]
     public double TextVerticalOffset { get; set; } = 1.0;
 
     /// <summary>
     /// Выступ полки 
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p63", 2, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p63", 0, 0, 100, descLocalKey: "d63", nameSymbol: "l")]
     [SaveToXData]
     public double ShelfLedge { get; set; }
 
@@ -182,7 +182,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Высота малого текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+    [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99)]
     [SaveToXData]
     public double SecondTextHeight { get; set; } = 2.5;
 
@@ -205,7 +205,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public double TextMaskOffset { get; set; } = 0.5;
 
     /// <summary>
-    /// Значение Todo
+    /// Значение
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 7, "p113", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
@@ -213,7 +213,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public string LeaderTextValue { get; set; } = string.Empty;
 
     /// <summary>
-    /// Примечание Todo
+    /// Примечание
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 9, "p68", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
@@ -371,7 +371,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         var mainTextHeight = MainTextHeight * scale;
         var secondTextHeight = SecondTextHeight * scale;
-        var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
         var shelfLedge = ShelfLedge * scale;
         var isRight = ShelfPosition == ShelfPosition.Right;
@@ -412,7 +411,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
 
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
-        ShelfLength = textIndent + largestTextLength + shelfLedge;
+        ShelfLength = TextIndent + largestTextLength + shelfLedge;
 
         Point3d topTextPosition;
         Point3d bottomTextPosition;
@@ -420,11 +419,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (isRight)
         {
             topTextPosition = new Point3d(
-                endPoint.X + textIndent + largestTextLength / 2,
+                endPoint.X + TextIndent + largestTextLength / 2,
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                endPoint.X + textIndent + largestTextLength / 2,
+                endPoint.X + TextIndent + largestTextLength / 2,
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -442,10 +441,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         else
         {
             topTextPosition = new Point3d(
-                endPoint.X - textIndent - largestTextLength / 2,
+                endPoint.X - TextIndent - largestTextLength / 2,
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                endPoint.X - textIndent - largestTextLength / 2,
+                endPoint.X - TextIndent - largestTextLength / 2,
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)

@@ -26,7 +26,7 @@
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p101}"/>
+                       Text="{Binding Source={StaticResource Lang}, XPath=p113}"/>
             <TextBox Grid.Row="0"
                      Grid.Column="1"
                      Name="TbNodeNumber"
@@ -35,7 +35,7 @@
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p102}"/>
+                       Text="{Binding Source={StaticResource Lang}, XPath=p68}"/>
             <TextBox Grid.Row="1"
                      Grid.Column="1"
                      Name="TbNodeAddress"
