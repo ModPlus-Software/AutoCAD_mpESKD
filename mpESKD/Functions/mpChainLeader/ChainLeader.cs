@@ -34,32 +34,22 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Line _leaderLine;
 
     /// <summary>
-    /// Верхний первый текст (номер узла)
+    /// Значение
     /// </summary>
-    private DBText _topFirstDbText;
+    private DBText _topDbText;
 
     /// <summary>
-    /// Маскировка фона верхнего первого текста (номер узла)
+    /// Маскировка фона значения
     /// </summary>
-    private Wipeout _topFirstTextMask;
+    private Wipeout _topTextMask;
 
     /// <summary>
-    /// Верхний второй текст (номер листа)
-    /// </summary>
-    private DBText _topSecondDbText;
-
-    /// <summary>
-    /// Маскировка фона верхнего второго текста (номер листа)
-    /// </summary>
-    private Wipeout _topSecondTextMask;
-
-    /// <summary>
-    /// Нижний текст (адрес узла)
+    /// Примечание
     /// </summary>
     private DBText _bottomDbText;
 
     /// <summary>
-    /// Маскировка нижнего текста (адрес узла)
+    /// Маскировка фона примечания
     /// </summary>
     private Wipeout _bottomTextMask;
 
@@ -105,13 +95,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             var entities = new List<Entity>
             {
-                _topFirstTextMask,
-                _topSecondTextMask,
+                _topTextMask,
                 _bottomTextMask,
                 _leaderLine,
                 _shelfLineFromEndPoint,
-                _topFirstDbText,
-                _topSecondDbText,
+                _topDbText,
                 _bottomDbText,
             };
 
@@ -141,7 +129,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p61", 1.0, 1.0, 10.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 
@@ -218,28 +205,20 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public double TextMaskOffset { get; set; } = 0.5;
 
     /// <summary>
-    /// Номер узла
+    /// Значение Todo
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p79", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 7, "p113", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
-    public string NodeNumber { get; set; } = string.Empty;
+    public string LeaderTextValue { get; set; } = string.Empty;
 
     /// <summary>
-    /// Номер листа
+    /// Примечание Todo
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 8, "p80", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 9, "p68", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
-    public string SheetNumber { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Адрес узла
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 9, "p81", "", propertyScope: PropertyScope.Palette)]
-    [SaveToXData]
-    [ValueToSearchBy]
-    public string NodeAddress { get; set; } = string.Empty;
+    public string LeaderTextComment { get; set; } = string.Empty;
 
     /// <summary>
     /// Точки стрелок
@@ -397,41 +376,28 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var shelfLedge = ShelfLedge * scale;
         var isRight = ShelfPosition == ShelfPosition.Right;
 
-        var topFirstTextLength = 0.0;
-        var topSecondTextLength = 0.0;
+        var topTextLength = 0.0;
         var bottomTextLength = 0.0;
         var bottomTextHeight = 0.0;
 
-        if (!string.IsNullOrEmpty(NodeNumber))
+        if (!string.IsNullOrEmpty(LeaderTextValue))
         {
-            _topFirstDbText = new DBText { TextString = NodeNumber };
-            _topFirstDbText.SetProperties(TextStyle, mainTextHeight);
-            _topFirstDbText.SetPosition(
+            _topDbText = new DBText { TextString = LeaderTextValue };
+            _topDbText.SetProperties(TextStyle, mainTextHeight);
+            _topDbText.SetPosition(
                 TextHorizontalMode.TextCenter, 
                 TextVerticalMode.TextVerticalMid, 
                 AttachmentPoint.MiddleCenter);
-            topFirstTextLength = _topFirstDbText.GetLength();
+            topTextLength = _topDbText.GetLength();
         }
         else
         {
-            _topFirstDbText = null;
+            _topDbText = null;
         }
 
-        if (!string.IsNullOrEmpty(SheetNumber))
+        if (!string.IsNullOrEmpty(LeaderTextComment))
         {
-            _topSecondDbText = new DBText { TextString = $"({SheetNumber})" };
-            _topSecondDbText.SetProperties(TextStyle, secondTextHeight);
-            _topSecondDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-            topSecondTextLength = _topSecondDbText.GetLength();
-        }
-        else
-        {
-            _topSecondDbText = null;
-        }
-
-        if (!string.IsNullOrEmpty(NodeAddress))
-        {
-            _bottomDbText = new DBText { TextString = NodeAddress };
+            _bottomDbText = new DBText { TextString = LeaderTextComment };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(
                 TextHorizontalMode.TextCenter, 
@@ -445,28 +411,26 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomDbText = null;
         }
 
-        var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         ShelfLength = textIndent + largestTextLength + shelfLedge;
 
-        Point3d topFirstTextPosition;
-        var topSecondTextPosition = default(Point3d);
+        Point3d topTextPosition;
         Point3d bottomTextPosition;
 
         if (isRight)
         {
-            topFirstTextPosition = new Point3d(
-                endPoint.X + (topFirstTextLength / 2) + ((ShelfLength - topTextLength) / 2),
+            topTextPosition = new Point3d(
+                endPoint.X + textIndent + largestTextLength / 2,
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                endPoint.X + (bottomTextLength / 2) + ((ShelfLength - bottomTextLength) / 2),
+                endPoint.X + textIndent + largestTextLength / 2,
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
-            if (_topFirstDbText != null)
+            if (_topDbText != null)
             {
-                _topFirstDbText.Position = topFirstTextPosition;
-                _topFirstDbText.AlignmentPoint = topFirstTextPosition;
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_bottomDbText != null)
@@ -477,17 +441,17 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
         else
         {
-            topFirstTextPosition = new Point3d(
-                endPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((ShelfLength - topTextLength) / 2),
+            topTextPosition = new Point3d(
+                endPoint.X - textIndent - largestTextLength / 2,
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                endPoint.X - (bottomTextLength / 2) - ((ShelfLength - bottomTextLength) / 2),
+                endPoint.X - textIndent - largestTextLength / 2,
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
-            if (_topFirstDbText != null)
+            if (_topDbText != null)
             {
-                _topFirstDbText.Position = topFirstTextPosition;
-                _topFirstDbText.AlignmentPoint = topFirstTextPosition;
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
             }
 
             if (_bottomDbText != null)
@@ -497,14 +461,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
         }
 
-        if (_topSecondDbText != null)
-        {
-            topSecondTextPosition = new Point3d(
-                topFirstTextPosition.X + (topFirstTextLength / 2) + (topSecondTextLength / 2), topFirstTextPosition.Y, 0);
-            _topSecondDbText.Position = topSecondTextPosition;
-            _topSecondDbText.AlignmentPoint = topSecondTextPosition;
-        }
-
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? endPoint + (Vector3d.XAxis * ShelfLength)
             : endPoint - (Vector3d.XAxis * ShelfLength);
@@ -512,8 +468,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
-            _topFirstTextMask = _topFirstDbText.GetBackgroundMask(offset, topFirstTextPosition);
-            _topSecondTextMask = _topSecondDbText.GetBackgroundMask(offset, topSecondTextPosition);
+            _topTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
             _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
 
@@ -521,10 +476,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         {
             var backRotationMatrix = GetBackRotationMatrix(endPoint);
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
-            _topFirstDbText?.TransformBy(backRotationMatrix);
-            _topFirstTextMask?.TransformBy(backRotationMatrix);
-            _topSecondDbText?.TransformBy(backRotationMatrix);
-            _topSecondTextMask?.TransformBy(backRotationMatrix);
+            _topDbText?.TransformBy(backRotationMatrix);
+            _topTextMask?.TransformBy(backRotationMatrix);
             _bottomDbText?.TransformBy(backRotationMatrix);
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
@@ -537,15 +490,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (!IsValueCreated)
             return;
 
-        NodeNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
+        LeaderTextValue = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
     }
-
-    #region Arrows
 
     private void CreateArrows(Point3d point3d, Vector3d mainNormal, double arrowSize, double scale)
     {
         new ArrowBuilder(mainNormal, arrowSize, scale).BuildArrow(ArrowType, point3d, _hatches, _leaderEndLines);
     }
-
-    #endregion
 }

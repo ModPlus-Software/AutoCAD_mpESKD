@@ -171,7 +171,7 @@ public class ChainLeaderFunction : ISmartEntityFunction
         var allValues = new List<string>();
         AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<ChainLeader>(typeof(ChainLeader)).ForEach(a =>
         {
-            allValues.Add(a.NodeNumber);
+            allValues.Add(a.LeaderTextValue);
         });
 
         return allValues.OrderBy(s => s, new OrdinalStringComparer()).LastOrDefault();
