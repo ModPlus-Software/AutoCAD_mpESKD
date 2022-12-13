@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpChainLeader;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -182,8 +184,13 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                                 chainLeader.EndPoint, newPoint);
 
-                            chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+                            if (pointOnPolyline.DistanceTo(chainLeader.EndPoint) <= chainLeader.MinDistanceBetweenPoints)
+                            {
+                                pointOnPolyline = chainLeader.EndPoint + (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                            }
 
+                            chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
+                            
                             ((BlockReference)entity).Position = pointOnPolyline;
                             chainLeader.InsertionPoint = pointOnPolyline;
                         }
