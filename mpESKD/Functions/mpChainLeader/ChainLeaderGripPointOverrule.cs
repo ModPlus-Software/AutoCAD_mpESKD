@@ -197,6 +197,11 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         else if (vertexGrip.GripIndex == 1)
                         {
                             chainLeader.EndPoint = vertexGrip.GripPoint + offset;
+
+                            if (chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint) <= chainLeader.MinDistanceBetweenPoints)
+                            {
+                                chainLeader.EndPoint += (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                            }
                         }
 
                         chainLeader.UpdateEntities();
