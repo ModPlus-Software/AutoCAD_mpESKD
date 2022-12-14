@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpChainLeader;
+﻿namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;

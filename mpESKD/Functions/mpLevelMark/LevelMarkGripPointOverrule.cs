@@ -90,10 +90,12 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                         {
                             levelMark.BottomShelfStartPoint = gripPoint + offset;
-                            if (levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint) < 1)
+                            AcadUtils.WriteMessageInDebug($"levelMark.BottomShelfStartPoint {levelMark.BottomShelfStartPoint} до if {levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint)}");
+                            if (levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint) < 5)
                             {
-                                levelMark.BottomShelfStartPoint += (levelMark.ObjectPoint - levelMark.BottomShelfStartPoint).GetNormal() * 2;
+                                levelMark.BottomShelfStartPoint += (levelMark.ObjectPoint - levelMark.BottomShelfStartPoint).GetNormal() * 5;
                             }
+                            AcadUtils.WriteMessageInDebug($"levelMark.BottomShelfStartPoint {levelMark.BottomShelfStartPoint} после if {levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint)}");
 
                             if (levelMark.ObjectLine)
                             {

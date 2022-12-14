@@ -450,8 +450,12 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         ObjectPoint = new Point3d(ObjectPoint.X, EndPoint.Y, ObjectPoint.Z);
 
         var horV = (EndPoint - ObjectPoint).GetNormal();
+        if (BottomShelfStartPoint.DistanceTo(ObjectPoint) < 2)
+        {
+            BottomShelfStartPoint += (ObjectPoint - BottomShelfStartPoint).GetNormal() * 2;
+        }
 
-        if (ObjectLine)
+        else if (ObjectLine)
         {
             BottomShelfStartPoint = ObjectPoint + (horV * ObjectLineOffset * GetFullScale());
         }
@@ -568,7 +572,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 }
                 else
                 {
-                    AcadUtils.WriteMessageInDebug($"Create other variant InsertionPoint - {InsertionPoint}, InsertionPointOCS - {InsertionPointOCS},  ObjectPoint {ObjectPoint},  BottomShelfStartPointOCS - {BottomShelfStartPointOCS}, EndPointOCS {EndPointOCS}, ShelfPointOCS {ShelfPointOCS} ");
+                   // AcadUtils.WriteMessageInDebug($"Create other variant InsertionPoint - {InsertionPoint}, InsertionPointOCS - {InsertionPointOCS},  ObjectPoint {ObjectPoint},  BottomShelfStartPointOCS - {BottomShelfStartPointOCS}, EndPointOCS {EndPointOCS}, ShelfPointOCS {ShelfPointOCS} ");
                     CreateEntities(
                         InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, ShelfPointOCS, scale);
                 }
@@ -625,8 +629,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topDbText.Position = topTextPosition;
 
-        //var textBottomPosition = shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
-
         _topDbText.AlignmentPoint = topTextPosition;
 
         if (!string.IsNullOrEmpty(Note))
@@ -671,8 +673,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         // если нижнего текста нет, то и выравнивать ничего не нужно
         if (_bottomDbText != null)
         {
-            AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
-            AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
+            //AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
+            //AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
 
             var diff = Math.Abs(topTextLength - bottomTextLength);
             AcadUtils.WriteMessageInDebug($"Diff: {diff}");
