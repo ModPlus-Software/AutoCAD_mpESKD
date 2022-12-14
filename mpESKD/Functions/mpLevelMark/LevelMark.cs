@@ -496,9 +496,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                     tempEndPoint.Y + (DistanceBetweenShelfs * scale),
                     tempEndPoint.Z);
 
-                AcadUtils.WriteMessageInDebug(
-                    "Create when LevelMarkJigState == mpLevelMark.LevelMarkJigState.InsertionPoint");
-
                 BottomShelfStartPoint = InsertionPoint;
                 CreateEntities(
                     InsertionPointOCS, InsertionPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
@@ -515,9 +512,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                     tempEndPoint.X,
                     tempEndPoint.Y + (DistanceBetweenShelfs * scale),
                     tempEndPoint.Z);
-
-                AcadUtils.WriteMessageInDebug(
-                    "Create when LevelMarkJigState == mpLevelMark.LevelMarkJigState.ObjectPoint");
 
                 BottomShelfStartPoint = EndPoint;
                 CreateEntities(
@@ -541,9 +535,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                         tempEndPoint.X,
                         tempEndPoint.Y + (DistanceBetweenShelfs * scale),
                         tempEndPoint.Z);
-
-                    AcadUtils.WriteMessageInDebug(
-                        "Create when EndPointOCS.DistanceTo(ObjectPointOCS) < MinDistanceBetweenPoints * scale");
 
                     BottomShelfStartPoint = ObjectPoint;
                     CreateEntities(
@@ -570,9 +561,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                         EndPointOCS.X,
                         EndPointOCS.Y + (DistanceBetweenShelfs * scale),
                         EndPointOCS.Z);
-
-                    AcadUtils.WriteMessageInDebug(
-                        "Create when LevelMarkJigState == mpLevelMark.LevelMarkJigState.EndPoint");
 
                     BottomShelfStartPoint = tempBottomShelfStartPoint.TransformBy(BlockTransform);
                     CreateEntities(
@@ -637,7 +625,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topDbText.Position = topTextPosition;
 
-        var textBottomPosition = shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
+        //var textBottomPosition = shelfPoint - (textVerticalOffset * verV) + (textIndent * horV);
 
         _topDbText.AlignmentPoint = topTextPosition;
 
@@ -648,7 +636,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             _bottomDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             var bottomTextPosition = isTop
                 ? shelfPoint - ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV)
-                : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV); ;
+                : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV);
             _bottomDbText.Position = bottomTextPosition;
             _bottomDbText.AlignmentPoint = bottomTextPosition;
             if (isTop)

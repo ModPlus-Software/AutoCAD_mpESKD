@@ -90,6 +90,11 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                         {
                             levelMark.BottomShelfStartPoint = gripPoint + offset;
+                            if (levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint) < 1)
+                            {
+                                levelMark.BottomShelfStartPoint += (levelMark.ObjectPoint - levelMark.BottomShelfStartPoint).GetNormal() * 2;
+                            }
+
                             if (levelMark.ObjectLine)
                             {
                                 levelMark.ObjectPoint =
