@@ -12,6 +12,9 @@ public class MainSettings : ObservableObject
     private readonly UserConfigFileUtils _userConfigFileUtils;
     private static MainSettings _instance;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainSettings"/> class.
+    /// </summary>
     public MainSettings()
     {
         _userConfigFileUtils = new UserConfigFileUtils(ModPlusConnector.Instance);
