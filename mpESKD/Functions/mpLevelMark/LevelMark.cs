@@ -668,8 +668,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         // если нижнего текста нет, то и выравнивать ничего не нужно
         if (_bottomDbText != null)
         {
-            //AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
-            //AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
+            AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
+            AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
 
             var diff = Math.Abs(topTextLength - bottomTextLength);
             AcadUtils.WriteMessageInDebug($"Diff: {diff}");
@@ -678,13 +678,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 if (NoteHorizontalAlignment == TextHorizontalAlignment.Center)
                 {
                     _bottomDbText.Position += diff / 2 * horV;
-                    _bottomDbText.AlignmentPoint = _bottomDbText.Position;
+                    _bottomDbText.AlignmentPoint += diff / 2 * horV;
                 }
                 else if ((isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Left) ||
                          (!isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Right))
                 {
                     _bottomDbText.Position += diff * horV;
-                    _bottomDbText.AlignmentPoint = _bottomDbText.Position;
+                    _bottomDbText.AlignmentPoint += diff * horV;
                 }
             }
             else
@@ -693,13 +693,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 {
                     AcadUtils.WriteMessageInDebug($"Diff if center: {diff}");
                     _topDbText.Position += diff / 2 * horV;
-                    _topDbText.AlignmentPoint = _topDbText.Position;
+                    _topDbText.AlignmentPoint += diff / 2 * horV;
                 }
                 else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left) ||
                          (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right))
                 {
-                    _topDbText.Position += diff / 2 * horV;
-                    _topDbText.AlignmentPoint = _topDbText.Position;
+                    _topDbText.Position += diff * horV;
+                    _topDbText.AlignmentPoint += diff * horV;
                 }
             }
         }
