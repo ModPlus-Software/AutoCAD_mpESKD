@@ -344,13 +344,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     public string Note { get; set; } = string.Empty;
 
     /// <summary>
-    /// Выравнивание примечания по горизонтали
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 12, "p74", TextHorizontalAlignment.Left, descLocalKey: "d73")]
-    [SaveToXData]
-    public TextHorizontalAlignment NoteHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
-
-    /// <summary>
     /// Высота текста
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 13, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
@@ -675,13 +668,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             AcadUtils.WriteMessageInDebug($"Diff: {diff}");
             if (topTextLength > bottomTextLength)
             {
-                if (NoteHorizontalAlignment == TextHorizontalAlignment.Center)
+                if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
                 {
                     _bottomDbText.Position += diff / 2 * horV;
                     _bottomDbText.AlignmentPoint += diff / 2 * horV;
                 }
-                else if ((isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Left) ||
-                         (!isLeft && NoteHorizontalAlignment == TextHorizontalAlignment.Right))
+                else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left) ||
+                         (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right))
                 {
                     _bottomDbText.Position += diff * horV;
                     _bottomDbText.AlignmentPoint += diff * horV;
