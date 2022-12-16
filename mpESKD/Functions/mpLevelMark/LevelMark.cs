@@ -561,7 +561,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 }
                 else
                 {
-                    // AcadUtils.WriteMessageInDebug($"Create other variant InsertionPoint - {InsertionPoint}, InsertionPointOCS - {InsertionPointOCS},  ObjectPoint {ObjectPoint},  BottomShelfStartPointOCS - {BottomShelfStartPointOCS}, EndPointOCS {EndPointOCS}, ShelfPointOCS {ShelfPointOCS} ");
                     CreateEntities(
                         InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, ShelfPointOCS, scale);
                 }
@@ -618,9 +617,10 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topDbText.Position = topTextPosition;
         _topDbText.AlignmentPoint = _topDbText.Position;
-        Point3d bottomTextPosition = new Point3d();
+       
         if (!string.IsNullOrEmpty(Note))
         {
+            Point3d bottomTextPosition = new Point3d();
             _bottomDbText = new DBText { TextString = Note };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
@@ -629,10 +629,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV);
             _bottomDbText.Position = bottomTextPosition;
             _bottomDbText.AlignmentPoint = _bottomDbText.Position;
-            //if (isTop)
-            //    _bottomDbText.Position -= verV * _bottomDbText.GetHeight();
-            //else
-            //    _bottomDbText.Position += verV * _bottomDbText.GetHeight();
         }
         else
         {
@@ -643,14 +639,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var topTextLength = _topDbText.GetLength();
 
         var bottomTextLength = _bottomDbText != null ? _bottomDbText.GetLength() : double.NaN;
-
-        //if (isLeft)
-        //{
-        //    _topDbText.Position += horV * topTextLength;
-
-        //    //if (_bottomDbText != null)
-        //    //    _bottomDbText.Position += horV * bottomTextLength;
-        //}
 
         var maxTextWidth = double.IsNaN(bottomTextLength)
             ? topTextLength
@@ -669,58 +657,16 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             
             var textMovementHorV = diff * horV;
             var textHalfMovementHorV = diff / 2 * horV;
+            var movingPosition = GetMovementPositionVector(isLeft, textHalfMovementHorV, textMovementHorV);
             if (topTextLength > bottomTextLength)
             {
-                Vector3d textpos = new Vector3d();
-                if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
-                {
-                    textpos = textHalfMovementHorV;
-                    //_bottomDbText.AlignmentPoint += textHalfMovementHorV;
-                }
-                else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
-                {
-                    if (ScaleFactorX > 0)
-                    {
-                        textpos = textMovementHorV;
-                        //_bottomDbText.AlignmentPoint += textMovementHorV;
-                    }
-                }
-                else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
-                {
-                    if (ScaleFactorX < 0)
-                    {
-                        textpos = textMovementHorV;
-                        //_bottomDbText.AlignmentPoint += textMovementHorV;
-                    }
-                }
-
-                _bottomDbText.Position += textpos;
-                _bottomDbText.AlignmentPoint += textpos;
+                _bottomDbText.Position += movingPosition;
+                _bottomDbText.AlignmentPoint += movingPosition;
             }
             else
             {
-                if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
-                {
-                    _topDbText.Position += textHalfMovementHorV;
-                    _topDbText.AlignmentPoint += textHalfMovementHorV;
-                }
-                else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
-                {
-                    if (ScaleFactorX > 0)
-                    {
-                        _topDbText.Position += textMovementHorV;
-                        _topDbText.AlignmentPoint += textMovementHorV;
-
-                    }
-                }
-                else if (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
-                {
-                    if (ScaleFactorX < 0)
-                    {
-                        _topDbText.Position += textMovementHorV;
-                        _topDbText.AlignmentPoint += textMovementHorV;
-                    }
-                }
+                _topDbText.Position += movingPosition;
+                _topDbText.AlignmentPoint += movingPosition;
             }
         }
 
@@ -765,5 +711,30 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     {
         var c = NumberSeparator == NumberSeparator.Comma ? ',' : '.';
         return numericValue.Replace(',', '.').Replace('.', c);
+    }
+
+    private Vector3d GetMovementPositionVector(bool isLeft, Vector3d textHalfMovementHorV, Vector3d textMovementHorV)
+    {
+        Vector3d textpos = new Vector3d();
+        if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
+        {
+            textpos = textHalfMovementHorV;
+        }
+        else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX > 0)
+            {
+                textpos = textMovementHorV;
+            }
+        }
+        else if (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX < 0)
+            {
+                textpos = textMovementHorV;
+            }
+        }
+
+        return textpos;
     }
 }
