@@ -617,14 +617,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topDbText.Position = topTextPosition;
         _topDbText.AlignmentPoint = _topDbText.Position;
-       
+
         if (!string.IsNullOrEmpty(Note))
         {
-            Point3d bottomTextPosition = new Point3d();
             _bottomDbText = new DBText { TextString = Note };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-            bottomTextPosition = isTop
+            Point3d bottomTextPosition = isTop
                 ? shelfPoint - ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV)
                 : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV);
             _bottomDbText.Position = bottomTextPosition;
@@ -649,11 +648,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         // если нижнего текста нет, то и выравнивать ничего не нужно
         if (_bottomDbText != null)
         {
-            AcadUtils.WriteMessageInDebug($"top text length: {topTextLength}");
-            AcadUtils.WriteMessageInDebug($"bottom text length: {bottomTextLength}");
-
             var diff = Math.Abs(topTextLength - bottomTextLength);
-            AcadUtils.WriteMessageInDebug($"Diff: {diff}");
             
             var textMovementHorV = diff * horV;
             var textHalfMovementHorV = diff / 2 * horV;
@@ -679,7 +674,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                 _bottomTextMask = _bottomDbText.GetBackgroundMask(maskOffset, _bottomDbText.Position);
             }
 
-            _topTextMask = _topDbText.GetBackgroundMask(maskOffset,_topDbText.Position);
+            _topTextMask = _topDbText.GetBackgroundMask(maskOffset, _topDbText.Position);
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
