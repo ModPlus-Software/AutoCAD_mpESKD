@@ -710,26 +710,20 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
     private Vector3d GetMovementPositionVector(bool isLeft, Vector3d textHalfMovementHorV, Vector3d textMovementHorV)
     {
-        Vector3d textpos = new Vector3d();
         if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
-        {
-            textpos = textHalfMovementHorV;
-        }
-        else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+            return textHalfMovementHorV;
+
+        if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
         {
             if (ScaleFactorX > 0)
-            {
-                textpos = textMovementHorV;
-            }
+                return textMovementHorV;
         }
-        else if (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
         {
             if (ScaleFactorX < 0)
-            {
-                textpos = textMovementHorV;
-            }
+                return textMovementHorV;
         }
 
-        return textpos;
+        return default;
     }
 }
