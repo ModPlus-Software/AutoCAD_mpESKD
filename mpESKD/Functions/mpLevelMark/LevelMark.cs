@@ -668,59 +668,53 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             AcadUtils.WriteMessageInDebug($"Diff: {diff}");
             
             var textMovementHorV = diff * horV;
-
+            var textHalfMovementHorV = diff / 2 * horV;
             if (topTextLength > bottomTextLength)
             {
+                Vector3d textpos = new Vector3d();
                 if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
                 {
-                    _bottomDbText.Position += diff / 2 * horV;
-                    _bottomDbText.AlignmentPoint += diff / 2 * horV;
+                    textpos = textHalfMovementHorV;
+                    //_bottomDbText.AlignmentPoint += textHalfMovementHorV;
                 }
                 else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
                 {
-                    //_bottomDbText.Position += textMovementHorV;
-                    //_bottomDbText.AlignmentPoint += textMovementHorV;
                     if (ScaleFactorX > 0)
                     {
-                        _bottomDbText.Position += textMovementHorV;
-                        _bottomDbText.AlignmentPoint += textMovementHorV;
-                        //_bottomDbText.Position = bottomTextPosition;
-                        //_bottomDbText.AlignmentPoint = bottomTextPosition;
+                        textpos = textMovementHorV;
+                        //_bottomDbText.AlignmentPoint += textMovementHorV;
                     }
                 }
                 else if ((isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
                 {
-                    //_bottomDbText.Position = bottomTextPosition;
-                    //_bottomDbText.AlignmentPoint = bottomTextPosition;
                     if (ScaleFactorX < 0)
                     {
-                        _bottomDbText.Position += textMovementHorV;
-                        _bottomDbText.AlignmentPoint += textMovementHorV;
+                        textpos = textMovementHorV;
+                        //_bottomDbText.AlignmentPoint += textMovementHorV;
                     }
                 }
+
+                _bottomDbText.Position += textpos;
+                _bottomDbText.AlignmentPoint += textpos;
             }
             else
             {
                 if (ValueHorizontalAlignment == TextHorizontalAlignment.Center)
                 {
-                    _topDbText.Position += diff / 2 * horV;
-                    _topDbText.AlignmentPoint += diff / 2 * horV;
+                    _topDbText.Position += textHalfMovementHorV;
+                    _topDbText.AlignmentPoint += textHalfMovementHorV;
                 }
                 else if ((!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right) || (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
                 {
-                    
                     if (ScaleFactorX > 0)
                     {
                         _topDbText.Position += textMovementHorV;
                         _topDbText.AlignmentPoint += textMovementHorV;
-                        //_topDbText.Position = topTextPosition;
-                        //_topDbText.AlignmentPoint = topTextPosition;
+
                     }
                 }
                 else if (isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Right || (!isLeft && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
                 {
-                    //_topDbText.Position = topTextPosition;
-                    //_topDbText.AlignmentPoint = topTextPosition;
                     if (ScaleFactorX < 0)
                     {
                         _topDbText.Position += textMovementHorV;
