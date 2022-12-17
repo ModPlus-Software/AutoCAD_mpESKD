@@ -580,6 +580,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         Point3d shelfPoint,
         double scale)
     {
+        AcadUtils.WriteMessageInDebug($"ObjectPointOCS {objectPoint}, BottomShelfStartPointOCS {BottomShelfStartPointOCS}");
         MeasuredValue = (objectPoint.Y - insertionPoint.Y) * MeasurementScale;
 
         var horV = (arrowPoint - objectPoint).GetNormal();
@@ -591,6 +592,11 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var secondTextHeight = SecondTextHeight * scale;
         var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
+
+        if (bottomShelfStartPoint.DistanceTo(objectPoint) < 1)
+        {
+            bottomShelfStartPoint += (bottomShelfStartPoint - objectPoint).GetNormal();
+        }
 
         if (ObjectLine)
         {
@@ -680,6 +686,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
+
+        AcadUtils.WriteMessageInDebug($"ObjectPointOCS - BottomShelfStartPointOCS  {objectPoint.DistanceTo(BottomShelfStartPointOCS) } \n");
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
