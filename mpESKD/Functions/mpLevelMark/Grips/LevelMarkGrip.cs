@@ -52,11 +52,6 @@ public class LevelMarkGrip : SmartEntityGripData
     }
 
     /// <summary>
-    /// Новое значение точки вершины
-    /// </summary>
-    public Point3d NewPoint { get; set; }
-
-    /// <summary>
     /// Экземпляр класса <see cref="mpLevelMark.LevelMark"/>
     /// </summary>
     public LevelMark LevelMark { get; }
@@ -95,13 +90,6 @@ public class LevelMarkGrip : SmartEntityGripData
             {
                 using (LevelMark)
                 {
-                    AcadUtils.WriteMessageInDebug($"newPOint before if {NewPoint}");
-                    LevelMark.BottomShelfStartPoint = NewPoint;
-                   
-
-
-                    //LevelMark.UpdateEntities();
-                    //LevelMark.BlockRecord.UpdateAnonymousBlocks();
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(LevelMark.BlockId, OpenMode.ForWrite, true, true);
@@ -113,9 +101,6 @@ public class LevelMarkGrip : SmartEntityGripData
                         tr.Commit();
                     }    
                 }
-                
-
-                //LevelMark.Dispose();
             }
 
             // При отмене перемещения возвращаем временные значения

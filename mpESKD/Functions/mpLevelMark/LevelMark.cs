@@ -490,8 +490,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                     tempEndPoint.Z);
 
                 BottomShelfStartPoint = InsertionPoint;
-                CreateEntities(
-                    InsertionPointOCS, InsertionPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
+                CreateEntities(InsertionPointOCS, InsertionPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
             }
             //// Задание второй точки - точки уровня. При этом в jig устанавливается EndPoint, которая по завершении
             //// будет перемещена в ObjectPoint. Минимальные расстояния не учитываются
@@ -507,8 +506,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                     tempEndPoint.Z);
 
                 BottomShelfStartPoint = EndPoint;
-                CreateEntities(
-                    InsertionPointOCS, EndPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
+                CreateEntities(InsertionPointOCS, EndPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
             }
             //// Прочие случаи
             else
@@ -530,8 +528,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                         tempEndPoint.Z);
 
                     BottomShelfStartPoint = ObjectPoint;
-                    CreateEntities(
-                        InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
+                    CreateEntities(InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, tempEndPoint, tempShelfPoint, scale);
                 }
                 else if (LevelMarkJigState == mpLevelMark.LevelMarkJigState.EndPoint)
                 {
@@ -556,13 +553,11 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
                         EndPointOCS.Z);
 
                     BottomShelfStartPoint = tempBottomShelfStartPoint.TransformBy(BlockTransform);
-                    CreateEntities(
-                        InsertionPointOCS, ObjectPointOCS, tempBottomShelfStartPoint, EndPointOCS, tempShelfPoint, scale);
+                    CreateEntities(InsertionPointOCS, ObjectPointOCS, tempBottomShelfStartPoint, EndPointOCS, tempShelfPoint, scale);
                 }
                 else
                 {
-                    CreateEntities(
-                        InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, ShelfPointOCS, scale);
+                    CreateEntities(InsertionPointOCS, ObjectPointOCS, BottomShelfStartPointOCS, EndPointOCS, ShelfPointOCS, scale);
                 }
             }
         }
@@ -592,12 +587,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var secondTextHeight = SecondTextHeight * scale;
         var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
-
-        if (bottomShelfStartPoint.DistanceTo(objectPoint) < 1)
-        {
-            bottomShelfStartPoint += (bottomShelfStartPoint - objectPoint).GetNormal();
-        }
-
+        
         if (ObjectLine)
         {
             _bottomShelfLine = new Line(
@@ -618,8 +608,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         _topDbText.SetProperties(TextStyle, mainTextHeight);
         _topDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         var topTextPosition = isTop
-            ? shelfPoint + ((textVerticalOffset + _topDbText.Height / 2) * verV) + ((textIndent + _topDbText.GetLength() / 2) * horV)
-            : shelfPoint - ((textVerticalOffset + _topDbText.Height / 2) * verV) + ((textIndent + _topDbText.GetLength() / 2) * horV);
+            ? shelfPoint + ((textVerticalOffset + (_topDbText.Height / 2)) * verV) + ((textIndent + (_topDbText.GetLength() / 2)) * horV)
+            : shelfPoint - ((textVerticalOffset + (_topDbText.Height / 2)) * verV) + ((textIndent + (_topDbText.GetLength() / 2)) * horV);
 
         _topDbText.Position = topTextPosition;
         _topDbText.AlignmentPoint = _topDbText.Position;
@@ -630,8 +620,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             Point3d bottomTextPosition = isTop
-                ? shelfPoint - ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV)
-                : shelfPoint + ((textVerticalOffset + _bottomDbText.GetHeight() / 2) * verV) + ((textIndent + _bottomDbText.GetLength() / 2) * horV);
+                ? shelfPoint - ((textVerticalOffset + (_bottomDbText.GetHeight() / 2)) * verV) + ((textIndent + (_bottomDbText.GetLength() / 2)) * horV)
+                : shelfPoint + ((textVerticalOffset + (_bottomDbText.GetHeight() / 2)) * verV) + ((textIndent + (_bottomDbText.GetLength() / 2)) * horV);
             _bottomDbText.Position = bottomTextPosition;
             _bottomDbText.AlignmentPoint = _bottomDbText.Position;
         }

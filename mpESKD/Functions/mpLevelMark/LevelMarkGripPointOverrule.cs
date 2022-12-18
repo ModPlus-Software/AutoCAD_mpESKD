@@ -31,16 +31,11 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                 var levelMark = EntityReaderService.Instance.GetFromEntity<LevelMark>(entity);
                 if (levelMark != null)
                 {
-                    grips.Add(new LevelMarkGrip(
-                        levelMark, GripType.BasePoint, GripName.BasePoint, levelMark.InsertionPoint));
-                    grips.Add(new LevelMarkGrip(
-                        levelMark, GripType.Point, GripName.ObjectPoint, levelMark.ObjectPoint));
-                    grips.Add(new LevelMarkGrip(
-                        levelMark, GripType.Point, GripName.BottomShelfStartPoint, levelMark.BottomShelfStartPoint));
-                    grips.Add(new LevelMarkGrip(
-                        levelMark, GripType.Point, GripName.ArrowPoint, levelMark.EndPoint));
-                    grips.Add(new LevelMarkGrip(
-                        levelMark, GripType.Point, GripName.TopShelfPoint, levelMark.ShelfPoint));
+                    grips.Add(new LevelMarkGrip(levelMark, GripType.BasePoint, GripName.BasePoint, levelMark.InsertionPoint));
+                    grips.Add(new LevelMarkGrip(levelMark, GripType.Point, GripName.ObjectPoint, levelMark.ObjectPoint));
+                    grips.Add(new LevelMarkGrip(levelMark, GripType.Point, GripName.BottomShelfStartPoint, levelMark.BottomShelfStartPoint));
+                    grips.Add(new LevelMarkGrip(levelMark, GripType.Point, GripName.ArrowPoint, levelMark.EndPoint));
+                    grips.Add(new LevelMarkGrip(levelMark, GripType.Point, GripName.TopShelfPoint, levelMark.ShelfPoint));
 
                     _cachedBottomShelfLength = Math.Abs(levelMark.EndPoint.X - levelMark.BottomShelfStartPoint.X);
                 }
@@ -90,23 +85,10 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                         {
                             levelMark.BottomShelfStartPoint = gripPoint + offset;
-                            AcadUtils.WriteMessageInDebug($"levelMark.BottomShelfStartPoint {levelMark.BottomShelfStartPoint} до if {levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint)}");
-                           
-                            var newPoint = gripPoint + offset;
-
-                            if (newPoint.DistanceTo(levelMark.ObjectPoint) <= levelMark.MinDistanceBetweenPoints)
-                            {
-
-                                levelMarkGrip.NewPoint = levelMark.ObjectPoint + (levelMark.ObjectPoint - levelMark.BottomShelfStartPoint).GetNormal();
-                            }
-
                             if (levelMark.ObjectLine)
                             {
-                                levelMark.ObjectPoint =
-                                    levelMark.BottomShelfStartPoint - (horV * levelMark.ObjectLineOffset * scale);
-
-                                levelMark.EndPoint =
-                                    levelMark.BottomShelfStartPoint + (horV * _cachedBottomShelfLength);
+                                levelMark.ObjectPoint = levelMark.BottomShelfStartPoint - (horV * levelMark.ObjectLineOffset * scale);
+                                levelMark.EndPoint = levelMark.BottomShelfStartPoint + (horV * _cachedBottomShelfLength);
                             }
                             else
                             {
@@ -114,21 +96,14 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                                     levelMark.ObjectPoint.X,
                                     levelMark.BottomShelfStartPoint.Y,
                                     levelMark.ObjectPoint.Z);
-                                levelMark.EndPoint =
-                                    levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale);
+                                levelMark.EndPoint = levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale);
                             }
-
-                            AcadUtils.WriteMessageInDebug($"levelMark.BottomShelfStartPoint {levelMark.BottomShelfStartPoint} после if {levelMark.BottomShelfStartPoint.DistanceTo(levelMark.ObjectPoint)}");
                         }
                         else if (levelMarkGrip.GripName == GripName.ArrowPoint)
                         {
                             var newPoint = gripPoint + offset;
-
-                            if (newPoint.DistanceTo(levelMark.ObjectPoint) - levelMark.BottomShelfLength <= levelMark.MinDistanceBetweenPoints)
-                            {
-                                newPoint = levelMark.ObjectPoint + (levelMark.ObjectPoint - levelMark.BottomShelfStartPoint).GetNormal() * (levelMark.BottomShelfLength + 1);
-                            }
-
+                            if (newPoint.DistanceTo(levelMark.ObjectPoint) < levelMark.MinDistanceBetweenPoints)
+                                newPoint = levelMark.ObjectPoint + (horV * levelMark.MinDistanceBetweenPoints);
                             levelMark.SetArrowPoint(newPoint);
                         }
                         else if (levelMarkGrip.GripName == GripName.TopShelfPoint)
@@ -137,6 +112,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         }
 
                         AcadUtils.WriteMessageInDebug($"двигаем levelMarkGrip.GripName {levelMarkGrip.GripName} \n");
+                        
                         // Вот тут происходит перерисовка примитивов внутри блока
                         levelMark.UpdateEntities();
                         levelMark.BlockRecord.UpdateAnonymousBlocks();
