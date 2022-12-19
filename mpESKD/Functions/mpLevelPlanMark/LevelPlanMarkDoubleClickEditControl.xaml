@@ -13,16 +13,19 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
- <mps:Card>
+    <mps:Card>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
             <TextBlock Grid.Column="0"
                        Text="{Binding Source={StaticResource Lang}, XPath=p110}"/>
-            
+
             <mps:NumericBox Grid.Column="1"
                             Name="LevelNumBox"/>
         </Grid>

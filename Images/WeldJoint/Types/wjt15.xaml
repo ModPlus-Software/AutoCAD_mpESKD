@@ -1,0 +1,284 @@
+<!-- Created with Ai->XAML Export Plug-In Version 0.5 (PC/64) -->
+<!-- By Mike Swanson (http://blog.mikeswanson.com/)           -->
+
+<Viewbox Width="380.000" Height="243.609"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Canvas Width="380.000" Height="243.609">
+
+  <Canvas>
+
+  <!-- Слой 1/Border -->
+  <Path Data="F1 M 380.000,28.500 L 0.000,28.500 L 0.000,0.000 L 380.000,0.000 L 380.000,28.500 Z"/>
+
+  <Canvas>
+
+  <!-- Слой 1/<Группа>/Border -->
+  <Path Data="F1 M 380.000,134.518 L 0.000,134.518 L 0.000,106.018 L 380.000,106.018 L 380.000,134.518 Z"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 0.000,120.268 L 80.000,120.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 100.000,120.268 L 180.000,120.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 200.000,120.268 L 280.000,120.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 300.000,120.268 L 380.000,120.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 10.000,107.268 L 10.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 30.000,107.268 L 30.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 50.000,107.268 L 50.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 70.000,107.268 L 70.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 110.000,107.268 L 110.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 130.000,107.268 L 130.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 150.000,107.268 L 150.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 170.000,107.268 L 170.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 210.000,107.268 L 210.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 230.000,107.268 L 230.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 250.000,107.268 L 250.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 270.000,107.268 L 270.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 310.000,107.268 L 310.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 330.000,107.268 L 330.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 350.000,107.268 L 350.000,133.268"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 370.000,107.268 L 370.000,133.268"/>
+
+  </Canvas>
+
+  <Canvas>
+
+  <!-- Слой 1/<Группа>/Border -->
+  <Path Data="F1 M 380.000,87.391 L 0.000,87.391 L 0.000,58.891 L 380.000,58.891 L 380.000,87.391 Z"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 0.000,73.141 L 380.000,73.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 10.000,60.141 L 10.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 30.000,60.141 L 30.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 50.000,60.141 L 50.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 70.000,60.141 L 70.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 90.000,60.141 L 90.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 110.000,60.141 L 110.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 130.000,60.141 L 130.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 150.000,60.141 L 150.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 170.000,60.141 L 170.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 190.000,60.141 L 190.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 210.000,60.141 L 210.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 230.000,60.141 L 230.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 250.000,60.141 L 250.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 270.000,60.141 L 270.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 290.000,60.141 L 290.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 310.000,60.141 L 310.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 330.000,60.141 L 330.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 350.000,60.141 L 350.000,86.141"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 370.000,60.141 L 370.000,86.141"/>
+
+  </Canvas>
+
+  <Canvas>
+
+  <!-- Слой 1/<Группа>/Border -->
+  <Path Data="F1 M 380.000,181.645 L 0.000,181.645 L 0.000,153.145 L 380.000,153.145 L 380.000,181.645 Z"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 0.000,180.395 L 80.000,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 100.000,180.395 L 180.000,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 200.000,180.395 L 280.000,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 300.000,180.395 L 380.000,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 10.808,162.011 L 29.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 29.192,162.011 L 10.808,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 50.808,162.011 L 69.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 69.192,162.011 L 50.808,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 116.211,162.011 L 134.596,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 134.596,162.011 L 116.211,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 156.211,162.011 L 174.596,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 174.596,162.011 L 156.211,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 310.808,162.011 L 329.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 329.192,162.011 L 310.808,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 350.808,162.011 L 369.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 369.192,162.011 L 350.808,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 210.808,162.011 L 229.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 229.192,162.011 L 210.808,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 250.808,162.011 L 269.192,180.395"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 269.192,162.011 L 250.808,180.395"/>
+
+  </Canvas>
+
+  <Canvas>
+
+  <!-- Слой 1/<Группа>/Border -->
+  <Path Data="F1 M 380.000,243.609 L 0.000,243.609 L 0.000,215.109 L 380.000,215.109 L 380.000,243.609 Z"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 0.000,242.359 L 380.000,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 10.808,223.974 L 29.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 29.192,223.974 L 10.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 50.808,223.974 L 69.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 69.192,223.974 L 50.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 90.808,223.974 L 109.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 109.192,223.974 L 90.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 130.808,223.974 L 149.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 149.192,223.974 L 130.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 170.808,223.974 L 189.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 189.192,223.974 L 170.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 210.808,223.974 L 229.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 229.192,223.974 L 210.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 250.808,223.974 L 269.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 269.192,223.974 L 250.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 290.808,223.974 L 309.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 309.192,223.974 L 290.808,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 330.808,223.974 L 349.192,242.359"/>
+
+  <!-- Слой 1/<Группа>/<Линейный график> -->
+  <Path StrokeThickness="2.0" Stroke="#ff000000" StrokeMiterLimit="1.0" Data="F1 M 349.192,223.974 L 330.808,242.359"/>
+
+  </Canvas>
+
+  <!-- Слой 1/<Составной контур> -->
+  <Path Fill="#ff000000" Data="F1 M 20.000,19.472 L 26.778,26.250 L 13.222,26.250 L 20.000,19.472 Z M 60.000,19.472 L 66.778,26.250 L 53.222,26.250 L 60.000,19.472 Z M 100.000,19.472 L 106.778,26.250 L 93.222,26.250 L 100.000,19.472 Z M 180.000,19.472 L 186.778,26.250 L 173.222,26.250 L 180.000,19.472 Z M 220.000,19.472 L 226.778,26.250 L 213.222,26.250 L 220.000,19.472 Z M 260.000,19.472 L 266.778,26.250 L 253.222,26.250 L 260.000,19.472 Z M 340.000,19.472 L 346.778,26.250 L 333.222,26.250 L 340.000,19.472 Z M 349.606,26.250 L 341.414,18.058 L 349.899,9.572 L 348.485,8.158 L 340.000,16.644 L 331.515,8.158 L 330.101,9.572 L 338.586,18.058 L 330.394,26.250 L 269.606,26.250 L 261.414,18.058 L 269.899,9.572 L 268.485,8.158 L 260.000,16.644 L 251.515,8.158 L 250.101,9.572 L 258.586,18.058 L 250.394,26.250 L 229.606,26.250 L 221.414,18.058 L 229.899,9.572 L 228.485,8.158 L 220.000,16.644 L 211.515,8.158 L 210.101,9.572 L 218.586,18.058 L 210.394,26.250 L 189.606,26.250 L 181.414,18.058 L 189.899,9.572 L 188.485,8.158 L 180.000,16.644 L 171.515,8.158 L 170.101,9.572 L 178.586,18.058 L 170.394,26.250 L 109.606,26.250 L 101.414,18.058 L 109.899,9.572 L 108.485,8.158 L 100.000,16.644 L 91.515,8.158 L 90.101,9.572 L 98.586,18.058 L 90.394,26.250 L 69.606,26.250 L 61.414,18.058 L 69.899,9.572 L 68.485,8.158 L 60.000,16.644 L 51.515,8.158 L 50.101,9.572 L 58.586,18.058 L 50.394,26.250 L 29.606,26.250 L 21.414,18.058 L 29.899,9.572 L 28.485,8.158 L 20.000,16.644 L 11.515,8.158 L 10.101,9.572 L 18.586,18.058 L 10.394,26.250 L 0.000,26.250 L 0.000,28.250 L 380.000,28.250 L 380.000,26.250 L 349.606,26.250 Z"/>
+
+  </Canvas>
+</Canvas>
+</Viewbox>

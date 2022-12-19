@@ -85,10 +85,13 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         else if (levelMarkGrip.GripName == GripName.BottomShelfStartPoint)
                         {
                             levelMark.BottomShelfStartPoint = gripPoint + offset;
+                            var v = (levelMark.BottomShelfStartPoint - levelMark.ObjectPoint).GetNormal();
                             if (levelMark.ObjectLine)
                             {
                                 levelMark.ObjectPoint = levelMark.BottomShelfStartPoint - (horV * levelMark.ObjectLineOffset * scale);
-                                levelMark.EndPoint = levelMark.BottomShelfStartPoint + (horV * _cachedBottomShelfLength);
+                                levelMark.EndPoint = horV.X * v.X > 0 
+                                    ? levelMark.BottomShelfStartPoint + (horV * _cachedBottomShelfLength)
+                                    : levelMark.BottomShelfStartPoint - (horV * _cachedBottomShelfLength);
                             }
                             else
                             {
@@ -96,7 +99,9 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                                     levelMark.ObjectPoint.X,
                                     levelMark.BottomShelfStartPoint.Y,
                                     levelMark.ObjectPoint.Z);
-                                levelMark.EndPoint = levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale);
+                                levelMark.EndPoint = horV.X * v.X > 0  
+                                    ? levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale)
+                                    : levelMark.BottomShelfStartPoint - (horV * levelMark.BottomShelfLength * scale);
                             }
                         }
                         else if (levelMarkGrip.GripName == GripName.ArrowPoint)

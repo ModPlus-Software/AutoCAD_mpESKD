@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
+using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
@@ -16,7 +17,7 @@ using ModPlusAPI.Windows;
 /// </summary>
 [SmartEntityDisplayNameKey("h139")]
 [SystemStyleDescriptionKey("h142")]
-public class WeldJoint : SmartLinearEntity
+public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
 {
     private WeldJointType _weldJointType = WeldJointType.ButtFactorySolidVisible;
         
@@ -398,6 +399,10 @@ public class WeldJoint : SmartLinearEntity
             {
                 _solidPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
             }
+        }
+        else
+        {
+            _solidPolyline = null;
         }
 
         switch (WeldJointType)

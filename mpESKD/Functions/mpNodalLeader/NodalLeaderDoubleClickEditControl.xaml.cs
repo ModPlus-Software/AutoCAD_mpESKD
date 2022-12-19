@@ -25,7 +25,7 @@ public partial class NodalLeaderDoubleClickEditControl : IDoubleClickEditControl
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
-        if (!(smartEntity is NodalLeader nodalLeader))
+        if (smartEntity is not NodalLeader nodalLeader)
             throw new ArgumentException("Wrong type of entity");
 
         _nodalLeader = nodalLeader;
