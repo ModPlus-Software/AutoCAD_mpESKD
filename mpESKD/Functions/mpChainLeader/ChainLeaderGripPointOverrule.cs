@@ -8,11 +8,14 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using System;
+using System.Collections.Generic;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
 public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLeader>
 {
+    private List<double> _distArrowPointsFromInsPoint = new();
     /// <inheritdoc />
     public override void GetGripPoints(
         Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
@@ -62,6 +65,19 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         GripPoint = chainLeader.EndPoint
                     };
                     grips.Add(gp);
+                    _distArrowPointsFromInsPoint.Clear();
+                    var distFromEndPointToInsPoint = chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint);
+                    foreach (var distance in chainLeader.ArrowPoints)
+                    {
+                        if (distance < 0)
+                        {
+                            _distArrowPointsFromInsPoint.Add(distFromEndPointToInsPoint - Math.Abs(distance));
+                        }
+                        else
+                        {
+                            _distArrowPointsFromInsPoint.Add(distFromEndPointToInsPoint + distance);
+                        }
+                    }
 
                     // Получаем ручку зеркалирования полки
                     var gp1 = new ChainLeaderShelfPositionGrip(chainLeader)
@@ -89,7 +105,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             GripPoint = new Point3d(
                                 chainLeader.EndPoint.X + chainLeader.ShelfLength,
                                 chainLeader.EndPoint.Y,
-                                chainLeader.EndPoint.Z) 
+                                chainLeader.EndPoint.Z)
                         });
                     }
                     else
@@ -99,7 +115,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             GripPoint = new Point3d(
                                 chainLeader.EndPoint.X - chainLeader.TextIndent,
                                 chainLeader.EndPoint.Y,
-                                chainLeader.EndPoint.Z) 
+                                chainLeader.EndPoint.Z)
                         });
 
                         // ручки выбора типа стрелки
@@ -108,7 +124,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             GripPoint = new Point3d(
                                 chainLeader.EndPoint.X - chainLeader.ShelfLength,
                                 chainLeader.EndPoint.Y,
-                                chainLeader.EndPoint.Z) 
+                                chainLeader.EndPoint.Z)
                         });
                     }
 
@@ -138,11 +154,11 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             // ручки переноса стрелки
                             grips.Add(new ChainLeaderArrowMoveGrip(chainLeader, i, (BlockReference)entity)
                             {
-                                GripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal) - (Vector3d.YAxis * curViewUnitSize)
+                                GripPoint = chainLeader.EndPoint + chainLeader.ArrowPoints[i] * normal
                             });
 
-                            var gripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal);
-                            var deleteGripPoint = new Point3d(gripPoint.X + 3 * chainLeader.GetFullScale(), gripPoint.Y, gripPoint.Z) ; 
+                            var gripPoint = chainLeader.EndPoint + chainLeader.ArrowPoints[i] * normal;
+                            var deleteGripPoint = new Point3d(gripPoint.X + 2 * chainLeader.GetFullScale(), gripPoint.Y, gripPoint.Z);
 
                             // ручки удаления выносок
                             grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, i, (BlockReference)entity)
@@ -181,24 +197,39 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                             var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                                 chainLeader.EndPoint, newPoint);
-                            
+
                             if (pointOnPolyline.DistanceTo(chainLeader.EndPoint) <= chainLeader.MinDistanceBetweenPoints)
                             {
-                                pointOnPolyline = chainLeader.EndPoint + ((chainLeader.EndPoint-chainLeader.InsertionPoint) * chainLeader.MinDistanceBetweenPoints);
+                                pointOnPolyline = chainLeader.EndPoint + ((chainLeader.EndPoint - chainLeader.InsertionPoint) * chainLeader.MinDistanceBetweenPoints);
                             }
 
                             chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
-                            
+
                             ((BlockReference)entity).Position = pointOnPolyline;
                             chainLeader.InsertionPoint = pointOnPolyline;
                         }
                         else if (vertexGrip.GripIndex == 1)
                         {
                             chainLeader.EndPoint = vertexGrip.GripPoint + offset;
+                            var distInspointToEndPoint = chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint);
 
-                            if (chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint) <= chainLeader.MinDistanceBetweenPoints)
+                            if (distInspointToEndPoint <= chainLeader.MinDistanceBetweenPoints)
                             {
                                 chainLeader.EndPoint += (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                            }
+
+                            vertexGrip.TempPoint3ds = new List<double>(chainLeader.ArrowPoints);
+                            chainLeader.ArrowPoints.Clear();
+                            foreach (var distance in _distArrowPointsFromInsPoint)
+                            {
+                                if (distance < distInspointToEndPoint)
+                                {
+                                    chainLeader.ArrowPoints.Add(-(distInspointToEndPoint - distance));
+                                }
+                                else
+                                {
+                                    chainLeader.ArrowPoints.Add((distance - distInspointToEndPoint));
+                                }
                             }
                         }
 
@@ -229,7 +260,9 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
                             chainLeader.EndPoint, newPoint);
 
-                        chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint( chainLeader, pointOnPolyline);
+                        addLeaderGrip.IsOnsegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
+                            chainLeader.EndPoint);
+                        chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint(chainLeader, pointOnPolyline);
 
                         chainLeader.UpdateEntities();
                         chainLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -238,7 +271,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         var chainLeader = moveLeaderGrip.ChainLeader;
                         var pointOnPolyline = moveLeaderGrip.GripPoint + offset;
-                       
+
                         chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint(chainLeader, pointOnPolyline);
 
                         chainLeader.UpdateEntities();

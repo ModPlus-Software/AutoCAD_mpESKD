@@ -8,6 +8,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -45,6 +46,8 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
     /// </summary>
     public int GripIndex { get; }
 
+    public List<double> TempPoint3ds { get; set; }
+
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -74,19 +77,23 @@ public class ChainLeaderVertexGrip : SmartEntityGripData
                 var tempInsPoint = ChainLeader.InsertionPoint;
                 using (ChainLeader)
                 {
-                    var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
-                    var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-
-                    var distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
-
-                    if (result < distFromEndPointToInsPoint)
+                    if (GripIndex == 0)
                     {
-                        tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
-                        ChainLeader.ArrowPoints.Remove(result);
-                        ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
+                        var mainNormal = (ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal();
+                        var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+
+                        var distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
+
+                        if (result < distFromEndPointToInsPoint)
+                        {
+                            tempInsPoint = ChainLeader.EndPoint + (mainNormal * result);
+                            ChainLeader.ArrowPoints.Remove(result);
+                            ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
+                        }
+
+                        ChainLeader.InsertionPoint = tempInsPoint;
                     }
 
-                    ChainLeader.InsertionPoint = tempInsPoint;
                     ChainLeader.UpdateEntities();
                     ChainLeader.BlockRecord.UpdateAnonymousBlocks();
                 }

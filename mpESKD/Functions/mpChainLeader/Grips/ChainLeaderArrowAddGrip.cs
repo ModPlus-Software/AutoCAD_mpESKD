@@ -40,6 +40,8 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
         return Language.GetItem("gp5");
     }
 
+    public bool IsOnsegment { get; set; }
+
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
@@ -51,7 +53,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                 if (!ChainLeader.ArrowPoints.Contains(ChainLeader.TempNewArrowPoint))
                 {
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
-                    if (ChainLeader.IsLeft)
+                    if (!ChainLeader.IsLeft)
                     {
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
@@ -92,7 +94,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                     // когда тянем влево, значения отрицательные
                     else
                     {
-                        if (result > ChainLeader.TempNewArrowPoint)
+                        if (result > ChainLeader.TempNewArrowPoint && !IsOnsegment)
                         {
                             tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
                             ChainLeader.ArrowPoints.Add(-1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint));

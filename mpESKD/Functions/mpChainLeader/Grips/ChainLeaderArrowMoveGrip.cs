@@ -71,7 +71,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
                     
-                    if (ChainLeader.TempNewArrowPoint > 0)
+                    if (ChainLeader.TempNewArrowPoint >= 0)
                     {
                         // если в списке есть значения и они положительные, то берем последнюю
                         if (result > 0)
