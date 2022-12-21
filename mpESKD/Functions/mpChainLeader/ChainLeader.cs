@@ -20,10 +20,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
-    private readonly List<Hatch> _hatches = new ();
-    private readonly List<Polyline> _leaderEndLines = new ();
+    private readonly List<Hatch> _hatches = new();
+    private readonly List<Polyline> _leaderEndLines = new();
     private double _scale;
-    
+
     private Line _shelfLineFromEndPoint;
 
     #region Entities
@@ -166,7 +166,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [EntityProperty(PropertiesCategory.Geometry, 6, "gp7", LeaderEndType.Point)]
     [SaveToXData]
     public LeaderEndType ArrowType { get; set; } = LeaderEndType.Point;
-    
+
     /// <inheritdoc />
     [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
     [SaveToXData]
@@ -259,6 +259,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
+        foreach (var arrow in ArrowPoints)
+        {
+            yield return EndPoint + (EndPoint - InsertionPoint).GetNormal() * arrow;
+        }
     }
 
     /// <inheritdoc />
@@ -312,7 +316,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
-        
+
         if (!double.IsNaN(TempNewArrowPoint))
         {
             var tempPoint = endPoint + (MainNormal * TempNewArrowPoint);
@@ -355,7 +359,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
 
         _leaderLine = new Line(FirstPoint, SecondPoint);
-        
+
         CreateArrows(insertionPoint, MainNormal, ArrowSize, _scale);
 
         foreach (var arrowPoint in ArrowPoints)
@@ -384,8 +388,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _topDbText = new DBText { TextString = LeaderTextValue };
             _topDbText.SetProperties(TextStyle, mainTextHeight);
             _topDbText.SetPosition(
-                TextHorizontalMode.TextCenter, 
-                TextVerticalMode.TextVerticalMid, 
+                TextHorizontalMode.TextCenter,
+                TextVerticalMode.TextVerticalMid,
                 AttachmentPoint.MiddleCenter);
             topTextLength = _topDbText.GetLength();
         }
@@ -399,8 +403,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             _bottomDbText = new DBText { TextString = LeaderTextComment };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(
-                TextHorizontalMode.TextCenter, 
-                TextVerticalMode.TextVerticalMid, 
+                TextHorizontalMode.TextCenter,
+                TextVerticalMode.TextVerticalMid,
                 AttachmentPoint.MiddleCenter);
             bottomTextLength = _bottomDbText.GetLength();
             bottomTextHeight = _bottomDbText.GetHeight();

@@ -146,6 +146,8 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                                 chainLeader.InsertionPoint.X + 3 * chainLeader.GetFullScale(),
                                 chainLeader.InsertionPoint.Y,
                                 0) - (Vector3d.YAxis * curViewUnitSize)
+
+
                         });
 
                         var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();

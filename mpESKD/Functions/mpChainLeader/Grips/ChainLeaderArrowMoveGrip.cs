@@ -118,6 +118,11 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                             ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             tempInsPoint = ChainLeader.InsertionPoint;
                         }
+                        else if (ChainLeader.TempNewArrowPoint < result)
+                        {
+                            
+                                ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
+                        }
                         else
                         {
                             ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
