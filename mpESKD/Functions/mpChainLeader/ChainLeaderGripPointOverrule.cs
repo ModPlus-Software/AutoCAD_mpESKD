@@ -270,8 +270,11 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     else if (gripData is ChainLeaderArrowMoveGrip moveLeaderGrip)
                     {
                         var chainLeader = moveLeaderGrip.ChainLeader;
-                        var pointOnPolyline = moveLeaderGrip.GripPoint + offset;
-
+                        var newPoint = moveLeaderGrip.GripPoint + offset;
+                        var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
+                            chainLeader.EndPoint, newPoint);
+                        moveLeaderGrip.IsOnsegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
+                            chainLeader.EndPoint);
                         chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint(chainLeader, pointOnPolyline);
 
                         chainLeader.UpdateEntities();
@@ -298,7 +301,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
     private double SetChainLeaderTempNewArrowPoint(ChainLeader chainLeader, Point3d pointOnPolyline)
     {
         chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
-
         var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
             chainLeader.SecondPoint);
 

@@ -40,6 +40,9 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
         return Language.GetItem("gp5");
     }
 
+    /// <summary>
+    /// Свойство для определения точки в существующем сегменте
+    /// </summary>
     public bool IsOnsegment { get; set; }
 
     /// <inheritdoc />

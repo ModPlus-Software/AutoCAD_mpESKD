@@ -47,6 +47,11 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
         return Language.GetItem("gp2"); // move
     }
 
+    /// <summary>
+    /// Свойство для определения точки в существующем сегменте
+    /// </summary>
+    public bool IsOnsegment { get; set; }
+
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
@@ -59,7 +64,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                 if (!ChainLeader.ArrowPoints.Contains(ChainLeader.TempNewArrowPoint))
                 {
                     var distFromEndPointToInsPoint = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
-                    if (ChainLeader.IsLeft)
+                    if (!ChainLeader.IsLeft)
                     {
                         distFromEndPointToInsPoint = -1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                     }
@@ -102,8 +107,13 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                         tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
 
                         // если первая положительная, значит слева нет точек
+                        if (IsOnsegment)
+                        {
+                            ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
+                            tempInsPoint = ChainLeader.InsertionPoint;
+                        }
                        
-                        if (ChainLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
+                        else if (ChainLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
                         {
                             ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             tempInsPoint = ChainLeader.InsertionPoint;
