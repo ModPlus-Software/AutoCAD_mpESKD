@@ -124,7 +124,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Основной единичный вектор
     /// </summary>
-    public Vector3d MainNormal { get; set; }
+    public Vector3d MainNormal => (EndPoint - InsertionPoint).GetNormal();
 
     /// <summary>
     /// Отступ текста
@@ -259,6 +259,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
+        foreach (var arrowPoint in ArrowPoints)
+        {
+            yield return EndPoint + (MainNormal * arrowPoint);
+        }
     }
 
     /// <inheritdoc />
@@ -307,7 +311,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         _hatches.Clear();
 
         var arrowSize = ArrowSize * scale;
-        MainNormal = (endPoint - insertionPoint).GetNormal();
 
         var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
