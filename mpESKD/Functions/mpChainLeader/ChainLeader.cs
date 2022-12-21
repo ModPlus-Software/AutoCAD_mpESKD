@@ -23,7 +23,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private readonly List<Hatch> _hatches = new();
     private readonly List<Polyline> _leaderEndLines = new();
     private double _scale;
-
+    private Vector3d _mainNormal;
     private Line _shelfLineFromEndPoint;
 
     #region Entities
@@ -120,11 +120,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
-
-    /// <summary>
-    /// Основной единичный вектор
-    /// </summary>
-    public Vector3d MainNormal { get; set; }
 
     /// <summary>
     /// Отступ текста
@@ -259,9 +254,9 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         yield return InsertionPoint;
         yield return EndPoint;
-        foreach (var arrow in ArrowPoints)
+        foreach (var arrowPoint in ArrowPoints)
         {
-            yield return EndPoint + (EndPoint - InsertionPoint).GetNormal() * arrow;
+            yield return EndPoint + (EndPoint - InsertionPoint).GetNormal() * arrowPoint;
         }
     }
 
@@ -311,15 +306,15 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         _hatches.Clear();
 
         var arrowSize = ArrowSize * scale;
-        MainNormal = (endPoint - insertionPoint).GetNormal();
+        _mainNormal = (endPoint - insertionPoint).GetNormal();
 
-        var leaderMinPoint = insertionPoint + (MainNormal * arrowSize);
+        var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
             _leaderLine = new Line(insertionPoint, endPoint);
 
         if (!double.IsNaN(TempNewArrowPoint))
         {
-            var tempPoint = endPoint + (MainNormal * TempNewArrowPoint);
+            var tempPoint = endPoint + (_mainNormal * TempNewArrowPoint);
             if (TempNewArrowPoint > 0)
             {
                 FirstPoint = insertionPoint;
@@ -331,7 +326,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 SecondPoint = endPoint;
             }
 
-            CreateArrows(tempPoint, MainNormal, ArrowSize, _scale);
+            CreateArrows(tempPoint, _mainNormal, ArrowSize, _scale);
         }
         else if (ArrowPoints.Count > 0)
         {
@@ -343,7 +338,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
             foreach (var arrowPoint in ArrowPoints)
             {
-                tempPoints.Add(endPoint + (MainNormal * arrowPoint));
+                tempPoints.Add(endPoint + (_mainNormal * arrowPoint));
             }
 
             var furthestPoints = tempPoints.GetFurthestPoints();
@@ -360,13 +355,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         _leaderLine = new Line(FirstPoint, SecondPoint);
 
-        CreateArrows(insertionPoint, MainNormal, ArrowSize, _scale);
+        CreateArrows(insertionPoint, _mainNormal, ArrowSize, _scale);
 
         foreach (var arrowPoint in ArrowPoints)
         {
-            var tempPoint1 = endPoint + (MainNormal * arrowPoint);
+            var tempPoint1 = endPoint + (_mainNormal * arrowPoint);
 
-            CreateArrows(tempPoint1, MainNormal, ArrowSize, _scale);
+            CreateArrows(tempPoint1, _mainNormal, ArrowSize, _scale);
         }
 
         // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
@@ -486,6 +481,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         }
 
         _shelfLineFromEndPoint = new Line(endPoint, shelfEndPoint);
+
+        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
     }
 
     private void SetNodeNumberOnCreation()

@@ -66,6 +66,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     };
                     grips.Add(gp);
                     _distArrowPointsFromInsPoint.Clear();
+                    
                     var distFromEndPointToInsPoint = chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint);
                     foreach (var distance in chainLeader.ArrowPoints)
                     {
@@ -146,8 +147,6 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                                 chainLeader.InsertionPoint.X + 3 * chainLeader.GetFullScale(),
                                 chainLeader.InsertionPoint.Y,
                                 0) - (Vector3d.YAxis * curViewUnitSize)
-
-
                         });
 
                         var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
@@ -163,7 +162,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             var deleteGripPoint = new Point3d(gripPoint.X + 2 * chainLeader.GetFullScale(), gripPoint.Y, gripPoint.Z);
 
                             // ручки удаления выносок
-                            grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, i, (BlockReference)entity)
+                            grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, i + 5, (BlockReference)entity)
                             {
                                 GripPoint = deleteGripPoint - (Vector3d.YAxis * curViewUnitSize)
                             });
@@ -217,7 +216,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                             if (distInspointToEndPoint <= chainLeader.MinDistanceBetweenPoints)
                             {
-                                chainLeader.EndPoint += (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                                chainLeader.EndPoint += (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal() * chainLeader.MinDistanceBetweenPoints;
                             }
 
                             vertexGrip.TempPoint3ds = new List<double>(chainLeader.ArrowPoints);

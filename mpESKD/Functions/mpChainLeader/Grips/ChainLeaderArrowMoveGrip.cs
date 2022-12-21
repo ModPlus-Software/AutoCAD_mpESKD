@@ -30,7 +30,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
         RubberBandLineDisabled = true;
         _entity = entity;
     }
-    
+
     /// <summary>
     /// Экземпляр класса <see cref="mpLevelPlanMark.LevelPlanMark"/>
     /// </summary>
@@ -75,7 +75,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                     };
                     tempList.AddRange(ChainLeader.ArrowPoints);
                     var result = tempList.OrderBy(x => x).FirstOrDefault();
-                    
+
                     if (ChainLeader.TempNewArrowPoint >= 0)
                     {
                         // если в списке есть значения и они положительные, то берем последнюю
@@ -90,9 +90,9 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                                 ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             }
                             else
-                            { 
+                            {
                                 // если текущая больше чем последняя она должна быть insPoint
-                                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
+                                tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * ChainLeader.TempNewArrowPoint);
                                 ChainLeader.ArrowPoints[GripIndex] = ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint);
                             }
                         }
@@ -101,10 +101,10 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                             ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                         }
                     }
-                    else 
+                    else
                     {
                         // ищем первую
-                        tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
+                        tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * ChainLeader.TempNewArrowPoint);
 
                         // если первая положительная, значит слева нет точек
                         if (IsOnsegment)
@@ -112,7 +112,6 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                             ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
                             tempInsPoint = ChainLeader.InsertionPoint;
                         }
-                       
                         else if (ChainLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
                         {
                             ChainLeader.ArrowPoints[GripIndex] = ChainLeader.TempNewArrowPoint;
@@ -120,8 +119,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                         }
                         else if (ChainLeader.TempNewArrowPoint < result)
                         {
-                            
-                                ChainLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
+                            ChainLeader.ArrowPoints[GripIndex] = -1 * distFromEndPointToInsPoint;
                         }
                         else
                         {
@@ -129,7 +127,7 @@ public class ChainLeaderArrowMoveGrip : SmartEntityGripData
                         }
                     }
                 }
-                
+
                 ChainLeader.InsertionPoint = tempInsPoint;
                 ChainLeader.TempNewArrowPoint = double.NaN;
 

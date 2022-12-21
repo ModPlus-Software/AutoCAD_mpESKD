@@ -51,22 +51,36 @@ public class ChainLeaderArrowRemoveGrip : SmartEntityGripData
         using (ChainLeader)
         {
             var tempInsPoint = ChainLeader.InsertionPoint;
-            
+
             if (GripIndex == 4)
             {
-                var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-
-                if (result > 0)
+                if (ChainLeader.ArrowPoints.Any(x => x < 0))
                 {
-                    result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
+                    var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                    ChainLeader.ArrowPoints.Remove(result);
+                    tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result);
                 }
+                else
+                {
+                    var result = ChainLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                    if (result > 0)
+                    {
+                        result = ChainLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
+                    }
 
-                tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result);
-                ChainLeader.ArrowPoints.Remove(result);
+                    ChainLeader.ArrowPoints.Remove(result);
+                    tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * result);
+
+                    if (!ChainLeader.ArrowPoints.Any(x => x < 0))
+                    {
+                        var reversed = ChainLeader.ArrowPoints.Select(x => -x).ToList();
+                        ChainLeader.ArrowPoints = reversed;
+                    }    
+                }
             }
             else if (ChainLeader.ArrowPoints.Count != 0)
             {
-                ChainLeader.ArrowPoints.RemoveAt(GripIndex);
+                ChainLeader.ArrowPoints.RemoveAt(GripIndex-5);
             }
 
             ChainLeader.InsertionPoint = tempInsPoint;

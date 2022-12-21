@@ -84,7 +84,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                             }
                             else
                             { // если текущая больше чем последняя она должна быть insPoint
-                                tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
+                                tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * ChainLeader.TempNewArrowPoint);
                                 ChainLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
                             }
                         }
@@ -99,7 +99,7 @@ public class ChainLeaderArrowAddGrip : SmartEntityGripData
                     {
                         if (result > ChainLeader.TempNewArrowPoint && !IsOnsegment)
                         {
-                            tempInsPoint = ChainLeader.EndPoint + (ChainLeader.MainNormal * ChainLeader.TempNewArrowPoint);
+                            tempInsPoint = ChainLeader.EndPoint + ((ChainLeader.EndPoint - ChainLeader.InsertionPoint).GetNormal() * ChainLeader.TempNewArrowPoint);
                             ChainLeader.ArrowPoints.Add(-1 * ChainLeader.EndPoint.DistanceTo(ChainLeader.InsertionPoint));
                         }
                         else
