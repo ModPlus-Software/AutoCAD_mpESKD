@@ -66,6 +66,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     };
                     grips.Add(gp);
                     _distArrowPointsFromInsPoint.Clear();
+                    
                     var distFromEndPointToInsPoint = chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint);
                     foreach (var distance in chainLeader.ArrowPoints)
                     {
@@ -105,7 +106,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             GripPoint = new Point3d(
                                 chainLeader.EndPoint.X + chainLeader.ShelfLength,
                                 chainLeader.EndPoint.Y,
-                                chainLeader.EndPoint.Z)
+                                chainLeader.EndPoint.Z) + (Vector3d.XAxis * 10 * curViewUnitSize)
                         });
                     }
                     else
@@ -124,17 +125,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                             GripPoint = new Point3d(
                                 chainLeader.EndPoint.X - chainLeader.ShelfLength,
                                 chainLeader.EndPoint.Y,
-                                chainLeader.EndPoint.Z)
+                                chainLeader.EndPoint.Z) - (Vector3d.XAxis * 10 * curViewUnitSize)
                         });
                     }
 
                     // получаем ручку для создания стрелки
                     grips.Add(new ChainLeaderArrowAddGrip(chainLeader, (BlockReference)entity)
                     {
-                        GripPoint = new Point3d(
-                        chainLeader.InsertionPoint.X - 3 * chainLeader.GetFullScale(),
-                        chainLeader.InsertionPoint.Y,
-                        chainLeader.InsertionPoint.Z) - (Vector3d.YAxis * curViewUnitSize)
+                        GripPoint = chainLeader.InsertionPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
                     });
 
                     if (chainLeader.ArrowPoints.Count >= 1)
@@ -142,28 +140,24 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         // ручки удаления стрелки с insertionPoint
                         grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, 4, (BlockReference)entity)
                         {
-                            GripPoint = new Point3d(
-                                chainLeader.InsertionPoint.X + 3 * chainLeader.GetFullScale(),
-                                chainLeader.InsertionPoint.Y,
-                                0) - (Vector3d.YAxis * curViewUnitSize)
+                            GripPoint = chainLeader.InsertionPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
                         });
 
                         var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
                         for (var i = 0; i < chainLeader.ArrowPoints.Count; i++)
                         {
+                            var gripPoint = chainLeader.EndPoint + (chainLeader.ArrowPoints[i] * normal);
+
                             // ручки переноса стрелки
                             grips.Add(new ChainLeaderArrowMoveGrip(chainLeader, i, (BlockReference)entity)
                             {
-                                GripPoint = chainLeader.EndPoint + chainLeader.ArrowPoints[i] * normal
+                                GripPoint = gripPoint
                             });
-
-                            var gripPoint = chainLeader.EndPoint + chainLeader.ArrowPoints[i] * normal;
-                            var deleteGripPoint = new Point3d(gripPoint.X + 2 * chainLeader.GetFullScale(), gripPoint.Y, gripPoint.Z);
-
+                            
                             // ручки удаления выносок
-                            grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, i, (BlockReference)entity)
+                            grips.Add(new ChainLeaderArrowRemoveGrip(chainLeader, i + 5, (BlockReference)entity)
                             {
-                                GripPoint = deleteGripPoint - (Vector3d.YAxis * curViewUnitSize)
+                                GripPoint = gripPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
                             });
                         }
                     }
@@ -177,9 +171,8 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
         }
     }
 
-    // <inheritdoc/>
-    public override void MoveGripPointsAt(
-        Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
+    /// <inheritdoc/>
+    public override void MoveGripPointsAt(Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
         try
         {
@@ -215,7 +208,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                             if (distInspointToEndPoint <= chainLeader.MinDistanceBetweenPoints)
                             {
-                                chainLeader.EndPoint += (chainLeader.MainNormal * chainLeader.MinDistanceBetweenPoints);
+                                chainLeader.EndPoint += (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal() * chainLeader.MinDistanceBetweenPoints;
                             }
 
                             vertexGrip.TempPoint3ds = new List<double>(chainLeader.ArrowPoints);
