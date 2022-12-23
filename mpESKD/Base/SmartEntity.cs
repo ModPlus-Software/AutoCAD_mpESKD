@@ -277,6 +277,11 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
         return Matrix3d.Rotation(-Rotation, Vector3d.ZAxis, center);
     }
 
+    public Matrix3d GetBackMirroredRotationMatrix(Point3d center)
+    {
+        return Matrix3d.Rotation(Rotation, Vector3d.ZAxis, center);
+    }
+
     /// <inheritdoc />
     public abstract IEnumerable<Point3d> GetPointsForOsnap();
 

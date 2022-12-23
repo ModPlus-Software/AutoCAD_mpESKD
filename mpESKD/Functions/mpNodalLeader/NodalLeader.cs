@@ -107,9 +107,9 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     [SaveToXData]
     public Point3d LeaderPoint { get; set; }
-    
+
     private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
-    
+
     /// <summary>
     /// Состояние Jig при создании узловой выноски
     /// </summary>
@@ -509,7 +509,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             bottomTextPosition = new Point3d(
                 leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
                 leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
-            
+
             if (_topFirstDbText != null)
             {
                 _topFirstDbText.Position = topFirstTextPosition;
@@ -556,6 +556,19 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
 
+        MirrorIfNeed(new[] { _topFirstDbText, _topSecondDbText, _bottomDbText });
+
+        if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
+        {
+            var tempFirstTextPosition = new Point3d(_topFirstDbText.Position.X + (topSecondTextLength), _topFirstDbText.Position.Y, 0);
+            var tempSecondTextPosition = new Point3d(_topSecondDbText.Position.X - topFirstTextLength, _topSecondDbText.Position.Y, 0);
+
+            _topFirstDbText.Position = tempFirstTextPosition;
+            _topFirstDbText.AlignmentPoint = tempFirstTextPosition;
+            _topSecondDbText.Position = tempSecondTextPosition;
+            _topSecondDbText.AlignmentPoint = tempSecondTextPosition;
+        }
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
@@ -567,6 +580,11 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
+            if (ScaleFactorX <= 0)
+            {
+                backRotationMatrix = GetBackMirroredRotationMatrix(leaderPoint);
+            }
+
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
             _topFirstDbText?.TransformBy(backRotationMatrix);
             _topFirstTextMask?.TransformBy(backRotationMatrix);
