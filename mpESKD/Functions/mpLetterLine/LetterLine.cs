@@ -286,7 +286,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
             * при условии что расстояние от второй точки до первой больше минимального допустимого
             */
             var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * _scale);
+                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * _scale);
             CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
             EndPoint = tmpEndPoint.TransformBy(BlockTransform);
         }
