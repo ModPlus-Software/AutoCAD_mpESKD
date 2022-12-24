@@ -71,7 +71,6 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                         GripPoint = fragmentMarker.EndPoint
                     };
                     grips.Add(gp);
-                    AcadUtils.WriteMessageInDebug($"fragmentMarker.InsertionPoint {fragmentMarker.InsertionPoint}, fragmentMarker.EndPoint {fragmentMarker.EndPoint}");
                     // получаем ручку выноски
                     if (!(!string.IsNullOrEmpty(fragmentMarker.MainText) |
                           !string.IsNullOrEmpty(fragmentMarker.SmallText)))
