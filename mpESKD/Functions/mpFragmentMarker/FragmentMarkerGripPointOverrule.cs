@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpFragmentMarker;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Functions.mpFragmentMarker;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -69,7 +71,6 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                         GripPoint = fragmentMarker.EndPoint
                     };
                     grips.Add(gp);
-
                     // получаем ручку выноски
                     if (!(!string.IsNullOrEmpty(fragmentMarker.MainText) |
                           !string.IsNullOrEmpty(fragmentMarker.SmallText)))

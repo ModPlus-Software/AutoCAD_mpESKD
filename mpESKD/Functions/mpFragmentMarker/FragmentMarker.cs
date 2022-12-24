@@ -312,7 +312,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     {
         var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ?
             new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
-            ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+            ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
 
         var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
         FillMainPolylineWithPoints(pts, bulges);

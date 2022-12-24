@@ -181,7 +181,7 @@ public class BreakLine : SmartEntity
             * при условии что расстояние от второй точки до первой больше минимального допустимого
             */
             var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
             var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out bulges);
             FillMainPolylineWithPoints(pts, bulges);
             EndPoint = tmpEndPoint.TransformBy(BlockTransform);
