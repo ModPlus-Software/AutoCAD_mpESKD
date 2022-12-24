@@ -289,10 +289,20 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
                     var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS, out List<double> bulges);
                     _leaderFirstPoint = pts[3].ToPoint3d();
                     FillMainPolylineWithPoints(pts, bulges);
+                    AcadUtils.WriteMessageInDebug($"in else length > MinDistanceBetweenPoints * scale");
                 }
                 else
                 {
                     MakeSimplyEntity(scale);
+                    //var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ?
+                    //    new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
+                    //    EndPointOCS + ((EndPointOCS-InsertionPointOCS).GetNormal() * MinDistanceBetweenPoints * scale);
+
+                    //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
+                    //FillMainPolylineWithPoints(pts, bulges);
+
+                    //_leaderFirstPoint = pts[3].ToPoint3d();
+                    AcadUtils.WriteMessageInDebug($"in else else");
                 }
 
                 CreateEntities(_leaderFirstPoint, LeaderPointOCS, scale);
@@ -310,10 +320,32 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     /// </summary>
     private void MakeSimplyEntity(double scale)
     {
-        var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ?
-            new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
-            ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+        //var tmpEndPoint = JigState == FragmentMarkerJigState.InsertionPoint ?
+        //    new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z) :
+        //    ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
 
+        Point3d tmpEndPoint;
+
+        if (JigState == FragmentMarkerJigState.InsertionPoint)
+        {
+            tmpEndPoint = new Point3d(InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y,
+                InsertionPointOCS.Z);
+            AcadUtils.WriteMessageInDebug($" tmpEndPoint in if {tmpEndPoint}");
+            if (Rotation > 0)
+            {
+                tmpEndPoint.RotateBy(-Rotation, Vector3d.ZAxis, EndPoint);
+
+                AcadUtils.WriteMessageInDebug($" tmpEndPoint in InsertionPoint after rotation {tmpEndPoint}");
+            }    
+        }
+        else
+        {
+            tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPointOCS, EndPointOCS,
+                InsertionPointOCS, MinDistanceBetweenPoints * scale);
+            AcadUtils.WriteMessageInDebug($" tmpEndPoint in else {tmpEndPoint} JigState {JigState}");
+
+        }
+        
         var pts = PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint, out var bulges);
         FillMainPolylineWithPoints(pts, bulges);
 
