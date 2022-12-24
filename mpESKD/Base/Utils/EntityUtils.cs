@@ -130,7 +130,7 @@ public static class EntityUtils
     {
         if (dbText == null)
             return null;
-        AcadUtils.WriteMessageInDebug($"\n dbText.TextString {dbText.TextString} dbText.GeometricExtents {dbText.GeometricExtents} \n");
+        
         return GetBackgroundMask(dbText.GeometricExtents, offset, center);
     }
 

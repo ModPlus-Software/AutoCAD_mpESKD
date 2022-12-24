@@ -423,6 +423,19 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
 
+        MirrorIfNeed(new[] { _topFirstDbText, _topSecondDbText, _bottomDbText });
+
+        if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
+        {
+            var tempFirstTextPosition = new Point3d(_topFirstDbText.Position.X + (topSecondTextLength), _topFirstDbText.Position.Y, 0);
+            var tempSecondTextPosition = new Point3d(_topSecondDbText.Position.X - topFirstTextLength, _topSecondDbText.Position.Y, 0);
+
+            _topFirstDbText.Position = tempFirstTextPosition;
+            _topFirstDbText.AlignmentPoint = tempFirstTextPosition;
+            _topSecondDbText.Position = tempSecondTextPosition;
+            _topSecondDbText.AlignmentPoint = tempSecondTextPosition;
+        }
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
@@ -434,6 +447,11 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
+            if (ScaleFactorX <= 0)
+            {
+                backRotationMatrix = GetBackMirroredRotationMatrix(leaderPoint);
+            }
+
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
             _topFirstDbText?.TransformBy(backRotationMatrix);
             _topFirstTextMask?.TransformBy(backRotationMatrix);

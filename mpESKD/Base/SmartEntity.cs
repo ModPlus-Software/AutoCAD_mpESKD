@@ -249,7 +249,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
         }
         set => _blockRecord = value;
     }
-        
+
     /// <summary>
     /// Метод обработки события изменения масштаба
     /// </summary>
@@ -275,6 +275,11 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     public Matrix3d GetBackRotationMatrix(Point3d center)
     {
         return Matrix3d.Rotation(-Rotation, Vector3d.ZAxis, center);
+    }
+
+    public Matrix3d GetBackMirroredRotationMatrix(Point3d center)
+    {
+        return Matrix3d.Rotation(Rotation, Vector3d.ZAxis, center);
     }
 
     /// <inheritdoc />
@@ -476,7 +481,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName && tv.Value.ToString() == "mp" + GetType().Name);
             if (typedValue1001.Value != null)
             {
-                var binaryFormatter = new BinaryFormatter {Binder = new Binder()};
+                var binaryFormatter = new BinaryFormatter { Binder = new Binder() };
                 var memoryStream = GetMemoryStreamFromResultBuffer(resultBuffer);
                 var deserialize = binaryFormatter.Deserialize(memoryStream);
                 if (deserialize is DataHolder dataHolder)
@@ -558,7 +563,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
 
                 if (string.IsNullOrEmpty(valueForProperty))
                     continue;
-                    
+
                 if (propertyInfo.Name == nameof(StyleGuid))
                 {
                     StyleGuid = valueForProperty;
@@ -594,9 +599,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 }
                 else if (propertyInfo.PropertyType == typeof(List<double>))
                 {
-                    propertyInfo.SetValue(
-                        this,
-                        valueForProperty.Split('#').Select(s => double.Parse(s, NumberStyles.Any, CultureInfo.InvariantCulture)).ToList());
+                    propertyInfo.SetValue(this, valueForProperty.Split('#').Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToList());
                 }
                 else if (propertyInfo.PropertyType == typeof(int))
                 {
@@ -705,7 +708,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
             return;
         if ((ScaleFactorX >= 0 || MainFunction.Mirroring) && (ScaleFactorX <= 0 || !MainFunction.Mirroring))
             return;
-        
+
         dbText.IsMirroredInX = true;
     }
 

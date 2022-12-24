@@ -188,7 +188,7 @@ public class GroundLine : SmartLinearEntity
             * при условии что расстояние от второй точки до первой больше минимального допустимого
             */
             var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPoint, EndPoint, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
             CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             EndPoint = tmpEndPoint.TransformBy(BlockTransform);
         }

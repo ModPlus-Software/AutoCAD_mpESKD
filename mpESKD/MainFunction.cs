@@ -71,8 +71,7 @@ public class MainFunction : IExtensionApplication
         // bedit watcher
         BeditCommandWatcher.Initialize();
         AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
-
-        AcadUtils.Documents.DocumentCreated += Documents_DocumentCreated;
+        
         AcadUtils.Documents.DocumentActivated += Documents_DocumentActivated;
 
         foreach (Document document in AcadUtils.Documents)
@@ -411,9 +410,13 @@ public class MainFunction : IExtensionApplication
 
         e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
         e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+        e.Document.CommandWillStart -= CommandWillStart;
         e.Document.CommandWillStart += CommandWillStart;
+        e.Document.CommandEnded -= CommandEnded;
         e.Document.CommandEnded += CommandEnded;
+        e.Document.CommandCancelled -= CommandCancelled;
         e.Document.CommandCancelled += CommandCancelled;
+       
         // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
         // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
         try
@@ -443,20 +446,6 @@ public class MainFunction : IExtensionApplication
         {
             // ignore
         }
-    }
-
-    private static void Documents_DocumentCreated(object sender, DocumentCollectionEventArgs e)
-    {
-        if (e.Document == null) 
-            return;
-
-        e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
-        e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-        e.Document.LayoutSwitched -= DocumentOnLayoutSwitched;
-        e.Document.LayoutSwitched += DocumentOnLayoutSwitched;
-        e.Document.CommandWillStart += CommandWillStart;
-        e.Document.CommandEnded += CommandEnded;
-        e.Document.CommandCancelled += CommandCancelled;
     }
 
     private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
@@ -498,36 +487,7 @@ public class MainFunction : IExtensionApplication
 
     private static void DocumentOnLayoutSwitched(object sender, LayoutSwitchedEventArgs e)
     {
-        try
-        {
-            if (AcadUtils.IsInModel())
-                return;
-            
-            using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
-            
-            if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
-            {
-                foreach (var objectId in btr)
-                {
-                    if (tr.GetObject(objectId, OpenMode.ForWrite) is not BlockReference blockReference || blockReference.XData == null) 
-                        continue;
-
-                    var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
-                    if (entity == null)
-                        continue;
-
-                    entity.UpdateEntities();
-                    entity.BlockRecord.UpdateAnonymousBlocks();
-                    blockReference.RecordGraphicsModified(true);
-                }
-            }
-
-            tr.Commit();
-        }
-        catch (System.Exception exception)
-        {
-            Debug.Print(exception.Message);
-        }
+        UpdateSmartObjectsInModelSpace();
     }
 
     private static void CommandCancelled(object sender, CommandEventArgs e)
@@ -538,6 +498,11 @@ public class MainFunction : IExtensionApplication
     private static void CommandEnded(object sender, CommandEventArgs e)
     {
         Mirroring = false;
+
+        if (e.GlobalCommandName is "REGEN" or "REGENALL")
+        {
+            UpdateSmartObjectsInModelSpace();
+        }
     }
 
     private static void CommandWillStart(object sender, CommandEventArgs e)
@@ -577,5 +542,39 @@ public class MainFunction : IExtensionApplication
         var rxObject = RXObject.GetClass(typeof(BlockReference));
         Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(
             rxObject, _intellectualEntityContextMenu);
+    }
+
+    private static void UpdateSmartObjectsInModelSpace()
+    {
+        try
+        {
+            if (AcadUtils.IsInModel())
+                return;
+
+            using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
+
+            if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
+            {
+                foreach (var objectId in btr)
+                {
+                    if (tr.GetObject(objectId, OpenMode.ForWrite) is not BlockReference blockReference || blockReference.XData == null)
+                        continue;
+
+                    var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
+                    if (entity == null)
+                        continue;
+
+                    entity.UpdateEntities();
+                    entity.BlockRecord.UpdateAnonymousBlocks();
+                    blockReference.RecordGraphicsModified(true);
+                }
+            }
+
+            tr.Commit();
+        }
+        catch (System.Exception exception)
+        {
+            Debug.Print(exception.Message);
+        }
     }
 }

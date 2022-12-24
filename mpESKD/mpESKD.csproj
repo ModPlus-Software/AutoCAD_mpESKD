@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.20.0.0</Version>
+		<Version>1.21.5.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 		<Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023</Configurations>
 		<Platforms>x64</Platforms>
@@ -148,10 +148,6 @@
 		<PackageReference Include="ModPlus.AutoCAD.API.2016" Version="1.0.0" ExcludeAssets="runtime" />
 		<PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
-	<ItemGroup>
-	  <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32.png" />
-	  <None Remove="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32_dark.png" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
@@ -177,6 +173,8 @@
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCylinder_32x32_dark.png" />
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32.png" />
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
+		<Resource Include="Functions\mpChainLeader\Icons\mpChainLeader_32x32.png" />
+		<Resource Include="Functions\mpChainLeader\Icons\mpChainLeader_32x32_dark.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
@@ -257,6 +255,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Page Update="Functions\mpChainLeader\ChainLeaderDoubleClickEditControl.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Functions\mpChainLeader\ChainLeader.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
 		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
 		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 		</Page>

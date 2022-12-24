@@ -12,7 +12,10 @@ public class MainSettings : ObservableObject
     private readonly UserConfigFileUtils _userConfigFileUtils;
     private static MainSettings _instance;
 
-    private MainSettings()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MainSettings"/> class.
+    /// </summary>
+    public MainSettings()
     {
         _userConfigFileUtils = new UserConfigFileUtils(ModPlusConnector.Instance);
     }
@@ -304,6 +307,23 @@ public class MainSettings : ObservableObject
     /// Продолжать нумерацию фрагмента при создании нового фрагмента
     /// </summary>
     public bool FragmentMarkerContinueNodeNumber
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region ChainLeader
+
+    /// <summary>
+    /// Продолжать нумерацию выноски при создании новой выноски
+    /// </summary>
+    public bool ChainLeaderContinueNodeNumber
     {
         get => _userConfigFileUtils.GetValue(true);
         set

@@ -11,6 +11,7 @@ using Base.Abstractions;
 using Base.Utils;
 using Functions.mpAxis;
 using Functions.mpBreakLine;
+using Functions.mpChainLeader;
 using Functions.mpFragmentMarker;
 using Functions.mpGroundLine;
 using Functions.mpLetterLine;
@@ -187,6 +188,9 @@ public class RibbonBuilder
         var ribPanel = new RibbonPanel { Source = ribSourcePanel };
         ribbonTab.Panels.Add(ribPanel);
         var ribRowPanel = new RibbonRowPanel();
+
+        // mpChainLeader
+        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<ChainLeader>()));
 
         // mpNodalLeader
         ribRowPanel.Items.Add(GetBigButton(GetDescriptor<NodalLeader>()));
