@@ -10,7 +10,24 @@ using Autodesk.AutoCAD.GraphicsInterface;
 /// </summary>
 public static class TextStyleUtils
 {
-    /// <summary>Проверка наличия текстового стиля в текущем документе</summary>
+    /// <summary>
+    /// Возвращает имя текущего текстового стиля
+    /// </summary>
+    public static string GetCurrentTextStyleName()
+    {
+        using (AcadUtils.Document.LockDocument())
+        {
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var textStyle = (TextStyleTableRecord)tr.GetObject(AcadUtils.Database.Textstyle, OpenMode.ForRead);
+                return textStyle.Name;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Проверка наличия текстового стиля в текущем документе
+    /// </summary>
     /// <param name="textStyleName">Имя текстового стиля</param>
     public static bool HasTextStyle(string textStyleName)
     {

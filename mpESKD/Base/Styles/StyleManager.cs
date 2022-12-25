@@ -728,33 +728,19 @@ public static class StyleManager
                     }
                     else if (attribute.Name == "TextStyle")
                     {
-                        var apply = false;
-                        if (isOnEntityCreation)
+                        var textStyleName = style.StyleType == StyleType.User
+                            ? propertyFromStyle.Value.ToString()
+                            : TextStyleUtils.GetCurrentTextStyleName();
+                        if (TextStyleUtils.HasTextStyle(textStyleName))
                         {
-                            if (MainSettings.Instance.UseTextStyleFromStyle)
-                            {
-                                apply = true;
-                            }
+                            propertyInfo.SetValue(entity, textStyleName);
                         }
                         else
                         {
-                            apply = true;
-                        }
-
-                        if (apply)
-                        {
-                            var textStyleName = propertyFromStyle.Value.ToString();
-                            if (TextStyleUtils.HasTextStyle(textStyleName))
+                            if (MainSettings.Instance.IfNoTextStyle == 1 &&
+                                TextStyleUtils.CreateTextStyle(style.TextStyleXmlData))
                             {
                                 propertyInfo.SetValue(entity, textStyleName);
-                            }
-                            else
-                            {
-                                if (MainSettings.Instance.IfNoTextStyle == 1 &&
-                                    TextStyleUtils.CreateTextStyle(style.TextStyleXmlData))
-                                {
-                                    propertyInfo.SetValue(entity, textStyleName);
-                                }
                             }
                         }
                     }

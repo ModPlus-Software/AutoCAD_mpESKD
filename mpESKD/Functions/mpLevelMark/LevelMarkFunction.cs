@@ -30,7 +30,7 @@ public class LevelMarkFunction : ISmartEntityFunction
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
         SmartEntityUtils.SendStatistic<LevelMark>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -40,7 +40,7 @@ public class LevelMarkFunction : ISmartEntityFunction
              * При инициализации плагина регистрации нет!
              */
             ExtendedDataUtils.AddRegAppTableRecord<LevelMark>();
-                
+
             var levelMark = new LevelMark();
 
             var blockReference = MainFunction.CreateBlock(levelMark);
@@ -75,7 +75,7 @@ public class LevelMarkFunction : ISmartEntityFunction
     public void AlignLevelMarks()
     {
 #if !DEBUG
-            Statistic.SendCommandStarting("mpLevelMarkAlign", ModPlusConnector.Instance.AvailProductExternalVersion);
+        Statistic.SendCommandStarting("mpLevelMarkAlign", ModPlusConnector.Instance.AvailProductExternalVersion);
 #endif
         try
         {
@@ -187,7 +187,7 @@ public class LevelMarkFunction : ISmartEntityFunction
     private static void CreateLevelMark()
     {
         SmartEntityUtils.SendStatistic<LevelMark>();
-            
+
         try
         {
             Overrule.Overruling = false;
@@ -197,7 +197,7 @@ public class LevelMarkFunction : ISmartEntityFunction
              * При инициализации плагина регистрации нет!
              */
             ExtendedDataUtils.AddRegAppTableRecord<LevelMark>();
-                
+
             var style = StyleManager.GetCurrentStyle(typeof(LevelMark));
             var levelMark = new LevelMark();
 
