@@ -728,20 +728,26 @@ public static class StyleManager
                     }
                     else if (attribute.Name == "TextStyle")
                     {
-                        var textStyleName = style.StyleType == StyleType.User
-                            ? propertyFromStyle.Value.ToString()
-                            : TextStyleUtils.GetCurrentTextStyleName();
-                        if (TextStyleUtils.HasTextStyle(textStyleName))
+                        if (MainSettings.Instance.UseTextStyleFromStyle)
                         {
-                            propertyInfo.SetValue(entity, textStyleName);
-                        }
-                        else
-                        {
-                            if (MainSettings.Instance.IfNoTextStyle == 1 &&
-                                TextStyleUtils.CreateTextStyle(style.TextStyleXmlData))
+                            var textStyleName = propertyFromStyle.Value.ToString();
+                            if (TextStyleUtils.HasTextStyle(textStyleName))
                             {
                                 propertyInfo.SetValue(entity, textStyleName);
                             }
+                            else
+                            {
+                                if (MainSettings.Instance.IfNoTextStyle == 1 &&
+                                    TextStyleUtils.CreateTextStyle(style.TextStyleXmlData))
+                                {
+                                    propertyInfo.SetValue(entity, textStyleName);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var textStyleName = TextStyleUtils.GetCurrentTextStyleName();
+                            propertyInfo.SetValue(entity, textStyleName);
                         }
                     }
                     else if (attribute.Name == "NumberSeparator")
