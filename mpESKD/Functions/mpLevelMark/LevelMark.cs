@@ -295,7 +295,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     }
 
     /// <summary>
-    /// Выравнивание основного значения по горизонтали
+    /// Выравнивание текста по горизонтали
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 5, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
     [SaveToXData]
@@ -363,6 +363,11 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     [EntityProperty(PropertiesCategory.Content, 15, "p69", 1.0, 0.000001, 1000000, descLocalKey: "d69")]
     [SaveToXData]
     public double MeasurementScale { get; set; } = 1.0;
+
+    /// <summary>
+    /// Свойство определяющая сторону полки
+    /// </summary>
+    public bool IsLeft => (ObjectPointOCS - EndPointOCS).GetNormal().X < 0;
 
     /// <summary>
     /// Нижняя полка
@@ -587,7 +592,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var secondTextHeight = SecondTextHeight * scale;
         var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
-        
+
         if (ObjectLine)
         {
             _bottomShelfLine = new Line(
@@ -645,7 +650,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         if (_bottomDbText != null)
         {
             var diff = Math.Abs(topTextLength - bottomTextLength);
-            
+
             var textMovementHorV = diff * horV;
             var textHalfMovementHorV = diff / 2 * horV;
             var movingPosition = GetMovementPositionVector(isLeft, textHalfMovementHorV, textMovementHorV);
@@ -674,11 +679,13 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
+        TopShelfLineLength = _topShelfLine.Length;
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
-
-        AcadUtils.WriteMessageInDebug($"ObjectPointOCS - BottomShelfStartPointOCS  {objectPoint.DistanceTo(BottomShelfStartPointOCS) } \n");
     }
+
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
     {

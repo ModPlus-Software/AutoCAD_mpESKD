@@ -38,6 +38,32 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                     grips.Add(new LevelMarkGrip(levelMark, GripType.Point, GripName.TopShelfPoint, levelMark.ShelfPoint));
 
                     _cachedBottomShelfLength = Math.Abs(levelMark.EndPoint.X - levelMark.BottomShelfStartPoint.X);
+
+                    // получаем ручку типа рамки
+                    if (!string.IsNullOrEmpty(levelMark.Note))
+                    {
+                        if (!levelMark.IsLeft)
+                        {
+                            grips.Add(new LevelMarkTextAlignGrip(levelMark)
+                            {
+                                GripPoint = new Point3d(
+                                    levelMark.ShelfPoint.X - levelMark.TopShelfLineLength,
+                                    levelMark.ShelfPoint.Y + levelMark.MainTextHeight + levelMark.TextVerticalOffset,
+                                    levelMark.ShelfPoint.Z)
+                            });
+                        }
+                        else
+                        {
+                            grips.Add(new LevelMarkTextAlignGrip(levelMark)
+                            {
+                                GripPoint = new Point3d(
+                                    levelMark.ShelfPoint.X + levelMark.TopShelfLineLength,
+                                    levelMark.ShelfPoint.Y + levelMark.MainTextHeight + levelMark.TextVerticalOffset,
+                                    levelMark.ShelfPoint.Z)
+                            });    
+                        }
+                        
+                    }
                 }
             }
         }

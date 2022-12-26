@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Base.Overrules;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Base.Overrules;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -75,6 +77,16 @@ public abstract class SmartEntityGripData : GripData
         {
             worldDraw.Geometry.Polygon(PointsForListMinusGrip(num, ecs));
             worldDraw.Geometry.Polygon(PointsForListTriangle(num, ecs));
+        }
+        else if (GripType == GripType.TextAlign)
+        {
+            worldDraw.Geometry.Polygon(PointsForTopLineAlignGrip(num, ecs));
+            foreach (var points in PointsForTopLineAlignGrip(num, ecs))
+            {
+                AcadUtils.WriteMessageInDebug(points.ToString());
+            }
+            worldDraw.Geometry.Polygon(PointsForMiddleLineAlignGrip(num, ecs));
+            worldDraw.Geometry.Polygon(PointsForBottomLineAlignGrip(num, ecs));
         }
         else
         {
@@ -192,6 +204,7 @@ public abstract class SmartEntityGripData : GripData
             GripPoint - (horUnit * 0.5) - (verUnit * 1.25),
             GripPoint - (horUnit * 0.5) - (verUnit * 0.25)
         };
+
     }
 
     private Point3dCollection PointsForTwoArrowsGripLeftRightFirstArrow(double num, CoordinateSystem3d ecs)
@@ -244,8 +257,8 @@ public abstract class SmartEntityGripData : GripData
 
     private Point3dCollection PointsForListTriangle(double num, CoordinateSystem3d ecs)
     {
-        var horUnit = num * 0.8 * ecs.Xaxis;
-        var verUnit = num * 0.8 * ecs.Yaxis;
+        var horUnit = num * ecs.Xaxis;
+        var verUnit = num * ecs.Yaxis;
         return new Point3dCollection
         {
             GripPoint - verUnit,
@@ -264,6 +277,45 @@ public abstract class SmartEntityGripData : GripData
             GripPoint + horUnit + (verUnit * 1.5),
             GripPoint + horUnit + (verUnit * 2),
             GripPoint - horUnit + (verUnit * 2)
+        };
+    }
+
+    private Point3dCollection PointsForTopLineAlignGrip(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.9 * ecs.Xaxis;
+        var verUnit = num * 0.6 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 1.5),
+            GripPoint + horUnit + (verUnit * 2),
+            GripPoint - horUnit + (verUnit * 2)
+        };
+    }
+
+    private Point3dCollection PointsForMiddleLineAlignGrip(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.9 * ecs.Xaxis;
+        var verUnit = num * 0.6 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit - (verUnit * 0.25),
+            GripPoint - (horUnit * 0.2) - (verUnit * 0.25),
+            GripPoint - (horUnit * 0.2) + (verUnit * 0.25),
+            GripPoint - horUnit + (verUnit * 0.25)
+        };
+    }
+
+    private Point3dCollection PointsForBottomLineAlignGrip(double num, CoordinateSystem3d ecs)
+    {
+        var horUnit = num * 0.9 * ecs.Xaxis;
+        var verUnit = num * 0.6 * ecs.Yaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit - (verUnit * 2),
+            GripPoint + (horUnit * 0.2) - (verUnit * 2),
+            GripPoint + (horUnit * 0.2) - (verUnit * 1.5),
+            GripPoint - horUnit - (verUnit * 1.5)
         };
     }
 

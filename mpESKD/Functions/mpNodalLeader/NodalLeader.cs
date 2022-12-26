@@ -561,12 +561,16 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
         {
             var tempFirstTextPosition = new Point3d(_topFirstDbText.Position.X + (topSecondTextLength), _topFirstDbText.Position.Y, 0);
-            var tempSecondTextPosition = new Point3d(_topSecondDbText.Position.X - topFirstTextLength, _topSecondDbText.Position.Y, 0);
 
             _topFirstDbText.Position = tempFirstTextPosition;
             _topFirstDbText.AlignmentPoint = tempFirstTextPosition;
-            _topSecondDbText.Position = tempSecondTextPosition;
-            _topSecondDbText.AlignmentPoint = tempSecondTextPosition;
+
+            if (_topSecondDbText != null)
+            {
+                var tempSecondTextPosition = new Point3d(_topSecondDbText.Position.X - topFirstTextLength, _topSecondDbText.Position.Y, 0);
+                _topSecondDbText.Position = tempSecondTextPosition;
+                _topSecondDbText.AlignmentPoint = tempSecondTextPosition;
+            }
         }
 
         if (HideTextBackground)
