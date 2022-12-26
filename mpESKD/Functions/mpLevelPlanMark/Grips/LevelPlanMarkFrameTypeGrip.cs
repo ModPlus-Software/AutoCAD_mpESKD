@@ -4,6 +4,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using Autodesk.AutoCAD.DatabaseServices;
+using Base;
 using ModPlusAPI;
 using Base.Enums;
 using Base.Overrules;
@@ -16,22 +17,27 @@ using Base.Utils;
 public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
+    private readonly SmartEntity _smartEntity;
+    private readonly Func<FrameType> _getFrameTypeFunc;
+    private readonly Action<FrameType> _setFrameTypeEntity;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelPlanMarkFrameTypeGrip"/> class.
     /// </summary>
-    /// <param name="levelPlanMark">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
-    public LevelPlanMarkFrameTypeGrip(LevelPlanMark levelPlanMark)
+    /// <param name="smartEntity">Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/></param>
+    /// <param name="getFrameTypeFunc">Метод получения типа рамки</param>
+    /// <param name="setFrameTypeEntity">Метод задания типа рамки</param>
+    public LevelPlanMarkFrameTypeGrip(
+        SmartEntity smartEntity,
+        Func<FrameType> getFrameTypeFunc, 
+        Action<FrameType> setFrameTypeEntity)
     {
-        LevelPlanMark = levelPlanMark;
+        _smartEntity = smartEntity;
+        _getFrameTypeFunc = getFrameTypeFunc;
+        _setFrameTypeEntity = setFrameTypeEntity;
         GripType = GripType.List;
     }
-
-    /// <summary>
-    /// Экземпляр <see cref="mpLevelPlanMark.LevelPlanMark"/>
-    /// </summary>
-    public LevelPlanMark LevelPlanMark { get; }
-
+    
     /// <inheritdoc />
     public override string GetTooltip()
     {
@@ -42,52 +48,49 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
-        using (LevelPlanMark)
+        _win = new ContextMenuHost();
+
+        ContextMenu cm;
+
+        _win.Loaded += (_, _) =>
         {
-            _win = new ContextMenuHost();
-
-            ContextMenu cm;
-
-            _win.Loaded += (_, _) =>
+            cm = (ContextMenu)_win.FindResource("Cm");
+            var frameType = _getFrameTypeFunc.Invoke();
+            var menuItem = new MenuItem
             {
-                cm = (ContextMenu)_win.FindResource("Cm");
-
-                var menuItem = new MenuItem
-                {
-                    Name = FrameType.Rectangular.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft2"), // Прямоугольная 
-                    IsChecked = LevelPlanMark.FrameType == FrameType.Rectangular
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
-
-                menuItem = new MenuItem
-                {
-                    Name = FrameType.Line.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft3"), // Линия
-                    IsChecked = LevelPlanMark.FrameType == FrameType.Line
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
-
-                menuItem = new MenuItem
-                {
-                    Name = FrameType.None.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft4"), // Без рамки
-                    IsChecked = LevelPlanMark.FrameType == FrameType.None
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
-
-                cm.MouseMove += (_, _) => _win.Close();
-                cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
-                cm.IsOpen = true;
+                Name = FrameType.Rectangular.ToString(),
+                IsCheckable = true,
+                Header = Language.GetItem("ft2"), // Прямоугольная 
+                IsChecked = frameType == FrameType.Rectangular
             };
-            _win.Show();
-        }
+            menuItem.Click += MenuItemOnClick;
+            cm.Items.Add(menuItem);
+
+            menuItem = new MenuItem
+            {
+                Name = FrameType.Line.ToString(),
+                IsCheckable = true,
+                Header = Language.GetItem("ft3"), // Линия
+                IsChecked = frameType == FrameType.Line
+            };
+            menuItem.Click += MenuItemOnClick;
+            cm.Items.Add(menuItem);
+
+            menuItem = new MenuItem
+            {
+                Name = FrameType.None.ToString(),
+                IsCheckable = true,
+                Header = Language.GetItem("ft4"), // Без рамки
+                IsChecked = frameType == FrameType.None
+            };
+            menuItem.Click += MenuItemOnClick;
+            cm.Items.Add(menuItem);
+
+            cm.MouseMove += (_, _) => _win.Close();
+            cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
+            cm.IsOpen = true;
+        };
+        _win.Show();
 
         return ReturnValue.GetNewGripPoints;
     }
@@ -98,17 +101,17 @@ public class LevelPlanMarkFrameTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        LevelPlanMark.FrameType = (FrameType)Enum.Parse(typeof(FrameType), menuItem.Name);
+        _setFrameTypeEntity.Invoke((FrameType)Enum.Parse(typeof(FrameType), menuItem.Name));
       
-        LevelPlanMark.UpdateEntities();
-        LevelPlanMark.BlockRecord.UpdateAnonymousBlocks();
+        _smartEntity.UpdateEntities();
+        _smartEntity.BlockRecord.UpdateAnonymousBlocks();
         using (AcadUtils.Document.LockDocument())
         {
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
-                var blkRef = tr.GetObject(LevelPlanMark.BlockId, OpenMode.ForWrite, true, true);
+                var blkRef = tr.GetObject(_smartEntity.BlockId, OpenMode.ForWrite, true, true);
 
-                using (var resBuf = LevelPlanMark.GetDataForXData())
+                using (var resBuf = _smartEntity.GetDataForXData())
                 {
                     blkRef.XData = resBuf;
                 }

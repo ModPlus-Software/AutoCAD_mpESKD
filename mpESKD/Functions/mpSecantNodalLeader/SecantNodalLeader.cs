@@ -427,9 +427,13 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
         if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
         {
-            var tempFirstTextPosition = new Point3d(_topFirstDbText.Position.X + (topSecondTextLength), _topFirstDbText.Position.Y, 0);
-            _topFirstDbText.Position = tempFirstTextPosition;
-            _topFirstDbText.AlignmentPoint = tempFirstTextPosition;
+            if (_topFirstDbText != null)
+            {
+                var tempFirstTextPosition = new Point3d(_topFirstDbText.Position.X + topSecondTextLength, _topFirstDbText.Position.Y, 0);
+
+                _topFirstDbText.Position = tempFirstTextPosition;
+                _topFirstDbText.AlignmentPoint = tempFirstTextPosition;
+            }
 
             if (_topSecondDbText != null)
             {
