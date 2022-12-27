@@ -1,6 +1,5 @@
-﻿using mpESKD.Base.Utils;
+﻿namespace mpESKD.Functions.mpLevelMark;
 
-namespace mpESKD.Functions.mpLevelMark;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -9,6 +8,8 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
+using mpESKD.Base.Utils;
 using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -39,30 +40,34 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
 
                     _cachedBottomShelfLength = Math.Abs(levelMark.EndPoint.X - levelMark.BottomShelfStartPoint.X);
 
-                    // получаем ручку типа рамки
+                    // получаем ручку выравнивания текста
                     if (!string.IsNullOrEmpty(levelMark.Note))
                     {
-                        if (!levelMark.IsLeft)
+                        if (levelMark.IsLeft)
                         {
-                            grips.Add(new LevelMarkTextAlignGrip(levelMark)
+                            grips.Add(new EntityTextAlignGrip(levelMark,
+                                () => levelMark.ValueHorizontalAlignment,
+                                (setAlignEntity) => levelMark.ValueHorizontalAlignment = setAlignEntity)
                             {
                                 GripPoint = new Point3d(
                                     levelMark.ShelfPoint.X - levelMark.TopShelfLineLength,
                                     levelMark.ShelfPoint.Y + levelMark.MainTextHeight + levelMark.TextVerticalOffset,
                                     levelMark.ShelfPoint.Z)
+
                             });
                         }
                         else
                         {
-                            grips.Add(new LevelMarkTextAlignGrip(levelMark)
+                            grips.Add(new EntityTextAlignGrip(levelMark,
+                                () => levelMark.ValueHorizontalAlignment,
+                                setAlignEntity => levelMark.ValueHorizontalAlignment = setAlignEntity)
                             {
                                 GripPoint = new Point3d(
                                     levelMark.ShelfPoint.X + levelMark.TopShelfLineLength,
                                     levelMark.ShelfPoint.Y + levelMark.MainTextHeight + levelMark.TextVerticalOffset,
                                     levelMark.ShelfPoint.Z)
-                            });    
+                            });
                         }
-                        
                     }
                 }
             }
@@ -115,7 +120,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                             if (levelMark.ObjectLine)
                             {
                                 levelMark.ObjectPoint = levelMark.BottomShelfStartPoint - (horV * levelMark.ObjectLineOffset * scale);
-                                levelMark.EndPoint = horV.X * v.X > 0 
+                                levelMark.EndPoint = horV.X * v.X > 0
                                     ? levelMark.BottomShelfStartPoint + (horV * _cachedBottomShelfLength)
                                     : levelMark.BottomShelfStartPoint - (horV * _cachedBottomShelfLength);
                             }
@@ -125,7 +130,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                                     levelMark.ObjectPoint.X,
                                     levelMark.BottomShelfStartPoint.Y,
                                     levelMark.ObjectPoint.Z);
-                                levelMark.EndPoint = horV.X * v.X > 0  
+                                levelMark.EndPoint = horV.X * v.X > 0
                                     ? levelMark.BottomShelfStartPoint + (horV * levelMark.BottomShelfLength * scale)
                                     : levelMark.BottomShelfStartPoint - (horV * levelMark.BottomShelfLength * scale);
                             }
@@ -143,7 +148,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         }
 
                         AcadUtils.WriteMessageInDebug($"двигаем levelMarkGrip.GripName {levelMarkGrip.GripName} \n");
-                        
+
                         // Вот тут происходит перерисовка примитивов внутри блока
                         levelMark.UpdateEntities();
                         levelMark.BlockRecord.UpdateAnonymousBlocks();

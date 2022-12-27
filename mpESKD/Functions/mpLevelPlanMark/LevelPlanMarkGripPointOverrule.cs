@@ -58,10 +58,7 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                     });
 
                     // получаем ручку типа рамки
-                    grips.Add(new LevelPlanMarkFrameTypeGrip(
-                        levelPlanMark,
-                        () => levelPlanMark.FrameType,
-                        frameType => levelPlanMark.FrameType = frameType)
+                    grips.Add(new LevelPlanMarkFrameTypeGrip(levelPlanMark)
                     {
                         GripPoint = new Point3d(
                             levelPlanMark.InsertionPoint.X + (levelPlanMark.BorderWidth / 2 * levelPlanMark.GetFullScale()),

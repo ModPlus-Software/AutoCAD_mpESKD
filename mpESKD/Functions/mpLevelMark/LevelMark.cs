@@ -22,6 +22,38 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private bool _objectLine;
     private int _objectLineOffset = 5;
     private int _bottomShelfLength = 10;
+    
+    /// <summary>
+    /// Нижняя полка
+    /// </summary>
+    private Line _bottomShelfLine;
+
+    /// <summary>
+    /// Вертикальная линия между полками
+    /// </summary>
+    private Line _verticalLine;
+
+    /// <summary>
+    /// Верхняя полка
+    /// </summary>
+    private Line _topShelfLine;
+
+    /// <summary>
+    /// Стрелка
+    /// </summary>
+    private Polyline _arrowPolyline;
+
+    /// <summary>
+    /// Верхний (основной) текст
+    /// </summary>
+    private DBText _topDbText;
+    private Wipeout _topTextMask;
+
+    /// <summary>
+    /// Нижний (второстепенный) текст
+    /// </summary>
+    private DBText _bottomDbText;
+    private Wipeout _bottomTextMask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -370,36 +402,10 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     public bool IsLeft => (ObjectPointOCS - EndPointOCS).GetNormal().X < 0;
 
     /// <summary>
-    /// Нижняя полка
+    /// Длина полки
     /// </summary>
-    private Line _bottomShelfLine;
-
-    /// <summary>
-    /// Вертикальная линия между полками
-    /// </summary>
-    private Line _verticalLine;
-
-    /// <summary>
-    /// Верхняя полка
-    /// </summary>
-    private Line _topShelfLine;
-
-    /// <summary>
-    /// Стрелка
-    /// </summary>
-    private Polyline _arrowPolyline;
-
-    /// <summary>
-    /// Верхний (основной) текст
-    /// </summary>
-    private DBText _topDbText;
-    private Wipeout _topTextMask;
-
-    /// <summary>
-    /// Нижний (второстепенный) текст
-    /// </summary>
-    private DBText _bottomDbText;
-    private Wipeout _bottomTextMask;
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -683,9 +689,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
     }
-
-    [SaveToXData]
-    public double TopShelfLineLength { get; set; }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
     {

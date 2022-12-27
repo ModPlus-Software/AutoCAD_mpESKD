@@ -60,6 +60,10 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     /// </summary>
     private Wipeout _bottomTextMask;
 
+    /// <summary>
+    /// Первая точка выноски
+    /// </summary>
+    private Point3d _leaderFirstPoint;
     #endregion
 
     /// <summary>
@@ -232,10 +236,21 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     [ValueToSearchBy]
     public string SmallText { get; set; } = string.Empty;
 
-    private Point3d _leaderFirstPoint;
+    /// <summary>
+    /// Выравнивание текста по горизонтали
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 10, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+    [SaveToXData]
+    public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
+
+    /// <summary>
+    /// Длина полки
+    /// </summary>
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
 
     /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
-    public Point3d MiddlePoint => new (
+    public Point3d MiddlePoint => new(
         (InsertionPoint.X + EndPoint.X) / 2,
         (InsertionPoint.Y + EndPoint.Y) / 2,
         (InsertionPoint.Z + EndPoint.Z) / 2);
@@ -484,17 +499,10 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
-
+        
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
-
-        var offset = TextMaskOffset * scale;
-        if (HideTextBackground)
-        {
-            _topFirstTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
-        }
 
         if (IsTextAlwaysHorizontal && IsRotated)
         {
@@ -509,6 +517,32 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         if (_leaderLine != null && (_bottomDbText != null || _topDbText != null))
         {
             _shelfLine = new Line(leaderPoint, shelfEndPoint);
+            TopShelfLineLength = _shelfLine.Length;
+        }
+
+        if (_bottomDbText != null && _topDbText != null)
+        {
+            var diff = Math.Abs(topTextLength - bottomTextLength);
+            var horV = (shelfEndPoint - leaderPoint).GetNormal();
+            var textHalfMovementHorV = diff / 2 * horV;
+            var movingPosition = GetMovementPositionVector(isRight, textHalfMovementHorV);
+            if (topTextLength > bottomTextLength)
+            {
+                _bottomDbText.Position += movingPosition;
+                _bottomDbText.AlignmentPoint += movingPosition;
+            }
+            else
+            {
+                _topDbText.Position += movingPosition;
+                _topDbText.AlignmentPoint += movingPosition;
+            }
+        }
+
+        var offset = TextMaskOffset * scale;
+        if (HideTextBackground)
+        {
+            _topFirstTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
+            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
@@ -520,5 +554,26 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
             return;
 
         MainText = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
+    }
+
+    private Vector3d GetMovementPositionVector(bool isRight, Vector3d textHalfMovementHorV)
+    {
+        if ((isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX > 0)
+                return textHalfMovementHorV;
+            return -textHalfMovementHorV;
+        }
+
+        if ((!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX < 0)
+                return textHalfMovementHorV;
+            return -textHalfMovementHorV;
+        }
+
+        return default;
     }
 }

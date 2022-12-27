@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpFragmentMarker;
+﻿namespace mpESKD.Functions.mpFragmentMarker;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
 
 /// <inheritdoc />
 public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<FragmentMarker>
@@ -86,6 +85,35 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                                     (Vector3d.YAxis * ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) * fragmentMarker.GetFullScale())),
                         GripType = GripType.TwoArrowsLeftRight
                     });
+
+                    if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
+                        return;
+                    // получаем ручку выравнивания текста
+                    if (fragmentMarker.ShelfPosition == ShelfPosition.Left)
+                    {
+                        grips.Add(new EntityTextAlignGrip(fragmentMarker,
+                            () => fragmentMarker.ValueHorizontalAlignment,
+                            (setAlignEntity) => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = new Point3d(
+                                fragmentMarker.LeaderPoint.X + fragmentMarker.TopShelfLineLength,
+                                fragmentMarker.LeaderPoint.Y + fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset,
+                                fragmentMarker.LeaderPoint.Z)
+                        });
+                    }
+                    else
+                    {
+                        grips.Add(new EntityTextAlignGrip(fragmentMarker,
+                            () => fragmentMarker.ValueHorizontalAlignment,
+                            setAlignEntity => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = new Point3d(
+                                fragmentMarker.LeaderPoint.X - fragmentMarker.TopShelfLineLength,
+                                fragmentMarker.LeaderPoint.Y + fragmentMarker.MainTextHeight +
+                                fragmentMarker.TextVerticalOffset,
+                                fragmentMarker.LeaderPoint.Z)
+                        });
+                    }
                 }
             }
         }
