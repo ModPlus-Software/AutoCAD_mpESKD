@@ -88,32 +88,33 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
 
                     if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
                         return;
+                    
                     // получаем ручку выравнивания текста
+                    
+                    var shelfLength = fragmentMarker.TopShelfLineLength;
+                    
                     if (fragmentMarker.ShelfPosition == ShelfPosition.Left)
                     {
-                        grips.Add(new EntityTextAlignGrip(fragmentMarker,
-                            () => fragmentMarker.ValueHorizontalAlignment,
-                            (setAlignEntity) => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
-                        {
-                            GripPoint = new Point3d(
-                                fragmentMarker.LeaderPoint.X + fragmentMarker.TopShelfLineLength,
-                                fragmentMarker.LeaderPoint.Y + fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset,
-                                fragmentMarker.LeaderPoint.Z)
-                        });
+                        shelfLength = -shelfLength;
                     }
-                    else
+
+                    if (fragmentMarker.ScaleFactorX < 0)
                     {
-                        grips.Add(new EntityTextAlignGrip(fragmentMarker,
-                            () => fragmentMarker.ValueHorizontalAlignment,
-                            setAlignEntity => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
-                        {
-                            GripPoint = new Point3d(
-                                fragmentMarker.LeaderPoint.X - fragmentMarker.TopShelfLineLength,
-                                fragmentMarker.LeaderPoint.Y + fragmentMarker.MainTextHeight +
-                                fragmentMarker.TextVerticalOffset,
-                                fragmentMarker.LeaderPoint.Z)
-                        });
+                        shelfLength = -shelfLength;
                     }
+
+                    var gripPoint = fragmentMarker.LeaderPoint + 
+                                    (Vector3d.XAxis * shelfLength * fragmentMarker.GetFullScale());
+                    gripPoint += Vector3d.YAxis * 
+                                 (fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
+                                  fragmentMarker.GetFullScale();
+
+                    grips.Add(new EntityTextAlignGrip(fragmentMarker,
+                        () => fragmentMarker.ValueHorizontalAlignment,
+                        (setAlignEntity) => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
+                    {
+                        GripPoint = gripPoint
+                    });
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpSecantNodalLeader;
+﻿using mpESKD.Base.Overrules.Grips;
+
+namespace mpESKD.Functions.mpSecantNodalLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -32,11 +34,38 @@ public class SecantNodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Se
                     grips.Add(new SecantNodalLeaderGrip(
                         nodalLeader, GripType.Point, GripName.LeaderPoint, nodalLeader.EndPoint));
 
+                    if (!(!string.IsNullOrEmpty(nodalLeader.NodeNumber) |
+                          !string.IsNullOrEmpty(nodalLeader.SheetNumber)))
+                        return;
+                    var shelfPointGrip = nodalLeader.EndPoint +
+                                         (Vector3d.YAxis *
+                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
+                                           nodalLeader.GetFullScale()));
                     grips.Add(new SecantNodalLevelShelfPositionGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.EndPoint +
-                                    (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
+                        GripPoint = shelfPointGrip,
                         GripType = GripType.TwoArrowsLeftRight
+                    });
+
+                    var shelfLength = nodalLeader.TopShelfLineLength;
+                    
+                    if (nodalLeader.ShelfPosition == ShelfPosition.Left)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    if (nodalLeader.ScaleFactorX < 0)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength * nodalLeader.GetFullScale();
+
+                    grips.Add(new EntityTextAlignGrip(nodalLeader,
+                        () => nodalLeader.ValueHorizontalAlignment,
+                        (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                    {
+                        GripPoint = alignGripPoint
                     });
                 }
             }

@@ -48,7 +48,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
     /// <summary>
     /// Маскировка фона верхнего текста 
     /// </summary>
-    private Wipeout _topFirstTextMask;
+    private Wipeout _topTextMask;
 
     /// <summary>
     /// Нижний текст 
@@ -98,7 +98,7 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             var entities = new List<Entity>
             {
-                _topFirstTextMask,
+                _topTextMask,
                 _bottomTextMask,
                 _mainPolyline,
                 _leaderLine,
@@ -499,17 +499,32 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
                 _bottomDbText.AlignmentPoint = bottomTextPosition;
             }
         }
-        
+
         var shelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? leaderPoint + (Vector3d.XAxis * shelfLength)
             : leaderPoint - (Vector3d.XAxis * shelfLength);
+
+        if (_bottomDbText != null && _topDbText != null)
+        {
+            var horV = (shelfEndPoint - leaderPoint).GetNormal();
+            SetTextMovingPosition(topTextLength, bottomTextLength, horV, isRight);
+        }
+
+        if (HideTextBackground)
+        {
+            var offset = TextMaskOffset * scale;
+            if (_topDbText != null)
+                _topTextMask = _topDbText.GetBackgroundMask(offset, _topDbText.Position);
+            if (_bottomDbText != null)
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, _bottomDbText.Position);
+        }
 
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
             _topDbText?.TransformBy(backRotationMatrix);
-            _topFirstTextMask?.TransformBy(backRotationMatrix);
+            _topTextMask?.TransformBy(backRotationMatrix);
             _bottomDbText?.TransformBy(backRotationMatrix);
             _bottomTextMask?.TransformBy(backRotationMatrix);
         }
@@ -518,31 +533,6 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         {
             _shelfLine = new Line(leaderPoint, shelfEndPoint);
             TopShelfLineLength = _shelfLine.Length;
-        }
-
-        if (_bottomDbText != null && _topDbText != null)
-        {
-            var diff = Math.Abs(topTextLength - bottomTextLength);
-            var horV = (shelfEndPoint - leaderPoint).GetNormal();
-            var textHalfMovementHorV = diff / 2 * horV;
-            var movingPosition = GetMovementPositionVector(isRight, textHalfMovementHorV);
-            if (topTextLength > bottomTextLength)
-            {
-                _bottomDbText.Position += movingPosition;
-                _bottomDbText.AlignmentPoint += movingPosition;
-            }
-            else
-            {
-                _topDbText.Position += movingPosition;
-                _topDbText.AlignmentPoint += movingPosition;
-            }
-        }
-
-        var offset = TextMaskOffset * scale;
-        if (HideTextBackground)
-        {
-            _topFirstTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
@@ -556,24 +546,20 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         MainText = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
     }
 
-    private Vector3d GetMovementPositionVector(bool isRight, Vector3d textHalfMovementHorV)
+    private void SetTextMovingPosition(double topTextLength, double bottomTextLength, Vector3d horV, bool isRight)
     {
-        if ((isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
-            (!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        var diff = Math.Abs(topTextLength - bottomTextLength);
+        var textHalfMovementHorV = diff / 2 * horV;
+        var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
+        if (topTextLength > bottomTextLength)
         {
-            if (ScaleFactorX > 0)
-                return textHalfMovementHorV;
-            return -textHalfMovementHorV;
+            _bottomDbText.Position += movingPosition;
+            _bottomDbText.AlignmentPoint += movingPosition;
         }
-
-        if ((!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
-            (isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        else
         {
-            if (ScaleFactorX < 0)
-                return textHalfMovementHorV;
-            return -textHalfMovementHorV;
+            _topDbText.Position += movingPosition;
+            _topDbText.AlignmentPoint += movingPosition;
         }
-
-        return default;
     }
 }

@@ -94,6 +94,12 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
 
     /// <summary>
+    /// Длина полки
+    /// </summary>
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
+
+    /// <summary>
     /// Точка начала верхней полки. Задает высоту от нижней полки до верхней
     /// </summary>
     public Point3d ShelfPoint
@@ -401,11 +407,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// </summary>
     public bool IsLeft => (ObjectPointOCS - EndPointOCS).GetNormal().X < 0;
 
-    /// <summary>
-    /// Длина полки
-    /// </summary>
-    [SaveToXData]
-    public double TopShelfLineLength { get; set; }
+
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -586,7 +588,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         Point3d shelfPoint,
         double scale)
     {
-        AcadUtils.WriteMessageInDebug($"ObjectPointOCS {objectPoint}, BottomShelfStartPointOCS {BottomShelfStartPointOCS}");
         MeasuredValue = (objectPoint.Y - insertionPoint.Y) * MeasurementScale;
 
         var horV = (arrowPoint - objectPoint).GetNormal();
@@ -686,7 +687,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
         TopShelfLineLength = _topShelfLine.Length;
-
+        
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
     }
 

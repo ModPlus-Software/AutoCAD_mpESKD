@@ -216,6 +216,13 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     public string LeaderTextComment { get; set; } = string.Empty;
 
     /// <summary>
+    /// Выравнивание текста по горизонтали
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 10, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+    [SaveToXData]
+    public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
+
+    /// <summary>
     /// Точки стрелок
     /// </summary>
     [SaveToXData]
@@ -463,13 +470,36 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ? endPoint + (Vector3d.XAxis * ShelfLength)
             : endPoint - (Vector3d.XAxis * ShelfLength);
 
+
+        if (_bottomDbText != null && _topDbText != null)
+        {
+            var horV = (shelfEndPoint - endPoint).GetNormal();
+            var diff = Math.Abs(topTextLength - bottomTextLength);
+            var textHalfMovementHorV = diff / 2 * horV;
+            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
+            if (topTextLength > bottomTextLength)
+            {
+                bottomTextPosition += movingPosition;
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+            }
+            else
+            {
+                topTextPosition += movingPosition;
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
+            }
+        }
+
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * scale;
-            _topTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
-            _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
+            if (_topDbText != null)
+                _topTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
+            if (_bottomDbText != null)
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
         }
-
+        
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(endPoint);

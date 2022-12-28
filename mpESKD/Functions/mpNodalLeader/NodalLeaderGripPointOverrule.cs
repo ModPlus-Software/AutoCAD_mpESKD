@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpNodalLeader;
+﻿using mpESKD.Base.Enums;
+using mpESKD.Base.Overrules.Grips;
+
+namespace mpESKD.Functions.mpNodalLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -82,10 +85,34 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         GripPoint = nodalLeader.LeaderPoint
                     };
                     grips.Add(gp);
+                    var shelfPointGrip = nodalLeader.LeaderPoint +
+                                         (Vector3d.YAxis *
+                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
+                                           nodalLeader.GetFullScale()));
                     grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.LeaderPoint +
-                                    (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
+                        GripPoint = shelfPointGrip
+                    });
+
+                    var shelfLength = nodalLeader.TopShelfLineLength;
+                    
+                    if (nodalLeader.ShelfPosition == ShelfPosition.Left)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    if (nodalLeader.ScaleFactorX < 0)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength * nodalLeader.GetFullScale();
+
+                    grips.Add(new EntityTextAlignGrip(nodalLeader,
+                        () => nodalLeader.ValueHorizontalAlignment,
+                        (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                    {
+                        GripPoint = alignGripPoint
                     });
                 }
             }

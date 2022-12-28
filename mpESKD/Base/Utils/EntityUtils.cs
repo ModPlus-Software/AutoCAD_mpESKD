@@ -1,10 +1,11 @@
 ﻿namespace mpESKD.Base.Utils;
 
-using System;
 using Abstractions;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using mpESKD.Base.Enums;
+using System;
 using View;
 
 /// <summary>
@@ -46,6 +47,35 @@ public static class EntityUtils
             dbText.VerticalMode = verticalMode.Value;
         if (attachmentPoint.HasValue)
             dbText.Justify = attachmentPoint.Value;
+    }
+
+    /// <summary>
+    /// Возвращает вектор сдвига текста при выравнивании
+    /// </summary>
+    /// <param name="ValueHorizontalAlignment">Значение выравнивания по горизонтали</param>
+    /// <param name="isRight">Направление полки</param>
+    /// <param name="textHalfMovementHorV">Половина сдвига по горизонтали</param>
+    /// <param name="ScaleFactorX">Значение зеркальности</param>
+    /// <returns></returns>
+    public static Vector3d GetMovementPositionVector(TextHorizontalAlignment ValueHorizontalAlignment, bool isRight, Vector3d textHalfMovementHorV, double ScaleFactorX)
+    {
+        if ((isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX > 0)
+                return textHalfMovementHorV;
+            return -textHalfMovementHorV;
+        }
+
+        if ((!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        {
+            if (ScaleFactorX < 0)
+                return textHalfMovementHorV;
+            return -textHalfMovementHorV;
+        }
+
+        return default;
     }
 
     /// <summary>
