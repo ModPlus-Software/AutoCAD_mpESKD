@@ -80,7 +80,8 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                     };
                     grips.Add(gp);
 
-                    if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
+                    if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | 
+                        (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
                         return;
                     
                     // получаем ручку выравнивания текста

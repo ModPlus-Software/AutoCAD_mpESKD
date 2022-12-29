@@ -471,12 +471,19 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
             }
             else
             {
-                _topFirstDbText.Position += movingPosition;
-                _topFirstDbText.AlignmentPoint += movingPosition;
-                topFirstTextPosition += movingPosition;
-                _topSecondDbText.Position += movingPosition;
-                _topSecondDbText.AlignmentPoint += movingPosition;
-                topSecondTextPosition += movingPosition;
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position += movingPosition;
+                    _topFirstDbText.AlignmentPoint += movingPosition;
+                    topFirstTextPosition += movingPosition;
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position += movingPosition;
+                    _topSecondDbText.AlignmentPoint += movingPosition;
+                    topSecondTextPosition += movingPosition;
+                }
             }
         }
 

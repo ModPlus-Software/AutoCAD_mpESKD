@@ -52,25 +52,29 @@ public static class EntityUtils
     /// <summary>
     /// Возвращает вектор сдвига текста при выравнивании
     /// </summary>
-    /// <param name="ValueHorizontalAlignment">Значение выравнивания по горизонтали</param>
+    /// <param name="valueHorizontalAlignment">Значение выравнивания по горизонтали</param>
     /// <param name="isRight">Направление полки</param>
     /// <param name="textHalfMovementHorV">Половина сдвига по горизонтали</param>
-    /// <param name="ScaleFactorX">Значение зеркальности</param>
+    /// <param name="scaleFactorX">Значение зеркальности</param>
     /// <returns></returns>
-    public static Vector3d GetMovementPositionVector(TextHorizontalAlignment ValueHorizontalAlignment, bool isRight, Vector3d textHalfMovementHorV, double ScaleFactorX)
+    public static Vector3d GetMovementPositionVector(
+        TextHorizontalAlignment valueHorizontalAlignment, 
+        bool isRight, 
+        Vector3d textHalfMovementHorV, 
+        double scaleFactorX)
     {
-        if ((isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
-            (!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        if ((isRight && valueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (!isRight && valueHorizontalAlignment == TextHorizontalAlignment.Left))
         {
-            if (ScaleFactorX > 0)
+            if (scaleFactorX > 0)
                 return textHalfMovementHorV;
             return -textHalfMovementHorV;
         }
 
-        if ((!isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Right) ||
-            (isRight && ValueHorizontalAlignment == TextHorizontalAlignment.Left))
+        if ((!isRight && valueHorizontalAlignment == TextHorizontalAlignment.Right) ||
+            (isRight && valueHorizontalAlignment == TextHorizontalAlignment.Left))
         {
-            if (ScaleFactorX < 0)
+            if (scaleFactorX < 0)
                 return textHalfMovementHorV;
             return -textHalfMovementHorV;
         }
@@ -252,19 +256,19 @@ public static class EntityUtils
         {
             var minPoint = extents3d.MinPoint;
             var maxPoint = extents3d.MaxPoint;
-            AcadUtils.WriteMessageInDebug($"minPoint {minPoint} maxPoint {maxPoint} \n");
+            
             var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
             var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
             var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
             var bottomRightPoint = new Point2d(maxPoint.X + offset, minPoint.Y - offset);
-            AcadUtils.WriteMessageInDebug($"\n bottomLeftPoint {bottomLeftPoint}, topLeftPoint {topLeftPoint}, topRightPoint {topRightPoint}, bottomRightPoint {bottomRightPoint} \n");
+            
             var wipeout = new Wipeout();
             wipeout.SetFrom(
                 new Point2dCollection
                 {
                     bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
                 }, Vector3d.ZAxis);
-            AcadUtils.WriteMessageInDebug($"wipeout.Bounds {wipeout.Bounds} \n");
+            
             return wipeout;
         }
         catch (Autodesk.AutoCAD.Runtime.Exception ex)

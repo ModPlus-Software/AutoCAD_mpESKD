@@ -36,9 +36,9 @@ public class SecantNodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Se
                         return;
                     grips.Add(new SecantNodalLeaderGrip(
                         nodalLeader, GripType.Point, GripName.LeaderPoint, nodalLeader.EndPoint));
-                    
+
                     var shelfLength = nodalLeader.TopShelfLineLength;
-                    
+
                     if (nodalLeader.ShelfPosition == ShelfPosition.Left)
                     {
                         shelfLength = -shelfLength;
@@ -66,12 +66,17 @@ public class SecantNodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Se
                         GripType = GripType.TwoArrowsLeftRight
                     });
 
-                    grips.Add(new EntityTextAlignGrip(nodalLeader,
-                        () => nodalLeader.ValueHorizontalAlignment,
-                        (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                    if ((!string.IsNullOrEmpty(nodalLeader.NodeAddress)) & 
+                        ((!string.IsNullOrEmpty(nodalLeader.NodeNumber) | !string.IsNullOrEmpty(nodalLeader.SheetNumber)) || 
+                         (!string.IsNullOrEmpty(nodalLeader.NodeNumber) & !string.IsNullOrEmpty(nodalLeader.SheetNumber))))
                     {
-                        GripPoint = alignGripPoint
-                    });
+                        grips.Add(new EntityTextAlignGrip(nodalLeader,
+                            () => nodalLeader.ValueHorizontalAlignment,
+                            (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = alignGripPoint
+                        });
+                    }
                 }
             }
         }

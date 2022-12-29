@@ -591,7 +591,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if ((_bottomDbText != null && _topFirstDbText != null) || (_bottomDbText != null && _topSecondDbText != null))
         {
             var horV = (shelfEndPoint - leaderPoint).GetNormal();
-            
+
             var diff = Math.Abs(topTextLength - bottomTextLength);
             var textHalfMovementHorV = diff / 2 * horV;
             var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
@@ -603,12 +603,19 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             }
             else
             {
-                _topFirstDbText.Position += movingPosition;
-                _topFirstDbText.AlignmentPoint += movingPosition;
-                topFirstTextPosition += movingPosition;
-                _topSecondDbText.Position += movingPosition;
-                _topSecondDbText.AlignmentPoint += movingPosition;
-                topSecondTextPosition += movingPosition;
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position += movingPosition;
+                    _topFirstDbText.AlignmentPoint += movingPosition;
+                    topFirstTextPosition += movingPosition;
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position += movingPosition;
+                    _topSecondDbText.AlignmentPoint += movingPosition;
+                    topSecondTextPosition += movingPosition;
+                }
             }
         }
 

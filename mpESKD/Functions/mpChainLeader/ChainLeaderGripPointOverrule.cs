@@ -116,7 +116,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                     var textIndent = chainLeader.TextIndent;
                     var shelfLength = chainLeader.ShelfLength;
-                    
+
                     if (chainLeader.ShelfPosition == ShelfPosition.Left)
                     {
                         textIndent = -textIndent;
@@ -130,11 +130,11 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     }
 
                     var arrowTypeGripPoint = chainLeader.EndPoint + Vector3d.XAxis * shelfLength;
-                    var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis * 
+                    var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis *
                                                                 (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) * chainLeader.GetFullScale());
                     var shelfMoveGripPoint = chainLeader.EndPoint + Vector3d.XAxis * textIndent;
                     var shelfPositionGripPoint = chainLeader.EndPoint +
-                                                 (Vector3d.YAxis * 
+                                                 (Vector3d.YAxis *
                                                  (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset));
 
                     if (chainLeader.IsRotated & !chainLeader.IsTextAlwaysHorizontal)
@@ -165,7 +165,8 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         GripPoint = arrowTypeGripPoint
                     });
 
-                    if ((string.IsNullOrEmpty(chainLeader.LeaderTextValue) | string.IsNullOrEmpty(chainLeader.LeaderTextComment)) | (string.IsNullOrEmpty(chainLeader.LeaderTextValue) & string.IsNullOrEmpty(chainLeader.LeaderTextComment)))
+                    if ((string.IsNullOrEmpty(chainLeader.LeaderTextValue) | string.IsNullOrEmpty(chainLeader.LeaderTextComment)) 
+                        | (string.IsNullOrEmpty(chainLeader.LeaderTextValue) & string.IsNullOrEmpty(chainLeader.LeaderTextComment)))
                         return;
 
                     grips.Add(new EntityTextAlignGrip(chainLeader,
@@ -263,10 +264,14 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         var chainLeader = addLeaderGrip.ChainLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
 
-                        var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
-                            chainLeader.EndPoint, newPoint);
+                        var pointOnPolyline = GetPerpendicularPoint(
+                            chainLeader.InsertionPoint,
+                            chainLeader.EndPoint,
+                            newPoint);
 
-                        addLeaderGrip.IsOnsegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
+                        addLeaderGrip.IsOnsegment = IsPointBetween(
+                            pointOnPolyline, 
+                            chainLeader.InsertionPoint,
                             chainLeader.EndPoint);
                         chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint(chainLeader, pointOnPolyline);
 
@@ -277,9 +282,13 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                     {
                         var chainLeader = moveLeaderGrip.ChainLeader;
                         var newPoint = moveLeaderGrip.GripPoint + offset;
-                        var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
-                            chainLeader.EndPoint, newPoint);
-                        moveLeaderGrip.IsOnsegment = IsPointBetween(pointOnPolyline, chainLeader.InsertionPoint,
+                        var pointOnPolyline = GetPerpendicularPoint(
+                            chainLeader.InsertionPoint,
+                            chainLeader.EndPoint, 
+                            newPoint);
+                        moveLeaderGrip.IsOnsegment = IsPointBetween(
+                            pointOnPolyline, 
+                            chainLeader.InsertionPoint,
                             chainLeader.EndPoint);
                         chainLeader.TempNewArrowPoint = SetChainLeaderTempNewArrowPoint(chainLeader, pointOnPolyline);
 
