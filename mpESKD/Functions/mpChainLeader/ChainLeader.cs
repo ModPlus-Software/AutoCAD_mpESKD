@@ -470,7 +470,6 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             ? endPoint + (Vector3d.XAxis * ShelfLength)
             : endPoint - (Vector3d.XAxis * ShelfLength);
 
-
         if (_bottomDbText != null && _topDbText != null)
         {
             var horV = (shelfEndPoint - endPoint).GetNormal();
@@ -503,6 +502,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(endPoint);
+            if (ScaleFactorX < 0)
+            {
+                backRotationMatrix = GetBackMirroredRotationMatrix(endPoint);
+            }
+
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
             _topDbText?.TransformBy(backRotationMatrix);
             _topTextMask?.TransformBy(backRotationMatrix);

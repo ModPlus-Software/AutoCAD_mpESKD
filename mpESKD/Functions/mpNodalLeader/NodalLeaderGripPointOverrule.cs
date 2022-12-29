@@ -85,14 +85,6 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         GripPoint = nodalLeader.LeaderPoint
                     };
                     grips.Add(gp);
-                    var shelfPointGrip = nodalLeader.LeaderPoint +
-                                         (Vector3d.YAxis *
-                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
-                                           nodalLeader.GetFullScale()));
-                    grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
-                    {
-                        GripPoint = shelfPointGrip
-                    });
 
                     var shelfLength = nodalLeader.TopShelfLineLength;
                     
@@ -106,7 +98,21 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         shelfLength = -shelfLength;
                     }
 
-                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength * nodalLeader.GetFullScale();
+                    var shelfPointGrip = nodalLeader.LeaderPoint +
+                                         (Vector3d.YAxis *
+                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
+                                           nodalLeader.GetFullScale()));
+                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength;
+                    if (nodalLeader.IsRotated & !nodalLeader.IsTextAlwaysHorizontal)
+                    {
+                        shelfPointGrip = shelfPointGrip.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.LeaderPoint);
+                        alignGripPoint = alignGripPoint.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.LeaderPoint);
+                    }
+
+                    grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
+                    {
+                        GripPoint = shelfPointGrip
+                    });
 
                     grips.Add(new EntityTextAlignGrip(nodalLeader,
                         () => nodalLeader.ValueHorizontalAlignment,

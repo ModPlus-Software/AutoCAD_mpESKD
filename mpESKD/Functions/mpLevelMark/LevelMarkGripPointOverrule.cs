@@ -54,7 +54,7 @@ public class LevelMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelMark>
                         shelfLength = -shelfLength;
                     }
 
-                    var gripPoint = levelMark.ShelfPoint + Vector3d.XAxis * shelfLength * levelMark.GetFullScale();;
+                    var gripPoint = levelMark.ShelfPoint + Vector3d.XAxis * shelfLength;
                     gripPoint += Vector3d.YAxis * 
                                   (levelMark.MainTextHeight + levelMark.TextVerticalOffset) * 
                                   levelMark.GetFullScale();

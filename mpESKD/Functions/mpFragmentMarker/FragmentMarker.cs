@@ -522,6 +522,11 @@ public class FragmentMarker : SmartEntity, ITextValueEntity, IWithDoubleClickEdi
         if (IsTextAlwaysHorizontal && IsRotated)
         {
             var backRotationMatrix = GetBackRotationMatrix(leaderPoint);
+            if (ScaleFactorX < 0)
+            {
+                backRotationMatrix = GetBackMirroredRotationMatrix(leaderPoint);
+            }
+
             shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
             _topDbText?.TransformBy(backRotationMatrix);
             _topTextMask?.TransformBy(backRotationMatrix);

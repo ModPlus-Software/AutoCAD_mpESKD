@@ -130,21 +130,16 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         shelfLength = -shelfLength;
                     }
 
-                    var arrowTypeGripPoint = chainLeader.EndPoint + Vector3d.XAxis * shelfLength * chainLeader.GetFullScale();
+                    var arrowTypeGripPoint = chainLeader.EndPoint + Vector3d.XAxis * shelfLength;
                     var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis * 
-                                                                (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) *
-                                                                chainLeader.GetFullScale());
-                    var shelfMoveGripPoint = chainLeader.EndPoint +
-                                             (Vector3d.XAxis * (textIndent * chainLeader.GetFullScale()));
+                                                                (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset));
+                    var shelfMoveGripPoint = chainLeader.EndPoint + Vector3d.XAxis * textIndent;
                     var shelfPositionGripPoint = chainLeader.EndPoint +
-                                                 (Vector3d.YAxis *
-                                                  ((chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) *
-                                                   chainLeader.GetFullScale()));
-                    if (chainLeader.ScaleFactorX < 0)
-                        chainLeader.Rotation = -chainLeader.Rotation;
+                                                 (Vector3d.YAxis * 
+                                                 (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset));
+
                     if (chainLeader.IsRotated & !chainLeader.IsTextAlwaysHorizontal)
                     {
-                        
                         arrowTypeGripPoint = arrowTypeGripPoint.RotateBy(chainLeader.Rotation, Vector3d.ZAxis, chainLeader.EndPoint);
                         alignGripPoint = alignGripPoint.RotateBy(chainLeader.Rotation, Vector3d.ZAxis, chainLeader.EndPoint);
                         shelfMoveGripPoint = shelfMoveGripPoint.RotateBy(chainLeader.Rotation, Vector3d.ZAxis, chainLeader.EndPoint);

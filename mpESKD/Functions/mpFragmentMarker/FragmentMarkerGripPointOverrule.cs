@@ -79,12 +79,6 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                         GripPoint = fragmentMarker.LeaderPoint
                     };
                     grips.Add(gp);
-                    grips.Add(new FragmentMarkerShelfPositionGrip(fragmentMarker)
-                    {
-                        GripPoint = fragmentMarker.LeaderPoint +
-                                    (Vector3d.YAxis * ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) * fragmentMarker.GetFullScale())),
-                        GripType = GripType.TwoArrowsLeftRight
-                    });
 
                     if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
                         return;
@@ -103,17 +97,32 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                         shelfLength = -shelfLength;
                     }
 
-                    var gripPoint = fragmentMarker.LeaderPoint + 
-                                    (Vector3d.XAxis * shelfLength * fragmentMarker.GetFullScale());
-                    gripPoint += Vector3d.YAxis * 
-                                 (fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
-                                  fragmentMarker.GetFullScale();
+                    var shelfPointGrip = fragmentMarker.LeaderPoint +
+                                         (Vector3d.YAxis *
+                                          ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
+                                           fragmentMarker.GetFullScale()));
+                    var alignGripPoint = fragmentMarker.LeaderPoint + (Vector3d.XAxis * shelfLength);
+                    alignGripPoint += Vector3d.YAxis * 
+                                      (fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
+                                      fragmentMarker.GetFullScale();
+
+                    if (fragmentMarker.IsRotated & !fragmentMarker.IsTextAlwaysHorizontal)
+                    {
+                        shelfPointGrip = shelfPointGrip.RotateBy(fragmentMarker.Rotation, Vector3d.ZAxis, fragmentMarker.LeaderPoint);
+                        alignGripPoint = alignGripPoint.RotateBy(fragmentMarker.Rotation, Vector3d.ZAxis, fragmentMarker.LeaderPoint);
+                    }
+
+                    grips.Add(new FragmentMarkerShelfPositionGrip(fragmentMarker)
+                    {
+                        GripPoint = shelfPointGrip,
+                        GripType = GripType.TwoArrowsLeftRight
+                    });
 
                     grips.Add(new EntityTextAlignGrip(fragmentMarker,
                         () => fragmentMarker.ValueHorizontalAlignment,
                         (setAlignEntity) => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
                     {
-                        GripPoint = gripPoint
+                        GripPoint = alignGripPoint
                     });
                 }
             }
