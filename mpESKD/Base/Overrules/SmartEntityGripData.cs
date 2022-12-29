@@ -1,11 +1,10 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Base.Overrules;
+﻿namespace mpESKD.Base.Overrules;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
 using Enums;
+using mpESKD.Base.Utils;
 
 /// <inheritdoc />
 public abstract class SmartEntityGripData : GripData
@@ -81,10 +80,6 @@ public abstract class SmartEntityGripData : GripData
         else if (GripType == GripType.TextAlign)
         {
             worldDraw.Geometry.Polygon(PointsForTopLineAlignGrip(num, ecs));
-            foreach (var points in PointsForTopLineAlignGrip(num, ecs))
-            {
-                AcadUtils.WriteMessageInDebug(points.ToString());
-            }
             worldDraw.Geometry.Polygon(PointsForMiddleLineAlignGrip(num, ecs));
             worldDraw.Geometry.Polygon(PointsForBottomLineAlignGrip(num, ecs));
         }
@@ -257,8 +252,8 @@ public abstract class SmartEntityGripData : GripData
 
     private Point3dCollection PointsForListTriangle(double num, CoordinateSystem3d ecs)
     {
-        var horUnit = num * ecs.Xaxis;
-        var verUnit = num * ecs.Yaxis;
+        var horUnit = num * 0.8 * ecs.Xaxis;
+        var verUnit = num * 0.8 * ecs.Yaxis;
         return new Point3dCollection
         {
             GripPoint - verUnit,

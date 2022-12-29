@@ -1,7 +1,4 @@
-﻿using mpESKD.Base.Enums;
-using mpESKD.Base.Overrules.Grips;
-
-namespace mpESKD.Functions.mpNodalLeader;
+﻿namespace mpESKD.Functions.mpNodalLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +7,8 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Enums;
+using mpESKD.Base.Overrules.Grips;
 using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 

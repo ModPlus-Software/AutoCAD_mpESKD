@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Overrules.Grips;
-
-namespace mpESKD.Functions.mpChainLeader;
+﻿namespace mpESKD.Functions.mpChainLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
 using System;
 using System.Collections.Generic;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;

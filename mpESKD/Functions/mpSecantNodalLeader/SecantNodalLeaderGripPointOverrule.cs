@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Overrules.Grips;
-
-namespace mpESKD.Functions.mpSecantNodalLeader;
+﻿namespace mpESKD.Functions.mpSecantNodalLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
