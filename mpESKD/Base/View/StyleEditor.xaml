@@ -345,6 +345,9 @@
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h44}"
                                           IsChecked="{Binding Path=AxisSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           ToolTip="{Binding Source={StaticResource Lang}, XPath=h45}"/>
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h44}"
+                                          IsChecked="{Binding Path=AxisSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h45}"/>
                             </StackPanel>
                         </Border>
                     </TabItem>

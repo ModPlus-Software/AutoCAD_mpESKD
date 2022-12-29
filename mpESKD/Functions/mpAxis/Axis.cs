@@ -22,6 +22,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     // last values
     private readonly string _lastHorizontalValue = string.Empty;
     private readonly string _lastVerticalValue = string.Empty;
+    private readonly bool _rotateText;
 
     private int _bottomFractureOffset;
     private int _markersCount = 1;
@@ -160,11 +161,13 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     /// <param name="lastHorizontalValue">Значение последней горизонтальной оси</param>
     /// <param name="lastVerticalValue">Значение последней вертикальной оси</param>
-    public Axis(string lastHorizontalValue, string lastVerticalValue)
+    /// <param name="rotateText"></param>
+    public Axis(string lastHorizontalValue, string lastVerticalValue, bool rotateText)
     {
         // last values
         _lastHorizontalValue = lastHorizontalValue;
         _lastVerticalValue = lastVerticalValue;
+        _rotateText = rotateText;
     }
 
     /// <inheritdoc/>
@@ -896,6 +899,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
                 if (!string.IsNullOrEmpty(BottomOrientText))
                 {
                     _bottomOrientDBText = new DBText();
+                    _bottomOrientDBText.SetProperties(TextStyle, textHeight);
                 }
                 else
                 {
@@ -1163,47 +1167,47 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (_bottomFirstDBText != null)
         {
             UpdateTextEntity(
-            _bottomFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _bottomFirstMarker.Center, ref _bottomFirstTextMask);
+            _bottomFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _bottomFirstMarker.Center, ref _bottomFirstTextMask, _bottomFirstMarker.Center);
         }
 
         if (_bottomSecondMarker != null)
         {
             UpdateTextEntity(
-                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _bottomSecondMarker.Center, ref _bottomSecondTextMask);
+                _bottomSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _bottomSecondMarker.Center, ref _bottomSecondTextMask, _bottomSecondMarker.Center);
         }
 
         if (_bottomThirdMarker != null)
         {
             UpdateTextEntity(
-                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center, ref _bottomThirdTextMask);
+                _bottomThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _bottomThirdMarker.Center, ref _bottomThirdTextMask, _bottomThirdMarker.Center);
         }
 
         if (_topFirstMarker != null)
         {
             UpdateTextEntity(
-                _topFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _topFirstMarker.Center, ref _topFirstTextMask);
+                _topFirstDBText, FirstTextPrefix + FirstText + FirstTextSuffix, _topFirstMarker.Center, ref _topFirstTextMask, _topFirstMarker.Center);
         }
 
         if (_topSecondMarker != null)
         {
             UpdateTextEntity(
-                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center, ref _topSecondTextMask);
+                _topSecondDBText, SecondTextPrefix + SecondText + SecondTextSuffix, _topSecondMarker.Center, ref _topSecondTextMask, _topSecondMarker.Center);
         }
 
         if (_topThirdMarker != null)
         {
             UpdateTextEntity(
-                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center, ref _topThirdTextMask);
+                _topThirdDBText, ThirdTextPrefix + ThirdText + ThirdTextSuffix, _topThirdMarker.Center, ref _topThirdTextMask, _topThirdMarker.Center);
         }
 
         if (_bottomOrientMarker != null)
         {
-            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, _bottomOrientMarker.Center, ref _bottomOrientTextMask);
+            UpdateTextEntity(_bottomOrientDBText, BottomOrientText, _bottomOrientMarker.Center, ref _bottomOrientTextMask, _bottomOrientMarker.Center);
         }
 
         if (_topOrientMarker != null)
         {
-            UpdateTextEntity(_topOrientDBText, TopOrientText, _topOrientMarker.Center, ref _topOrientTextMask);
+            UpdateTextEntity(_topOrientDBText, TopOrientText, _topOrientMarker.Center, ref _topOrientTextMask, _topOrientMarker.Center);
         }
 
         MirrorIfNeed(new[]
@@ -1222,15 +1226,21 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <param name="textString">Текстовое значение</param>
     /// <param name="dbTextPosition">Положение текста</param>
     /// <param name="mask">Маскировка фона</param>
-    private void UpdateTextEntity(DBText dbText, string textString, Point3d dbTextPosition, ref Wipeout mask)
+    /// <param name="rotationCenter">Центр вращения текста</param>
+    private void UpdateTextEntity(DBText dbText, string textString, Point3d dbTextPosition, ref Wipeout mask, Point3d rotationCenter)
     {
         if (dbText == null)
             return;
 
         var maskOffset = TextMaskOffset * GetScale();
         var textRotation = TextRotationAngle.DegreeToRadian();
+        if (IsRotated & _rotateText)
+        {
+            textRotation = Rotation.DegreeToRadian();
+        }
+
         dbText.TextString = textString;
-        var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
+        var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, rotationCenter);
         dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         dbText.Position = dbTextPosition;
         dbText.AlignmentPoint = dbTextPosition;

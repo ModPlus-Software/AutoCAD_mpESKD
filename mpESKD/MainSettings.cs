@@ -188,6 +188,19 @@ public class MainSettings : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Сохранять значения последних созданных осей и продолжать значения создаваемых осей
+    /// </summary>
+    public bool AxisTextRotateWithBlock
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Section
