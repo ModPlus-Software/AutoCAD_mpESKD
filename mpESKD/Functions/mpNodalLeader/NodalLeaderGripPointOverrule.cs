@@ -7,6 +7,8 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Enums;
+using mpESKD.Base.Overrules.Grips;
 using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -82,11 +84,46 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         GripPoint = nodalLeader.LeaderPoint
                     };
                     grips.Add(gp);
+
+                    var shelfLength = nodalLeader.TopShelfLineLength;
+                    
+                    if (nodalLeader.ShelfPosition == ShelfPosition.Left)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    if (nodalLeader.ScaleFactorX < 0)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    var shelfPointGrip = nodalLeader.LeaderPoint +
+                                         (Vector3d.YAxis *
+                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
+                                           nodalLeader.GetFullScale()));
+                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength;
+                    if (nodalLeader.IsRotated & !nodalLeader.IsTextAlwaysHorizontal)
+                    {
+                        shelfPointGrip = shelfPointGrip.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.LeaderPoint);
+                        alignGripPoint = alignGripPoint.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.LeaderPoint);
+                    }
+
                     grips.Add(new NodalLevelShelfPositionGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.LeaderPoint +
-                                    (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
+                        GripPoint = shelfPointGrip
                     });
+
+                    if ((!string.IsNullOrEmpty(nodalLeader.NodeAddress)) & 
+                        ((!string.IsNullOrEmpty(nodalLeader.NodeNumber) | !string.IsNullOrEmpty(nodalLeader.SheetNumber)) || 
+                         (!string.IsNullOrEmpty(nodalLeader.NodeNumber) & !string.IsNullOrEmpty(nodalLeader.SheetNumber))))
+                    {
+                        grips.Add(new EntityTextAlignGrip(nodalLeader,
+                            () => nodalLeader.ValueHorizontalAlignment,
+                            (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = alignGripPoint
+                        });
+                    }
                 }
             }
         }

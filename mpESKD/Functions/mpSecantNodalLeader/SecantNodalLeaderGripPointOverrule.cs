@@ -8,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -29,15 +30,53 @@ public class SecantNodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Se
                 {
                     grips.Add(new SecantNodalLeaderGrip(
                         nodalLeader, GripType.BasePoint, GripName.InsertionPoint, nodalLeader.InsertionPoint));
+
+                    if (!(!string.IsNullOrEmpty(nodalLeader.NodeNumber) |
+                          !string.IsNullOrEmpty(nodalLeader.SheetNumber)))
+                        return;
                     grips.Add(new SecantNodalLeaderGrip(
                         nodalLeader, GripType.Point, GripName.LeaderPoint, nodalLeader.EndPoint));
 
+                    var shelfLength = nodalLeader.TopShelfLineLength;
+
+                    if (nodalLeader.ShelfPosition == ShelfPosition.Left)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    if (nodalLeader.ScaleFactorX < 0)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    var shelfPointGrip = nodalLeader.EndPoint +
+                                         (Vector3d.YAxis *
+                                          ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) *
+                                           nodalLeader.GetFullScale()));
+                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength;
+                    if (nodalLeader.IsRotated & !nodalLeader.IsTextAlwaysHorizontal)
+                    {
+                        shelfPointGrip = shelfPointGrip.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.EndPoint);
+                        alignGripPoint = alignGripPoint.RotateBy(nodalLeader.Rotation, Vector3d.ZAxis, nodalLeader.EndPoint);
+                    }
+
                     grips.Add(new SecantNodalLevelShelfPositionGrip(nodalLeader)
                     {
-                        GripPoint = nodalLeader.EndPoint +
-                                    (Vector3d.YAxis * ((nodalLeader.MainTextHeight + nodalLeader.TextVerticalOffset) * nodalLeader.GetFullScale())),
+                        GripPoint = shelfPointGrip,
                         GripType = GripType.TwoArrowsLeftRight
                     });
+
+                    if ((!string.IsNullOrEmpty(nodalLeader.NodeAddress)) & 
+                        ((!string.IsNullOrEmpty(nodalLeader.NodeNumber) | !string.IsNullOrEmpty(nodalLeader.SheetNumber)) || 
+                         (!string.IsNullOrEmpty(nodalLeader.NodeNumber) & !string.IsNullOrEmpty(nodalLeader.SheetNumber))))
+                    {
+                        grips.Add(new EntityTextAlignGrip(nodalLeader,
+                            () => nodalLeader.ValueHorizontalAlignment,
+                            (setAlignEntity) => nodalLeader.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = alignGripPoint
+                        });
+                    }
                 }
             }
         }
