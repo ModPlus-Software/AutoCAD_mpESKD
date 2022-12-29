@@ -131,7 +131,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
 
                     var arrowTypeGripPoint = chainLeader.EndPoint + Vector3d.XAxis * shelfLength;
                     var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis * 
-                                                                (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset));
+                                                                (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) * chainLeader.GetFullScale());
                     var shelfMoveGripPoint = chainLeader.EndPoint + Vector3d.XAxis * textIndent;
                     var shelfPositionGripPoint = chainLeader.EndPoint +
                                                  (Vector3d.YAxis * 
