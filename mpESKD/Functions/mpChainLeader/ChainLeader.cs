@@ -20,8 +20,8 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _cachedNodeNumber;
-    private readonly List<Hatch> _hatches = new();
-    private readonly List<Polyline> _leaderEndLines = new();
+    private readonly List<Hatch> _hatches = new ();
+    private readonly List<Polyline> _leaderEndLines = new ();
     private double _scale;
     private Vector3d _mainNormal;
     private Line _shelfLineFromEndPoint;
@@ -226,7 +226,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// Точки стрелок
     /// </summary>
     [SaveToXData]
-    public List<double> ArrowPoints { get; set; } = new();
+    public List<double> ArrowPoints { get; set; } = new ();
 
     /// <summary>
     /// Расстояние от Endpoint для отображения при растягивании
@@ -263,7 +263,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         yield return EndPoint;
         foreach (var arrowPoint in ArrowPoints)
         {
-            yield return EndPoint + (EndPoint - InsertionPoint).GetNormal() * arrowPoint;
+            yield return EndPoint + ((EndPoint - InsertionPoint).GetNormal() * arrowPoint);
         }
     }
 
@@ -425,11 +425,11 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (isRight)
         {
             topTextPosition = new Point3d(
-                endPoint.X + TextIndent + largestTextLength / 2,
+                endPoint.X + TextIndent + (largestTextLength / 2),
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                endPoint.X + TextIndent + largestTextLength / 2,
+                endPoint.X + TextIndent + (largestTextLength / 2),
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -447,10 +447,10 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         else
         {
             topTextPosition = new Point3d(
-                endPoint.X - TextIndent - largestTextLength / 2,
+                endPoint.X - TextIndent - (largestTextLength / 2),
                 endPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                endPoint.X - TextIndent - largestTextLength / 2,
+                endPoint.X - TextIndent - (largestTextLength / 2),
                 endPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)

@@ -16,7 +16,8 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 /// <inheritdoc />
 public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLeader>
 {
-    private List<double> _distArrowPointsFromInsPoint = new();
+    private readonly List<double> _distArrowPointsFromInsPoint = new ();
+
     /// <inheritdoc />
     public override void GetGripPoints(
         Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
@@ -129,10 +130,10 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         shelfLength = -shelfLength;
                     }
 
-                    var arrowTypeGripPoint = chainLeader.EndPoint + Vector3d.XAxis * shelfLength;
+                    var arrowTypeGripPoint = chainLeader.EndPoint + (Vector3d.XAxis * shelfLength);
                     var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis *
                                                                 (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset) * chainLeader.GetFullScale());
-                    var shelfMoveGripPoint = chainLeader.EndPoint + Vector3d.XAxis * textIndent;
+                    var shelfMoveGripPoint = chainLeader.EndPoint + (Vector3d.XAxis * textIndent);
                     var shelfPositionGripPoint = chainLeader.EndPoint +
                                                  (Vector3d.YAxis *
                                                  (chainLeader.MainTextHeight + chainLeader.TextVerticalOffset));
@@ -169,9 +170,10 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         | (string.IsNullOrEmpty(chainLeader.LeaderTextValue) & string.IsNullOrEmpty(chainLeader.LeaderTextComment)))
                         return;
 
-                    grips.Add(new EntityTextAlignGrip(chainLeader,
+                    grips.Add(new EntityTextAlignGrip(
+                        chainLeader,
                         () => chainLeader.ValueHorizontalAlignment,
-                        (setAlignEntity) => chainLeader.ValueHorizontalAlignment = setAlignEntity)
+                        setAlignEntity => chainLeader.ValueHorizontalAlignment = setAlignEntity)
                     {
                         GripPoint = alignGripPoint
                     });
@@ -202,8 +204,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                         {
                             var newPoint = vertexGrip.GripPoint + offset;
 
-                            var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint,
-                                chainLeader.EndPoint, newPoint);
+                            var pointOnPolyline = GetPerpendicularPoint(chainLeader.InsertionPoint, chainLeader.EndPoint, newPoint);
 
                             if (pointOnPolyline.DistanceTo(chainLeader.EndPoint) <= chainLeader.MinDistanceBetweenPoints)
                             {
@@ -235,7 +236,7 @@ public class ChainLeaderGripPointOverrule : BaseSmartEntityGripOverrule<ChainLea
                                 }
                                 else
                                 {
-                                    chainLeader.ArrowPoints.Add((distance - distInspointToEndPoint));
+                                    chainLeader.ArrowPoints.Add(distance - distInspointToEndPoint);
                                 }
                             }
                         }
