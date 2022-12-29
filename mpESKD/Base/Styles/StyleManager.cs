@@ -728,20 +728,7 @@ public static class StyleManager
                     }
                     else if (attribute.Name == "TextStyle")
                     {
-                        var apply = false;
-                        if (isOnEntityCreation)
-                        {
-                            if (MainSettings.Instance.UseTextStyleFromStyle)
-                            {
-                                apply = true;
-                            }
-                        }
-                        else
-                        {
-                            apply = true;
-                        }
-
-                        if (apply)
+                        if (MainSettings.Instance.UseTextStyleFromStyle)
                         {
                             var textStyleName = propertyFromStyle.Value.ToString();
                             if (TextStyleUtils.HasTextStyle(textStyleName))
@@ -756,6 +743,11 @@ public static class StyleManager
                                     propertyInfo.SetValue(entity, textStyleName);
                                 }
                             }
+                        }
+                        else
+                        {
+                            var textStyleName = TextStyleUtils.GetCurrentTextStyleName();
+                            propertyInfo.SetValue(entity, textStyleName);
                         }
                     }
                     else if (attribute.Name == "NumberSeparator")
