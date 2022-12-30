@@ -570,7 +570,7 @@ public class NodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         MirrorIfNeed(new[] { _topFirstDbText, _topSecondDbText, _bottomDbText });
 
-        if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
+        if ((ScaleFactorX <= 0 && !CommandsWatcher.Mirroring) || (ScaleFactorX >= 0 && CommandsWatcher.Mirroring))
         {
             if (_topFirstDbText != null)
             {
