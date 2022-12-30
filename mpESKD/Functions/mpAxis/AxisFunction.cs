@@ -93,11 +93,7 @@ public class AxisFunction : ISmartEntityFunction
             var axisLastHorizontalValue = string.Empty;
             var axisLastVerticalValue = string.Empty;
             FindLastAxisValues(ref axisLastHorizontalValue, ref axisLastVerticalValue);
-            var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue, true);
-            if (!MainSettings.Instance.AxisTextRotateWithBlock)
-            {
-                axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue, false);
-            }
+            var axis = new Axis(axisLastHorizontalValue, axisLastVerticalValue);
 
             var blockReference = MainFunction.CreateBlock(axis);
             axis.ApplyStyle(style, true);

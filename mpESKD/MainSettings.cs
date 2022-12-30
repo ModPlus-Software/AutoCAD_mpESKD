@@ -189,7 +189,7 @@ public class MainSettings : ObservableObject
     }
 
     /// <summary>
-    /// Сохранять значения последних созданных осей и продолжать значения создаваемых осей
+    /// При повороте блока обратный поворот текста
     /// </summary>
     public bool AxisTextRotateWithBlock
     {

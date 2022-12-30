@@ -22,7 +22,7 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     // last values
     private readonly string _lastHorizontalValue = string.Empty;
     private readonly string _lastVerticalValue = string.Empty;
-    private readonly bool _rotateText;
+    private bool _rotateText;
 
     private int _bottomFractureOffset;
     private int _markersCount = 1;
@@ -161,13 +161,11 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     /// <param name="lastHorizontalValue">Значение последней горизонтальной оси</param>
     /// <param name="lastVerticalValue">Значение последней вертикальной оси</param>
-    /// <param name="rotateText"></param>
-    public Axis(string lastHorizontalValue, string lastVerticalValue, bool rotateText)
+    public Axis(string lastHorizontalValue, string lastVerticalValue)
     {
         // last values
         _lastHorizontalValue = lastHorizontalValue;
         _lastVerticalValue = lastVerticalValue;
-        _rotateText = rotateText;
     }
 
     /// <inheritdoc/>
@@ -658,6 +656,8 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         try
         {
+            _rotateText = MainSettings.Instance.AxisTextRotateWithBlock;
+            AcadUtils.WriteMessageInDebug($"_rotateText {_rotateText}");
             var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
             if (EndPointOCS.Equals(Point3d.Origin))
@@ -1233,10 +1233,11 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             return;
 
         var maskOffset = TextMaskOffset * GetScale();
-        var textRotation = TextRotationAngle.DegreeToRadian();
-        if (IsRotated & _rotateText)
+        var textRotation = TextRotationAngle.DegreeToRadian() - Rotation;
+        
+        if (_rotateText & IsRotated & textRotation == 0)
         {
-            textRotation = Rotation.DegreeToRadian();
+            textRotation = - Rotation;
         }
 
         dbText.TextString = textString;
@@ -1252,7 +1253,14 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             mask = dbText.GetBackgroundMask(maskOffset, dbText.Position);
             if (textRotation != 0.0)
                 mask.TransformBy(rotationMatrix);
+            if (IsRotated)
+            {
+                rotationMatrix = Matrix3d.Rotation(textRotation+Rotation, Vector3d.ZAxis, rotationCenter);
+                mask.TransformBy(rotationMatrix);
+            }
         }
+
+        //RotateIfNeed(dbText);
     }
 
     private void SetFirstTextOnCreation()

@@ -40,6 +40,11 @@ public class MainFunction : IExtensionApplication
     /// </summary>
     public static bool Mirroring { get; private set; }
 
+    /// <summary>
+    /// Возвращает true, если в данный момент выполняется команда ROTATE
+    /// </summary>
+    public static bool Rotating { get; private set; }
+
     /// <inheritdoc />
     public void Initialize()
     {
@@ -493,11 +498,13 @@ public class MainFunction : IExtensionApplication
     private static void CommandCancelled(object sender, CommandEventArgs e)
     {
         Mirroring = false;
+        Rotating = false;
     }
 
     private static void CommandEnded(object sender, CommandEventArgs e)
     {
         Mirroring = false;
+        Rotating = false;
 
         if (e.GlobalCommandName is "REGEN" or "REGENALL")
         {
@@ -510,6 +517,11 @@ public class MainFunction : IExtensionApplication
         if (e.GlobalCommandName == "MIRROR")
         {
             Mirroring = true;
+        }
+
+        if (e.GlobalCommandName == "REGEN")
+        {
+            Rotating = true;
         }
     }
 
@@ -548,8 +560,8 @@ public class MainFunction : IExtensionApplication
     {
         try
         {
-            if (AcadUtils.IsInModel())
-                return;
+            //if (AcadUtils.IsInModel())
+            //    return;
 
             using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
 
