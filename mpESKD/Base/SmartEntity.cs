@@ -706,7 +706,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
     {
         if (dbText == null)
             return;
-        if ((ScaleFactorX >= 0 || MainFunction.Mirroring) && (ScaleFactorX <= 0 || !MainFunction.Mirroring))
+        if ((ScaleFactorX >= 0 || CommandsWatcher.Mirroring) && (ScaleFactorX <= 0 || !CommandsWatcher.Mirroring))
             return;
 
         dbText.IsMirroredInX = true;

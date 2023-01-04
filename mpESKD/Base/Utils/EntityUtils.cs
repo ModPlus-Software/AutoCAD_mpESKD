@@ -89,7 +89,7 @@ public static class EntityUtils
     /// <param name="blockReference">Блок, представляющий интеллектуальный объект</param>
     public static void DoubleClickEdit(BlockReference blockReference)
     {
-        BeditCommandWatcher.UseBedit = false;
+        CommandsWatcher.UseBedit = false;
 
         var smartEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
         if (smartEntity is IWithDoubleClickEditor entityWithEditor)

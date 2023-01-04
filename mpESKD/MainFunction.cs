@@ -1,7 +1,6 @@
 ﻿namespace mpESKD;
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,12 +14,10 @@ using Autodesk.AutoCAD.Windows;
 using Base;
 using Base.Enums;
 using Base.Utils;
-using Functions.SearchEntities;
 using ModPlusAPI;
 using mpESKD.Base.Properties;
 using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using StyleEditor = Base.View.StyleEditor;
-using SystemVariableChangedEventArgs = Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs;
 
 /// <summary>
 /// Основные команды и инициализация приложения
@@ -34,17 +31,7 @@ public class MainFunction : IExtensionApplication
     /// Путь к папке хранения пользовательских стилей
     /// </summary>
     public static string StylesPath { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Возвращает true, если в данный момент выполняется команда MIRROR
-    /// </summary>
-    public static bool Mirroring { get; private set; }
-
-    /// <summary>
-    /// Возвращает true, если в данный момент выполняется команда ROTATE
-    /// </summary>
-    public static bool Rotating { get; private set; }
-
+    
     /// <inheritdoc />
     public void Initialize()
     {
@@ -71,22 +58,19 @@ public class MainFunction : IExtensionApplication
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
-        AcApp.SystemVariableChanged += AcAppOnSystemVariableChanged;
+        CommandsWatcher.Initialize();
 
-        // bedit watcher
-        BeditCommandWatcher.Initialize();
+        AcApp.SystemVariableChanged += AcAppOnSystemVariableChanged;
+        
         AcApp.BeginDoubleClick += AcApp_BeginDoubleClick;
         
         AcadUtils.Documents.DocumentActivated += Documents_DocumentActivated;
 
-        foreach (Document document in AcadUtils.Documents)
-        {
-            document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-            document.LayoutSwitched += DocumentOnLayoutSwitched;
-        }
+        if (AcadUtils.Document != null) 
+            SubscribeDocumentEvenets(AcadUtils.Document);
     }
 
-    private void AcAppOnSystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
+    private void AcAppOnSystemVariableChanged(object sender, Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs e)
     {
         if (e.Name.Equals("WSCURRENT") && 
             MainSettings.Instance.AutoLoad & !MainSettings.Instance.AddToMpPalette)
@@ -169,7 +153,7 @@ public class MainFunction : IExtensionApplication
     public void CreateAnalogCommand()
     {
         var psr = AcadUtils.Editor.SelectImplied();
-        if (psr.Value == null || psr.Value.Count != 1) 
+        if (psr.Value is not { Count: 1 }) 
             return;
 
         SmartEntity intellectualEntity = null;
@@ -383,13 +367,13 @@ public class MainFunction : IExtensionApplication
                     var applicableAppName = ExtendedDataUtils.ApplicableAppName(blockReference);
 
                     if (string.IsNullOrEmpty(applicableAppName))
-                        BeditCommandWatcher.UseBedit = true;
+                        CommandsWatcher.UseBedit = true;
                     else
                         EntityUtils.DoubleClickEdit(blockReference);
                 }
                 else
                 {
-                    BeditCommandWatcher.UseBedit = true;
+                    CommandsWatcher.UseBedit = true;
                 }
 
                 tr.Commit();
@@ -413,44 +397,20 @@ public class MainFunction : IExtensionApplication
         if (e.Document == null)
             return;
 
-        e.Document.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
-        e.Document.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
-        e.Document.CommandWillStart -= CommandWillStart;
-        e.Document.CommandWillStart += CommandWillStart;
-        e.Document.CommandEnded -= CommandEnded;
-        e.Document.CommandEnded += CommandEnded;
-        e.Document.CommandCancelled -= CommandCancelled;
-        e.Document.CommandCancelled += CommandCancelled;
-       
+        SubscribeDocumentEvenets(e.Document);
+
         // при открытии документа соберу все блоки в текущем пространстве (?) и вызову обновление их внутренних
         // примитивов. Нужно, так как в некоторых случаях (пока не ясно в каких) внутренние примитивы отсутствуют
-        try
-        {
-            var timer = Stopwatch.StartNew();
-            using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
-            {
-                foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfSmartEntities(
-                             TypeFactory.Instance.GetEntityCommandNames(), tr))
-                {
-                    var ie = EntityReaderService.Instance.GetFromEntity(blockReference);
-                    if (ie != null)
-                    {
-                        blockReference.UpgradeOpen();
-                        ie.UpdateEntities();
-                        ie.GetBlockTableRecordForUndo(blockReference)?.UpdateAnonymousBlocks();
-                    }
-                }
+        SmartEntityUtils.UpdateSmartObjects(false);
+    }
 
-                tr.Commit();
-            }
-
-            timer.Stop();
-            Debug.Print($"Time for update entities: {timer.ElapsedMilliseconds} milliseconds");
-        }
-        catch
-        {
-            // ignore
-        }
+    private static void SubscribeDocumentEvenets(Document doc)
+    {
+        doc.ImpliedSelectionChanged -= Document_ImpliedSelectionChanged;
+        doc.ImpliedSelectionChanged += Document_ImpliedSelectionChanged;
+        doc.LayoutSwitched -= DocumentOnLayoutSwitched;
+        doc.LayoutSwitched += DocumentOnLayoutSwitched;
+        CommandsWatcher.SubscribeDocument(doc);
     }
 
     private static void Document_ImpliedSelectionChanged(object sender, EventArgs e)
@@ -490,40 +450,7 @@ public class MainFunction : IExtensionApplication
         }
     }
 
-    private static void DocumentOnLayoutSwitched(object sender, LayoutSwitchedEventArgs e)
-    {
-        UpdateSmartObjectsInModelSpace();
-    }
-
-    private static void CommandCancelled(object sender, CommandEventArgs e)
-    {
-        Mirroring = false;
-        Rotating = false;
-    }
-
-    private static void CommandEnded(object sender, CommandEventArgs e)
-    {
-        Mirroring = false;
-        Rotating = false;
-
-        if (e.GlobalCommandName is "REGEN" or "REGENALL")
-        {
-            UpdateSmartObjectsInModelSpace();
-        }
-    }
-
-    private static void CommandWillStart(object sender, CommandEventArgs e)
-    {
-        if (e.GlobalCommandName == "MIRROR")
-        {
-            Mirroring = true;
-        }
-
-        if (e.GlobalCommandName == "REGEN")
-        {
-            Rotating = true;
-        }
-    }
+    private static void DocumentOnLayoutSwitched(object sender, LayoutSwitchedEventArgs e) => SmartEntityUtils.UpdateSmartObjects(true);
 
     private static void AttachCreateAnalogContextMenu()
     {
@@ -540,11 +467,8 @@ public class MainFunction : IExtensionApplication
             rxObject, _intellectualEntityContextMenu);
     }
 
-    private static void CreateAnalogMenuItem_Click(object sender, EventArgs e)
-    {
-        AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
-            "_.mpESKDCreateAnalog ", false, false, false);
-    }
+    private static void CreateAnalogMenuItem_Click(object sender, EventArgs e) => 
+        AcApp.DocumentManager.MdiActiveDocument.SendStringToExecute("_.mpESKDCreateAnalog ", false, false, false);
 
     private static void DetachCreateAnalogContextMenu()
     {
@@ -554,39 +478,5 @@ public class MainFunction : IExtensionApplication
         var rxObject = RXObject.GetClass(typeof(BlockReference));
         Autodesk.AutoCAD.ApplicationServices.Application.RemoveObjectContextMenuExtension(
             rxObject, _intellectualEntityContextMenu);
-    }
-
-    private static void UpdateSmartObjectsInModelSpace()
-    {
-        try
-        {
-            //if (AcadUtils.IsInModel())
-            //    return;
-
-            using var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction();
-
-            if (tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead) is BlockTableRecord btr)
-            {
-                foreach (var objectId in btr)
-                {
-                    if (tr.GetObject(objectId, OpenMode.ForWrite) is not BlockReference blockReference || blockReference.XData == null)
-                        continue;
-
-                    var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
-                    if (entity == null)
-                        continue;
-
-                    entity.UpdateEntities();
-                    entity.BlockRecord.UpdateAnonymousBlocks();
-                    blockReference.RecordGraphicsModified(true);
-                }
-            }
-
-            tr.Commit();
-        }
-        catch (System.Exception exception)
-        {
-            Debug.Print(exception.Message);
-        }
     }
 }

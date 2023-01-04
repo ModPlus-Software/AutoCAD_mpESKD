@@ -40,8 +40,8 @@ public class SmartEntityObjectOverrule<TEntity> : ObjectOverrule
                     return;
 
                 if ((dbObject.IsNewObject && dbObject.Database == AcadUtils.Database) ||
-                    (dbObject.IsUndoing && dbObject.IsModifiedXData)) //// ||
-                    ////(dbObject.IsModified && AcadUtils.Database.TransactionManager.TopTransaction == null))
+                    (dbObject.IsUndoing && dbObject.IsModifiedXData) ||
+                    (CommandsWatcher.Rotation && dbObject.IsWriteEnabled))
                 {
                     var smartEntity = EntityReaderService.Instance.GetFromEntity<TEntity>(dbObject);
                     if (smartEntity == null)

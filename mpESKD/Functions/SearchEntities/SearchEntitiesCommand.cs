@@ -11,6 +11,7 @@ using Base.Enums;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Abstractions;
 
 /// <summary>
 /// Поиск интеллектуальных объектов в чертеже
@@ -79,8 +80,9 @@ public static class SearchEntitiesCommand
                                 var entity = EntityReaderService.Instance.GetFromEntity(blockReference);
                                 if (entity != null)
                                 {
+                                    blockReference.UpgradeOpen();
                                     entity.UpdateEntities();
-                                    entity.BlockRecord.UpdateAnonymousBlocks();
+                                    entity.GetBlockTableRecordForUndo(blockReference)?.UpdateAnonymousBlocks();
                                 }
                             }
                                 
