@@ -1233,56 +1233,33 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         if (dbText == null)
             return;
-        AcadUtils.WriteMessageInDebug($"TempRotation at first {TempRotation.RadianToDegree()}");
 
         var textAngle = TextRotationAngle.DegreeToRadian();
 
         // если блок повернут и меняем угол через свойство
-        if (IsRotated && !CommandsWatcher.Rotation && !_rotateText)
+        if ((CommandsWatcher.Rotation && _rotateText) | (!CommandsWatcher.Rotation && _rotateText))
         {
-            TempRotation = TextRotationAngle.DegreeToRadian();
-            AcadUtils.WriteMessageInDebug($"_tempRotation при изменении через свойство {TempRotation.RadianToDegree()}");
-        }
-
-        else if (CommandsWatcher.Rotation && _rotateText)
-        {
-            TempRotation =  -1* (Rotation - TextRotationAngle.DegreeToRadian());
-
-            AcadUtils.WriteMessageInDebug($"temptRotation {TempRotation.RadianToDegree()}");
-        }
-
-        else if (!CommandsWatcher.Rotation && _rotateText)
-        {
-            TempRotation = -1 * (Rotation - TextRotationAngle.DegreeToRadian());
-
-            AcadUtils.WriteMessageInDebug($"temptRotation {TempRotation.RadianToDegree()}");
+            TempRotation = -1 * (Rotation - textAngle);
         }
         else
         {
             TempRotation = textAngle;
         }
+
         dbText.TextString = textString;
         dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         dbText.Position = dbTextPosition;
         dbText.AlignmentPoint = dbTextPosition;
         var rotationMatrix = Matrix3d.Rotation(TempRotation, Vector3d.ZAxis, rotationCenter);
         dbText.TransformBy(rotationMatrix);
-        AcadUtils.WriteMessageInDebug($"textRotation {TempRotation.RadianToDegree()}");
 
-        var maskOffset = TextMaskOffset * GetScale();
         if (HideTextBackground)
         {
+            var maskOffset = TextMaskOffset * GetScale();
             mask = dbText.GetBackgroundMask(maskOffset, dbText.Position);
             if (TempRotation != 0.0)
                 mask.TransformBy(rotationMatrix);
-            if (IsRotated)
-            {
-                rotationMatrix = Matrix3d.Rotation(TempRotation + Rotation, Vector3d.ZAxis, rotationCenter);
-                mask.TransformBy(rotationMatrix);
-            }
         }
-
-        //RotateIfNeed(dbText);
     }
 
     private void SetFirstTextOnCreation()
