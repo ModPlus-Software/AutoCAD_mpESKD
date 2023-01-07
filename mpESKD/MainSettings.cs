@@ -188,6 +188,19 @@ public class MainSettings : ObservableObject
         }
     }
 
+    /// <summary>
+    /// При повороте блока обратный поворот текста
+    /// </summary>
+    public bool AxisTextRotateWithBlock
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Section
