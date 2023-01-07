@@ -712,18 +712,6 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
         dbText.IsMirroredInX = true;
     }
 
-    protected void RotateIfNeed(DBText dbText)
-    {
-        if (dbText == null)
-            return;
-        if ((Rotation >= 0 || MainFunction.Rotating) && (Rotation <= 0 || !MainFunction.Rotating))
-            return;
-
-        var textRotation = Rotation.DegreeToRadian();
-        
-        Matrix3d.Rotation(textRotation, Vector3d.ZAxis, dbText.Position);
-    }
-
     /// <summary>
     /// Выполнить зеркалирования текста при необходимости 
     /// </summary>

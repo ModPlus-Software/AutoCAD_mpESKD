@@ -440,6 +440,8 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public double BottomLineAngle { get; set; }
 
+    //[SaveToXData]
+    public double TempRotation { get; set; }
     /// <summary>
     /// Нижняя точка расположения маркеров
     /// </summary>  
@@ -1231,31 +1233,51 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         if (dbText == null)
             return;
+        AcadUtils.WriteMessageInDebug($"TempRotation at first {TempRotation.RadianToDegree()}");
 
-        var maskOffset = TextMaskOffset * GetScale();
-        var textRotation = TextRotationAngle.DegreeToRadian() - Rotation;
-        
-        if (_rotateText & IsRotated & textRotation == 0)
+        var textAngle = TextRotationAngle.DegreeToRadian();
+
+        // если блок повернут и меняем угол через свойство
+        if (IsRotated && !CommandsWatcher.Rotation && !_rotateText)
         {
-            textRotation = - Rotation;
+            TempRotation = TextRotationAngle.DegreeToRadian();
+            AcadUtils.WriteMessageInDebug($"_tempRotation при изменении через свойство {TempRotation.RadianToDegree()}");
         }
 
+        else if (CommandsWatcher.Rotation && _rotateText)
+        {
+            TempRotation =  -1* (Rotation - TextRotationAngle.DegreeToRadian());
+
+            AcadUtils.WriteMessageInDebug($"temptRotation {TempRotation.RadianToDegree()}");
+        }
+
+        else if (!CommandsWatcher.Rotation && _rotateText)
+        {
+            TempRotation = -1 * (Rotation - TextRotationAngle.DegreeToRadian());
+
+            AcadUtils.WriteMessageInDebug($"temptRotation {TempRotation.RadianToDegree()}");
+        }
+        else
+        {
+            TempRotation = textAngle;
+        }
         dbText.TextString = textString;
-        var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, rotationCenter);
         dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         dbText.Position = dbTextPosition;
         dbText.AlignmentPoint = dbTextPosition;
-        if (textRotation != 0.0)
-            dbText.TransformBy(rotationMatrix);
+        var rotationMatrix = Matrix3d.Rotation(TempRotation, Vector3d.ZAxis, rotationCenter);
+        dbText.TransformBy(rotationMatrix);
+        AcadUtils.WriteMessageInDebug($"textRotation {TempRotation.RadianToDegree()}");
 
+        var maskOffset = TextMaskOffset * GetScale();
         if (HideTextBackground)
         {
             mask = dbText.GetBackgroundMask(maskOffset, dbText.Position);
-            if (textRotation != 0.0)
+            if (TempRotation != 0.0)
                 mask.TransformBy(rotationMatrix);
             if (IsRotated)
             {
-                rotationMatrix = Matrix3d.Rotation(textRotation+Rotation, Vector3d.ZAxis, rotationCenter);
+                rotationMatrix = Matrix3d.Rotation(TempRotation + Rotation, Vector3d.ZAxis, rotationCenter);
                 mask.TransformBy(rotationMatrix);
             }
         }
