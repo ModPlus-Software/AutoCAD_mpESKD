@@ -1234,16 +1234,13 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (dbText == null)
             return;
 
-        var textAngle = TextRotationAngle.DegreeToRadian();
-
-        // если блок повернут и меняем угол через свойство
-        if ((CommandsWatcher.Rotation && _rotateText) | (!CommandsWatcher.Rotation && _rotateText))
+        if (_rotateText)
         {
-            TempRotation = -1 * (Rotation - textAngle);
+            TempRotation = -1 * (Rotation - TextRotationAngle.DegreeToRadian());
         }
         else
         {
-            TempRotation = textAngle;
+            TempRotation = TextRotationAngle.DegreeToRadian();
         }
 
         dbText.TextString = textString;
