@@ -440,8 +440,6 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     [SaveToXData]
     public double BottomLineAngle { get; set; }
 
-    //[SaveToXData]
-    public double TempRotation { get; set; }
     /// <summary>
     /// Нижняя точка расположения маркеров
     /// </summary>  
@@ -1234,27 +1232,24 @@ public class Axis : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         if (dbText == null)
             return;
 
+        var textRotation = TextRotationAngle.DegreeToRadian();
         if (_rotateText)
         {
-            TempRotation = -1 * (Rotation - TextRotationAngle.DegreeToRadian());
-        }
-        else
-        {
-            TempRotation = TextRotationAngle.DegreeToRadian();
+            textRotation = -1 * (Rotation - TextRotationAngle.DegreeToRadian());
         }
 
         dbText.TextString = textString;
         dbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
         dbText.Position = dbTextPosition;
         dbText.AlignmentPoint = dbTextPosition;
-        var rotationMatrix = Matrix3d.Rotation(TempRotation, Vector3d.ZAxis, rotationCenter);
+        var rotationMatrix = Matrix3d.Rotation(textRotation, Vector3d.ZAxis, rotationCenter);
         dbText.TransformBy(rotationMatrix);
 
         if (HideTextBackground)
         {
             var maskOffset = TextMaskOffset * GetScale();
             mask = dbText.GetBackgroundMask(maskOffset, dbText.Position);
-            if (TempRotation != 0.0)
+            if (textRotation != 0.0)
                 mask.TransformBy(rotationMatrix);
         }
     }
