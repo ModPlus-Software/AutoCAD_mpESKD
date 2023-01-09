@@ -335,4 +335,21 @@ public class MainSettings : ObservableObject
 
     #endregion
 
+    #region CrestedLeader
+
+    /// <summary>
+    /// Продолжать нумерацию выноски при создании новой выноски
+    /// </summary>
+    public bool CrestedLeaderContinueNodeNumber
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
 }

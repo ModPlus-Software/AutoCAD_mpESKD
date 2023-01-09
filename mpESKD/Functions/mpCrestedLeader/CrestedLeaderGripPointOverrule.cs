@@ -1,22 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Autodesk.AutoCAD.EditorInput;
-using ModPlusAPI;
-using ModPlusAPI.IO;
-using mpESKD.Base.Styles;
-using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpCrestedLeader;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Base;
 using Base.Enums;
 using Base.Overrules;
-using Grips;
+using ModPlusAPI;
+using ModPlusAPI.IO;
 using ModPlusAPI.Windows;
-using Exception = Autodesk.AutoCAD.Runtime.Exception;
+using mpESKD.Base.Styles;
+using mpESKD.Base.Utils;
+using System.Collections.Generic;
+using System.Linq;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
