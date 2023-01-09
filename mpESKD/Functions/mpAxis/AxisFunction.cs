@@ -77,7 +77,7 @@ public class AxisFunction : ISmartEntityFunction
     private static void CreateAxis()
     {
         SmartEntityUtils.SendStatistic<Axis>();
-            
+
         try
         {
             Overrule.Overruling = false;
