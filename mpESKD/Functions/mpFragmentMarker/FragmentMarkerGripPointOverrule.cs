@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpFragmentMarker;
+﻿namespace mpESKD.Functions.mpFragmentMarker;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -10,6 +8,7 @@ using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Overrules.Grips;
 
 /// <inheritdoc />
 public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<FragmentMarker>
@@ -80,11 +79,51 @@ public class FragmentMarkerGripPointOverrule : BaseSmartEntityGripOverrule<Fragm
                         GripPoint = fragmentMarker.LeaderPoint
                     };
                     grips.Add(gp);
+
+                    if ((string.IsNullOrEmpty(fragmentMarker.MainText) | string.IsNullOrEmpty(fragmentMarker.SmallText)) | 
+                        (string.IsNullOrEmpty(fragmentMarker.MainText) & string.IsNullOrEmpty(fragmentMarker.SmallText)))
+                        return;
+                    
+                    // получаем ручку выравнивания текста
+                    
+                    var shelfLength = fragmentMarker.TopShelfLineLength;
+                    
+                    if (fragmentMarker.ShelfPosition == ShelfPosition.Left)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    if (fragmentMarker.ScaleFactorX < 0)
+                    {
+                        shelfLength = -shelfLength;
+                    }
+
+                    var shelfPointGrip = fragmentMarker.LeaderPoint +
+                                         (Vector3d.YAxis *
+                                          ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
+                                           fragmentMarker.GetFullScale()));
+                    var alignGripPoint = fragmentMarker.LeaderPoint + (Vector3d.XAxis * shelfLength);
+                    alignGripPoint += Vector3d.YAxis * 
+                                      (fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) *
+                                      fragmentMarker.GetFullScale();
+
+                    if (fragmentMarker.IsRotated & !fragmentMarker.IsTextAlwaysHorizontal)
+                    {
+                        shelfPointGrip = shelfPointGrip.RotateBy(fragmentMarker.Rotation, Vector3d.ZAxis, fragmentMarker.LeaderPoint);
+                        alignGripPoint = alignGripPoint.RotateBy(fragmentMarker.Rotation, Vector3d.ZAxis, fragmentMarker.LeaderPoint);
+                    }
+
                     grips.Add(new FragmentMarkerShelfPositionGrip(fragmentMarker)
                     {
-                        GripPoint = fragmentMarker.LeaderPoint +
-                                    (Vector3d.YAxis * ((fragmentMarker.MainTextHeight + fragmentMarker.TextVerticalOffset) * fragmentMarker.GetFullScale())),
+                        GripPoint = shelfPointGrip,
                         GripType = GripType.TwoArrowsLeftRight
+                    });
+
+                    grips.Add(new EntityTextAlignGrip(fragmentMarker,
+                        () => fragmentMarker.ValueHorizontalAlignment,
+                        (setAlignEntity) => fragmentMarker.ValueHorizontalAlignment = setAlignEntity)
+                    {
+                        GripPoint = alignGripPoint
                     });
                 }
             }

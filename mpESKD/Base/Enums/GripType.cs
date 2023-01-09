@@ -43,5 +43,10 @@ public enum GripType
     /// <summary>
     /// Точка отсчета
     /// </summary>
-    BasePoint
+    BasePoint,
+
+    /// <summary>
+    /// Отображение выравнивания текста
+    /// </summary>
+    TextAlign
 }

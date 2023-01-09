@@ -22,6 +22,38 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private bool _objectLine;
     private int _objectLineOffset = 5;
     private int _bottomShelfLength = 10;
+    
+    /// <summary>
+    /// Нижняя полка
+    /// </summary>
+    private Line _bottomShelfLine;
+
+    /// <summary>
+    /// Вертикальная линия между полками
+    /// </summary>
+    private Line _verticalLine;
+
+    /// <summary>
+    /// Верхняя полка
+    /// </summary>
+    private Line _topShelfLine;
+
+    /// <summary>
+    /// Стрелка
+    /// </summary>
+    private Polyline _arrowPolyline;
+
+    /// <summary>
+    /// Верхний (основной) текст
+    /// </summary>
+    private DBText _topDbText;
+    private Wipeout _topTextMask;
+
+    /// <summary>
+    /// Нижний (второстепенный) текст
+    /// </summary>
+    private DBText _bottomDbText;
+    private Wipeout _bottomTextMask;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LevelMark"/> class.
@@ -60,6 +92,12 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// Точка начала (со стороны объекта) нижней полки в системе координат блока
     /// </summary>
     private Point3d BottomShelfStartPointOCS => BottomShelfStartPoint.TransformBy(BlockTransform.Inverse());
+
+    /// <summary>
+    /// Длина полки
+    /// </summary>
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
 
     /// <summary>
     /// Точка начала верхней полки. Задает высоту от нижней полки до верхней
@@ -295,7 +333,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     }
 
     /// <summary>
-    /// Выравнивание основного значения по горизонтали
+    /// Выравнивание текста по горизонтали
     /// </summary>
     [EntityProperty(PropertiesCategory.Content, 5, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
     [SaveToXData]
@@ -365,36 +403,11 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     public double MeasurementScale { get; set; } = 1.0;
 
     /// <summary>
-    /// Нижняя полка
+    /// Свойство определяющая сторону полки
     /// </summary>
-    private Line _bottomShelfLine;
+    public bool IsLeft => (ObjectPointOCS - EndPointOCS).GetNormal().X < 0;
 
-    /// <summary>
-    /// Вертикальная линия между полками
-    /// </summary>
-    private Line _verticalLine;
 
-    /// <summary>
-    /// Верхняя полка
-    /// </summary>
-    private Line _topShelfLine;
-
-    /// <summary>
-    /// Стрелка
-    /// </summary>
-    private Polyline _arrowPolyline;
-
-    /// <summary>
-    /// Верхний (основной) текст
-    /// </summary>
-    private DBText _topDbText;
-    private Wipeout _topTextMask;
-
-    /// <summary>
-    /// Нижний (второстепенный) текст
-    /// </summary>
-    private DBText _bottomDbText;
-    private Wipeout _bottomTextMask;
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -575,7 +588,6 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         Point3d shelfPoint,
         double scale)
     {
-        AcadUtils.WriteMessageInDebug($"ObjectPointOCS {objectPoint}, BottomShelfStartPointOCS {BottomShelfStartPointOCS}");
         MeasuredValue = (objectPoint.Y - insertionPoint.Y) * MeasurementScale;
 
         var horV = (arrowPoint - objectPoint).GetNormal();
@@ -587,7 +599,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var secondTextHeight = SecondTextHeight * scale;
         var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
-        
+
         if (ObjectLine)
         {
             _bottomShelfLine = new Line(
@@ -645,7 +657,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         if (_bottomDbText != null)
         {
             var diff = Math.Abs(topTextLength - bottomTextLength);
-            
+
             var textMovementHorV = diff * horV;
             var textHalfMovementHorV = diff / 2 * horV;
             var movingPosition = GetMovementPositionVector(isLeft, textHalfMovementHorV, textMovementHorV);
@@ -674,10 +686,9 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         }
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
-
+        TopShelfLineLength = _topShelfLine.Length;
+        
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
-
-        AcadUtils.WriteMessageInDebug($"ObjectPointOCS - BottomShelfStartPointOCS  {objectPoint.DistanceTo(BottomShelfStartPointOCS) } \n");
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)

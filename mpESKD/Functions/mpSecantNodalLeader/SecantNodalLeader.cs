@@ -242,6 +242,19 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
     [ValueToSearchBy]
     public string NodeAddress { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Выравнивание текста по горизонтали
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 10, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+    [SaveToXData]
+    public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
+
+    /// <summary>
+    /// Длина полки
+    /// </summary>
+    [SaveToXData]
+    public double TopShelfLineLength { get; set; }
+
     /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
@@ -382,7 +395,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
                 _topFirstDbText.Position = topFirstTextPosition;
                 _topFirstDbText.AlignmentPoint = topFirstTextPosition;
             }
-            
+
             if (_bottomDbText != null)
             {
                 _bottomDbText.Position = bottomTextPosition;
@@ -425,7 +438,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
         MirrorIfNeed(new[] { _topFirstDbText, _topSecondDbText, _bottomDbText });
 
-        if ((ScaleFactorX <= 0 && !MainFunction.Mirroring) || (ScaleFactorX >= 0 && MainFunction.Mirroring))
+        if ((ScaleFactorX <= 0 && !CommandsWatcher.Mirroring) || (ScaleFactorX >= 0 && CommandsWatcher.Mirroring))
         {
             if (_topFirstDbText != null)
             {
@@ -440,6 +453,37 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
                 var tempSecondTextPosition = new Point3d(_topSecondDbText.Position.X - topFirstTextLength, _topSecondDbText.Position.Y, 0);
                 _topSecondDbText.Position = tempSecondTextPosition;
                 _topSecondDbText.AlignmentPoint = tempSecondTextPosition;
+            }
+        }
+
+        if ((_bottomDbText != null && _topFirstDbText != null) || (_bottomDbText != null && _topSecondDbText != null))
+        {
+            var horV = (shelfEndPoint - leaderPoint).GetNormal();
+            
+            var diff = Math.Abs(topTextLength - bottomTextLength);
+            var textHalfMovementHorV = diff / 2 * horV;
+            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
+            if (topTextLength > bottomTextLength)
+            {
+                _bottomDbText.Position += movingPosition;
+                _bottomDbText.AlignmentPoint += movingPosition;
+                bottomTextPosition += movingPosition;
+            }
+            else
+            {
+                if (_topFirstDbText != null)
+                {
+                    _topFirstDbText.Position += movingPosition;
+                    _topFirstDbText.AlignmentPoint += movingPosition;
+                    topFirstTextPosition += movingPosition;
+                }
+
+                if (_topSecondDbText != null)
+                {
+                    _topSecondDbText.Position += movingPosition;
+                    _topSecondDbText.AlignmentPoint += movingPosition;
+                    topSecondTextPosition += movingPosition;
+                }
             }
         }
 
@@ -469,6 +513,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         }
 
         _shelfLine = new Line(leaderPoint, shelfEndPoint);
+        TopShelfLineLength = _shelfLine.Length;
     }
 
     private void SetNodeNumberOnCreation()
