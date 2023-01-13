@@ -30,14 +30,14 @@ public partial class CrestedLeaderDoubleClickEditControl : IDoubleClickEditContr
 
         _crestedLeader = chainLeader;
 
-        TbNodeNumber.Text = _crestedLeader.NodeNumber;
-        TbNodeAddress.Text = _crestedLeader.NodeAddress;
+        TbNodeNumber.Text = _crestedLeader.LeaderTextValue;
+        TbNodeAddress.Text = _crestedLeader.LeaderTextComment;
     }
 
     /// <inheritdoc/>
     public void OnAccept()
     {
-        _crestedLeader.NodeNumber = TbNodeNumber.Text;
-        _crestedLeader.NodeAddress = TbNodeAddress.Text;
+        _crestedLeader.LeaderTextValue = TbNodeNumber.Text;
+        _crestedLeader.LeaderTextComment = TbNodeAddress.Text;
     }
 }

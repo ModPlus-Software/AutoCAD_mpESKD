@@ -284,8 +284,4 @@
 		</Page>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Functions\mpCrestedLeader\Grips\" />
-	</ItemGroup>
-
 </Project>
