@@ -46,7 +46,7 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
     /// </summary>
     public int GripIndex { get; }
 
-    public List<double> TempPoint3ds { get; set; }
+    public List<Point3d> TempPoint3ds { get; set; }
 
     /// <inheritdoc />
     public override string GetTooltip()
@@ -84,12 +84,12 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
 
                         var distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
 
-                        if (result < distFromEndPointToInsPoint)
-                        {
-                            tempInsPoint = CrestedLeader.EndPoint + (mainNormal * result);
-                            CrestedLeader.ArrowPoints.Remove(result);
-                            CrestedLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
-                        }
+                        //if (result < distFromEndPointToInsPoint)
+                        //{
+                        //    tempInsPoint = CrestedLeader.EndPoint + (mainNormal * result);
+                        //    CrestedLeader.ArrowPoints.Remove(result);
+                        //    CrestedLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
+                        //}
 
                         CrestedLeader.InsertionPoint = tempInsPoint;
                     }

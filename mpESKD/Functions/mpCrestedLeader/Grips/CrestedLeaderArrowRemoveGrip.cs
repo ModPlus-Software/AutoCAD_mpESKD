@@ -54,29 +54,32 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
 
             if (GripIndex == 4)
             {
-                if (CrestedLeader.ArrowPoints.Any(x => x < 0))
+                if (CrestedLeader.ArrowPoints.Count > 0)
                 {
-                    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-                    CrestedLeader.ArrowPoints.Remove(result);
-                    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
-                }
-                else
-                {
-                    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-                    if (result > 0)
-                    {
-                        result = CrestedLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
-                    }
+                    //var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                    var furthiestPoints = CrestedLeader.ArrowPoints.GetFurthestPoints();
+                    CrestedLeader.ArrowPoints.Remove(furthiestPoints.Item1);
+                    tempInsPoint = furthiestPoints.Item1;
 
-                    CrestedLeader.ArrowPoints.Remove(result);
-                    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
-
-                    if (!CrestedLeader.ArrowPoints.Any(x => x < 0))
-                    {
-                        var reversed = CrestedLeader.ArrowPoints.Select(x => -x).ToList();
-                        CrestedLeader.ArrowPoints = reversed;
-                    }    
+                    CrestedLeader.LeaderPoint = furthiestPoints.Item2;
                 }
+                //else
+                //{
+                //    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                //    if (result > 0)
+                //    {
+                //        result = CrestedLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
+                //    }
+
+                //    CrestedLeader.ArrowPoints.Remove(result);
+                //    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
+
+                //    if (!CrestedLeader.ArrowPoints.Any(x => x < 0))
+                //    {
+                //        var reversed = CrestedLeader.ArrowPoints.Select(x => -x).ToList();
+                //        CrestedLeader.ArrowPoints = reversed;
+                //    }
+                //}
             }
             else if (CrestedLeader.ArrowPoints.Count != 0)
             {
