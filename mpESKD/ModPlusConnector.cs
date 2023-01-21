@@ -19,7 +19,7 @@ public class ModPlusConnector : IModPlusPlugin
     public SupportedProduct SupportedProduct => SupportedProduct.AutoCAD;
 
     /// <inheritdoc/>
-    public string Name => "mpESKD";
+    public string Name => nameof(mpESKD);
 
 #if A2013
     /// <inheritdoc/>
