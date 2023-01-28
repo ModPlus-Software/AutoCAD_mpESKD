@@ -83,7 +83,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
             }
             else if (CrestedLeader.ArrowPoints.Count != 0)
             {
-                CrestedLeader.ArrowPoints.RemoveAt(GripIndex-5);
+                CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
             }
 
             CrestedLeader.InsertionPoint = tempInsPoint;

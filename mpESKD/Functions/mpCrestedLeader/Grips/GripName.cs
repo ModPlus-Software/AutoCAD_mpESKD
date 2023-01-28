@@ -11,11 +11,6 @@ public enum GripName
     StartGrip,
 
     /// <summary>
-    /// Middle grip
-    /// </summary>
-    MiddleGrip,
-
-    /// <summary>
     /// End grip
     /// </summary>
     EndGrip,

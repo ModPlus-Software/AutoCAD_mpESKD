@@ -66,7 +66,6 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
 
                 if (!CrestedLeader.ArrowPoints.Contains(CrestedLeader.TempNewArrowPoint))
                 {
-                    
                     //if (!CrestedLeader.IsLeft)
                     //{
                     //    distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
@@ -129,7 +128,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                 }
 
                 //CrestedLeader.InsertionPoint = tempInsPoint;
-                CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);;
+                CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

@@ -70,6 +70,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     private double _mainAngle;
 
+    private Line _secondTempLeaderLine;
+
     #endregion
 
     /// <summary>
@@ -118,7 +120,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _shelfLineFromEndPoint,
                 _topDbText,
                 _bottomDbText,
-                _secondLeaderLine
+                _secondLeaderLine,
+                _secondTempLeaderLine
             };
             entities.AddRange(_leaderLines);
             entities.AddRange(_hatches);
@@ -400,8 +403,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _mainNormal = (endPoint - insertionPoint).GetNormal();
         _secondNormal = (leaderPoint - endPoint).GetNormal();
 
-        _mainAngle = _secondNormal.GetAngleTo(_mainNormal, Vector3d.ZAxis);
-        AcadUtils.WriteMessageInDebug($"mainAngle {_mainAngle.RadianToDegree()}");
+        //_mainAngle = _secondNormal.GetAngleTo(_mainNormal, Vector3d.ZAxis);
+        //AcadUtils.WriteMessageInDebug($"mainAngle {_mainAngle.RadianToDegree()}");
 
         var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
         if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
@@ -417,7 +420,20 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         if (!double.IsNaN(TempNewArrowPointOCS.X))
         {
-            CreateLeadersWithArrows(TempNewArrowPointOCS);
+            var pointOnPolyline = CreateLeadersWithArrows(TempNewArrowPointOCS);
+            
+            var distToEndPoint = pointOnPolyline.DistanceTo(endPoint);
+            var distToLeaderPoint = pointOnPolyline.DistanceTo(leaderPoint);
+            if (distToLeaderPoint < distToEndPoint)
+            {
+                _secondTempLeaderLine = new Line(SecondPoint, pointOnPolyline);
+                AcadUtils.WriteMessageInDebug($"меняться должно со стороны leaderPoint {pointOnPolyline}");
+            }
+            else
+            {
+                _secondTempLeaderLine = new Line(pointOnPolyline, ThirdPoint);
+                AcadUtils.WriteMessageInDebug($"меняться должно со стороны endPoint {pointOnPolyline}");
+            }
         }
 
         CreateArrows(insertionPoint, _mainNormal, ArrowSize, _scale);
@@ -427,11 +443,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             leaderPoint
         };
 
-        //foreach (var arrowPoint in LeaderPointsOCS.Where(arrowPoint => !double.IsNaN(arrowPoint.X)))
-        //{
-        //    tempList.Add(arrowPoint);
-        //    CreateLeadersWithArrows(arrowPoint);
-        //}
         tempList.AddRange(from arrowPoint in LeaderPointsOCS where !double.IsNaN(arrowPoint.X) select CreateLeadersWithArrows(arrowPoint));
 
         var furthest = tempList.GetFurthestPoints();
@@ -621,5 +632,4 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         CreateArrows(arrowPoint, tempNormal, ArrowSize, _scale);
         return pts[0];
     }
-
 }

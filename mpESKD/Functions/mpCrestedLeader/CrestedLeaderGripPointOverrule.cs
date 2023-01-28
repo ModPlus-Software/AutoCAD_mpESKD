@@ -6,9 +6,9 @@ using Autodesk.AutoCAD.Runtime;
 using Base;
 using Base.Enums;
 using Base.Overrules;
+using Grips;
 using ModPlusAPI.Windows;
 using mpESKD.Base.Overrules.Grips;
-using Grips;
 using System;
 using System.Collections.Generic;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
@@ -203,7 +203,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         if (vertexGrip.GripIndex == 0)
                         {
                             var newPoint = vertexGrip.GripPoint + offset;
-                            var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
+                            //var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
                             
                             //var pointOnPolyline = GetPointOnMainLeader(chainLeader.InsertionPoint, chainLeader.EndPoint, newPoint);
 
@@ -263,25 +263,58 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     }
                     else if (gripData is CrestedLeaderArrowAddGrip addLeaderGrip)
                     {
+
                         var crestedLeader = addLeaderGrip.CrestedLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
+                        var tmpInsPoint = crestedLeader.InsertionPoint;
+                        var tmpEndPoint = crestedLeader.EndPoint;
+                        var tmpLeaderPoint = crestedLeader.LeaderPoint;
 
-                        //var pointOnPolyline = GetPerpendicularPoint(
-                        //    chainLeader.InsertionPoint,
-                        //    chainLeader.EndPoint,
-                        //    newPoint);
-                        //var mainNormal = (crestedLeader.EndPoint - crestedLeader.InsertionPoint).GetNormal();
-                        //var secondNormal = (crestedLeader.LeaderPoint - crestedLeader.EndPoint).GetNormal();
+                        var tempLine = new Line(crestedLeader.EndPoint, crestedLeader.LeaderPoint);
+                        var mainNormal = (crestedLeader.EndPoint - crestedLeader.InsertionPoint).GetNormal();
+                        //var pointOnPolyline = CreateLeadersWithArrows(
+                        //    tempLine,
+                        //    Intersect.ExtendArgument,
+                        //    newPoint,
+                        //    mainNormal);
 
-                        //var mainAngle = secondNormal.GetAngleTo(mainNormal, Vector3d.ZAxis);
-                        //var mainLine = new Line(crestedLeader.EndPoint, crestedLeader.LeaderPoint);
-                        //var pointOnPolyline = GetPointOnMainLeader(newPoint, mainAngle, secondNormal, mainLine);
-                        //addLeaderGrip.IsOnsegment = IsPointBetween(
-                        //    pointOnPolyline, 
-                        //    crestedLeader.InsertionPoint,
-                        //    crestedLeader.EndPoint);
-                        crestedLeader.TempNewArrowPoint = newPoint;
+                        //var isOnSegment = IsPointBetween(pointOnPolyline, crestedLeader.EndPoint, crestedLeader.LeaderPoint);
+                        //if (isOnSegment)
+                        //{
+                            crestedLeader.TempNewArrowPoint = newPoint;
+                            //AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment}");
+                        //}
+                        //else
+                        //{
+                        //    pointOnPolyline = CreateLeadersWithArrows(
+                        //        tempLine,
+                        //        Intersect.ExtendArgument,
+                        //        newPoint,
+                        //        mainNormal);
+                        //    AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment}");
+                        //    var distToEndPoint = pointOnPolyline.DistanceTo(crestedLeader.EndPoint);
+                        //    var distToLeaderPoint = pointOnPolyline.DistanceTo(crestedLeader.LeaderPoint);
+                        //    if (distToLeaderPoint < distToEndPoint)
+                        //    {
+                        //        crestedLeader.TempNewArrowPoint = newPoint;
+                        //        crestedLeader.LeaderPoint = pointOnPolyline;
+                        //        crestedLeader.EndPoint = tmpEndPoint;
+                        //        //crestedLeader.ArrowPoints.Add(crestedLeader.InsertionPoint);
+                        //        //crestedLeader.InsertionPoint = newPoint;
 
+                        //        AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем LeaderPoint");    
+                        //    }
+                        //    else
+                        //    {
+                        //        crestedLeader.TempNewArrowPoint = newPoint;
+                        //        crestedLeader.EndPoint = pointOnPolyline;
+                        //        crestedLeader.LeaderPoint = tmpLeaderPoint;
+                        //        //crestedLeader.ArrowPoints.Add(crestedLeader.InsertionPoint);
+                        //        //crestedLeader.InsertionPoint = newPoint;
+                        //        AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем EndPoint");    
+                        //    }
+                        //}
+                        
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
@@ -373,9 +406,30 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
     //    return v1.DotProduct(v2) > 0;
     //}
 
-    //private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
-    //{
-    //    var segment = new LineSegment3d(startPt, endPt);
-    //    return segment.IsOn(point);
-    //}
+    private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
+    {
+        var segment = new LineSegment3d(startPt, endPt);
+        return segment.IsOn(point);
+    }
+
+    private Point3d CreateLeadersWithArrows(Line secondLeaderLine, Intersect intersectType, Point3d arrowPoint, Vector3d mainNormal)
+    {
+        var templine = new Line(arrowPoint, arrowPoint + mainNormal);
+        var pts = new Point3dCollection();
+
+        secondLeaderLine.IntersectWith(templine, intersectType, pts, IntPtr.Zero, IntPtr.Zero);
+
+        try
+        {
+            if (!double.IsNaN(pts[0].X))
+                return pts[0];
+            return default;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return default;
+        }
+        
+    }
 }
