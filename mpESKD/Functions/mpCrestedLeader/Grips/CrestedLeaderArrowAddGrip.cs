@@ -91,11 +91,11 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                     }
                     else
                     {
-
                         CrestedLeader.EndPoint = pointOnPolyline;
                         CrestedLeader.LeaderPoint = tmpLeaderPoint;
-                        CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
                         CrestedLeader.ArrowPoints.Add(CrestedLeader.InsertionPoint);
+                        CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
+                        
                         
                         AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем EndPoint");
                     }

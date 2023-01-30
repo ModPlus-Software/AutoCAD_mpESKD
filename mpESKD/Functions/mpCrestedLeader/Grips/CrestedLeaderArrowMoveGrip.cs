@@ -1,15 +1,12 @@
-﻿using System;
-using Autodesk.AutoCAD.Geometry;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Collections.Generic;
-using System.Linq;
+using System;
 
 /// <summary>
 /// Ручка вершин
@@ -67,14 +64,56 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
             _endGripTmp = CrestedLeader.EndPoint;
             _leaderGripTmp = CrestedLeader.LeaderPoint;
         }
+
         if (newStatus == Status.GripEnd)
         {
             using (CrestedLeader)
             {
                 var tempInsPoint = CrestedLeader.InsertionPoint;
                 //TODO 
+                if (GripIndex == 0)
+                {
+                    AcadUtils.WriteMessageInDebug($"CrestedLeader.TempNewArrowPoint {CrestedLeader.TempNewArrowPoint}");
+                }
                 if (!CrestedLeader.ArrowPoints.Contains(CrestedLeader.TempNewArrowPoint))
                 {
+                    var tmpEndPoint = CrestedLeader.EndPoint;
+                    var tmpLeaderPoint = CrestedLeader.LeaderPoint;
+
+                    var tempLine = new Line(CrestedLeader.EndPoint, CrestedLeader.LeaderPoint);
+                    var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                    var pointOnPolyline = CreateLeadersWithArrows(tempLine, Intersect.ExtendBoth, CrestedLeader.TempNewArrowPoint, mainNormal);
+
+                    var isOnSegment = IsPointBetween(pointOnPolyline, tmpEndPoint, tmpLeaderPoint);
+                    if (!isOnSegment)
+                    {
+                        var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
+                        var distToLeaderPoint = pointOnPolyline.DistanceTo(tmpLeaderPoint);
+                        if (distToLeaderPoint < distToEndPoint)
+                        {
+                            CrestedLeader.LeaderPoint = pointOnPolyline;
+                            //CrestedLeader.EndPoint = tmpEndPoint;
+                            CrestedLeader.ArrowPoints[GripIndex] = (CrestedLeader.TempNewArrowPoint);
+                            //CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
+
+                            AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем LeaderPoint");
+                        }
+                        else
+                        {
+                            CrestedLeader.EndPoint = pointOnPolyline;
+                            CrestedLeader.LeaderPoint = tmpLeaderPoint;
+                            CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
+                            CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.InsertionPoint;
+                        
+                            AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем EndPoint");
+                        }
+                    }
+                    else 
+                    {
+                        //CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
+                        CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
+                    }
+
                     //if (!CrestedLeader.IsLeft)
                     //{
                     //    distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
@@ -117,7 +156,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                     //    // если первая положительная, значит слева нет точек
                     //    if (IsOnsegment)
                     //    {
-                            CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
+                            
                     //        tempInsPoint = CrestedLeader.InsertionPoint;
                     //    }
                     //    else if (CrestedLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
@@ -136,7 +175,6 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                     //}
                 }
 
-                //CrestedLeader.InsertionPoint = tempInsPoint;
                 CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
 
                 CrestedLeader.UpdateEntities();
@@ -145,7 +183,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-                    _entity.Position = tempInsPoint;
+                    _entity.Position = CrestedLeader.InsertionPoint;
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
@@ -166,5 +204,32 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
+    }
+
+    private Point3d CreateLeadersWithArrows(Line secondLeaderLine, Intersect intersectType, Point3d arrowPoint, Vector3d mainNormal)
+    {
+        var templine = new Line(arrowPoint, arrowPoint + mainNormal);
+        var pts = new Point3dCollection();
+
+        secondLeaderLine.IntersectWith(templine, intersectType, pts, IntPtr.Zero, IntPtr.Zero);
+
+        try
+        {
+            if (pts.Count > 0)
+                return pts[0];
+        }
+        catch (Exception e)
+        {
+            AcadUtils.WriteMessageInDebug("ошибка построения линии");
+
+        }
+
+        return default;
+    }
+
+    private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
+    {
+        var segment = new LineSegment3d(startPt, endPt);
+        return segment.IsOn(point);
     }
 }
