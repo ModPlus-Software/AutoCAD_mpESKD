@@ -454,7 +454,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
         }
 
-        CreateArrows(insertionPoint, _mainNormal, ArrowSize, _scale);
+        //CreateArrows(insertionPoint, _mainNormal, ArrowSize, _scale);
         var tempList = new List<Point3d>
         {
             endPoint,
