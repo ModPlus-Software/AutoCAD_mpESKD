@@ -409,7 +409,216 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private void UpdateEntities(Point3d leaderStart, Point3d leaderEnd, List<Point3d> arrows, double scale)
     {
-        
+        _leaderLines.Clear();
+        _leaderEndLines.Clear();
+        _hatches.Clear();
+
+        var arrowSize = ArrowSize * scale;
+        var insertionPoint = arrows[0];
+        var endPoint = leaderStart;
+        var leaderPoint = leaderEnd;
+
+        _mainNormal = (endPoint - insertionPoint).GetNormal();
+        _secondNormal = (leaderPoint - endPoint).GetNormal();
+
+        //_mainAngle = _secondNormal.GetAngleTo(_mainNormal, Vector3d.ZAxis);
+        //AcadUtils.WriteMessageInDebug($"mainAngle {_mainAngle.RadianToDegree()}");
+
+        var leaderMinPoint = insertionPoint + (_mainNormal * arrowSize);
+        if (leaderMinPoint.DistanceTo(endPoint) > 0.0)
+            _leaderLine = new Line(insertionPoint, endPoint);
+
+        if (ArrowPoints.Count == 0)
+        {
+            SecondPoint = endPoint;
+            ThirdPoint = leaderPoint;
+        }
+
+        _secondLeaderLine = new Line(SecondPoint, ThirdPoint);
+
+        if (!double.IsNaN(TempNewArrowPointOCS.X))
+        {
+            var pointOnPolyline = CreateLeadersWithArrows(TempNewArrowPointOCS);
+            
+            var distToEndPoint = pointOnPolyline.DistanceTo(endPoint);
+            var distToLeaderPoint = pointOnPolyline.DistanceTo(leaderPoint);
+            if (distToLeaderPoint < distToEndPoint)
+            {
+                _secondTempLeaderLine = new Line(SecondPoint, pointOnPolyline);
+                AcadUtils.WriteMessageInDebug($"меняться должно со стороны leaderPoint {pointOnPolyline}");
+            }
+            else
+            {
+                _secondTempLeaderLine = new Line(pointOnPolyline, ThirdPoint);
+                AcadUtils.WriteMessageInDebug($"меняться должно со стороны endPoint {pointOnPolyline}");
+            }
+        }
+
+        CreateArrows(insertionPoint, _mainNormal, ArrowSize, _scale);
+        var tempList = new List<Point3d>
+        {
+            endPoint,
+            leaderPoint
+        };
+
+        tempList.AddRange(from arrowPoint in LeaderPointsOCS where !double.IsNaN(arrowPoint.X) select CreateLeadersWithArrows(arrowPoint));
+
+        var furthest = tempList.GetFurthestPoints();
+        SecondPoint = furthest.Item1;
+        ThirdPoint = furthest.Item2;
+        _secondLeaderLine = new Line(SecondPoint, ThirdPoint);
+
+        // Дальше код идентичен коду в NodalLeader! Учесть при внесении изменений
+
+        #region TextCreation
+
+        SetNodeNumberOnCreation();
+
+        var mainTextHeight = MainTextHeight * scale;
+        var secondTextHeight = SecondTextHeight * scale;
+        var textVerticalOffset = TextVerticalOffset * scale;
+        var shelfLedge = ShelfLedge * scale;
+        var isRight = ShelfPosition == ShelfPosition.Right;
+
+        var topTextLength = 0.0;
+        var bottomTextLength = 0.0;
+        var bottomTextHeight = 0.0;
+
+        if (!string.IsNullOrEmpty(LeaderTextValue))
+        {
+            _topDbText = new DBText { TextString = LeaderTextValue };
+            _topDbText.SetProperties(TextStyle, mainTextHeight);
+            _topDbText.SetPosition(
+                TextHorizontalMode.TextCenter,
+                TextVerticalMode.TextVerticalMid,
+                AttachmentPoint.MiddleCenter);
+            topTextLength = _topDbText.GetLength();
+        }
+        else
+        {
+            _topDbText = null;
+        }
+
+        if (!string.IsNullOrEmpty(LeaderTextComment))
+        {
+            _bottomDbText = new DBText { TextString = LeaderTextComment };
+            _bottomDbText.SetProperties(TextStyle, secondTextHeight);
+            _bottomDbText.SetPosition(
+                TextHorizontalMode.TextCenter,
+                TextVerticalMode.TextVerticalMid,
+                AttachmentPoint.MiddleCenter);
+            bottomTextLength = _bottomDbText.GetLength();
+            bottomTextHeight = _bottomDbText.GetHeight();
+        }
+        else
+        {
+            _bottomDbText = null;
+        }
+
+        var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+        ShelfLength = TextIndent + largestTextLength + shelfLedge;
+
+        Point3d topTextPosition;
+        Point3d bottomTextPosition;
+
+        if (isRight)
+        {
+            topTextPosition = new Point3d(
+                ThirdPoint.X + TextIndent + (largestTextLength / 2),
+                ThirdPoint.Y + textVerticalOffset + (mainTextHeight / 2),
+                0);
+            bottomTextPosition = new Point3d(
+                ThirdPoint.X + TextIndent + (largestTextLength / 2),
+                ThirdPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+
+            if (_topDbText != null)
+            {
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
+            }
+
+            if (_bottomDbText != null)
+            {
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+            }
+        }
+        else
+        {
+            topTextPosition = new Point3d(
+                leaderPoint.X - TextIndent - (largestTextLength / 2),
+                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+            bottomTextPosition = new Point3d(
+                leaderPoint.X - TextIndent - (largestTextLength / 2),
+                leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
+
+            if (_topDbText != null)
+            {
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
+            }
+
+            if (_bottomDbText != null)
+            {
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+            }
+        }
+
+        var shelfEndPoint = ShelfPosition == ShelfPosition.Right
+            ? leaderPoint + (Vector3d.XAxis * ShelfLength)
+            : leaderPoint - (Vector3d.XAxis * ShelfLength);
+
+        if (_bottomDbText != null && _topDbText != null)
+        {
+            var horV = (shelfEndPoint - leaderPoint).GetNormal();
+            var diff = Math.Abs(topTextLength - bottomTextLength);
+            var textHalfMovementHorV = diff / 2 * horV;
+            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
+            if (topTextLength > bottomTextLength)
+            {
+                bottomTextPosition += movingPosition;
+                _bottomDbText.Position = bottomTextPosition;
+                _bottomDbText.AlignmentPoint = bottomTextPosition;
+            }
+            else
+            {
+                topTextPosition += movingPosition;
+                _topDbText.Position = topTextPosition;
+                _topDbText.AlignmentPoint = topTextPosition;
+            }
+        }
+
+        if (HideTextBackground)
+        {
+            var offset = TextMaskOffset * scale;
+            if (_topDbText != null)
+                _topTextMask = _topDbText.GetBackgroundMask(offset, topTextPosition);
+            if (_bottomDbText != null)
+                _bottomTextMask = _bottomDbText.GetBackgroundMask(offset, bottomTextPosition);
+        }
+
+        if (IsTextAlwaysHorizontal && IsRotated)
+        {
+            var backRotationMatrix = GetBackRotationMatrix(endPoint);
+            if (ScaleFactorX < 0)
+            {
+                backRotationMatrix = GetBackMirroredRotationMatrix(endPoint);
+            }
+
+            shelfEndPoint = shelfEndPoint.TransformBy(backRotationMatrix);
+            _topDbText?.TransformBy(backRotationMatrix);
+            _topTextMask?.TransformBy(backRotationMatrix);
+            _bottomDbText?.TransformBy(backRotationMatrix);
+            _bottomTextMask?.TransformBy(backRotationMatrix);
+        }
+
+        _shelfLineFromEndPoint = new Line(leaderPoint, shelfEndPoint);
+
+        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
+        AcadUtils.WriteMessageInDebug($"__________________________");
+
+        #endregion
     }
 
     private void MakeSimpleEntity()

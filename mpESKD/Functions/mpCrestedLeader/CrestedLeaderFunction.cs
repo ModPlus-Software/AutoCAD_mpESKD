@@ -141,16 +141,16 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     crestedLeader.InsertionPoint = crestedLeader.EndPoint;
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                 }
-                else if (crestedLeader.JigState == CrestedLeaderJigState.EndPoint)
-                {
-                    break;
+                //else if (crestedLeader.JigState == CrestedLeaderJigState.EndPoint)
+                //{
+                //    break;
                     
-                    //crestedLeader.JigState = CrestedLeaderJigState.LeaderPoint;
-                    //entityJig.PromptForNextPoint = leaderPointPrompt;
-                    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
-                    //entityJig.JigState = JigState.CustomPoint;
+                //    //crestedLeader.JigState = CrestedLeaderJigState.LeaderPoint;
+                //    //entityJig.PromptForNextPoint = leaderPointPrompt;
+                //    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
+                //    //entityJig.JigState = JigState.CustomPoint;
                     
-                }
+                //}
                 else
                 {
                     break;
