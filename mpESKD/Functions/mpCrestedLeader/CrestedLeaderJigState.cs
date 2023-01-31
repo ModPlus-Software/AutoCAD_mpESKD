@@ -18,5 +18,5 @@ public enum CrestedLeaderJigState
     /// <summary>
     /// Указание конечной точки (точка выноски)
     /// </summary>
-    LeaderPoint
+    LeaderStart
 }

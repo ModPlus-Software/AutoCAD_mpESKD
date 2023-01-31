@@ -248,6 +248,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     [SaveToXData]
     public List<Point3d> ArrowPoints { get; set; } = new();
+    
     private List<Point3d> LeaderPointsOCS => ArrowPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
 
     /// <summary>
@@ -304,77 +305,111 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc />
     public override void UpdateEntities()
     {
-        try
+        var scale = GetScale();
+        if (JigState == CrestedLeaderJigState.InsertionPoint)
         {
-            _scale = GetScale();
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
-            // Задание первой точки (точки вставки). Она же точка начала отсчета
-            if (JigState == CrestedLeaderJigState.InsertionPoint)
+            var arrows = new List<Point3d>()
             {
-                var tempEndPoint = new Point3d(
-                    InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale),
-                    InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
-                    InsertionPointOCS.Z);
+                InsertionPointOCS
+            };
 
-                CreateEntities(InsertionPointOCS, tempEndPoint, tempEndPoint, _scale);
-            }
-            else if (JigState == CrestedLeaderJigState.EndPoint)
-            {
-                if (length < MinDistanceBetweenPoints * _scale)
-                {
-                    // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint близко к leaderpoint");
-                    //MakeSimplyEntity(scale);
-                    MakeSimpleEntity();
-                }
-                else
-                {
-                    AcadUtils.WriteMessageInDebug($"тут должно строится когда больше минимального надо задать EndPoint {EndPoint}");
-                    // Задание второй точки
-                    //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
-                    //_leaderFirstPoint = pts[3].ToPoint3d();
-                    //FillMainPolylineWithPoints(pts, bulges);
-                    var tempLeaderPoint = new Point3d(
-                        EndPoint.X + (ShelfLength * _scale),
-                        EndPoint.Y,
-                        EndPoint.Z);
-                    CreateEntities(InsertionPointOCS, EndPoint, tempLeaderPoint, _scale);
-                }
-            }
-            else if (JigState == CrestedLeaderJigState.LeaderPoint)
-            {
-                CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointOCS, _scale);
-                AcadUtils.WriteMessageInDebug($"задали EndPoint {EndPoint} ждем LeaderPoint {LeaderPoint}");
-            }
-            else
-            {
-                AcadUtils.WriteMessageInDebug($"lheubt случаи EndPoint {EndPoint} ждем insertionPoint {LeaderPoint}");
+            var leaderStart = new Point3d((InsertionPointOCS.X + 20) * scale, InsertionPointOCS.Y + 20, 0);
+            var leaderEnd = new Point3d((leaderStart.X + 30) * scale, leaderStart.Y, 0);
 
-                // Если конечная точка на расстоянии, менее допустимого
-                if (length < MinDistanceBetweenPoints * _scale)
-                {
-                    MakeSimpleEntity();
-                }
-                else
-                {
-                    AcadUtils.WriteMessageInDebug($"insertionPoint {InsertionPoint} EndPoint {EndPoint} LeaderPoint {LeaderPoint}");
-                    AcadUtils.WriteMessageInDebug($"в else {InsertionPoint}");
-                    // Прочие случаи
-                    var tempList = new List<Point3d>
-                    {
-                        EndPointOCS,
-                        LeaderPointOCS
-                    };
-
-                    //_mainAngle = 
-                    CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointOCS, _scale);
-                }
-            }
+            UpdateEntities(leaderStart, leaderEnd, arrows, scale);
         }
-        catch (Exception exception)
+        else if (JigState == CrestedLeaderJigState.LeaderStart)
         {
-            ExceptionBox.Show(exception);
+            var arrows = new List<Point3d>()
+            {
+                InsertionPointOCS
+            };
+            var leaderStart = EndPointOCS;
+            var leaderEnd = new Point3d((leaderStart.X + 30) * scale, leaderStart.Y, 0);
+
+            UpdateEntities(leaderStart, leaderEnd, arrows, scale);
         }
+        else
+        {
+            UpdateEntities(InsertionPointOCS, EndPointOCS, LeaderPointsOCS, scale);
+        }
+
+        //try
+        //{
+        //    _scale = GetScale();
+        //    var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+        //    // Задание первой точки (точки вставки). Она же точка начала отсчета
+        //    if (JigState == CrestedLeaderJigState.InsertionPoint)
+        //    {
+        //        var tempEndPoint = new Point3d(
+        //            InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale),
+        //            InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
+        //            InsertionPointOCS.Z);
+
+        //        CreateEntities(InsertionPointOCS, tempEndPoint, tempEndPoint, _scale);
+        //    }
+        //    else if (JigState == CrestedLeaderJigState.EndPoint)
+        //    {
+        //        if (length < MinDistanceBetweenPoints * _scale)
+        //        {
+        //            // Задание второй точки - случай когда расстояние между точками меньше минимального
+        //            AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint близко к leaderpoint");
+        //            //MakeSimplyEntity(scale);
+        //            MakeSimpleEntity();
+        //        }
+        //        else
+        //        {
+        //            AcadUtils.WriteMessageInDebug($"тут должно строится когда больше минимального надо задать EndPoint {EndPoint}");
+        //            // Задание второй точки
+        //            //var pts = PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint, out List<double> bulges);
+        //            //_leaderFirstPoint = pts[3].ToPoint3d();
+        //            //FillMainPolylineWithPoints(pts, bulges);
+        //            var tempLeaderPoint = new Point3d(
+        //                EndPoint.X + (ShelfLength * _scale),
+        //                EndPoint.Y,
+        //                EndPoint.Z);
+        //            CreateEntities(InsertionPointOCS, EndPoint, tempLeaderPoint, _scale);
+        //        }
+        //    }
+        //    else if (JigState == CrestedLeaderJigState.LeaderPoint)
+        //    {
+        //        CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointOCS, _scale);
+        //        AcadUtils.WriteMessageInDebug($"задали EndPoint {EndPoint} ждем LeaderPoint {LeaderPoint}");
+        //    }
+        //    else
+        //    {
+        //        AcadUtils.WriteMessageInDebug($"lheubt случаи EndPoint {EndPoint} ждем insertionPoint {LeaderPoint}");
+
+        //        // Если конечная точка на расстоянии, менее допустимого
+        //        if (length < MinDistanceBetweenPoints * _scale)
+        //        {
+        //            MakeSimpleEntity();
+        //        }
+        //        else
+        //        {
+        //            AcadUtils.WriteMessageInDebug($"insertionPoint {InsertionPoint} EndPoint {EndPoint} LeaderPoint {LeaderPoint}");
+        //            AcadUtils.WriteMessageInDebug($"в else {InsertionPoint}");
+        //            // Прочие случаи
+        //            var tempList = new List<Point3d>
+        //            {
+        //                EndPointOCS,
+        //                LeaderPointOCS
+        //            };
+
+        //            //_mainAngle = 
+        //            CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointOCS, _scale);
+        //        }
+        //    }
+        //}
+        //catch (Exception exception)
+        //{
+        //    ExceptionBox.Show(exception);
+        //}
+    }
+
+    private void UpdateEntities(Point3d leaderStart, Point3d leaderEnd, List<Point3d> arrows, double scale)
+    {
+        
     }
 
     private void MakeSimpleEntity()

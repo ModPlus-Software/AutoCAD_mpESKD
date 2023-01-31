@@ -124,18 +124,31 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             {
                 if (crestedLeader.JigState == CrestedLeaderJigState.InsertionPoint)
                 {
-                    crestedLeader.JigState = CrestedLeaderJigState.EndPoint;
-                    entityJig.PromptForNextPoint = endPointPrompt;
+                    crestedLeader.JigState = CrestedLeaderJigState.LeaderStart;
+                    
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     entityJig.JigState = JigState.PromptNextPoint;
+
+                    //crestedLeader.JigState = CrestedLeaderJigState.EndPoint;
+                    //entityJig.PromptForNextPoint = endPointPrompt;
+                    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
+                    //entityJig.JigState = JigState.PromptNextPoint;
+                }
+                else if (crestedLeader.JigState == CrestedLeaderJigState.LeaderStart)
+                {
+                    crestedLeader.JigState = CrestedLeaderJigState.EndPoint;
+                    crestedLeader.ArrowPoints.Add(crestedLeader.InsertionPoint);
+                    crestedLeader.InsertionPoint = crestedLeader.EndPoint;
+                    entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                 }
                 else if (crestedLeader.JigState == CrestedLeaderJigState.EndPoint)
                 {
+                    break;
                     
-                    crestedLeader.JigState = CrestedLeaderJigState.LeaderPoint;
-                    entityJig.PromptForNextPoint = leaderPointPrompt;
-                    entityJig.PreviousPoint = crestedLeader.InsertionPoint;
-                    entityJig.JigState = JigState.CustomPoint;
+                    //crestedLeader.JigState = CrestedLeaderJigState.LeaderPoint;
+                    //entityJig.PromptForNextPoint = leaderPointPrompt;
+                    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
+                    //entityJig.JigState = JigState.CustomPoint;
                     
                 }
                 else
