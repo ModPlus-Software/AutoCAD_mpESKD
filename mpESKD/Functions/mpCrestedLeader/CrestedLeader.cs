@@ -346,6 +346,36 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 AcadUtils.WriteMessageInDebug($"InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS}");
                 CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointsOCS, _scale);
             }
+
+            //var scale = GetScale();
+            //if (JigState == CrestedLeaderJigState.InsertionPoint)
+            //{
+            //    var arrows = new List<Point3d>()
+            //    {
+            //        InsertionPointOCS
+            //    };
+
+            //    var leaderStart = new Point3d((InsertionPointOCS.X + 20) * scale, InsertionPointOCS.Y + 20, 0);
+            //    var leaderEnd = new Point3d((leaderStart.X + 30) * scale, leaderStart.Y, 0);
+
+            //    CreateEntities(leaderStart, leaderEnd, arrows, scale);
+            //}
+            //else if (JigState == CrestedLeaderJigState.LeaderStart)
+            //{
+            //    var arrows = new List<Point3d>()
+            //    {
+            //        InsertionPointOCS
+            //    };
+            //    var leaderStart = EndPointOCS;
+            //    var leaderEnd = new Point3d((leaderStart.X + 30) * scale, leaderStart.Y, 0);
+
+            //    CreateEntities(leaderStart, leaderEnd, arrows, scale);
+            //}
+            //else
+            //{
+            //    CreateEntities(InsertionPointOCS, EndPointOCS, LeaderPointsOCS, scale);
+            //}
+
         }
         catch (Exception exception)
         {
