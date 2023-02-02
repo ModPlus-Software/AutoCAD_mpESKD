@@ -1,4 +1,8 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿using System;
+using Autodesk.AutoCAD.Geometry;
+using mpESKD.Functions.mpChainLeader.Grips;
+
+namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Enums;
@@ -52,41 +56,78 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
         {
             var tempInsPoint = CrestedLeader.InsertionPoint;
 
-            if (GripIndex == 4)
+
+            if (CrestedLeader.ArrowPoints.Count > 1)
             {
-                if (CrestedLeader.ArrowPoints.Count > 0)
+                var tempLine = new Line(CrestedLeader.InsertionPoint, CrestedLeader.EndPoint);
+                var mainNormal = (CrestedLeader.InsertionPoint - CrestedLeader.ArrowPoints[0]).GetNormal();
+                
+                // первый индекс грипа в списке начинается с 5
+                if (GripIndex == 5)
                 {
-                    //var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-                    var furthiestPoints = CrestedLeader.ArrowPoints.GetFurthestPoints();
-                    CrestedLeader.ArrowPoints.Remove(furthiestPoints.Item1);
-                    tempInsPoint = furthiestPoints.Item1;
+                    AcadUtils.WriteMessageInDebug($"надо удалять первую точки {CrestedLeader.ArrowPoints[0]}");
+                    
+                    CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.FirstOrDefault());
+                    
+                    var firtsPoint = CrestedLeader.ArrowPoints[0];
+                    var templine = new Line(firtsPoint, firtsPoint + mainNormal);
+                    var pts = new Point3dCollection();
 
-                    CrestedLeader.LeaderPoint = furthiestPoints.Item2;
+                    tempLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                    if (pts.Count > 0)
+                    {
+                        tempInsPoint = pts[0];
+                        CrestedLeader.InsertionPoint = tempInsPoint;
+                    }
                 }
-                //else
-                //{
-                //    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-                //    if (result > 0)
-                //    {
-                //        result = CrestedLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
-                //    }
 
-                //    CrestedLeader.ArrowPoints.Remove(result);
-                //    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
+                if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
+                {
+                    AcadUtils.WriteMessageInDebug(
+                        $"надо удалять первую точки {CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1]}");
 
-                //    if (!CrestedLeader.ArrowPoints.Any(x => x < 0))
-                //    {
-                //        var reversed = CrestedLeader.ArrowPoints.Select(x => -x).ToList();
-                //        CrestedLeader.ArrowPoints = reversed;
-                //    }
-                //}
+                    CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.LastOrDefault());
+                    
+                    var lastPoint = CrestedLeader.ArrowPoints.LastOrDefault();
+                    var templine = new Line(lastPoint, lastPoint + mainNormal);
+                    var pts = new Point3dCollection();
+
+                    tempLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                    if (pts.Count > 0)
+                    {
+                        
+                        CrestedLeader.EndPoint = pts[0];
+                    }
+                }
+                else 
+                {
+                    CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
+                }
             }
-            else if (CrestedLeader.ArrowPoints.Count != 0)
-            {
-                CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
-            }
+            //else
+            //{
+            //    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+            //    if (result > 0)
+            //    {
+            //        result = CrestedLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
+            //    }
 
-            CrestedLeader.InsertionPoint = tempInsPoint;
+            //    CrestedLeader.ArrowPoints.Remove(result);
+            //    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
+
+            //    if (!CrestedLeader.ArrowPoints.Any(x => x < 0))
+            //    {
+            //        var reversed = CrestedLeader.ArrowPoints.Select(x => -x).ToList();
+            //        CrestedLeader.ArrowPoints = reversed;
+            //    }
+            //}
+
+            //else if (CrestedLeader.ArrowPoints.Count != 0)
+            //{
+            //    CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
+            //}
+
+            
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

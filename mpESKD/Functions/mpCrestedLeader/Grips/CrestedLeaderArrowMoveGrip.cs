@@ -71,6 +71,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
             {
                 var tempInsPoint = CrestedLeader.InsertionPoint;
                 //TODO 
+
                 if (GripIndex == 0)
                 {
                     AcadUtils.WriteMessageInDebug($"CrestedLeader.TempNewArrowPoint {CrestedLeader.TempNewArrowPoint}");
