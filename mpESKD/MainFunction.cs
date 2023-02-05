@@ -130,6 +130,9 @@ public class MainFunction : IExtensionApplication
     [CommandMethod("ModPlus", "mpStyleEditor", CommandFlags.Modal)]
     public static void OpenStyleEditor()
     {
+#if !DEBUG
+        ModPlusAPI.Statistic.SendCommandStarting(ModPlusConnector.Instance);
+#endif
         if (_styleEditor == null)
         {
             _styleEditor = new StyleEditor();
@@ -152,6 +155,9 @@ public class MainFunction : IExtensionApplication
     [CommandMethod("ModPlus", "mpESKDCreateAnalog", CommandFlags.UsePickSet)]
     public void CreateAnalogCommand()
     {
+#if !DEBUG
+        ModPlusAPI.Statistic.SendCommandStarting(ModPlusConnector.Instance);
+#endif
         var psr = AcadUtils.Editor.SelectImplied();
         if (psr.Value is not { Count: 1 }) 
             return;

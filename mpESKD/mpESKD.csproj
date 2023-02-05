@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.23.10.0</Version>
+		<Version>1.23.11.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 		<Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023</Configurations>
 		<Platforms>x64</Platforms>
@@ -150,9 +150,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2022.1.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusAPI" Version="9.8.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusStyle" Version="4.3.0" ExcludeAssets="runtime" />
+		<PackageReference Include="JetBrains.Annotations" Version="2022.3.1" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusAPI" Version="11.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlusStyle" Version="4.5.0" ExcludeAssets="runtime" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

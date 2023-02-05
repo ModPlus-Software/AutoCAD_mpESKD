@@ -27,8 +27,7 @@ public static class SmartEntityUtils
         where T : SmartEntity
     {
 #if !DEBUG
-            ModPlusAPI.Statistic.SendCommandStarting(GetDescriptor<T>().Name, ModPlusConnector.Instance.AvailProductExternalVersion);
-            ModPlusAPI.Statistic.SendCommandStarting(ModPlusConnector.Instance);
+            ModPlusAPI.Statistic.SendCommandStarting(ModPlusConnector.Instance, GetDescriptor<T>().Name);
 #endif
     }
 

@@ -75,7 +75,7 @@ public class LevelMarkFunction : ISmartEntityFunction
     public void AlignLevelMarks()
     {
 #if !DEBUG
-        Statistic.SendCommandStarting("mpLevelMarkAlign", ModPlusConnector.Instance.AvailProductExternalVersion);
+        Statistic.SendCommandStarting(ModPlusConnector.Instance, "mpLevelMarkAlign");
 #endif
         try
         {
