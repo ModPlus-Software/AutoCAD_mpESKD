@@ -80,8 +80,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                         CrestedLeader.InsertionPoint = tempInsPoint;
                     }
                 }
-
-                if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
+                else if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
                 {
                     AcadUtils.WriteMessageInDebug(
                         $"надо удалять первую точки {CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1]}");

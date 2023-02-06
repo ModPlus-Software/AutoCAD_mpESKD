@@ -350,15 +350,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     //    InsertionPointOCS.X + (ShelfLength * _scale),
                     //    tempEndPoint.Y,
                     //    InsertionPointOCS.Z);
+                    CreateEntities(leaderStart, leaderEnd, arrows, _scale);
                 }
                 else
                 {
                     leaderEnd = new Point3d((leaderStart.X + 10) * _scale, leaderStart.Y, 0);
 
                     AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint не близко к leaderpoint");
+                    CreateEntities(leaderStart, leaderEnd, arrows, _scale);
                 }
 
-                CreateEntities(leaderStart, leaderEnd, arrows, _scale);
+                
             }
             else
             {
