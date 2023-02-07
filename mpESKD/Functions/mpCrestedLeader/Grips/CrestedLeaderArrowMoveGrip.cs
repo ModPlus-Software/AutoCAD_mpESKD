@@ -17,6 +17,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
     private readonly BlockReference _entity;
     private Point3d _startGripTmp;
     private Point3d _endGripTmp;
+    private Point3d _leaderGripTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
@@ -49,6 +50,11 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         return Language.GetItem("gp2"); // move
     }
 
+    /// <summary>
+    /// Свойство для определения точки в существующем сегменте
+    /// </summary>
+    public bool IsOnsegment { get; set; }
+
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
@@ -56,6 +62,7 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         {
             _startGripTmp = CrestedLeader.InsertionPoint;
             _endGripTmp = CrestedLeader.EndPoint;
+            _leaderGripTmp = CrestedLeader.LeaderPoint;
         }
 
         if (newStatus == Status.GripEnd)

@@ -55,18 +55,18 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 if (crestedLeader != null)
                 {
                     // Получаем ручку на первой точке
-                    //var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
-                    //{
-                    //    GripPoint = crestedLeader.InsertionPoint
-                    //};
-                    //grips.Add(gp);
+                    var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
+                    {
+                        GripPoint = crestedLeader.InsertionPoint
+                    };
+                    grips.Add(gp);
 
                     // Получаем ручку на второй точке
-                    //gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
-                    //{
-                    //    GripPoint = crestedLeader.EndPoint
-                    //};
-                    //grips.Add(gp);
+                    gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
+                    {
+                        GripPoint = crestedLeader.EndPoint
+                    };
+                    grips.Add(gp);
                     //_distArrowPointsFromInsPoint.Clear();
 
                     //var distFromEndPointToInsPoint = crestedLeader.EndPoint.DistanceTo(crestedLeader.InsertionPoint);
@@ -205,20 +205,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                         if (vertexGrip.GripIndex == 0)
                         {
-                            var newPoint = vertexGrip.GripPoint + offset;
-                            //var normal = (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal();
-                            
-                            //var pointOnPolyline = GetPointOnMainLeader(chainLeader.InsertionPoint, chainLeader.EndPoint, newPoint);
+                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
 
-                            //if (pointOnPolyline.DistanceTo(chainLeader.EndPoint) <= chainLeader.MinDistanceBetweenPoints)
-                            //{
-                            //    pointOnPolyline = chainLeader.EndPoint + ((chainLeader.EndPoint - chainLeader.InsertionPoint) * chainLeader.MinDistanceBetweenPoints);
-                            //}
-
-                            //chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
-
-                            ((BlockReference)entity).Position = newPoint;
-                            chainLeader.InsertionPoint = newPoint;
+                            ((BlockReference)entity).Position = chainLeader.InsertionPoint;
+                            //chainLeader.InsertionPoint = newPoint;
                         }
                         else if (vertexGrip.GripIndex == 1)
                         {
@@ -229,20 +219,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             {
                                 chainLeader.EndPoint += (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal() * chainLeader.MinDistanceBetweenPoints;
                             }
-
-                            //vertexGrip.TempPoint3ds = new List<Point3d>(chainLeader.ArrowPoints);
-                            //chainLeader.ArrowPoints.Clear();
-                            //foreach (var distance in _distArrowPointsFromInsPoint)
-                            //{
-                            //    if (distance < distInspointToEndPoint)
-                            //    {
-                            //        chainLeader.ArrowPoints.Add(-(distInspointToEndPoint - distance));
-                            //    }
-                            //    else
-                            //    {
-                            //        chainLeader.ArrowPoints.Add(distance - distInspointToEndPoint);
-                            //    }
-                            //}
                         }
 
                         chainLeader.UpdateEntities();
@@ -355,59 +331,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 ExceptionBox.Show(exception);
         }
     }
-
-    //private double SetChainLeaderTempNewArrowPoint(CrestedLeader chainLeader, Point3d pointOnPolyline)
-    //{
-    //    chainLeader.IsLeft = IsLeft(chainLeader.InsertionPoint, chainLeader.EndPoint, pointOnPolyline);
-    //    var isOnSegment = IsPointBetween(pointOnPolyline, chainLeader.FirstPoint,
-    //        chainLeader.SecondPoint);
-
-    //    if (!isOnSegment)
-    //    {
-    //        if (!chainLeader.IsLeft)
-    //        {
-    //            chainLeader.TempNewArrowPoint = chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-    //        }
-    //        else
-    //        {
-    //            chainLeader.TempNewArrowPoint = -1 * chainLeader.EndPoint.DistanceTo(pointOnPolyline);
-    //        }
-    //    }
-
-    //    return chainLeader.TempNewArrowPoint;
-    //}
-
-    //private Point3d GetPerpendicularPoint(Point3d varStart, Point3d varEnd, Point3d varBase)
-    //{
-    //    var a = varStart;
-    //    var b = varEnd;
-    //    var c = varBase;
-
-    //    var f0 = c.X - (b.Y - a.Y);
-    //    var f1 = c.Y + (b.X - a.X);
-    //    var k2 = (((c.X - a.X) * (b.Y - a.Y)) - ((b.X - a.X) * (c.Y - a.Y))) / (((b.X - a.X) * (f1 - c.Y)) - ((f0 - c.X) * (b.Y - a.Y)));
-    //    var xPoint = ((f0 - c.X) * k2) + c.X;
-    //    var yPoint = ((f1 - c.Y) * k2) + c.Y;
-
-    //    return new Point3d(xPoint, yPoint, 0);
-    //}
-
-    //private Point3d GetPointOnMainLeader(Point3d newPoint, double angle, Vector3d normal, Line mainLine)
-    //{
-    //    var katetPoint = mainLine.GetClosestPointTo(newPoint, true);
-    //    var katetA = newPoint.DistanceTo(katetPoint);
-    //    var b = katetA * Math.Tan(angle);
-
-    //    return katetPoint + normal * b;
-    //}
-
-    //private bool IsLeft(Point3d insertionPoint, Point3d endPoint, Point3d pointOnLine)
-    //{
-    //    var v1 = (insertionPoint - endPoint).GetNormal();
-    //    var v2 = (pointOnLine - endPoint).GetNormal();
-
-    //    return v1.DotProduct(v2) > 0;
-    //}
 
     private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
     {

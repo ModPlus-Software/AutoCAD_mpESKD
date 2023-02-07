@@ -17,7 +17,8 @@ using System.Linq;
 public class CrestedLeaderVertexGrip: SmartEntityGripData
 {
     // Временное значение ручки
-    private Point3d _gripTmp;
+    private Point3d _gripTmpIns;
+    private Point3d _gripTmpEnd;
 
     // Экземпляр анонимного блока
     private readonly BlockReference _entity;
@@ -61,15 +62,14 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
         {
             if (newStatus == Status.GripStart)
             {
-                if (GripIndex == 0)
-                {
-                    _gripTmp = CrestedLeader.InsertionPoint;
-                }
+                
+                    _gripTmpIns = CrestedLeader.InsertionPoint;
+                    _gripTmpEnd = CrestedLeader.EndPoint;
+                
 
-                if (GripIndex == 1)
-                {
-                    _gripTmp = CrestedLeader.EndPoint;
-                }
+                
+                
+                
             }
 
             if (newStatus == Status.GripEnd)
@@ -79,20 +79,34 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
                 {
                     if (GripIndex == 0)
                     {
-                        var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
-                        var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+                        AcadUtils.WriteMessageInDebug($"CrestedLeader.TempNewArrowPoint {GripPoint}");
+                        
+                        //CrestedLeader.InsertionPoint = GripPoint;
+                        //CrestedLeader.EndPoint = _gripTmpEnd;
 
-                        var distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
-
-                        //if (result < distFromEndPointToInsPoint)
-                        //{
-                        //    tempInsPoint = CrestedLeader.EndPoint + (mainNormal * result);
-                        //    CrestedLeader.ArrowPoints.Remove(result);
-                        //    CrestedLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
-                        //}
-
-                        CrestedLeader.InsertionPoint = tempInsPoint;
                     }
+                    else if (GripIndex == 1)
+                    {
+                        //CrestedLeader.InsertionPoint = _gripTmpIns;
+                        //CrestedLeader.EndPoint = GripPoint;
+                    }
+
+                    //if (GripIndex == 0)
+                    //{
+                    //    var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                    //    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
+
+                    //    var distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
+
+                    //    //if (result < distFromEndPointToInsPoint)
+                    //    //{
+                    //    //    tempInsPoint = CrestedLeader.EndPoint + (mainNormal * result);
+                    //    //    CrestedLeader.ArrowPoints.Remove(result);
+                    //    //    CrestedLeader.ArrowPoints.Add(distFromEndPointToInsPoint);
+                    //    //}
+
+                    //    CrestedLeader.InsertionPoint = tempInsPoint;
+                    //}
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -101,7 +115,7 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-                    _entity.Position = tempInsPoint;
+                    //_entity.Position = tempInsPoint;
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
@@ -116,16 +130,16 @@ public class CrestedLeaderVertexGrip: SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_gripTmp != null)
+                if (_gripTmpIns != null)
                 {
                     if (GripIndex == 0)
                     {
-                        CrestedLeader.InsertionPoint = _gripTmp;
+                        CrestedLeader.InsertionPoint = _gripTmpIns;
                     }
 
                     if (GripIndex == 1)
                     {
-                        CrestedLeader.EndPoint = _gripTmp;
+                        CrestedLeader.EndPoint = _gripTmpEnd;
                     }
                 }
             }
