@@ -310,8 +310,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             _scale = GetScale();
             var length = EndPointOCS.DistanceTo(InsertionPointOCS);
-            // Задание первой точки (точки вставки). Она же точка начала отсчета
 
+            // Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == CrestedLeaderJigState.InsertionPoint)
             {
                 var arrows = new List<Point3d>()
@@ -350,17 +350,32 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     //    InsertionPointOCS.X + (ShelfLength * _scale),
                     //    tempEndPoint.Y,
                     //    InsertionPointOCS.Z);
+
+                    var leaderMinPoint = new Point3d(
+                        leaderStart.X + (MinDistanceBetweenPoints * _scale),
+                        leaderStart.Y,
+                        0);
+
+                    if (ArrowPoints.Count == 0)
+                    {
+                        if (arrows[0].DistanceTo(leaderStart) < MinDistanceBetweenPoints)
+                        {
+                            leaderStart = leaderMinPoint;
+                        }
+
+
+                        AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
+                    }
+
                     CreateEntities(leaderStart, leaderEnd, arrows, _scale);
                 }
                 else
                 {
-                    leaderEnd = new Point3d((leaderStart.X + 10) * _scale, leaderStart.Y, 0);
+                    //leaderEnd = new Point3d((leaderStart.X + 10) * _scale, leaderStart.Y, 0);
 
                     AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint не близко к leaderpoint");
                     CreateEntities(leaderStart, leaderEnd, arrows, _scale);
                 }
-
-                
             }
             else
             {
@@ -494,17 +509,34 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         var arrowSize = ArrowSize * scale;
 
-        //var mainNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
+        var mainNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
 
-        //var leaderMinPoint = arrows[0] + (mainNormal * arrowSize);
+        var leaderMinPoint = arrows[0] + (mainNormal * arrowSize);
 
         _leaderShelfLine = new Line(leaderStart, leaderEnd);
 
-        if (ArrowPoints.Count == 1)
+        if (ArrowPoints.Count == 0)
+        {
+            if (arrows[0].DistanceTo(leaderStart) < MinDistanceBetweenPoints)
+            {
+                leaderStart = leaderMinPoint;
+                leaderEnd =   new Point3d(
+                    leaderStart.X + (ShelfLength * _scale),
+                    leaderStart.Y,
+                    leaderStart.Z);
+            }
+
+
+            _leaderLine = new Line(arrows[0], leaderStart);
+            _leaderShelfLine = new Line(leaderStart, leaderEnd);
+            AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
+        }
+
+        else if (ArrowPoints.Count == 1)
         {
             _leaderLine = new Line(arrows[0], leaderStart);
 
-            AcadUtils.WriteMessageInDebug("первое построение прямых");
+            AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
         }
         else
         {

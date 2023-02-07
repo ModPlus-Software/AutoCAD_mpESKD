@@ -99,7 +99,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         var normal = (crestedLeader.EndPoint - crestedLeader.InsertionPoint).GetNormal();
                         for (var i = 0; i < crestedLeader.ArrowPoints.Count; i++)
                         {
-                            var gripPoint = crestedLeader.ArrowPoints[i] ;
+                            var gripPoint = crestedLeader.ArrowPoints[i];
 
                             // ручки переноса стрелки
                             grips.Add(new CrestedLeaderArrowMoveGrip(crestedLeader, i, (BlockReference)entity)
@@ -107,11 +107,14 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                 GripPoint = gripPoint
                             });
 
-                            // ручки удаления выносок
-                            grips.Add(new CrestedLeaderArrowRemoveGrip(crestedLeader, i + 5, (BlockReference)entity)
+                            if (crestedLeader.ArrowPoints.Count > 1)
                             {
-                                GripPoint = gripPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
-                            });
+                                // ручки удаления выносок
+                                grips.Add(new CrestedLeaderArrowRemoveGrip(crestedLeader, i + 5, (BlockReference)entity)
+                                {
+                                    GripPoint = gripPoint + (Vector3d.XAxis * 20 * curViewUnitSize)
+                                });
+                            }
                         }
                     }
 

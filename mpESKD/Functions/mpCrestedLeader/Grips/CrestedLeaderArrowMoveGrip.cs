@@ -17,7 +17,6 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
     private readonly BlockReference _entity;
     private Point3d _startGripTmp;
     private Point3d _endGripTmp;
-    private Point3d _leaderGripTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChainLeaderVertexGrip"/> class.
@@ -50,11 +49,6 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         return Language.GetItem("gp2"); // move
     }
 
-    /// <summary>
-    /// Свойство для определения точки в существующем сегменте
-    /// </summary>
-    public bool IsOnsegment { get; set; }
-
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
@@ -62,118 +56,61 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         {
             _startGripTmp = CrestedLeader.InsertionPoint;
             _endGripTmp = CrestedLeader.EndPoint;
-            _leaderGripTmp = CrestedLeader.LeaderPoint;
         }
 
         if (newStatus == Status.GripEnd)
         {
             using (CrestedLeader)
             {
-                var tempInsPoint = CrestedLeader.InsertionPoint;
-                //TODO 
-
-                if (GripIndex == 0)
-                {
-                    AcadUtils.WriteMessageInDebug($"CrestedLeader.TempNewArrowPoint {CrestedLeader.TempNewArrowPoint}");
-                }
                 if (!CrestedLeader.ArrowPoints.Contains(CrestedLeader.TempNewArrowPoint))
                 {
+                    var tmpInsPoint = CrestedLeader.InsertionPoint;
                     var tmpEndPoint = CrestedLeader.EndPoint;
-                    var tmpLeaderPoint = CrestedLeader.LeaderPoint;
 
-                    var tempLine = new Line(CrestedLeader.EndPoint, CrestedLeader.LeaderPoint);
-                    var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
-                    var pointOnPolyline = CreateLeadersWithArrows(tempLine, Intersect.ExtendBoth, CrestedLeader.TempNewArrowPoint, mainNormal);
+                    var secondLeaderLine = new Line(CrestedLeader.InsertionPoint, CrestedLeader.EndPoint);
+                    var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
+                    var templine = new Line(CrestedLeader.TempNewArrowPoint, CrestedLeader.TempNewArrowPoint + mainNormal);
+                    var pts = new Point3dCollection();
 
-                    var isOnSegment = IsPointBetween(pointOnPolyline, tmpEndPoint, tmpLeaderPoint);
+                    secondLeaderLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                    var pointOnPolyline = new Point3d();
+
+                    if (pts.Count > 0)
+                    {
+                        pointOnPolyline = pts[0];
+                    }
+
+                    var isOnSegment = IsPointBetween(pointOnPolyline, tmpInsPoint, tmpEndPoint);
+                    var distToInsPoint = pointOnPolyline.DistanceTo(tmpInsPoint);
+                    var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
+
                     if (!isOnSegment)
                     {
-                        var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
-                        var distToLeaderPoint = pointOnPolyline.DistanceTo(tmpLeaderPoint);
-                        if (distToLeaderPoint < distToEndPoint)
+                        if (distToInsPoint < distToEndPoint)
                         {
-                            CrestedLeader.LeaderPoint = pointOnPolyline;
-                            //CrestedLeader.EndPoint = tmpEndPoint;
-                            CrestedLeader.ArrowPoints[GripIndex] = (CrestedLeader.TempNewArrowPoint);
-                            //CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
-
-                            AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем LeaderPoint");
+                            CrestedLeader.InsertionPoint = pointOnPolyline;
+                            
+                            CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
+                            CrestedLeader.ArrowPoints.Insert(0, CrestedLeader.TempNewArrowPoint);
                         }
                         else
                         {
                             CrestedLeader.EndPoint = pointOnPolyline;
-                            CrestedLeader.LeaderPoint = tmpLeaderPoint;
-                            CrestedLeader.InsertionPoint = CrestedLeader.TempNewArrowPoint;
-                            CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.InsertionPoint;
-                        
-                            AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем EndPoint");
+
+                            CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
+                            CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
                         }
                     }
-                    else 
+                    else
                     {
-                        //CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
                         CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
+                        var points = CrestedLeader.ArrowPoints;
+
+                        var sortPoint = CrestedLeader.InsertionPoint - ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * 100000);
+
+                        points.Sort((p1, p2) => GetPointOnPolyline(p1, secondLeaderLine, mainNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, secondLeaderLine, mainNormal).DistanceTo(sortPoint)));
+                        CrestedLeader.ArrowPoints = points;
                     }
-
-                    //if (!CrestedLeader.IsLeft)
-                    //{
-                    //    distFromEndPointToInsPoint = -1 * CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
-                    //}
-
-                    //var tempList = new List<Point3d>();
-                    //tempList.AddRange(CrestedLeader.ArrowPoints);
-                    //var result = tempList.OrderBy(x => x).FirstOrDefault();
-
-                    //if (CrestedLeader.TempNewArrowPoint >= 0)
-                    //{
-                    //    // если в списке есть значения и они положительные, то берем последнюю
-                    //    if (result > 0)
-                    //    {
-                    //        result = tempList.OrderBy(x => x).LastOrDefault();
-
-                    //        // если последняя больше чем текущая
-                    //        if (result > CrestedLeader.TempNewArrowPoint)
-                    //        {
-                    //            // текущую добавляем в список, inspoint не меняем
-                    //            CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
-                    //        }
-                    //        else
-                    //        {
-                    //            // если текущая больше чем последняя она должна быть insPoint
-                    //            tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * CrestedLeader.TempNewArrowPoint);
-                    //            CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
-                    //        }
-                    //    }
-                    //    else
-                    //    {
-                    //        CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    // ищем первую
-                    //    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * CrestedLeader.TempNewArrowPoint);
-
-                    //    // если первая положительная, значит слева нет точек
-                    //    if (IsOnsegment)
-                    //    {
-                            
-                    //        tempInsPoint = CrestedLeader.InsertionPoint;
-                    //    }
-                    //    else if (CrestedLeader.TempNewArrowPoint > distFromEndPointToInsPoint)
-                    //    {
-                    //        CrestedLeader.ArrowPoints[GripIndex] = CrestedLeader.TempNewArrowPoint;
-                    //        tempInsPoint = CrestedLeader.InsertionPoint;
-                    //    }
-                    //    else if (CrestedLeader.TempNewArrowPoint < result)
-                    //    {
-                    //        CrestedLeader.ArrowPoints[GripIndex] = -1 * distFromEndPointToInsPoint;
-                    //    }
-                    //    else
-                    //    {
-                    //        CrestedLeader.ArrowPoints[GripIndex] = distFromEndPointToInsPoint;
-                    //    }
-                    //}
                 }
 
                 CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
@@ -200,37 +137,30 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
             CrestedLeader.TempNewArrowPoint = default;
             CrestedLeader.InsertionPoint = _startGripTmp;
             CrestedLeader.EndPoint = _endGripTmp;
-            CrestedLeader.LeaderPoint = _leaderGripTmp;
-
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
-    }
-
-    private Point3d CreateLeadersWithArrows(Line secondLeaderLine, Intersect intersectType, Point3d arrowPoint, Vector3d mainNormal)
-    {
-        var templine = new Line(arrowPoint, arrowPoint + mainNormal);
-        var pts = new Point3dCollection();
-
-        secondLeaderLine.IntersectWith(templine, intersectType, pts, IntPtr.Zero, IntPtr.Zero);
-
-        try
-        {
-            if (pts.Count > 0)
-                return pts[0];
-        }
-        catch (Exception e)
-        {
-            AcadUtils.WriteMessageInDebug("ошибка построения линии");
-
-        }
-
-        return default;
     }
 
     private bool IsPointBetween(Point3d point, Point3d startPt, Point3d endPt)
     {
         var segment = new LineSegment3d(startPt, endPt);
         return segment.IsOn(point);
+    }
+
+    private Point3d GetPointOnPolyline(Point3d point, Line line, Vector3d mainNormal)
+    {
+        var templine = new Line(point, point + mainNormal);
+        var pts = new Point3dCollection();
+
+        line.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+        var pointOnPolyline = new Point3d();
+
+        if (pts.Count > 0)
+        {
+            pointOnPolyline = pts[0];
+        }
+
+        return pointOnPolyline;
     }
 }

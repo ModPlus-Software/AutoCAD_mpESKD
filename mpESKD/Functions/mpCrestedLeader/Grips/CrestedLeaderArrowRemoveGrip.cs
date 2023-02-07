@@ -60,7 +60,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
             if (CrestedLeader.ArrowPoints.Count > 1)
             {
                 var tempLine = new Line(CrestedLeader.InsertionPoint, CrestedLeader.EndPoint);
-                var mainNormal = (CrestedLeader.InsertionPoint - CrestedLeader.ArrowPoints[0]).GetNormal();
+                var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
                 
                 // первый индекс грипа в списке начинается с 5
                 if (GripIndex == 5)
@@ -94,8 +94,14 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                     tempLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
                     if (pts.Count > 0)
                     {
-                        
+                        var tempNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
                         CrestedLeader.EndPoint = pts[0];
+                        var dist = CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
+                        if (dist < CrestedLeader.MinDistanceBetweenPoints)
+                        {
+                            CrestedLeader.EndPoint = CrestedLeader.InsertionPoint +
+                                                     (tempNormal * CrestedLeader.MinDistanceBetweenPoints);
+                        }
                     }
                 }
                 else 
