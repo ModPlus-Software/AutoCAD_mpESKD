@@ -76,16 +76,17 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                 var isOnSegment = IsPointBetween(pointOnPolyline, tmpInsPoint, tmpEndPoint);
                 var distToInsPoint = pointOnPolyline.DistanceTo(tmpInsPoint);
                 var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
+                AcadUtils.WriteMessageInDebug($"pointOnPolyline {pointOnPolyline}");
                 if (!isOnSegment)
                 {
                     if (distToInsPoint < distToEndPoint)
                     {
-                        CrestedLeader.InsertionPoint = pointOnPolyline;
+                        CrestedLeader.InsertionPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);
                         CrestedLeader.ArrowPoints.Insert(0, CrestedLeader.TempNewArrowPoint);
                     }
                     else
                     {
-                        CrestedLeader.EndPoint = pointOnPolyline;
+                        CrestedLeader.EndPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);;
                         CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
                     }
                 }

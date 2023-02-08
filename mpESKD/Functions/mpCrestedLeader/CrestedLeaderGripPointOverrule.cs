@@ -16,8 +16,6 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
 {
-    private readonly List<double> _distArrowPointsFromInsPoint = new ();
-
     /// <inheritdoc />
     public override void GetGripPoints(
         Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
@@ -54,17 +52,18 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                 if (crestedLeader != null)
                 {
-                    // Получаем ручку на первой точке
-                    var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
-                    {
-                        GripPoint = crestedLeader.InsertionPoint
-                    };
-                    grips.Add(gp);
-
+                    //// Получаем ручку на первой точке
+                    //var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
+                    //{
+                    //    GripPoint = crestedLeader.InsertionPoint
+                    //};
+                    //grips.Add(gp);
+                    var shelfStretchPoint = crestedLeader.InsertionPoint.X +
+                                            (crestedLeader.InsertionPoint.DistanceTo(crestedLeader.EndPoint) / 2);
                     // Получаем ручку на второй точке
-                    gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
+                    var gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
                     {
-                        GripPoint = crestedLeader.EndPoint
+                        GripPoint = new Point3d(shelfStretchPoint, crestedLeader.InsertionPoint.Y,0)
                     };
                     grips.Add(gp);
                     //_distArrowPointsFromInsPoint.Clear();
@@ -85,7 +84,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     // получаем ручку для создания стрелки
                     grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
                     {
-                        GripPoint = crestedLeader.EndPoint - (Vector3d.XAxis * 20 * curViewUnitSize)
+                        GripPoint = new Point3d(crestedLeader.EndPoint.X, crestedLeader.InsertionPoint.Y, 0) - Vector3d.XAxis * 20 * curViewUnitSize
                     });
 
                     if (crestedLeader.ArrowPoints.Count >= 1)

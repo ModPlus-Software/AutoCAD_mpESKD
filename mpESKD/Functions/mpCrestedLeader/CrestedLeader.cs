@@ -260,24 +260,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private Point3d TempNewArrowPointOCS => TempNewArrowPoint.TransformBy(BlockTransform.Inverse());
 
     /// <summary>
-    /// Первая точка основной полилинии
-    /// </summary>
-    [SaveToXData]
-    public Point3d FirstPoint { get; set; }
-
-    /// <summary>
-    /// Вторая точка основной полилинии
-    /// </summary>
-    [SaveToXData]
-    public Point3d SecondPoint { get; set; } = Point3d.Origin;
-
-    /// <summary>
-    /// Вторая точка основной полилинии
-    /// </summary>
-    [SaveToXData]
-    public Point3d ThirdPoint { get; set; } = Point3d.Origin;
-
-    /// <summary>
     /// Длина полки
     /// </summary>
     [SaveToXData]
@@ -288,9 +270,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     [SaveToXData]
     public Point3d LeaderPoint { get; set; } = Point3d.Origin;
-
-    /// <inheritdoc />
-    public Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -320,12 +299,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             };
 
                 var leaderStart = new Point3d((InsertionPointOCS.X) * _scale, InsertionPointOCS.Y, 0);
-                //var leaderEnd = new Point3d((leaderStart.X + 30) * _scale, leaderStart.Y, 0);
+                
                 var tempEndPoint = new Point3d(
                                 InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale),
                                 InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
                                 InsertionPointOCS.Z);
-
+                AcadUtils.WriteMessageInDebug($"ждем первую точку InsertionPoint {InsertionPoint} EndPoint {EndPoint}");
                 CreateEntities(leaderStart, tempEndPoint, arrows, _scale);
             }
             else if (JigState == CrestedLeaderJigState.LeaderStart)
@@ -335,9 +314,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 var arrows = new List<Point3d> { InsertionPointOCS };
 
-                var leaderStart = EndPointOCS;
+                var leaderStart = InsertionPointOCS;
                 var leaderEnd = new Point3d((leaderStart.X + 30) * _scale, leaderStart.Y, 0);
-
+                AcadUtils.WriteMessageInDebug($"ждем вторую точку InsertionPoint {InsertionPoint} EndPoint {EndPoint}");
                 if (length < MinDistanceBetweenPoints * _scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
@@ -346,11 +325,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                         leaderStart.X + (MinDistanceBetweenPoints * _scale),
                         leaderStart.Y,
                         0);
-                    //var tempLeaderPoint = new Point3d(
-                    //    InsertionPointOCS.X + (ShelfLength * _scale),
-                    //    tempEndPoint.Y,
-                    //    InsertionPointOCS.Z);
-
+               
                     var leaderMinPoint = new Point3d(
                         leaderStart.X + (MinDistanceBetweenPoints * _scale),
                         leaderStart.Y,
@@ -360,30 +335,30 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     {
                         if (arrows[0].DistanceTo(leaderStart) < MinDistanceBetweenPoints)
                         {
-                            leaderStart = leaderMinPoint;
+                            leaderStart = arrows[0];
                         }
 
 
-                        AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
+                        AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} leaderStart {leaderStart} вторая точка leaderEnd {leaderEnd}");
                     }
 
-                    CreateEntities(leaderStart, leaderEnd, arrows, _scale);
+                    CreateEntities(leaderStart, EndPointOCS, arrows, _scale);
                 }
                 else
                 {
-                    //leaderEnd = new Point3d((leaderStart.X + 10) * _scale, leaderStart.Y, 0);
-
-                    AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint не близко к leaderpoint");
-                    CreateEntities(leaderStart, leaderEnd, arrows, _scale);
+                    AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint не близко к leaderpoint ервая точка {arrows[0]} leaderStart {leaderStart} вторая точка leaderEnd {leaderEnd}");
+                    var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
+                    CreateEntities(leaderStart, tempEndPoint, arrows, _scale);
                 }
             }
             else
             {
-                var tempEndPoint = EndPointOCS;
+                var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y ,0);
                 if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale)
                 {
-                    tempEndPoint = InsertionPointOCS + ((EndPointOCS - InsertionPointOCS).GetNormal() * MinDistanceBetweenPoints);
+                    tempEndPoint = new Point3d( InsertionPointOCS.X + MinDistanceBetweenPoints, InsertionPointOCS.Y, 0);
                 }
+
                 AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS}");
                 CreateEntities(InsertionPointOCS, tempEndPoint, LeaderPointsOCS, _scale);
             }
@@ -407,25 +382,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _leaderEndLines.Clear();
         _hatches.Clear();
 
-        var arrowSize = ArrowSize * scale;
         var mainNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
-        var leaderMinPoint = leaderStart + (mainNormal * MinDistanceBetweenPoints);
-        if (arrows.Count > 0)
-        {
-            leaderMinPoint = arrows[0] + (mainNormal * arrowSize);
-        }
-        
-        _leaderShelfLine = new Line(leaderStart, leaderEnd);
 
+        _leaderShelfLine = new Line(leaderStart, leaderEnd);
+        var leaderMinPoint = leaderStart + (mainNormal * MinDistanceBetweenPoints * _scale);
         if (ArrowPoints.Count == 0)
         {
-            if (leaderMinPoint.DistanceTo(leaderEnd) < MinDistanceBetweenPoints)
+            if (leaderStart.DistanceTo(leaderEnd) < MinDistanceBetweenPoints)
             {
-                
-                leaderEnd =   new Point3d(
-                    leaderStart.X + (ShelfLength * _scale),
-                    leaderStart.Y,
-                    leaderStart.Z);
+                leaderEnd = leaderMinPoint;
             }
 
             _leaderLine = new Line(leaderStart, leaderMinPoint);
@@ -434,6 +399,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
         else if (ArrowPoints.Count == 1)
         {
+            leaderMinPoint = arrows[0] + (mainNormal * MinDistanceBetweenPoints);
             _leaderLine = new Line(arrows[0], leaderStart);
 
             AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
@@ -442,8 +408,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             foreach (var arrowPoint in LeaderPointsOCS)
             {
-                //tempList.Add(CreateLeadersWithArrows(arrowPoint));
-                //var secondNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
                 var templine = new Line(arrowPoint, arrowPoint + mainNormal);
                 var pts = new Point3dCollection();
 
@@ -457,14 +421,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
             }
         }
-
-        //if (ArrowPoints.Count == 1)
-        //{
-        //    SecondPoint = leaderStart;
-        //    ThirdPoint = leaderEnd;
-        //}
-
-
 
         if (!double.IsNaN(TempNewArrowPointOCS.X))
         {

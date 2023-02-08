@@ -95,14 +95,14 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                     {
                         if (distToInsPoint < distToEndPoint)
                         {
-                            CrestedLeader.InsertionPoint = pointOnPolyline;
+                            CrestedLeader.InsertionPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);
                             
                             CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
                             CrestedLeader.ArrowPoints.Insert(0, CrestedLeader.TempNewArrowPoint);
                         }
                         else
                         {
-                            CrestedLeader.EndPoint = pointOnPolyline;
+                            CrestedLeader.EndPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);
 
                             CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
                             CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
