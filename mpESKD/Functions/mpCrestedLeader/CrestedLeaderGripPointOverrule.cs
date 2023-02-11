@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using mpESKD.Base.Utils;
+
+namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -52,34 +54,27 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                 if (crestedLeader != null)
                 {
-                    //// Получаем ручку на первой точке
-                    //var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
-                    //{
-                    //    GripPoint = crestedLeader.InsertionPoint
-                    //};
-                    //grips.Add(gp);
+                    if (crestedLeader.ArrowPoints.Count == 1)
+                    {
+                        //// Получаем ручку на первой точке
+                        var gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
+                        {
+                            GripPoint = crestedLeader.InsertionPoint
+                        };
+                        grips.Add(gp);
+                    }
+
                     var shelfStretchPoint = crestedLeader.InsertionPoint.X +
                                             (crestedLeader.InsertionPoint.DistanceTo(crestedLeader.EndPoint) / 2);
-                    // Получаем ручку на второй точке
-                    var gp = new CrestedLeaderVertexGrip(crestedLeader, 1, (BlockReference)entity)
+                    // Получаем ручку по середине
+                    if (crestedLeader.ArrowPoints.Count > 1)
                     {
-                        GripPoint = new Point3d(shelfStretchPoint, crestedLeader.InsertionPoint.Y,0)
-                    };
-                    grips.Add(gp);
-                    //_distArrowPointsFromInsPoint.Clear();
-
-                    //var distFromEndPointToInsPoint = crestedLeader.EndPoint.DistanceTo(crestedLeader.InsertionPoint);
-                    //foreach (var distance in crestedLeader.ArrowPoints)
-                    //{
-                    //    //if (distance < 0)
-                    //    //{
-                    //    //    _distArrowPointsFromInsPoint.Add(distFromEndPointToInsPoint - Math.Abs(distance));
-                    //    //}
-                    //    //else
-                    //    //{
-                    //    //    _distArrowPointsFromInsPoint.Add(distFromEndPointToInsPoint + distance);
-                    //    //}
-                    //}
+                        var gp = new CrestedLeaderVertexGrip(crestedLeader, 0, (BlockReference)entity)
+                        {
+                            GripPoint = new Point3d(shelfStretchPoint, crestedLeader.InsertionPoint.Y, 0)
+                        };
+                        grips.Add(gp);
+                    }
 
                     // получаем ручку для создания стрелки
                     grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
@@ -168,7 +163,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         GripPoint = arrowTypeGripPoint
                     });
 
-                    if ((string.IsNullOrEmpty(crestedLeader.LeaderTextValue) | string.IsNullOrEmpty(crestedLeader.LeaderTextComment)) 
+                    if ((string.IsNullOrEmpty(crestedLeader.LeaderTextValue) | string.IsNullOrEmpty(crestedLeader.LeaderTextComment))
                         | (string.IsNullOrEmpty(crestedLeader.LeaderTextValue) & string.IsNullOrEmpty(crestedLeader.LeaderTextComment)))
                         return;
 
@@ -200,99 +195,40 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 {
                     if (gripData is CrestedLeaderVertexGrip vertexGrip)
                     {
-                        var chainLeader = vertexGrip.CrestedLeader;
+                        var crestedLeader = vertexGrip.CrestedLeader;
+                        var newPoint = vertexGrip.GripPoint + offset;
+                        vertexGrip.NewPoint = offset.Y;
+                        
+                        crestedLeader.TempNewStretchPoint = newPoint;
 
-                        if (vertexGrip.GripIndex == 0)
-                        {
-                            chainLeader.InsertionPoint = vertexGrip.GripPoint + offset;
+                        crestedLeader.UpdateEntities();
+                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
-                            ((BlockReference)entity).Position = chainLeader.InsertionPoint;
-                            //chainLeader.InsertionPoint = newPoint;
-                        }
-                        else if (vertexGrip.GripIndex == 1)
-                        {
-                            chainLeader.EndPoint = vertexGrip.GripPoint + offset;
-                            var distInspointToEndPoint = chainLeader.EndPoint.DistanceTo(chainLeader.InsertionPoint);
-
-                            if (distInspointToEndPoint <= chainLeader.MinDistanceBetweenPoints)
-                            {
-                                chainLeader.EndPoint += (chainLeader.EndPoint - chainLeader.InsertionPoint).GetNormal() * chainLeader.MinDistanceBetweenPoints;
-                            }
-                        }
-
-                        chainLeader.UpdateEntities();
-                        chainLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
                     {
-                        var chainLeader = shelfMoveGrip.CrestedLeader;
-                        if (chainLeader.ShelfPosition == ShelfPosition.Right)
+                        var crestedLeader = shelfMoveGrip.CrestedLeader;
+                        if (crestedLeader.ShelfPosition == ShelfPosition.Right)
                         {
-                            chainLeader.TextIndent = shelfMoveGrip.GripPoint.X - chainLeader.EndPoint.X + offset.X;
+                            crestedLeader.TextIndent = shelfMoveGrip.GripPoint.X - crestedLeader.EndPoint.X + offset.X;
                         }
                         else
                         {
-                            chainLeader.TextIndent = chainLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
+                            crestedLeader.TextIndent = crestedLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
                         }
 
-                        shelfMoveGrip.NewPoint = chainLeader.TextIndent;
-                        chainLeader.UpdateEntities();
-                        chainLeader.BlockRecord.UpdateAnonymousBlocks();
+                        shelfMoveGrip.NewPoint = crestedLeader.TextIndent;
+                        crestedLeader.UpdateEntities();
+                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else if (gripData is CrestedLeaderArrowAddGrip addLeaderGrip)
                     {
 
                         var crestedLeader = addLeaderGrip.CrestedLeader;
                         var newPoint = addLeaderGrip.GripPoint + offset;
-                        //var tmpInsPoint = crestedLeader.InsertionPoint;
-                        //var tmpEndPoint = crestedLeader.EndPoint;
-                        //var tmpLeaderPoint = crestedLeader.LeaderPoint;
 
-                        //var tempLine = new Line(crestedLeader.EndPoint, crestedLeader.LeaderPoint);
-                        //var mainNormal = (crestedLeader.EndPoint - crestedLeader.InsertionPoint).GetNormal();
-                        //var pointOnPolyline = CreateLeadersWithArrows(
-                        //    tempLine,
-                        //    Intersect.ExtendArgument,
-                        //    newPoint,
-                        //    mainNormal);
+                        crestedLeader.TempNewArrowPoint = newPoint;
 
-                        //var isOnSegment = IsPointBetween(pointOnPolyline, crestedLeader.EndPoint, crestedLeader.LeaderPoint);
-                        //if (isOnSegment)
-                        //{
-                            crestedLeader.TempNewArrowPoint = newPoint;
-                            //AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment}");
-                        //}
-                        //else
-                        //{
-                        //    pointOnPolyline = CreateLeadersWithArrows(
-                        //        tempLine,
-                        //        Intersect.ExtendArgument,
-                        //        newPoint,
-                        //        mainNormal);
-                        //    AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment}");
-                        //    var distToEndPoint = pointOnPolyline.DistanceTo(crestedLeader.EndPoint);
-                        //    var distToLeaderPoint = pointOnPolyline.DistanceTo(crestedLeader.LeaderPoint);
-                        //    if (distToLeaderPoint < distToEndPoint)
-                        //    {
-                        //        crestedLeader.TempNewArrowPoint = newPoint;
-                        //        crestedLeader.LeaderPoint = pointOnPolyline;
-                        //        crestedLeader.EndPoint = tmpEndPoint;
-                        //        //crestedLeader.ArrowPoints.Add(crestedLeader.InsertionPoint);
-                        //        //crestedLeader.InsertionPoint = newPoint;
-
-                        //        AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем LeaderPoint");    
-                        //    }
-                        //    else
-                        //    {
-                        //        crestedLeader.TempNewArrowPoint = newPoint;
-                        //        crestedLeader.EndPoint = pointOnPolyline;
-                        //        crestedLeader.LeaderPoint = tmpLeaderPoint;
-                        //        //crestedLeader.ArrowPoints.Add(crestedLeader.InsertionPoint);
-                        //        //crestedLeader.InsertionPoint = newPoint;
-                        //        AcadUtils.WriteMessageInDebug($"isOnSegment {isOnSegment} меняем EndPoint");    
-                        //    }
-                        //}
-                       
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
@@ -300,14 +236,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     {
                         var crestedLeader = moveLeaderGrip.CrestedLeader;
                         var newPoint = moveLeaderGrip.GripPoint + offset;
-                        //var pointOnPolyline = GetPerpendicularPoint(
-                        //    chainLeader.InsertionPoint,
-                        //    chainLeader.EndPoint, 
-                        //    newPoint);
-                        //moveLeaderGrip.IsOnsegment = IsPointBetween(
-                        //    pointOnPolyline, 
-                        //    chainLeader.InsertionPoint,
-                        //    chainLeader.EndPoint);
+
                         crestedLeader.TempNewArrowPoint = newPoint;
 
                         crestedLeader.UpdateEntities();
@@ -355,8 +284,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
             Console.WriteLine(e);
             return default;
         }
-        
+
     }
 
-   
+
 }

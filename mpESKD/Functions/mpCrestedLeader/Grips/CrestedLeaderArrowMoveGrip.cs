@@ -72,41 +72,60 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
                 if (!CrestedLeader.ArrowPoints.Contains(CrestedLeader.TempNewArrowPoint))
                 {
                     var tmpInsPoint = CrestedLeader.InsertionPoint;
-                    var tmpEndPoint = CrestedLeader.EndPoint;
+                    var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y,0);
 
-                    var secondLeaderLine = new Line(CrestedLeader.InsertionPoint, CrestedLeader.EndPoint);
+                    var secondLeaderLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
                     var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
-                    var templine = new Line(CrestedLeader.TempNewArrowPoint, CrestedLeader.TempNewArrowPoint + mainNormal);
-                    var pts = new Point3dCollection();
-
-                    secondLeaderLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
-                    var pointOnPolyline = new Point3d();
-
-                    if (pts.Count > 0)
+                    
+                    if (GripIndex == 0)
                     {
-                        pointOnPolyline = pts[0];
+                        CrestedLeader.ArrowPoints.RemoveAt(0);
+                        CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
+
+                        var points = CrestedLeader.ArrowPoints;
+                        var sortPoint = CrestedLeader.InsertionPoint - ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * 100000);
+
+                        points.Sort((p1, p2) => GetPointOnPolyline(p1, secondLeaderLine, mainNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, secondLeaderLine, mainNormal).DistanceTo(sortPoint)));
+                        CrestedLeader.ArrowPoints = points;
+                        
+                
+
+                        var firstPoint = CrestedLeader.ArrowPoints[0];
+                        var lastPoint = CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1];
+
+                        CrestedLeader.InsertionPoint = GetPointOnPolyline(firstPoint, secondLeaderLine, mainNormal);
+                        CrestedLeader.EndPoint = GetPointOnPolyline(lastPoint, secondLeaderLine, mainNormal);
                     }
-
-                    var isOnSegment = IsPointBetween(pointOnPolyline, tmpInsPoint, tmpEndPoint);
-                    var distToInsPoint = pointOnPolyline.DistanceTo(tmpInsPoint);
-                    var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
-
-                    if (!isOnSegment)
+                    else if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
                     {
-                        if (distToInsPoint < distToEndPoint)
-                        {
-                            CrestedLeader.InsertionPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);
-                            
-                            CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
-                            CrestedLeader.ArrowPoints.Insert(0, CrestedLeader.TempNewArrowPoint);
-                        }
-                        else
-                        {
-                            CrestedLeader.EndPoint = new Point3d(pointOnPolyline.X, CrestedLeader.InsertionPoint.Y, 0);
+                        AcadUtils.WriteMessageInDebug($"меняем endpoint {CrestedLeader.EndPoint}");
 
-                            CrestedLeader.ArrowPoints.RemoveAt(GripIndex);
-                            CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
-                        }
+                        CrestedLeader.ArrowPoints.RemoveAt(CrestedLeader.ArrowPoints.Count-1);
+                        CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
+
+                        var points = CrestedLeader.ArrowPoints;
+                        var sortPoint = CrestedLeader.InsertionPoint - ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * 100000);
+
+                        points.Sort((p1, p2) => GetPointOnPolyline(p1, secondLeaderLine, mainNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, secondLeaderLine, mainNormal).DistanceTo(sortPoint)));
+                        CrestedLeader.ArrowPoints = points;
+                        
+                        //var templine = new Line(CrestedLeader.ArrowPoints[0], CrestedLeader.ArrowPoints[0] + mainNormal);
+
+
+                        //var pts = new Point3dCollection();
+
+                        //secondLeaderLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                        //var pointOnPolyline = new Point3d();
+
+                        //if (pts.Count > 0)
+                        //{
+                        //    pointOnPolyline = pts[0];
+                        //}
+                        var firstPoint = CrestedLeader.ArrowPoints[0];
+                        var lastPoint = CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1];
+
+                        CrestedLeader.InsertionPoint = GetPointOnPolyline(firstPoint, secondLeaderLine, mainNormal);
+                        CrestedLeader.EndPoint = GetPointOnPolyline(lastPoint, secondLeaderLine, mainNormal);
                     }
                     else
                     {
@@ -117,6 +136,37 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
 
                         points.Sort((p1, p2) => GetPointOnPolyline(p1, secondLeaderLine, mainNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, secondLeaderLine, mainNormal).DistanceTo(sortPoint)));
                         CrestedLeader.ArrowPoints = points;
+
+                        var firstPoint = CrestedLeader.ArrowPoints[0];
+                        var lastPoint = CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1];
+
+                        CrestedLeader.InsertionPoint = GetPointOnPolyline(firstPoint, secondLeaderLine, mainNormal);
+                        CrestedLeader.EndPoint = GetPointOnPolyline(lastPoint, secondLeaderLine, mainNormal);
+                        //var templine = new Line(firstPoint, firstPoint + mainNormal);
+
+                        //var pts = new Point3dCollection();
+
+                        //secondLeaderLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                        //var firstPointOnPolyline = new Point3d();
+
+                        //if (pts.Count > 0)
+                        //{
+                        //    firstPointOnPolyline = pts[0];
+                        //}
+
+                        //var templine2 = new Line(lastPoint, lastPoint + mainNormal);
+
+                        //var pts2 = new Point3dCollection();
+
+                        //secondLeaderLine.IntersectWith(templine2, Intersect.ExtendBoth, pts2, IntPtr.Zero, IntPtr.Zero);
+                        //var secondPointOnPolyline = new Point3d();
+
+                        //if (pts2.Count > 0)
+                        //{
+                        //    secondPointOnPolyline = pts2[0];
+                        //}
+                        
+                        
                     }
                 }
 
@@ -169,5 +219,6 @@ public class CrestedLeaderArrowMoveGrip : SmartEntityGripData
         }
 
         return pointOnPolyline;
+
     }
 }

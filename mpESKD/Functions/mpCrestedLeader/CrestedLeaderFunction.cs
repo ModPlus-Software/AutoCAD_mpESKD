@@ -109,7 +109,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
         var entityJig = new DefaultEntityJig(crestedLeader, blockReference, new Point3d(0, 0, 0), point3d =>
         {
-            crestedLeader.LeaderPoint = point3d;
+            crestedLeader.EndPoint = point3d;
         })
         {
             PromptForInsertionPoint = insertionPointPrompt

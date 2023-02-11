@@ -59,7 +59,8 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
 
             if (CrestedLeader.ArrowPoints.Count > 1)
             {
-                var tempLine = new Line(CrestedLeader.InsertionPoint, CrestedLeader.EndPoint);
+                var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y,0);
+                var tempLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
                 var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
                 
                 // первый индекс грипа в списке начинается с 5
@@ -109,30 +110,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                     CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
                 }
             }
-            //else
-            //{
-            //    var result = CrestedLeader.ArrowPoints.OrderBy(x => x).FirstOrDefault();
-            //    if (result > 0)
-            //    {
-            //        result = CrestedLeader.ArrowPoints.OrderBy(x => x).LastOrDefault();
-            //    }
 
-            //    CrestedLeader.ArrowPoints.Remove(result);
-            //    tempInsPoint = CrestedLeader.EndPoint + ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * result);
-
-            //    if (!CrestedLeader.ArrowPoints.Any(x => x < 0))
-            //    {
-            //        var reversed = CrestedLeader.ArrowPoints.Select(x => -x).ToList();
-            //        CrestedLeader.ArrowPoints = reversed;
-            //    }
-            //}
-
-            //else if (CrestedLeader.ArrowPoints.Count != 0)
-            //{
-            //    CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
-            //}
-
-            
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

@@ -48,5 +48,10 @@ public enum GripType
     /// <summary>
     /// Отображение выравнивания текста
     /// </summary>
-    TextAlign
+    TextAlign,
+
+    /// <summary>
+    /// Точка растягивания
+    /// </summary>
+    Stretch
 }
