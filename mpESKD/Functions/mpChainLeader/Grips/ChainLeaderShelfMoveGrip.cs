@@ -55,9 +55,11 @@ public class ChainLeaderShelfMoveGrip : SmartEntityGripData
             {
                 using (ChainLeader)
                 {
-                    if (NewPoint < 1)
+                    var minOffset = 1 * ChainLeader.GetScale();
+
+                    if (NewPoint < minOffset)
                     {
-                        NewPoint = 1;
+                        NewPoint = minOffset;
                     }
 
                     ChainLeader.TextIndent = NewPoint;
