@@ -32,7 +32,7 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpChainLeader.ChainLeader"/>
+    /// Экземпляр <see cref="mpCrestedLeader.CrestedLeader"/>
     /// </summary>
     public CrestedLeader CrestedLeader { get; }
 
@@ -57,20 +57,21 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
             using (CrestedLeader)
             {
                 var tmpInsPoint = CrestedLeader.InsertionPoint;
-                var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y,0);
+                var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
 
                 if (tmpInsPoint == tmpEndPoint)
                 {
-                    tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X + CrestedLeader.MinDistanceBetweenPoints, CrestedLeader.InsertionPoint.Y,0);
+                    tmpEndPoint = CrestedLeader.InsertionPoint + CrestedLeader.MinDistanceBetweenPoints * mainNormal;
                 }
 
-                var secondLeaderLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
-                var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
+                var mainLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
+                var leaderNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
 
-                var templine = new Line(CrestedLeader.TempNewArrowPoint, CrestedLeader.TempNewArrowPoint + mainNormal);
+                var templine = new Line(CrestedLeader.TempNewArrowPoint, CrestedLeader.TempNewArrowPoint + leaderNormal);
                 var pts = new Point3dCollection();
 
-                secondLeaderLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                mainLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
                 var pointOnPolyline = new Point3d();
 
                 if (pts.Count > 0)
@@ -81,7 +82,7 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                 var isOnSegment = IsPointBetween(pointOnPolyline, tmpInsPoint, tmpEndPoint);
                 var distToInsPoint = pointOnPolyline.DistanceTo(tmpInsPoint);
                 var distToEndPoint = pointOnPolyline.DistanceTo(tmpEndPoint);
-                AcadUtils.WriteMessageInDebug($"pointOnPolyline {pointOnPolyline}");
+
                 if (!isOnSegment)
                 {
                     if (distToInsPoint < distToEndPoint)
@@ -100,14 +101,18 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                     CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
 
                     var points = CrestedLeader.ArrowPoints;
-                    var sortPoint = CrestedLeader.InsertionPoint - ((CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() * 100000);
-
-                    points.Sort((p1, p2) => GetPointOnPolyline(p1, secondLeaderLine, mainNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, secondLeaderLine, mainNormal).DistanceTo(sortPoint)));
+                    var sortPoint = CrestedLeader.InsertionPoint - (mainNormal * 100000);
+                    if (CrestedLeader.IsLeft)
+                    {
+                        sortPoint = CrestedLeader.InsertionPoint + (mainNormal * 100000);
+                    }
+                    
+                    points.Sort((p1, p2) => GetPointOnPolyline(p1, mainLine, leaderNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, mainLine, leaderNormal).DistanceTo(sortPoint)));
                     CrestedLeader.ArrowPoints = points;
                 }
 
                 CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
-
+                
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

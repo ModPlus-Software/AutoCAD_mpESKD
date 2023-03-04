@@ -8,12 +8,12 @@ public enum GripName
     /// <summary>
     /// Start grip
     /// </summary>
-    StartGrip,
+    VertexGrip,
 
     /// <summary>
     /// End grip
     /// </summary>
-    EndGrip,
+    Stretch,
 
     /// <summary>
     /// Leader grip

@@ -68,11 +68,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private Line _leaderMainLine;
 
-    [SaveToXData]
-    private double _mainAngle;
-
-    private Line _secondTempLeaderLine;
-
     #endregion
 
     /// <summary>
@@ -121,8 +116,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _shelfLineFromEndPoint,
                 _topDbText,
                 _bottomDbText,
-                _leaderMainLine,
-                _secondTempLeaderLine
+                _leaderMainLine
             };
             entities.AddRange(_leaderLines);
             entities.AddRange(_hatches);
@@ -166,19 +160,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <summary>
     /// Свойство определяющая сторону выноски
     /// </summary>
-    public bool IsLeft
-    {
-        get => InsertionPointOCS.X > EndPointOCS.X;
-
-        set { }
-    }
-
-    /// <summary>
-    /// Положение полки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p78", ShelfPosition.Right)]
-    [SaveToXData]
-    public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
+    public bool IsLeft => (EndPointOCS - InsertionPointOCS).GetNormal().X < 0;
+    
+    ///// <summary>
+    ///// Положение полки
+    ///// </summary>
+    //[EntityProperty(PropertiesCategory.Geometry, 4, "p78", ShelfPosition.Right)]
+    //[SaveToXData]
+    //public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
 
     /// <summary>
     /// Размер стрелок
@@ -282,11 +271,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double ShelfLength { get; set; }
 
-    /// <summary>
-    /// Точка выноски
-    /// </summary>
+    
     [SaveToXData]
-    public Point3d LeaderPoint { get; set; } = Point3d.Origin;
+    public Point3d FirstArrowSecondPoint { get; set; }
+
+    [SaveToXData]
+    public Point3d FirstArrowFirstPoint { get; set; }
+
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -363,13 +354,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
             else
             {
-                var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
+                var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
+                var tempEndPoint = InsertionPointOCS + mainNormal * Math.Abs(EndPointOCS.X - InsertionPointOCS.X) ;
                 if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale)
                 {
-                    tempEndPoint = new Point3d(InsertionPointOCS.X + MinDistanceBetweenPoints, InsertionPointOCS.Y, 0);
+                    tempEndPoint = InsertionPointOCS + mainNormal *  MinDistanceBetweenPoints * _scale;
                 }
 
-                AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS}");
+                AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS} tempEndPoint {tempEndPoint}");
                 CreateEntities(InsertionPointOCS, tempEndPoint, ArrowPointsOCS, _scale);
             }
 
@@ -380,75 +372,86 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
     }
 
-    [SaveToXData]
-    public Point3d FirstArrowSecondPoint { get; set; }
-
-    [SaveToXData]
-    public Point3d FirstArrowFirstPoint { get; set; }
-
-    public double Delta { get; set; }
-
     private void CreateEntities(Point3d leaderStart, Point3d leaderEnd, List<Point3d> arrows, double scale)
     {
         _leaderLines.Clear();
         _leaderEndLines.Clear();
         _hatches.Clear();
-
+        
         AcadUtils.WriteMessageInDebug($"IsLeft {IsLeft}");
-        var mainNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
-
+        var leaderNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
+        var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
+        var leaderEndPoint = leaderStart + Math.Abs(leaderEnd.X - leaderStart.X) * mainNormal;
         _leaderMainLine = new Line(leaderStart, leaderEnd);
-        AcadUtils.WriteMessageInDebug($"_leaderShelfLine.Length {_leaderMainLine.Length}, InsertionPoint {InsertionPoint} EndPoint {EndPoint} = {InsertionPointOCS.DistanceTo(EndPointOCS)}");
-        var leaderMinPoint = leaderStart + (mainNormal * MinDistanceBetweenPoints * _scale);
+        AcadUtils.WriteMessageInDebug($"leaderStart {leaderStart} - leaderEndPoint {leaderEndPoint}");
+        var leaderMinPoint = leaderStart + (leaderNormal * MinDistanceBetweenPoints * _scale);
 
         // отрисовка джиги при горизонтальном изменении
         if (!double.IsNaN(TempNewArrowPointOCS.X))
         {
             var pointOnPolyline = CreateLeadersWithArrows(TempNewArrowPointOCS);
 
-            var templine = new Line(TempNewArrowPointOCS, TempNewArrowPointOCS + mainNormal);
-            var pts = new Point3dCollection();
-
-            _leaderMainLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
-            if (pts.Count > 0)
-            {
-                templine = new Line(TempNewArrowPointOCS, pts[0]);
-                _leaderLines.Add(templine);
-                var tempNormal = (pts[0] - TempNewArrowPointOCS).GetNormal();
-                CreateArrows(TempNewArrowPointOCS, tempNormal, ArrowSize, _scale);
-            }
-
             var distToEndPoint = pointOnPolyline.DistanceTo(leaderStart);
             var distToLeaderPoint = pointOnPolyline.DistanceTo(leaderEnd);
-            if (distToLeaderPoint < distToEndPoint)
+            if (!IsLeft)
             {
-                leaderEnd = pointOnPolyline;
-                _secondTempLeaderLine = new Line(leaderStart, pointOnPolyline);
-                AcadUtils.WriteMessageInDebug($"меняться должно со стороны leaderPoint {pointOnPolyline}");
-                //LeaderPoint = pointOnPolyline;
+                if (distToLeaderPoint < distToEndPoint)
+                {
+                    if (pointOnPolyline.X > leaderEnd.X)
+                        leaderEnd = pointOnPolyline;
+
+                    //_secondTempLeaderLine = new Line(leaderStart, pointOnPolyline);
+                    AcadUtils.WriteMessageInDebug($"меняться должно со стороны leaderPoint {pointOnPolyline}");
+                    //LeaderPoint = pointOnPolyline;
+                }
+                else
+                {
+                    //_secondTempLeaderLine = new Line(pointOnPolyline, leaderEnd);
+                    leaderStart = pointOnPolyline;
+                    AcadUtils.WriteMessageInDebug($"меняться должно со стороны endPoint {pointOnPolyline}");
+                }
             }
             else
             {
-                _secondTempLeaderLine = new Line(pointOnPolyline, leaderEnd);
-                AcadUtils.WriteMessageInDebug($"меняться должно со стороны endPoint {pointOnPolyline}");
+                if (distToLeaderPoint < distToEndPoint)
+                {
+                    if (pointOnPolyline.X < leaderEnd.X)
+                        leaderEnd = pointOnPolyline;
+
+                    //_secondTempLeaderLine = new Line(leaderStart, pointOnPolyline);
+                    AcadUtils.WriteMessageInDebug($"левая меняться должно со стороны endPoint {pointOnPolyline}");
+                    //LeaderPoint = pointOnPolyline;
+                }
+                else
+                {
+                    //_secondTempLeaderLine = new Line(pointOnPolyline, leaderEnd);
+                    leaderEnd = pointOnPolyline;
+                    AcadUtils.WriteMessageInDebug($" левая меняться должно со стороны leaderPoint {pointOnPolyline}");
+                }
             }
-        }
-
-        // отрисовка джиги при вертикальном смешении полки
-        else if (!double.IsNaN(TempNewStretchPointOCS.X) & double.IsNaN(TempNewArrowPointOCS.X))
-        {
-            var secondLeaderLine = new Line(TempNewStretchPointOCS, new Point3d(TempNewStretchPointOCS.X + 1, TempNewStretchPointOCS.Y, 0));
-
-            AcadUtils.WriteMessageInDebug($"secondLeaderLine.StartPoint {secondLeaderLine.StartPoint} secondLeaderLine.EndPoint {secondLeaderLine.EndPoint}");
-            var firstPoint = ArrowPointsOCS[0];
-            var lastPoint = ArrowPointsOCS[ArrowPoints.Count - 1];
-            leaderStart = GetPointOnPolyline(firstPoint, secondLeaderLine, mainNormal);
-            leaderEnd = GetPointOnPolyline(lastPoint, secondLeaderLine, mainNormal);
 
             _leaderMainLine = new Line(leaderStart, leaderEnd);
         }
+        
+        // отрисовка джиги при вертикальном смешении полки
+        else if (!double.IsNaN(TempNewStretchPointOCS.X) & double.IsNaN(TempNewArrowPointOCS.X))
+        {
+            var tempMainLine = new Line(TempNewStretchPointOCS, new Point3d(TempNewStretchPointOCS.X + 1, TempNewStretchPointOCS.Y, 0));
+            var distFromEndPointToInsPoint = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
+            var firstPoint = ArrowPointsOCS[0];
+            leaderStart = GetPointOnPolyline(firstPoint, tempMainLine, leaderNormal);
+            leaderEnd = leaderStart + distFromEndPointToInsPoint * mainNormal;
+            //if (IsLeft)
+            //{
+            //    leaderEnd = new Point3d(leaderStart.X - distFromEndPointToInsPoint, TempNewStretchPointOCS.Y, 0);
+            //}
 
-        else if (ArrowPoints.Count == 0 & double.IsNaN(TempNewArrowPointOCS.X))
+            _leaderMainLine = new Line(leaderStart, leaderEnd);
+            AcadUtils.WriteMessageInDebug($"in TempNewStretchPointOCS leaderStart {leaderStart} leaderEnd {leaderEnd}");
+        }
+
+        // первое построение прямых первая точка
+        if (ArrowPoints.Count == 0 & double.IsNaN(TempNewArrowPointOCS.X))
         {
             if (leaderStart.DistanceTo(leaderEnd) < MinDistanceBetweenPoints)
             {
@@ -457,34 +460,33 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             _leaderLine = new Line(leaderStart, leaderMinPoint);
             _leaderMainLine = new Line(leaderStart, leaderEnd);
-            var normal = (_leaderLine.EndPoint - _leaderLine.StartPoint).GetNormal();
-            CreateArrows(leaderStart, normal, ArrowSize, _scale);
-            AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
+            
+            CreateArrows(leaderStart, mainNormal, ArrowSize, _scale);
         }
+
+        // второе построение прямых первая точка
         else if (ArrowPoints.Count == 1 & double.IsNaN(TempNewArrowPointOCS.X))
         {
             _leaderLine = new Line(arrows[0], leaderStart);
             var normal = (_leaderLine.EndPoint - _leaderLine.StartPoint).GetNormal();
-            AcadUtils.WriteMessageInDebug($"второе построение прямых первая точка {arrows[0]} вторая точка {leaderStart}");
             CreateArrows(arrows[0], normal, ArrowSize, _scale);
         }
         else
         {
             foreach (var arrowPoint in ArrowPointsOCS)
             {
-                var templine = new Line(arrowPoint, arrowPoint + mainNormal);
+                var templine = new Line(arrowPoint, arrowPoint + leaderNormal);
                 var pts = new Point3dCollection();
 
                 _leaderMainLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
                 if (pts.Count > 0)
                 {
                     templine = new Line(arrowPoint, pts[0]);
-                    AcadUtils.WriteMessageInDebug($"line StartPoint {templine.StartPoint} EndPoint {templine.EndPoint} -  {_leaderLines.Count}");
                     _leaderLines.Add(templine);
                     var normal = (templine.EndPoint - templine.StartPoint).GetNormal();
-                    if (normal.X == default)
+                    if (mainNormal.X == default)
                     {
-                        normal = (EndPointOCS - InsertionPointOCS).GetNormal();
+                        mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
                     }
 
                     CreateArrows(arrowPoint, normal, ArrowSize, _scale);
@@ -502,8 +504,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         var secondTextHeight = SecondTextHeight * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
         var shelfLedge = ShelfLedge * scale;
-        var isRight = ShelfPosition == ShelfPosition.Right;
-
+        
         var topTextLength = 0.0;
         var bottomTextLength = 0.0;
         var bottomTextHeight = 0.0;
@@ -539,20 +540,20 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             _bottomDbText = null;
         }
 
-        var largestTextLength = Math.Max(topTextLength, bottomTextLength);
-        ShelfLength = TextIndent + largestTextLength + shelfLedge;
+        LargestTextLength = Math.Max(topTextLength, bottomTextLength);
+        ShelfLength = TextIndent + LargestTextLength + shelfLedge;
 
         Point3d topTextPosition;
         Point3d bottomTextPosition;
-        var leaderPoint = new Point3d(leaderEnd.X + MinDistanceBetweenPoints, leaderEnd.X, 0);
-        if (isRight)
+       
+        if (!IsLeft)
         {
             topTextPosition = new Point3d(
-                leaderEnd.X + TextIndent + (largestTextLength / 2),
+                leaderEnd.X + TextIndent + (LargestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X + TextIndent + (largestTextLength / 2),
+                leaderEnd.X + TextIndent + (LargestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -570,10 +571,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         else
         {
             topTextPosition = new Point3d(
-                leaderEnd.X - TextIndent - (largestTextLength / 2),
+                leaderEnd.X - TextIndent - (LargestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X - TextIndent - (largestTextLength / 2),
+                leaderEnd.X - TextIndent - (LargestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -589,7 +590,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
         }
 
-        var shelfEndPoint = ShelfPosition == ShelfPosition.Right
+        var shelfEndPoint = !IsLeft
             ? leaderEnd + (Vector3d.XAxis * ShelfLength)
             : leaderEnd - (Vector3d.XAxis * ShelfLength);
 
@@ -598,7 +599,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             var horV = (shelfEndPoint - leaderEnd).GetNormal();
             var diff = Math.Abs(topTextLength - bottomTextLength);
             var textHalfMovementHorV = diff / 2 * horV;
-            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, isRight, textHalfMovementHorV, ScaleFactorX);
+            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, !IsLeft, textHalfMovementHorV, ScaleFactorX);
             if (topTextLength > bottomTextLength)
             {
                 bottomTextPosition += movingPosition;
@@ -638,14 +639,22 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
 
         _shelfLineFromEndPoint = new Line(leaderEnd, shelfEndPoint);
-
-        AcadUtils.WriteMessageInDebug($"leaderEnd {leaderEnd} shelfEndPoint {shelfEndPoint}");
+        
+        ShelfLineLength = shelfEndPoint.DistanceTo(leaderEnd);
+        AcadUtils.WriteMessageInDebug($"leaderEnd {leaderEnd} shelfEndPoint {shelfEndPoint} EndPoint {EndPoint} ShelfLineLength {ShelfLineLength}");
+        
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
         AcadUtils.WriteMessageInDebug($"__________________________");
 
         #endregion
     }
 
+    [SaveToXData]
+    public double LargestTextLength { get; set; }
+
+    [SaveToXData]
+    public double ShelfLineLength { get; set; }
+    
     private void SetNodeNumberOnCreation()
     {
         if (!IsValueCreated)

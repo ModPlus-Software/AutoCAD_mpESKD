@@ -66,7 +66,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                 // первый индекс грипа в списке начинается с 5
                 if (GripIndex == 5)
                 {
-                    AcadUtils.WriteMessageInDebug($"надо удалять первую точки {CrestedLeader.ArrowPoints[0]}");
+                    //AcadUtils.WriteMessageInDebug($"надо удалять первую точки {CrestedLeader.ArrowPoints[0]}");
                     
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.FirstOrDefault());
                     
@@ -83,8 +83,8 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                 }
                 else if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
                 {
-                    AcadUtils.WriteMessageInDebug(
-                        $"надо удалять первую точки {CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1]}");
+                    //AcadUtils.WriteMessageInDebug(
+                    //    $"надо удалять первую точки {CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1]}");
 
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.LastOrDefault());
                     
@@ -109,6 +109,8 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                 {
                     CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
                 }
+
+                CrestedLeader.EndPoint = tmpEndPoint;
             }
 
             CrestedLeader.UpdateEntities();
