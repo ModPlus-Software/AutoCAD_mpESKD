@@ -57,7 +57,8 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
             using (CrestedLeader)
             {
                 var tmpInsPoint = CrestedLeader.InsertionPoint;
-                var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                var tmpEndPointForNormal = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y, 0);
+                var mainNormal = (tmpEndPointForNormal - CrestedLeader.InsertionPoint).GetNormal();
                 var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
 
                 if (tmpInsPoint == tmpEndPoint)

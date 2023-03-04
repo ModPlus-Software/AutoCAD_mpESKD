@@ -56,12 +56,13 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
         {
             var tempInsPoint = CrestedLeader.InsertionPoint;
 
-
             if (CrestedLeader.ArrowPoints.Count > 1)
             {
-                var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y,0);
-                var tempLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
-                var mainNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
+                var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
+                var mainLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
+                
+                var leaderNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
                 
                 // первый индекс грипа в списке начинается с 5
                 if (GripIndex == 5)
@@ -71,10 +72,10 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.FirstOrDefault());
                     
                     var firtsPoint = CrestedLeader.ArrowPoints[0];
-                    var templine = new Line(firtsPoint, firtsPoint + mainNormal);
+                    var templine = new Line(firtsPoint, firtsPoint + leaderNormal);
                     var pts = new Point3dCollection();
 
-                    tempLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                    mainLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
                     if (pts.Count > 0)
                     {
                         tempInsPoint = pts[0];
@@ -89,10 +90,10 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.LastOrDefault());
                     
                     var lastPoint = CrestedLeader.ArrowPoints.LastOrDefault();
-                    var templine = new Line(lastPoint, lastPoint + mainNormal);
+                    var templine = new Line(lastPoint, lastPoint + leaderNormal);
                     var pts = new Point3dCollection();
 
-                    tempLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+                    mainLine.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
                     if (pts.Count > 0)
                     {
                         var tempNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();

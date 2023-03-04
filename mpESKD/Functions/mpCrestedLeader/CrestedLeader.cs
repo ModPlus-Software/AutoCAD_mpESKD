@@ -67,6 +67,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private Wipeout _bottomTextMask;
 
     private Line _leaderMainLine;
+    private Point3d _endPoint;
 
     #endregion
 
@@ -271,13 +272,18 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double ShelfLength { get; set; }
 
-    
+    [SaveToXData]
+    public new Point3d EndPoint
+    {
+        get => _endPoint;
+        set => _endPoint = new Point3d(value.X, InsertionPoint.Y, value.Z);
+    }
+
     [SaveToXData]
     public Point3d FirstArrowSecondPoint { get; set; }
 
     [SaveToXData]
     public Point3d FirstArrowFirstPoint { get; set; }
-
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -355,7 +361,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             else
             {
                 var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
-                var tempEndPoint = InsertionPointOCS + mainNormal * Math.Abs(EndPointOCS.X - InsertionPointOCS.X) ;
+                //var tempEndPoint = InsertionPointOCS + mainNormal * Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
+                var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
                 if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale)
                 {
                     tempEndPoint = InsertionPointOCS + mainNormal *  MinDistanceBetweenPoints * _scale;
@@ -382,8 +389,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         var leaderNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
         var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
         var leaderEndPoint = leaderStart + Math.Abs(leaderEnd.X - leaderStart.X) * mainNormal;
+
         _leaderMainLine = new Line(leaderStart, leaderEnd);
         AcadUtils.WriteMessageInDebug($"leaderStart {leaderStart} - leaderEndPoint {leaderEndPoint}");
+        
         var leaderMinPoint = leaderStart + (leaderNormal * MinDistanceBetweenPoints * _scale);
 
         // отрисовка джиги при горизонтальном изменении
