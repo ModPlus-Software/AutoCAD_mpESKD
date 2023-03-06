@@ -1,18 +1,14 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpCrestedLeader;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Base;
-using Base.Enums;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
 using mpESKD.Base.Overrules.Grips;
 using System;
-using System.Collections.Generic;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -119,12 +115,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     });
                 }
 
-                //var textIndent = crestedLeader.TextIndent;
                 var shelfLength = crestedLeader.ShelfLength;
 
                 if (crestedLeader.ScaleFactorX < 0)
                 {
-                    //textIndent = -textIndent;
                     shelfLength = -shelfLength;
                 }
 
@@ -223,18 +217,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         case CrestedLeaderShelfMoveGrip shelfMoveGrip:
                             {
                                 var crestedLeader = shelfMoveGrip.CrestedLeader;
-                                //if (crestedLeader.IsRight)
-                                //{
-                                //    crestedLeader.TextIndent = shelfMoveGrip.GripPoint.X - crestedLeader.EndPoint.X + offset.X;
-                                //}
-                                //else
-                                //{
-                                //    crestedLeader.TextIndent = crestedLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
-                                //}
-
                                 crestedLeader.EndPoint = shelfMoveGrip.GripPoint + offset;
-                                //shelfMoveGrip.NewPoint = offset;
-
                                 crestedLeader.UpdateEntities();
                                 crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                                 break;
@@ -278,21 +261,5 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
             if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
                 ExceptionBox.Show(exception);
         }
-    }
-
-    private Point3d GetPointOnPolyline(Point3d point, Line line, Vector3d mainNormal)
-    {
-        var templine = new Line(point, point + mainNormal);
-        var pts = new Point3dCollection();
-
-        line.IntersectWith(templine, Intersect.ExtendBoth, pts, 0, 0);
-        var pointOnPolyline = new Point3d();
-
-        if (pts.Count > 0)
-        {
-            pointOnPolyline = pts[0];
-        }
-
-        return pointOnPolyline;
     }
 }

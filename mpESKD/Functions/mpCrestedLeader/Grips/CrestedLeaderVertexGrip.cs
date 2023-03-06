@@ -73,14 +73,14 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
 
             if (newStatus == Status.GripEnd)
             {
-                
                 using (CrestedLeader)
                 {
                     var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
                     var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y, 0);
                     var distFromEndPointToInsPoint = CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
                     
-                    var tempMainLine = new Line(new Point3d(CrestedLeader.InsertionPoint.X, CrestedLeader.InsertionPoint.Y + NewPoint, 0),
+                    var tempMainLine = new Line(
+                        new Point3d(CrestedLeader.InsertionPoint.X, CrestedLeader.InsertionPoint.Y + NewPoint, 0),
                         new Point3d(tmpEndPoint.X, tmpEndPoint.Y + NewPoint, 0));
                     var leaderNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
 
@@ -88,7 +88,6 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
 
                     CrestedLeader.InsertionPoint = GetPointOnPolyline(firstPoint, tempMainLine, leaderNormal);
                     CrestedLeader.EndPoint = CrestedLeader.InsertionPoint + (mainNormal * distFromEndPointToInsPoint);
-
                 }
 
                 CrestedLeader.TempNewStretchPoint = new Point3d(double.NaN, double.NaN, double.NaN);
@@ -102,7 +101,6 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
                         blkRef.XData = resBuf;
-
                     }
 
                     tr.Commit();
@@ -116,12 +114,8 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
             {
                 if (_gripTmpIns != null)
                 {
-
-
                     CrestedLeader.InsertionPoint = _gripTmpIns;
-
                     CrestedLeader.EndPoint = _gripTmpEnd;
-
                 }
             }
 

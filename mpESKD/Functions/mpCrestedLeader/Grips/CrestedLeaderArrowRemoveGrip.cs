@@ -1,14 +1,13 @@
-﻿using System;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Functions.mpChainLeader.Grips;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using mpESKD.Functions.mpChainLeader.Grips;
+using System;
 using System.Linq;
 
 /// <summary>
@@ -61,16 +60,14 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                 var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
                 var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
                 var mainLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
-                
+
                 var leaderNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
-                
+
                 // первый индекс грипа в списке начинается с 5
                 if (GripIndex == 5)
                 {
-                    //AcadUtils.WriteMessageInDebug($"надо удалять первую точки {CrestedLeader.ArrowPoints[0]}");
-                    
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.FirstOrDefault());
-                    
+
                     var firtsPoint = CrestedLeader.ArrowPoints[0];
                     var templine = new Line(firtsPoint, firtsPoint + leaderNormal);
                     var pts = new Point3dCollection();
@@ -84,11 +81,8 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                 }
                 else if (GripIndex == CrestedLeader.ArrowPoints.Count + 4)
                 {
-                    //AcadUtils.WriteMessageInDebug(
-                    //    $"надо удалять первую точки {CrestedLeader.ArrowPoints[CrestedLeader.ArrowPoints.Count - 1]}");
-
                     CrestedLeader.ArrowPoints.Remove(CrestedLeader.ArrowPoints.LastOrDefault());
-                    
+
                     var lastPoint = CrestedLeader.ArrowPoints.LastOrDefault();
                     var templine = new Line(lastPoint, lastPoint + leaderNormal);
                     var pts = new Point3dCollection();
@@ -106,7 +100,7 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
                         }
                     }
                 }
-                else 
+                else
                 {
                     CrestedLeader.ArrowPoints.RemoveAt(GripIndex - 5);
                 }

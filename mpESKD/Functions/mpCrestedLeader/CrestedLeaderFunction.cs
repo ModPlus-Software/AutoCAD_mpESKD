@@ -39,11 +39,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<CrestedLeader>();
 
             var lastNodeNumber = FindLastNodeNumber();
-            var CrestedLeader = new CrestedLeader(lastNodeNumber);
-            var blockReference = MainFunction.CreateBlock(CrestedLeader);
-            CrestedLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+            var crestedLeader = new CrestedLeader(lastNodeNumber);
+            var blockReference = MainFunction.CreateBlock(crestedLeader);
+            crestedLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-            InsertCrestedLeaderWithJig(CrestedLeader, blockReference);
+            InsertCrestedLeaderWithJig(crestedLeader, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -104,8 +104,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
         // <msg1>Укажите точку вставки:</msg1>
         var leaderPointPrompt = Language.GetItem("msg11");
-        // <msg17>Укажите точку рамки:</msg17> // <-- TODO другой текст. Про вторую точку
-        var endPointPrompt = Language.GetItem("msg17");
 
         var entityJig = new DefaultEntityJig(crestedLeader, blockReference, new Point3d(0, 0, 0), point3d =>
         {
@@ -125,14 +123,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 if (crestedLeader.JigState == CrestedLeaderJigState.InsertionPoint)
                 {
                     crestedLeader.JigState = CrestedLeaderJigState.LeaderStart;
-                    
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     entityJig.JigState = JigState.PromptNextPoint;
-
-                    //crestedLeader.JigState = CrestedLeaderJigState.EndPoint;
-                    //entityJig.PromptForNextPoint = endPointPrompt;
-                    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
-                    //entityJig.JigState = JigState.PromptNextPoint;
                 }
                 else if (crestedLeader.JigState == CrestedLeaderJigState.LeaderStart)
                 {
@@ -141,16 +133,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     crestedLeader.InsertionPoint = crestedLeader.EndPoint;
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                 }
-                //else if (crestedLeader.JigState == CrestedLeaderJigState.EndPoint)
-                //{
-                //    break;
-                    
-                //    //crestedLeader.JigState = CrestedLeaderJigState.LeaderPoint;
-                //    //entityJig.PromptForNextPoint = leaderPointPrompt;
-                //    //entityJig.PreviousPoint = crestedLeader.InsertionPoint;
-                //    //entityJig.JigState = JigState.CustomPoint;
-                    
-                //}
                 else
                 {
                     break;

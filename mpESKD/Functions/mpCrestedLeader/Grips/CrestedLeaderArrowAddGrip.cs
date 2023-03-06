@@ -57,8 +57,12 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
             using (CrestedLeader)
             {
                 var tmpInsPoint = CrestedLeader.InsertionPoint;
-                var tmpEndPointForNormal = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y, 0);
-                var mainNormal = (tmpEndPointForNormal - CrestedLeader.InsertionPoint).GetNormal();
+                
+                var mainNormal = new Vector3d(1, 0, 0);
+                if (!CrestedLeader.IsRight)
+                {
+                    mainNormal = new Vector3d(-1, 0, 0);
+                }
                 var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
 
                 if (tmpInsPoint == tmpEndPoint)
@@ -101,17 +105,17 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                 {
                     CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
 
-                    var points = CrestedLeader.ArrowPoints;
-                    var sortPoint = CrestedLeader.InsertionPoint - (mainNormal * 100000);
-                    if (!CrestedLeader.IsRight)
-                    {
-                        sortPoint = CrestedLeader.InsertionPoint + (mainNormal * 100000);
-                    }
                     
-                    points.Sort((p1, p2) => GetPointOnPolyline(p1, mainLine, leaderNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, mainLine, leaderNormal).DistanceTo(sortPoint)));
-                    CrestedLeader.ArrowPoints = points;
                 }
-
+                var points = CrestedLeader.ArrowPoints;
+                var sortPoint = CrestedLeader.InsertionPoint - (mainNormal * 100000);
+                if (!CrestedLeader.IsRight)
+                {
+                    sortPoint = CrestedLeader.InsertionPoint + (mainNormal * 100000);
+                }
+                    
+                points.Sort((p1, p2) => GetPointOnPolyline(p1, mainLine, leaderNormal).DistanceTo(sortPoint).CompareTo(GetPointOnPolyline(p2, mainLine, leaderNormal).DistanceTo(sortPoint)));
+                CrestedLeader.ArrowPoints = points;
                 CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
                 
                 CrestedLeader.UpdateEntities();

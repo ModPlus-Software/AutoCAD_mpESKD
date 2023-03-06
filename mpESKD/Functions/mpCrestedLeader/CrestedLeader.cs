@@ -1,5 +1,5 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using System.Linq;
+﻿using System.Linq;
+using ModPlusAPI;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -31,11 +31,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// нормаль выноски
     /// </summary>
     private Vector3d _mainNormal;
-
-    /// <summary>
-    /// нормаль полки
-    /// </summary>
-    private Vector3d _secondNormal;
     private Line _shelfLineFromEndPoint;
     private readonly List<Line> _leaderLines = new();
 
@@ -67,8 +62,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private Wipeout _bottomTextMask;
 
     private Line _leaderMainLine;
-    private Point3d _endPoint;
-
+    
     #endregion
 
     /// <summary>
@@ -138,12 +132,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
 
-    ///// <summary>
-    ///// Отступ текста
-    ///// </summary>
-    //[SaveToXData]
-    //public double TextIndent { get; set; } = 1.0;
-
     /// <summary>
     /// Вертикальный отступ текста
     /// </summary>
@@ -169,22 +157,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 return true;
             }
+
             return (EndPointOCS - InsertionPointOCS).GetNormal().X > 0;
-
         }
-
-        //set
-        //{
-
-        //}
     }
-
-    ///// <summary>
-    ///// Положение полки
-    ///// </summary>
-    //[EntityProperty(PropertiesCategory.Geometry, 4, "p78", ShelfPosition.Right)]
-    //[SaveToXData]
-    //public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
 
     /// <summary>
     /// Размер стрелок
@@ -288,13 +264,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double ShelfLength { get; set; }
 
-    //[SaveToXData]
-    //public new Point3d EndPoint
-    //{
-    //    get => _endPoint;
-    //    set => _endPoint = new Point3d(value.X, InsertionPoint.Y, value.Z);
-    //}
-
     [SaveToXData]
     public Point3d FirstArrowSecondPoint { get; set; }
 
@@ -325,6 +294,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 _mainNormal = new Vector3d(-1, 0, 0);
             }
+
             // Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == CrestedLeaderJigState.InsertionPoint)
             {
@@ -356,37 +326,29 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 if (length < MinDistanceBetweenPoints * _scale)
                 {
                     // Задание второй точки - случай когда расстояние между точками меньше минимального
-                    AcadUtils.WriteMessageInDebug($"должно сработать когда расстояние от inspoint близко к leaderpoint EndPointOCS {EndPointOCS}");
-
                     if (ArrowPoints.Count == 0)
                     {
                         if (arrows[0].DistanceTo(leaderStart) < MinDistanceBetweenPoints)
                         {
                             leaderStart = arrows[0];
                         }
-
-                        AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} leaderStart {leaderStart} вторая точка");
                     }
+
                     var tempEndPoint = InsertionPointOCS + _mainNormal * MinDistanceBetweenPoints * _scale;
                     CreateEntities(leaderStart, tempEndPoint, arrows, _scale);
                 }
                 else
                 {
-                    AcadUtils.WriteMessageInDebug("должно сработать когда расстояние от inspoint не близко к leaderpoint ервая точка {arrows[0]} leaderStart {leaderStart} вторая точка leaderEnd {leaderEnd}");
-
                     CreateEntities(leaderStart, EndPointOCS, arrows, _scale);
                 }
             }
             else
             {
                 var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
-                AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS} tempEndPoint {tempEndPoint}");
-                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale | InsertionPointOCS.X == EndPointOCS.X)
+                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale | InsertionPointOCS.X.IsEqualTo(EndPointOCS.X))
                 {
                     tempEndPoint = InsertionPointOCS + _mainNormal * MinDistanceBetweenPoints * _scale;
-                    AcadUtils.WriteMessageInDebug($"in else MinDistanceBetweenPoints {tempEndPoint} ");
                 }
-
 
                 CreateEntities(InsertionPointOCS, tempEndPoint, ArrowPointsOCS, _scale);
             }
@@ -403,13 +365,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _leaderLines.Clear();
         _leaderEndLines.Clear();
         _hatches.Clear();
-        AcadUtils.WriteMessageInDebug($"IsRight {IsRight}");
+
         var leaderNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
 
         var leaderEndPoint = leaderStart + Math.Abs(leaderEnd.X - leaderStart.X) * _mainNormal;
 
         _leaderMainLine = new Line(leaderStart, leaderEnd);
-        AcadUtils.WriteMessageInDebug($"leaderStart {leaderStart} - leaderEndPoint {leaderEndPoint}");
 
         var leaderMinPoint = leaderStart + (leaderNormal * MinDistanceBetweenPoints * _scale);
 
@@ -462,7 +423,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
 
             _leaderMainLine = new Line(leaderStart, leaderEnd);
-            AcadUtils.WriteMessageInDebug($"in TempNewStretchPointOCS leaderStart {leaderStart} leaderEnd {leaderEnd}");
         }
 
         // первое построение прямых первая точка
@@ -555,8 +515,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             _bottomDbText = null;
         }
 
-        LargestTextLength = Math.Max(topTextLength, bottomTextLength);
-        ShelfLength = LargestTextLength + shelfLedge;
+        var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+        ShelfLength = largestTextLength + shelfLedge;
 
         Point3d topTextPosition;
         Point3d bottomTextPosition;
@@ -564,11 +524,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         if (IsRight)
         {
             topTextPosition = new Point3d(
-                leaderEnd.X + (LargestTextLength / 2),
+                leaderEnd.X + (largestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X + (LargestTextLength / 2),
+                leaderEnd.X + (largestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -586,10 +546,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         else
         {
             topTextPosition = new Point3d(
-                leaderEnd.X - (LargestTextLength / 2),
+                leaderEnd.X - (largestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X - (LargestTextLength / 2),
+                leaderEnd.X - (largestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -655,20 +615,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         _shelfLineFromEndPoint = new Line(leaderEnd, shelfEndPoint);
 
-        ShelfLineLength = shelfEndPoint.DistanceTo(leaderEnd);
-        AcadUtils.WriteMessageInDebug($"leaderEnd {leaderEnd} shelfEndPoint {shelfEndPoint} EndPoint {EndPoint} ShelfLineLength {ShelfLineLength}");
-
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
         AcadUtils.WriteMessageInDebug($"__________________________");
 
         #endregion
     }
-
-    [SaveToXData]
-    public double LargestTextLength { get; set; }
-
-    [SaveToXData]
-    public double ShelfLineLength { get; set; }
 
     private void SetNodeNumberOnCreation()
     {

@@ -1,8 +1,7 @@
-﻿using Autodesk.AutoCAD.Geometry;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Base.Enums;
 using Base.Overrules;
@@ -63,7 +62,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     }
 
                     CrestedLeader.EndPoint += (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
-                    //CrestedLeader.TextIndent = CrestedLeader.MinDistanceBetweenPoints;
+                    
                     CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
