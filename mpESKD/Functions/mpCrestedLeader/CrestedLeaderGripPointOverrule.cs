@@ -65,7 +65,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 }
 
                 var shelfStretchPoint = crestedLeader.InsertionPoint.X + Math.Abs(crestedLeader.InsertionPoint.X - crestedLeader.EndPoint.X) / 2;
-                if (crestedLeader.IsLeft)
+                if (!crestedLeader.IsRight)
                 {
                     shelfStretchPoint = crestedLeader.InsertionPoint.X - Math.Abs(crestedLeader.InsertionPoint.X - crestedLeader.EndPoint.X) / 2;
                 }
@@ -78,22 +78,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         GripPoint = new Point3d(shelfStretchPoint, crestedLeader.InsertionPoint.Y, 0)
                     };
                     grips.Add(gp);
-                }
-
-                // получаем ручку для создания стрелки
-                if (!crestedLeader.IsLeft)
-                {
-                    grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
-                    {
-                        GripPoint = new Point3d(crestedLeader.InsertionPoint.X, crestedLeader.InsertionPoint.Y, 0) - Vector3d.XAxis * 20 * curViewUnitSize
-                    });
-                }
-                else
-                {
-                    grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
-                    {
-                        GripPoint = new Point3d(crestedLeader.InsertionPoint.X, crestedLeader.InsertionPoint.Y, 0) + Vector3d.XAxis * 20 * curViewUnitSize
-                    });
                 }
 
                 if (crestedLeader.ArrowPoints.Count >= 1)
@@ -119,46 +103,51 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     }
                 }
 
-                var textIndent = crestedLeader.TextIndent;
-                var shelfLength = crestedLeader.ShelfLength;
+                // получаем ручку для создания стрелки
+                if (crestedLeader.IsRight)
+                {
+                    grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
+                    {
+                        GripPoint = new Point3d(crestedLeader.InsertionPoint.X, crestedLeader.InsertionPoint.Y, 0) - Vector3d.XAxis * 20 * curViewUnitSize
+                    });
+                }
+                else
+                {
+                    grips.Add(new CrestedLeaderArrowAddGrip(crestedLeader, (BlockReference)entity)
+                    {
+                        GripPoint = new Point3d(crestedLeader.InsertionPoint.X, crestedLeader.InsertionPoint.Y, 0) + Vector3d.XAxis * 20 * curViewUnitSize
+                    });
+                }
 
-                //if (crestedLeader.ShelfPosition == ShelfPosition.Left)
-                //{
-                //    textIndent = -textIndent;
-                //    shelfLength = -shelfLength;
-                //}
+                //var textIndent = crestedLeader.TextIndent;
+                var shelfLength = crestedLeader.ShelfLength;
 
                 if (crestedLeader.ScaleFactorX < 0)
                 {
-                    textIndent = -textIndent;
+                    //textIndent = -textIndent;
                     shelfLength = -shelfLength;
                 }
 
                 var endPointByX = new Point3d(crestedLeader.EndPoint.X, crestedLeader.InsertionPoint.Y, 0);
 
                 var arrowTypeGripPoint = endPointByX + (Vector3d.XAxis * shelfLength);
+                var shelfMoveGripPoint = endPointByX + (Vector3d.XAxis);
+
+                if (!crestedLeader.IsRight)
+                {
+                    arrowTypeGripPoint = endPointByX - (Vector3d.XAxis * shelfLength);
+                    shelfMoveGripPoint = endPointByX - (Vector3d.XAxis);
+                }
+
+
                 var alignGripPoint = arrowTypeGripPoint + (Vector3d.YAxis *
                                                            (crestedLeader.MainTextHeight + crestedLeader.TextVerticalOffset) * crestedLeader.GetFullScale());
-                var shelfMoveGripPoint = endPointByX + (Vector3d.XAxis * textIndent);
-                var shelfPositionGripPoint = endPointByX+
-                                             (Vector3d.YAxis *
-                                              (crestedLeader.MainTextHeight + crestedLeader.TextVerticalOffset));
-
                 if (crestedLeader.IsRotated & !crestedLeader.IsTextAlwaysHorizontal)
                 {
                     arrowTypeGripPoint = arrowTypeGripPoint.RotateBy(crestedLeader.Rotation, Vector3d.ZAxis, endPointByX);
                     alignGripPoint = alignGripPoint.RotateBy(crestedLeader.Rotation, Vector3d.ZAxis, endPointByX);
                     shelfMoveGripPoint = shelfMoveGripPoint.RotateBy(crestedLeader.Rotation, Vector3d.ZAxis, endPointByX);
-                    shelfPositionGripPoint = shelfPositionGripPoint.RotateBy(crestedLeader.Rotation, Vector3d.ZAxis, endPointByX);
                 }
-
-                //// Получаем ручку зеркалирования полки
-                //var gp1 = new CrestedLeaderShelfPositionGrip(crestedLeader)
-                //{
-                //    GripPoint = shelfPositionGripPoint,
-                //    GripType = GripType.TwoArrowsLeftRight
-                //};
-                //grips.Add(gp1);
 
                 // Получаем ручку изменения полки
                 grips.Add(new CrestedLeaderShelfMoveGrip(crestedLeader, 2)
@@ -234,16 +223,17 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         case CrestedLeaderShelfMoveGrip shelfMoveGrip:
                             {
                                 var crestedLeader = shelfMoveGrip.CrestedLeader;
-                                if (!crestedLeader.IsLeft)
-                                {
-                                    crestedLeader.TextIndent = shelfMoveGrip.GripPoint.X - crestedLeader.EndPoint.X + offset.X;
-                                }
-                                else
-                                {
-                                    crestedLeader.TextIndent = crestedLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
-                                }
+                                //if (crestedLeader.IsRight)
+                                //{
+                                //    crestedLeader.TextIndent = shelfMoveGrip.GripPoint.X - crestedLeader.EndPoint.X + offset.X;
+                                //}
+                                //else
+                                //{
+                                //    crestedLeader.TextIndent = crestedLeader.EndPoint.X - shelfMoveGrip.GripPoint.X - offset.X;
+                                //}
 
-                                shelfMoveGrip.NewPoint = crestedLeader.TextIndent;
+                                crestedLeader.EndPoint = shelfMoveGrip.GripPoint + offset;
+                                //shelfMoveGrip.NewPoint = offset;
 
                                 crestedLeader.UpdateEntities();
                                 crestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -254,7 +244,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             {
                                 var crestedLeader = addLeaderGrip.CrestedLeader;
                                 var newPoint = addLeaderGrip.GripPoint + offset;
-                                //crestedLeader.ShelfLength = newPoint.X - crestedLeader.EndPoint.X;
                                 crestedLeader.TempNewArrowPoint = newPoint;
 
                                 crestedLeader.UpdateEntities();

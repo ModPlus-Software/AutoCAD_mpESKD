@@ -155,8 +155,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 {
                     break;
                 }
-
-                AcadUtils.WriteMessageInDebug($"crestedLeader.JigState {crestedLeader.JigState.Value}  entityJig.JigState { entityJig.JigState}");
             }
             else
             {

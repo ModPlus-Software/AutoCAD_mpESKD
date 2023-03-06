@@ -138,11 +138,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc />
     public override double LineTypeScale { get; set; }
 
-    /// <summary>
-    /// Отступ текста
-    /// </summary>
-    [SaveToXData]
-    public double TextIndent { get; set; } = 1.0;
+    ///// <summary>
+    ///// Отступ текста
+    ///// </summary>
+    //[SaveToXData]
+    //public double TextIndent { get; set; } = 1.0;
 
     /// <summary>
     /// Вертикальный отступ текста
@@ -161,8 +161,24 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <summary>
     /// Свойство определяющая сторону выноски
     /// </summary>
-    public bool IsLeft => (EndPointOCS - InsertionPointOCS).GetNormal().X < 0;
-    
+    public bool IsRight
+    {
+        get
+        {
+            if (EndPointOCS.IsEqualTo(InsertionPointOCS))
+            {
+                return true;
+            }
+            return (EndPointOCS - InsertionPointOCS).GetNormal().X > 0;
+
+        }
+
+        //set
+        //{
+
+        //}
+    }
+
     ///// <summary>
     ///// Положение полки
     ///// </summary>
@@ -253,14 +269,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private List<Point3d> ArrowPointsOCS => ArrowPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
 
     /// <summary>
-    /// Расстояние от Endpoint для отображения при растягивании
+    /// Расстояние от Endpoint для отображения при горизонтальном растягивании
     /// </summary>
     public Point3d TempNewArrowPoint { get; set; } = new Point3d(Double.NaN, Double.NaN, Double.NaN);
 
     private Point3d TempNewArrowPointOCS => TempNewArrowPoint.TransformBy(BlockTransform.Inverse());
 
     /// <summary>
-    /// Расстояние от Endpoint для отображения при растягивании
+    /// Расстояние от Endpoint для отображения при вертикальном растягивании
     /// </summary>
     public Point3d TempNewStretchPoint { get; set; } = new Point3d(Double.NaN, Double.NaN, Double.NaN);
 
@@ -272,12 +288,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double ShelfLength { get; set; }
 
-    [SaveToXData]
-    public new Point3d EndPoint
-    {
-        get => _endPoint;
-        set => _endPoint = new Point3d(value.X, InsertionPoint.Y, value.Z);
-    }
+    //[SaveToXData]
+    //public new Point3d EndPoint
+    //{
+    //    get => _endPoint;
+    //    set => _endPoint = new Point3d(value.X, InsertionPoint.Y, value.Z);
+    //}
 
     [SaveToXData]
     public Point3d FirstArrowSecondPoint { get; set; }
@@ -302,8 +318,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         try
         {
             _scale = GetScale();
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
 
+            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+            _mainNormal = new Vector3d(1, 0, 0);
+            if (!IsRight)
+            {
+                _mainNormal = new Vector3d(-1, 0, 0);
+            }
             // Задание первой точки (точки вставки). Она же точка начала отсчета
             if (JigState == CrestedLeaderJigState.InsertionPoint)
             {
@@ -318,12 +339,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                                 InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale),
                                 InsertionPointOCS.Y + (MinDistanceBetweenPoints * _scale),
                                 InsertionPointOCS.Z);
-                AcadUtils.WriteMessageInDebug($"ждем первую точку InsertionPoint {InsertionPoint} EndPoint {EndPoint}");
+
                 CreateEntities(InsertionPointOCS, tempEndPoint, arrows, _scale);
                 var tempNormal = (tempEndPoint - leaderStart).GetNormal();
                 CreateArrows(InsertionPointOCS, tempNormal, ArrowSize, _scale);
             }
-            else if (JigState == CrestedLeaderJigState.LeaderStart)
+            else if (JigState == CrestedLeaderJigState.LeaderStart & InsertionPointOCS.Y != EndPointOCS.Y)
             {
                 FirstArrowFirstPoint = InsertionPointOCS;
                 FirstArrowSecondPoint = EndPointOCS;
@@ -331,8 +352,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 var arrows = new List<Point3d> { InsertionPointOCS };
 
                 var leaderStart = InsertionPointOCS;
-
-                AcadUtils.WriteMessageInDebug($"ждем вторую точку InsertionPoint {InsertionPoint} EndPoint {EndPoint}");
 
                 if (length < MinDistanceBetweenPoints * _scale)
                 {
@@ -348,8 +367,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                         AcadUtils.WriteMessageInDebug($"первое построение прямых первая точка {arrows[0]} leaderStart {leaderStart} вторая точка");
                     }
-
-                    CreateEntities(leaderStart, EndPointOCS, arrows, _scale);
+                    var tempEndPoint = InsertionPointOCS + _mainNormal * MinDistanceBetweenPoints * _scale;
+                    CreateEntities(leaderStart, tempEndPoint, arrows, _scale);
                 }
                 else
                 {
@@ -360,15 +379,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
             else
             {
-                var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
-                //var tempEndPoint = InsertionPointOCS + mainNormal * Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
                 var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
-                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale)
+                AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS} tempEndPoint {tempEndPoint}");
+                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale | InsertionPointOCS.X == EndPointOCS.X)
                 {
-                    tempEndPoint = InsertionPointOCS + mainNormal *  MinDistanceBetweenPoints * _scale;
+                    tempEndPoint = InsertionPointOCS + _mainNormal * MinDistanceBetweenPoints * _scale;
+                    AcadUtils.WriteMessageInDebug($"in else MinDistanceBetweenPoints {tempEndPoint} ");
                 }
 
-                AcadUtils.WriteMessageInDebug($"in else InsertionPoint {InsertionPoint} InsertionPointOCS {InsertionPointOCS}, EndPoint {EndPoint} EndPointOCS {EndPointOCS} tempEndPoint {tempEndPoint}");
+
                 CreateEntities(InsertionPointOCS, tempEndPoint, ArrowPointsOCS, _scale);
             }
 
@@ -384,15 +403,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _leaderLines.Clear();
         _leaderEndLines.Clear();
         _hatches.Clear();
-        
-        AcadUtils.WriteMessageInDebug($"IsLeft {IsLeft}");
+        AcadUtils.WriteMessageInDebug($"IsRight {IsRight}");
         var leaderNormal = (FirstArrowSecondPoint - FirstArrowFirstPoint).GetNormal();
-        var mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
-        var leaderEndPoint = leaderStart + Math.Abs(leaderEnd.X - leaderStart.X) * mainNormal;
+
+        var leaderEndPoint = leaderStart + Math.Abs(leaderEnd.X - leaderStart.X) * _mainNormal;
 
         _leaderMainLine = new Line(leaderStart, leaderEnd);
         AcadUtils.WriteMessageInDebug($"leaderStart {leaderStart} - leaderEndPoint {leaderEndPoint}");
-        
+
         var leaderMinPoint = leaderStart + (leaderNormal * MinDistanceBetweenPoints * _scale);
 
         // отрисовка джиги при горизонтальном изменении
@@ -402,46 +420,34 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             var distToEndPoint = pointOnPolyline.DistanceTo(leaderStart);
             var distToLeaderPoint = pointOnPolyline.DistanceTo(leaderEnd);
-            if (!IsLeft)
+            if (IsRight)
             {
                 if (distToLeaderPoint < distToEndPoint)
                 {
                     if (pointOnPolyline.X > leaderEnd.X)
                         leaderEnd = pointOnPolyline;
-
-                    //_secondTempLeaderLine = new Line(leaderStart, pointOnPolyline);
-                    AcadUtils.WriteMessageInDebug($"меняться должно со стороны leaderPoint {pointOnPolyline}");
-                    //LeaderPoint = pointOnPolyline;
                 }
                 else
                 {
-                    //_secondTempLeaderLine = new Line(pointOnPolyline, leaderEnd);
                     leaderStart = pointOnPolyline;
-                    AcadUtils.WriteMessageInDebug($"меняться должно со стороны endPoint {pointOnPolyline}");
                 }
             }
             else
             {
-                if (distToLeaderPoint < distToEndPoint)
+                if (distToLeaderPoint > distToEndPoint)
                 {
-                    if (pointOnPolyline.X < leaderEnd.X)
-                        leaderEnd = pointOnPolyline;
-
-                    //_secondTempLeaderLine = new Line(leaderStart, pointOnPolyline);
-                    AcadUtils.WriteMessageInDebug($"левая меняться должно со стороны endPoint {pointOnPolyline}");
-                    //LeaderPoint = pointOnPolyline;
+                    leaderStart = pointOnPolyline;
                 }
                 else
                 {
-                    //_secondTempLeaderLine = new Line(pointOnPolyline, leaderEnd);
-                    leaderEnd = pointOnPolyline;
-                    AcadUtils.WriteMessageInDebug($" левая меняться должно со стороны leaderPoint {pointOnPolyline}");
+                    if (pointOnPolyline.X < leaderEnd.X)
+                        leaderEnd = pointOnPolyline;
                 }
             }
 
             _leaderMainLine = new Line(leaderStart, leaderEnd);
         }
-        
+
         // отрисовка джиги при вертикальном смешении полки
         else if (!double.IsNaN(TempNewStretchPointOCS.X) & double.IsNaN(TempNewArrowPointOCS.X))
         {
@@ -449,11 +455,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             var distFromEndPointToInsPoint = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
             var firstPoint = ArrowPointsOCS[0];
             leaderStart = GetPointOnPolyline(firstPoint, tempMainLine, leaderNormal);
-            leaderEnd = leaderStart + distFromEndPointToInsPoint * mainNormal;
-            //if (IsLeft)
-            //{
-            //    leaderEnd = new Point3d(leaderStart.X - distFromEndPointToInsPoint, TempNewStretchPointOCS.Y, 0);
-            //}
+            leaderEnd = leaderStart + distFromEndPointToInsPoint * _mainNormal;
+            if (!IsRight)
+            {
+                leaderEnd = new Point3d(leaderStart.X - distFromEndPointToInsPoint, TempNewStretchPointOCS.Y, 0);
+            }
 
             _leaderMainLine = new Line(leaderStart, leaderEnd);
             AcadUtils.WriteMessageInDebug($"in TempNewStretchPointOCS leaderStart {leaderStart} leaderEnd {leaderEnd}");
@@ -469,8 +475,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             _leaderLine = new Line(leaderStart, leaderMinPoint);
             _leaderMainLine = new Line(leaderStart, leaderEnd);
-            
-            CreateArrows(leaderStart, mainNormal, ArrowSize, _scale);
+
+            CreateArrows(leaderStart, _mainNormal, ArrowSize, _scale);
         }
 
         // второе построение прямых первая точка
@@ -493,9 +499,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     templine = new Line(arrowPoint, pts[0]);
                     _leaderLines.Add(templine);
                     var normal = (templine.EndPoint - templine.StartPoint).GetNormal();
-                    if (mainNormal.X == default)
+                    if (normal == default)
                     {
-                        mainNormal = (EndPointOCS - InsertionPointOCS).GetNormal();
+                        normal = _mainNormal;
                     }
 
                     CreateArrows(arrowPoint, normal, ArrowSize, _scale);
@@ -513,7 +519,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         var secondTextHeight = SecondTextHeight * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
         var shelfLedge = ShelfLedge * scale;
-        
+
         var topTextLength = 0.0;
         var bottomTextLength = 0.0;
         var bottomTextHeight = 0.0;
@@ -550,19 +556,19 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
 
         LargestTextLength = Math.Max(topTextLength, bottomTextLength);
-        ShelfLength = TextIndent + LargestTextLength + shelfLedge;
+        ShelfLength = LargestTextLength + shelfLedge;
 
         Point3d topTextPosition;
         Point3d bottomTextPosition;
-       
-        if (!IsLeft)
+
+        if (IsRight)
         {
             topTextPosition = new Point3d(
-                leaderEnd.X + TextIndent + (LargestTextLength / 2),
+                leaderEnd.X + (LargestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2),
                 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X + TextIndent + (LargestTextLength / 2),
+                leaderEnd.X + (LargestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -580,10 +586,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         else
         {
             topTextPosition = new Point3d(
-                leaderEnd.X - TextIndent - (LargestTextLength / 2),
+                leaderEnd.X - (LargestTextLength / 2),
                 leaderEnd.Y + textVerticalOffset + (mainTextHeight / 2), 0);
             bottomTextPosition = new Point3d(
-                leaderEnd.X - TextIndent - (LargestTextLength / 2),
+                leaderEnd.X - (LargestTextLength / 2),
                 leaderEnd.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topDbText != null)
@@ -599,7 +605,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
         }
 
-        var shelfEndPoint = !IsLeft
+        var shelfEndPoint = IsRight
             ? leaderEnd + (Vector3d.XAxis * ShelfLength)
             : leaderEnd - (Vector3d.XAxis * ShelfLength);
 
@@ -608,7 +614,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             var horV = (shelfEndPoint - leaderEnd).GetNormal();
             var diff = Math.Abs(topTextLength - bottomTextLength);
             var textHalfMovementHorV = diff / 2 * horV;
-            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, !IsLeft, textHalfMovementHorV, ScaleFactorX);
+            var movingPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, IsRight, textHalfMovementHorV, ScaleFactorX);
             if (topTextLength > bottomTextLength)
             {
                 bottomTextPosition += movingPosition;
@@ -648,10 +654,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
 
         _shelfLineFromEndPoint = new Line(leaderEnd, shelfEndPoint);
-        
+
         ShelfLineLength = shelfEndPoint.DistanceTo(leaderEnd);
         AcadUtils.WriteMessageInDebug($"leaderEnd {leaderEnd} shelfEndPoint {shelfEndPoint} EndPoint {EndPoint} ShelfLineLength {ShelfLineLength}");
-        
+
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
         AcadUtils.WriteMessageInDebug($"__________________________");
 
@@ -663,7 +669,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     [SaveToXData]
     public double ShelfLineLength { get; set; }
-    
+
     private void SetNodeNumberOnCreation()
     {
         if (!IsValueCreated)

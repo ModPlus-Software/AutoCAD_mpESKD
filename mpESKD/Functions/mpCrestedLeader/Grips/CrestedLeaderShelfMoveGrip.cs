@@ -62,9 +62,8 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                         NewPoint = 1;
                     }
 
-                    CrestedLeader.EndPoint += (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal() *
-                                              CrestedLeader.TextIndent;
-                    CrestedLeader.TextIndent = CrestedLeader.MinDistanceBetweenPoints;
+                    CrestedLeader.EndPoint += (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                    //CrestedLeader.TextIndent = CrestedLeader.MinDistanceBetweenPoints;
                     CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

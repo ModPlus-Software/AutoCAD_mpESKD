@@ -103,7 +103,7 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
 
                     var points = CrestedLeader.ArrowPoints;
                     var sortPoint = CrestedLeader.InsertionPoint - (mainNormal * 100000);
-                    if (CrestedLeader.IsLeft)
+                    if (!CrestedLeader.IsRight)
                     {
                         sortPoint = CrestedLeader.InsertionPoint + (mainNormal * 100000);
                     }
