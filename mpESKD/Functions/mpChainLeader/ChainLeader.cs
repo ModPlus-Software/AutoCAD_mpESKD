@@ -311,7 +311,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         _leaderEndLines.Clear();
         _hatches.Clear();
-
+        
         var arrowSize = ArrowSize * scale;
         _mainNormal = (endPoint - insertionPoint).GetNormal();
 
@@ -418,7 +418,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
         ShelfLength = TextIndent + largestTextLength + shelfLedge;
-
+        
         Point3d topTextPosition;
         Point3d bottomTextPosition;
 

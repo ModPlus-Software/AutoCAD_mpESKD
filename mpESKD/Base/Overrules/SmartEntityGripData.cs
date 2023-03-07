@@ -46,6 +46,9 @@ public abstract class SmartEntityGripData : GripData
             case GripType.BasePoint:
                 point3dCollections = PointsForSquareGrip(num, ecs);
                 break;
+            case GripType.Stretch:
+                point3dCollections = PointsForStretchGrip(num, ecs);
+                break;
         }
 
         var backupColor = worldDraw.SubEntityTraits.Color;
@@ -173,6 +176,19 @@ public abstract class SmartEntityGripData : GripData
     }
 
     private Point3dCollection PointsForMinusGrip(double num, CoordinateSystem3d ecs)
+    {
+        var num2 = num / 3;
+        var horUnit = num * ecs.Xaxis;
+        return new Point3dCollection
+        {
+            GripPoint - horUnit + (num2 * ecs.Yaxis),
+            GripPoint + horUnit + (num2 * ecs.Yaxis),
+            GripPoint + horUnit - (num2 * ecs.Yaxis),
+            GripPoint - horUnit - (num2 * ecs.Yaxis)
+        };
+    }
+
+    private Point3dCollection PointsForStretchGrip(double num, CoordinateSystem3d ecs)
     {
         var num2 = num / 3;
         var horUnit = num * ecs.Xaxis;
