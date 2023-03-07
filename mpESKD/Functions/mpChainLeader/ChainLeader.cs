@@ -311,7 +311,7 @@ public class ChainLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     {
         _leaderEndLines.Clear();
         _hatches.Clear();
-        AcadUtils.WriteMessageInDebug($"TextIndent {TextIndent}");
+        
         var arrowSize = ArrowSize * scale;
         _mainNormal = (endPoint - insertionPoint).GetNormal();
 
