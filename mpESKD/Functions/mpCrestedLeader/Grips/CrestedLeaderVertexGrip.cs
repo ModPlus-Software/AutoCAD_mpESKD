@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+
 using mpESKD.Functions.mpChainLeader.Grips;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
-
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -11,8 +9,6 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Ручка вершин
@@ -50,9 +46,10 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
     /// </summary>
     public GripName GripName { get; }
 
+    /// <summary>
+    /// Новое значение точки вершины
+    /// </summary>
     public double NewPoint { get; set; }
-
-    public Point3d NewInsPoint { get; set; }
 
     /// <inheritdoc />
     public override string GetTooltip()
@@ -133,7 +130,7 @@ public class CrestedLeaderVertexGrip : SmartEntityGripData
         var templine = new Line(point, point + mainNormal);
         var pts = new Point3dCollection();
 
-        line.IntersectWith(templine, Intersect.ExtendBoth, pts, IntPtr.Zero, IntPtr.Zero);
+        line.IntersectWith(templine, Intersect.ExtendBoth, pts, 0, 0);
         var pointOnPolyline = new Point3d();
 
         if (pts.Count > 0)

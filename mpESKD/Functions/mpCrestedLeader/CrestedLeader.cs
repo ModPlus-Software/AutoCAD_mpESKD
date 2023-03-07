@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using ModPlusAPI;
-
-namespace mpESKD.Functions.mpCrestedLeader;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -13,6 +10,7 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Цепная выноска Todo
@@ -264,11 +262,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double ShelfLength { get; set; }
 
-    [SaveToXData]
-    public Point3d FirstArrowSecondPoint { get; set; }
-
+    /// <summary>
+    /// Первая точка для первой стрелки, для определения нормали
+    /// </summary>
     [SaveToXData]
     public Point3d FirstArrowFirstPoint { get; set; }
+
+    /// <summary>
+    /// Вторая точка для первой стрелки, для определения нормали
+    /// </summary>
+    [SaveToXData]
+    public Point3d FirstArrowSecondPoint { get; set; }
 
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
@@ -345,7 +349,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             else
             {
                 var tempEndPoint = new Point3d(EndPointOCS.X, InsertionPointOCS.Y, 0);
-                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale | InsertionPointOCS.X.IsEqualTo(EndPointOCS.X))
+                if (InsertionPointOCS.DistanceTo(EndPointOCS) < MinDistanceBetweenPoints * _scale | InsertionPointOCS.X.Equals(EndPointOCS.X))
                 {
                     tempEndPoint = InsertionPointOCS + _mainNormal * MinDistanceBetweenPoints * _scale;
                 }
@@ -616,8 +620,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _shelfLineFromEndPoint = new Line(leaderEnd, shelfEndPoint);
 
         MirrorIfNeed(new[] { _topDbText, _bottomDbText });
-        AcadUtils.WriteMessageInDebug($"__________________________");
-
         #endregion
     }
 

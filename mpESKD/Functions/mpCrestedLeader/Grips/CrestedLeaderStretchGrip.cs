@@ -73,7 +73,8 @@ public class CrestedLeaderStretchGrip : SmartEntityGripData
                     var tmpEndPoint = new Point3d(CrestedLeader.EndPoint.X, CrestedLeader.InsertionPoint.Y, 0);
                     var distFromEndPointToInsPoint = CrestedLeader.EndPoint.DistanceTo(CrestedLeader.InsertionPoint);
 
-                    var tempMainLine = new Line(new Point3d(CrestedLeader.InsertionPoint.X, CrestedLeader.InsertionPoint.Y + NewPoint, 0),
+                    var tempMainLine = new Line(
+                        new Point3d(CrestedLeader.InsertionPoint.X, CrestedLeader.InsertionPoint.Y + NewPoint, 0),
                         new Point3d(tmpEndPoint.X, tmpEndPoint.Y + NewPoint, 0));
                     var leaderNormal = (CrestedLeader.FirstArrowSecondPoint - CrestedLeader.FirstArrowFirstPoint).GetNormal();
 
@@ -81,10 +82,6 @@ public class CrestedLeaderStretchGrip : SmartEntityGripData
 
                     CrestedLeader.InsertionPoint = GetPointOnPolyline(firstPoint, tempMainLine, leaderNormal);
                     CrestedLeader.EndPoint = CrestedLeader.InsertionPoint + (mainNormal * distFromEndPointToInsPoint);
-                    //if (mainNormal.X < 0)
-                    //{
-                    //    CrestedLeader.EndPoint = new Point3d(CrestedLeader.InsertionPoint.X - distFromEndPointToInsPoint, CrestedLeader.InsertionPoint.Y, 0);
-                    //}
                 }
 
                 CrestedLeader.TempNewStretchPoint = new Point3d(double.NaN, double.NaN, double.NaN);
@@ -114,7 +111,6 @@ public class CrestedLeaderStretchGrip : SmartEntityGripData
                     CrestedLeader.InsertionPoint = _gripTmpIns;
                     CrestedLeader.EndPoint = _gripTmpEnd;
 
-                    //CrestedLeader.TextIndent = double.NaN;
                     CrestedLeader.TempNewStretchPoint = new Point3d(double.NaN, double.NaN, double.NaN);
                     CrestedLeader.TempNewArrowPoint = new Point3d(double.NaN, double.NaN, double.NaN);
                 }

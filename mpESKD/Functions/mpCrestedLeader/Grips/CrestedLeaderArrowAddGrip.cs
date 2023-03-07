@@ -63,6 +63,7 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                 {
                     mainNormal = new Vector3d(-1, 0, 0);
                 }
+
                 var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
 
                 if (tmpInsPoint == tmpEndPoint)
@@ -104,9 +105,8 @@ public class CrestedLeaderArrowAddGrip : SmartEntityGripData
                 else
                 {
                     CrestedLeader.ArrowPoints.Add(CrestedLeader.TempNewArrowPoint);
-
-                    
                 }
+
                 var points = CrestedLeader.ArrowPoints;
                 var sortPoint = CrestedLeader.InsertionPoint - (mainNormal * 100000);
                 if (CrestedLeader.IsRight)
