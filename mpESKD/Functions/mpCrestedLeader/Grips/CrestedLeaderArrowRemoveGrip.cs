@@ -57,7 +57,12 @@ public class CrestedLeaderArrowRemoveGrip : SmartEntityGripData
 
             if (CrestedLeader.ArrowPoints.Count > 1)
             {
-                var mainNormal = (CrestedLeader.EndPoint - CrestedLeader.InsertionPoint).GetNormal();
+                var mainNormal = new Vector3d(1, 0, 0);
+                if (!CrestedLeader.IsRight)
+                {
+                    mainNormal = new Vector3d(-1, 0, 0);
+                }
+
                 var tmpEndPoint = CrestedLeader.InsertionPoint + (Math.Abs(CrestedLeader.EndPoint.X - CrestedLeader.InsertionPoint.X) * mainNormal);
                 var mainLine = new Line(CrestedLeader.InsertionPoint, tmpEndPoint);
 
