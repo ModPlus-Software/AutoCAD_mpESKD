@@ -15,16 +15,16 @@ public class CrestedLeaderDescriptor : ISmartEntityDescriptor
     public string Name => "mpCrestedLeader";
 
     /// <inheritdoc />
-    /// Цепная выноска TODO
-    public string LName => Language.GetItem("h175");
+    /// Гребенчатая выноска
+    public string LName => Language.GetItem("h183");
 
     /// <inheritdoc />
-    /// Создание цепной выноске по ГОСТ 2.307 TODO
-    public string Description => Language.GetItem("h177");
+    /// Создание гребенчатой выноски по ГОСТ 2.307
+    public string Description => Language.GetItem("h185");
     
     /// <inheritdoc />
-    /// Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску по ГОСТ 2.307 TODO
-    public string FullDescription => Language.GetItem("h178");
+    /// Создание интеллектуального объекта на основе анонимного блока, описывающий цепную выноску по ГОСТ 2.307
+    public string FullDescription => Language.GetItem("h186");
 
     /// <inheritdoc />
     public string ToolTipHelpImage => string.Empty;

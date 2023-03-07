@@ -13,10 +13,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// Цепная выноска Todo
+/// Гребенчатая выноска
 /// </summary>
-[SmartEntityDisplayNameKey("h175")] // Цепная выноска Todo
-[SystemStyleDescriptionKey("h176")] // Базовый стиль для обозначения цепной выноски Todo
+[SmartEntityDisplayNameKey("h183")] // Гребенчатая выноска
+[SystemStyleDescriptionKey("h184")] //Базовый стиль для обозначения гребенчатой выноски
 public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
