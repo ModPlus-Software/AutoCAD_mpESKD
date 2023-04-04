@@ -58,7 +58,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     /// <summary>
     /// Команда создания цепной выноски
     /// </summary>
-    [CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
+    /// todo uncomment
+    //[CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
     public void CreateCrestedLeaderCommand()
     {
         CreateCrestedLeader();
