@@ -73,14 +73,8 @@ public class LevelPlanMarkGripPointOverrule : BaseSmartEntityGripOverrule<LevelP
                         {
                             GripPoint = levelPlanMark.LeaderPoints[i]
                         });
-                        var deleteGripPoint = new Point3d(
-                            levelPlanMark.LeaderPoints[i].X + 1,
-                            levelPlanMark.LeaderPoints[i].Y, 
-                            levelPlanMark.LeaderPoints[i].Z);
-                        var leaderEndTypeGripPoint = new Point3d(
-                            levelPlanMark.LeaderPoints[i].X - 1,
-                            levelPlanMark.LeaderPoints[i].Y, 
-                            levelPlanMark.LeaderPoints[i].Z);
+                        var deleteGripPoint = levelPlanMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
+                        var leaderEndTypeGripPoint = levelPlanMark.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
 
                         // ручки удаления выносок
                         grips.Add(new LevelPlanMarkLeaderRemoveGrip(levelPlanMark, i)
