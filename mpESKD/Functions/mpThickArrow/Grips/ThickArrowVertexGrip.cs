@@ -8,6 +8,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+
 using ThickArrow = mpThickArrow.ThickArrow;
 
 /// <summary>
@@ -20,10 +21,11 @@ public class ThickArrowVertexGrip : SmartEntityGripData
     /// </summary>
     /// <param name="thickArrow">Экземпляр класса <see cref="mpThickArrow.ThickArrow"/></param>
     /// <param name="index">Индекс ручки</param>
-    public ThickArrowVertexGrip(ThickArrow thickArrow, int index)
+    public ThickArrowVertexGrip(ThickArrow thickArrow, GripName gripName)
     {
         ThickArrow = thickArrow;
-        GripIndex = index;
+        //GripIndex = index;
+        GripName = gripName;
         GripType = GripType.Point;
     }
 
@@ -33,6 +35,11 @@ public class ThickArrowVertexGrip : SmartEntityGripData
     public ThickArrow ThickArrow { get;  }
 
     /// <summary>
+    /// Имя ручки
+    /// </summary>
+    public GripName GripName { get; }
+
+    /// <summary>
     /// Индекс ручки
     /// </summary>
     public int GripIndex { get; }
@@ -40,11 +47,25 @@ public class ThickArrowVertexGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp1"); // stretch
+        switch (GripName)
+        {
+            case GripName.StartGrip:
+            case GripName.EndGrip:
+                {
+                    return Language.GetItem("gp1"); // stretch
+                }
+
+            case GripName.MiddleGrip: return Language.GetItem("gp2"); // move
+        }
+
+        return base.GetTooltip();
     }
 
-    // Временное значение ручки
-    private Point3d _gripTmp;
+    // Временное значение первой ручки
+    private Point3d _startGripTmp;
+
+    // временное значение последней ручки
+    private Point3d _endGripTmp;
 
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
@@ -54,7 +75,21 @@ public class ThickArrowVertexGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                _gripTmp = GripPoint;
+                if (GripName == GripName.StartGrip)
+                {
+                    _startGripTmp = GripPoint;
+                }
+
+                if (GripName == GripName.EndGrip)
+                {
+                    _endGripTmp = GripPoint;
+                }
+
+                if (GripName == GripName.MiddleGrip)
+                {
+                    _startGripTmp = ThickArrow.InsertionPoint;
+                    _endGripTmp = ThickArrow.EndPoint;
+                }
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -78,16 +113,20 @@ public class ThickArrowVertexGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_gripTmp != null)
+                if (_startGripTmp != null & GripName == GripName.StartGrip)
                 {
-                    if (GripIndex == 0)
-                    {
-                        ThickArrow.InsertionPoint = _gripTmp;
-                    }
-                    else if (GripIndex == 1)
-                    {
-                        ThickArrow.EndPoint = _gripTmp;
-                    }
+                    ThickArrow.InsertionPoint = GripPoint;
+                }
+
+                if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
+                {
+                    ThickArrow.InsertionPoint = _startGripTmp;
+                    ThickArrow.EndPoint = _endGripTmp;
+                }
+
+                if (_endGripTmp != null & GripName == GripName.EndGrip)
+                {
+                    ThickArrow.EndPoint = GripPoint;
                 }
             }
 

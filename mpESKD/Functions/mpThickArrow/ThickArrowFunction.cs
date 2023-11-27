@@ -19,9 +19,9 @@ public class ThickArrowFunction : ISmartEntityFunction
     /// <inheritdoc />
     public void Initialize()
     {
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new ViewGripPointOverrule(), true);
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<View>(), true);
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<View>(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new ThickArrowGripPointOverrule(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<ThickArrow>(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<ThickArrow>(), true);
     }
 
     /// <inheritdoc />
@@ -35,7 +35,7 @@ public class ThickArrowFunction : ISmartEntityFunction
              * функции, т.к. регистрация происходит в текущем документе
              * При инициализации плагина регистрации нет!
              */
-            ExtendedDataUtils.AddRegAppTableRecord<View>();
+            ExtendedDataUtils.AddRegAppTableRecord<ThickArrow>();
 
             /* TODO: выяснить, для чего эти Last.. - строки взяты из mpView
              * для mpThickArrow - не требуются?
@@ -66,7 +66,7 @@ public class ThickArrowFunction : ISmartEntityFunction
     }
 
     /// <summary>
-    /// Команда создания широкой стрелки
+    /// Команда создания толстой стрелки
     /// </summary>
     [CommandMethod("ModPlus", "mpThickArrow", CommandFlags.Modal)]
     public void CreateViewCommand()

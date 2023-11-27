@@ -7,7 +7,6 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpView.Grips;
 
 /// <inheritdoc />
 public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickArrow.ThickArrow>
@@ -26,32 +25,43 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                 var thickArrow = EntityReaderService.Instance.GetFromEntity<mpThickArrow.ThickArrow>(entity);
                 if (thickArrow != null)
                 {
-                    // insertion (start) grip
-                    var vertexGrip = new ThickArrowVertexGrip(thickArrow, 0)
+                    //// insertion (start) grip
+                    //var vertexGrip = new ThickArrowVertexGrip(thickArrow, 0)
+                    //{
+                    //    GripPoint = thickArrow.InsertionPoint
+                    //};
+                    //grips.Add(vertexGrip);
+
+
+
+                    //vertexGrip = new ThickArrowVertexGrip(thickArrow, 1)
+                    //{
+                    //    GripPoint = thickArrow.TopShelfEndPoint
+                    //};
+                    //grips.Add(vertexGrip);
+
+                    // Получаем первую ручку (совпадает с точкой вставки блока)
+                    var gp = new ThickArrowVertexGrip(thickArrow, GripName.StartGrip)
                     {
                         GripPoint = thickArrow.InsertionPoint
                     };
-                    grips.Add(vertexGrip);
+                    grips.Add(gp);
 
-                    #region Text grips - не использ.
+                    // получаем среднюю ручку
+                    gp = new ThickArrowVertexGrip(thickArrow, GripName.MiddleGrip)
+                    {
+                        GripPoint = thickArrow.MiddlePoint
+                    };
+                    grips.Add(gp);
 
-                    //if (view.TextDesignationPoint != Point3d.Origin && view.HasTextValue())
-                    //{
-                    //    var textGrip = new ViewTextGrip(view)
-                    //    {
-                    //        GripPoint = view.TextDesignationPoint,
-                    //        TextGripName = "TopText"
-                    //    };
-                    //    grips.Add(textGrip);
-                    //}
+                    // получаем конечную ручку
+                    gp = new ThickArrowVertexGrip(thickArrow, GripName.EndGrip)
+                    {
+                        GripPoint = thickArrow.EndPoint
+                    };
+                    grips.Add(gp);
 
-                    //vertexGrip = new ViewVertexGrip(view, 1)
-                    //{
-                    //    GripPoint = view.TopShelfEndPoint
-                    //};
-                    //grips.Add(vertexGrip);
-                    
-                    #endregion
+
                 }
             }
         }

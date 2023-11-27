@@ -18,20 +18,15 @@ using ModPlusAPI.Windows;
 [SystemStyleDescriptionKey("h188")]
 public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 {
-    /* не нужно - нет обозначений
-     * private readonly string _lastIntegerValue = string.Empty;
-
-       private readonly string _lastLetterValue = string.Empty;*/
-
     #region Entities
 
-    ///// <summary>
-    ///// Верхняя полка
-    ///// </summary>
-    //private Line _shelfLine;
+    /// <summary>
+    /// Верхняя полка
+    /// </summary>
+    private Polyline _shelfLine;
 
     /// <summary>
-    /// Стрелка верхней полки
+    /// Стрелка 
     /// </summary>
     private Polyline _shelfArrow;
 
@@ -51,17 +46,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     {
     }
 
-    /* не нужно - нет обозначений
-    /// <summary>
-    /// Initializes a new instance of the <see cref="View"/> class.
-    /// </summary>
-    /// <param name="lastIntegerValue">Числовое значение последней созданной оси</param>
-    /// <param name="lastLetterValue">Буквенное значение последней созданной оси</param>
-    public ThickArrow(string lastIntegerValue, string lastLetterValue)
-    {
-        _lastIntegerValue = lastIntegerValue;
-        _lastLetterValue = lastLetterValue;
-    }*/
+    #region Неиспользуемые, но необходимые к реализации свойства
 
     /// <inheritdoc />
     /// В примитиве не используется!
@@ -71,16 +56,57 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// В примитиве не используется!
     public override double LineTypeScale { get; set; }
 
+    // TODO: Задавать, даже если не использ текст? Можно обойти исполльзование?
+    /// <inheritdoc />
+    /// В примитиве не используется!
+    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
+    [SaveToXData]
+    public override string TextStyle { get; set; }
+
+    #endregion 
+
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => 0.2;
 
+    /// <summary>
+    /// Длина полки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "w")]
+    [SaveToXData]
+    public int ShelfLength { get; set; } = 10;
 
+    /// <summary>
+    /// Толщина полки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p46", 10, 5, 15, nameSymbol: "w")]
+    [SaveToXData]
+    public double ShelfWidth { get; set; } = 0.01;
 
+    /// <summary>
+    /// Длина стрелки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 6, "p47", 5, 1, 8, nameSymbol: "e")]
+    [SaveToXData]
+    public int ShelfArrowLength { get; set; } = 5;
 
+    /// <summary>
+    /// Толщина стрелки
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p48", 1.5, 0.1, 5, nameSymbol: "t")]
+    [SaveToXData]
+    public double ShelfArrowWidth { get; set; } = 1.5;
 
+    /// <summary>
+    /// Конечная точка верхней полки
+    /// </summary>
+    [SaveToXData]
+    public Point3d TopShelfEndPoint { get; private set; }
 
-
-
+    /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
+    public Point3d MiddlePoint => new Point3d(
+        (InsertionPoint.X + EndPoint.X) / 2,
+        (InsertionPoint.Y + EndPoint.Y) / 2,
+        (InsertionPoint.Z + EndPoint.Z) / 2);
 
     /// <inheritdoc />
     public override IEnumerable<Entity> Entities
@@ -89,10 +115,8 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         {
             var entities = new List<Entity>
             {
-                //_textMask,
                 _shelfLine,
                 _shelfArrow,
-                //_mText
             };
 
             foreach (var e in entities)
@@ -143,9 +167,32 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         }
     }
 
-    private void CreateEntities()
+    private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
     {
-        // TODO: разобрать по примеру mpView
+        var normalVector = (endPoint - insertionPoint).GetNormal();
+
+        // shelf line
+        var shelfEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
+        TopShelfEndPoint = shelfEndPoint.TransformBy(BlockTransform);
+        var tmpEndPoint = insertionPoint + (normalVector * ShelfLength * scale);
+
+        /*
+        _shelfLine = new Polyline
+        {
+            StartPoint = insertionPoint,
+            EndPoint = tmpEndPoint
+        };*/
+
+        _shelfLine = new Polyline(2);
+        _shelfLine.AddVertexAt(0, tmpEndPoint.ToPoint2d(), 0.0, 0.1, 0.0);
+        _shelfLine.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, 0.1, 0.0);
+
+        // shelf arrow
+        var topShelfArrowStartPoint = insertionPoint + (normalVector * ShelfArrowLength * scale);
+        _shelfArrow = new Polyline(2);
+        _shelfArrow.AddVertexAt(0, topShelfArrowStartPoint.ToPoint2d(), 0.0, ShelfArrowWidth * scale, 0.0);
+        _shelfArrow.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, 0.0, 0.0);
+
     }
 
 }
