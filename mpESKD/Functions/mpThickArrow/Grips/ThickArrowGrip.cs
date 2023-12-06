@@ -14,14 +14,14 @@ using ThickArrow = mpThickArrow.ThickArrow;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class ThickArrowVertexGrip : SmartEntityGripData
+public class ThickArrowGrip : SmartEntityGripData
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ThickArrowVertexGrip"/> class.
+    /// Initializes a new instance of the <see cref="ThickArrowGrip"/> class.
     /// </summary>
     /// <param name="thickArrow">Экземпляр класса <see cref="mpThickArrow.ThickArrow"/></param>
     /// <param name="index">Индекс ручки</param>
-    public ThickArrowVertexGrip(ThickArrow thickArrow, GripName gripName)
+    public ThickArrowGrip(ThickArrow thickArrow, GripName gripName)
     {
         ThickArrow = thickArrow;
         //GripIndex = index;

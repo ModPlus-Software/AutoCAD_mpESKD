@@ -7,6 +7,10 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Functions.mpThickArrow.Grips;
+using mpESKD.Functions.mpThickArrow;
+using System.Diagnostics;
+
 
 /// <inheritdoc />
 public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickArrow.ThickArrow>
@@ -17,51 +21,57 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
     {
         try
         {
+            // Проверка дополнительных условий
             if (IsApplicable(entity))
             {
-                // Удаляю все ручки - это удалит ручку вставки блока
-                grips.Clear();
+                // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
+                // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
+                var blkRef = (BlockReference)entity;
 
-                var thickArrow = EntityReaderService.Instance.GetFromEntity<mpThickArrow.ThickArrow>(entity);
+                // Удаляем стандартную ручку позиции блока (точки вставки)
+                GripData toRemove = null;
+                foreach (var gd in grips)
+                {
+                    if (gd.GripPoint == blkRef.Position)
+                    {
+                        toRemove = gd;
+                        break;
+                    }
+                }
+
+                if (toRemove != null)
+                {
+                    grips.Remove(toRemove);
+                }
+
+                // Получаем экземпляр класса, который описывает как должен выглядеть примитив
+                // т.е. правила построения графики внутри блока
+                // Информация собирается по XData и свойствам самого блока
+                var thickArrow = EntityReaderService.Instance.GetFromEntity<ThickArrow>(entity);
+
+                // Паранойя программиста =)
                 if (thickArrow != null)
                 {
-                    //// insertion (start) grip
-                    //var vertexGrip = new ThickArrowVertexGrip(thickArrow, 0)
-                    //{
-                    //    GripPoint = thickArrow.InsertionPoint
-                    //};
-                    //grips.Add(vertexGrip);
-
-
-
-                    //vertexGrip = new ThickArrowVertexGrip(thickArrow, 1)
-                    //{
-                    //    GripPoint = thickArrow.TopShelfEndPoint
-                    //};
-                    //grips.Add(vertexGrip);
-
                     // Получаем первую ручку (совпадает с точкой вставки блока)
-                    var gp = new ThickArrowVertexGrip(thickArrow, GripName.StartGrip)
+                    var gp = new ThickArrowGrip(thickArrow, GripName.StartGrip)
                     {
                         GripPoint = thickArrow.InsertionPoint
                     };
                     grips.Add(gp);
 
                     // получаем среднюю ручку
-                    gp = new ThickArrowVertexGrip(thickArrow, GripName.MiddleGrip)
+                    gp = new ThickArrowGrip(thickArrow, GripName.MiddleGrip)
                     {
                         GripPoint = thickArrow.MiddlePoint
                     };
                     grips.Add(gp);
 
                     // получаем конечную ручку
-                    gp = new ThickArrowVertexGrip(thickArrow, GripName.EndGrip)
+                    gp = new ThickArrowGrip(thickArrow, GripName.EndGrip)
                     {
                         GripPoint = thickArrow.EndPoint
                     };
                     grips.Add(gp);
-
-
                 }
             }
         }
@@ -80,55 +90,79 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
         {
             if (IsApplicable(entity))
             {
+                // Проходим по коллекции ручек
                 foreach (var gripData in grips)
                 {
-                    if (gripData is ThickArrowVertexGrip vertexGrip)
+                    if (gripData is ThickArrowGrip gripPoint)
                     {
-                        var thickArrow = vertexGrip.ThickArrow;
+                        var thickArrow = gripPoint.ThickArrow;
+                        var scale = thickArrow.GetFullScale();
 
-                        if (vertexGrip.GripIndex == 0)
+                        // Далее, в зависимости от имени ручки произвожу действия
+                        if (gripPoint.GripName == GripName.StartGrip)
                         {
-                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
+                            // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
+                            // Все точки всегда совпадают (+ ручка)
+                            var newPt = gripPoint.GripPoint + offset;
+                            var length = thickArrow.EndPoint.DistanceTo(newPt);
+
+                            if (length < thickArrow.MinDistanceBetweenPoints * scale)
+                            {
+                                /* Если новая точка получается на расстоянии меньше минимального, то
+                                 * переносим ее в направлении между двумя точками на минимальное расстояние
+                                 */
+                                var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    thickArrow.EndPoint, newPt, thickArrow.EndPoint,
+                                    thickArrow.MinDistanceBetweenPoints * scale);
+
+                                if (thickArrow.EndPoint.Equals(newPt))
+                                {
+                                    // Если точки совпали, то задаем минимальное значение
+                                    tmpInsertionPoint = new Point3d(
+                                        thickArrow.EndPoint.X + (thickArrow.MinDistanceBetweenPoints * scale),
+                                        thickArrow.EndPoint.Y, thickArrow.EndPoint.Z);
+                                }
+
+                                ((BlockReference)entity).Position = tmpInsertionPoint;
+                                thickArrow.InsertionPoint = tmpInsertionPoint;
+                            }
+                            else
+                            {
+                                ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
+                                thickArrow.InsertionPoint = gripPoint.GripPoint + offset;
+                            }
                         }
-                        else if (vertexGrip.GripIndex == 1)
+
+                        if (gripPoint.GripName == GripName.MiddleGrip)
                         {
-                            thickArrow.EndPoint = vertexGrip.GripPoint + offset;
+                            // Т.к. средняя точка нужна для переноса примитива, но не соответствует точки вставки блока
+                            // и получается как средняя точка между InsertionPoint и EndPoint, то я переношу
+                            // точку вставки
+                            var lengthVector = (thickArrow.InsertionPoint - thickArrow.EndPoint) / 2;
+                            ((BlockReference)entity).Position = gripPoint.GripPoint + offset + lengthVector;
+                        }
+
+                        if (gripPoint.GripName == GripName.EndGrip)
+                        {
+                            var newPt = gripPoint.GripPoint + offset;
+                            if (newPt.Equals(((BlockReference)entity).Position))
+                            {
+                                thickArrow.EndPoint = new Point3d(
+                                    ((BlockReference)entity).Position.X + (thickArrow.MinDistanceBetweenPoints * scale),
+                                    ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
+                            }
+
+                            // С конечной точкой все просто
+                            else
+                            {
+                                thickArrow.EndPoint = gripPoint.GripPoint + offset;
+                            }
                         }
 
                         // Вот тут происходит перерисовка примитивов внутри блока
                         thickArrow.UpdateEntities();
                         thickArrow.BlockRecord.UpdateAnonymousBlocks();
                     }
-                    /*else if (gripData is ViewTextGrip textGrip)
-                    {
-                        var view = textGrip.View;
-                        var topShelfVector = (view.InsertionPoint - view.EndPoint).GetNormal();
-                        var topStrokeVector = topShelfVector.GetPerpendicularVector().Negate();
-
-                        var deltaY = topStrokeVector.DotProduct(offset) / view.BlockTransform.GetScale();
-                        var deltaX = topShelfVector.DotProduct(offset) / view.BlockTransform.GetScale();
-
-                        if (double.IsNaN(textGrip.CachedAlongTopShelfTextOffset))
-                        {
-                            view.AlongTopShelfTextOffset = deltaX;
-                        }
-                        else
-                        {
-                            view.AlongTopShelfTextOffset = textGrip.CachedAlongTopShelfTextOffset + deltaX;
-                        }
-
-                        if (double.IsNaN(textGrip.CachedAcrossTopShelfTextOffset))
-                        {
-                            view.AcrossTopShelfTextOffset = deltaY;
-                        }
-                        else
-                        {
-                            view.AcrossTopShelfTextOffset = textGrip.CachedAcrossTopShelfTextOffset + deltaY;
-                        }
-
-                        view.UpdateEntities();
-                        view.BlockRecord.UpdateAnonymousBlocks();
-                    }*/
                     else
                     {
                         base.MoveGripPointsAt(entity, grips, offset, bitFlags);
