@@ -37,15 +37,6 @@ public class ThickArrowFunction : ISmartEntityFunction
              */
             ExtendedDataUtils.AddRegAppTableRecord<ThickArrow>();
 
-            /* TODO: выяснить, для чего эти Last.. - строки взяты из mpView
-             * для mpThickArrow - не требуются?
-             * зачем в mpView берется последняя ось?
-             * 
-            var viewLastLetterValue = string.Empty;
-            var viewLastIntegerValue = string.Empty;
-            FindLastViewValues(ref viewLastLetterValue, ref viewLastIntegerValue);
-            var view = new View(viewLastIntegerValue, viewLastLetterValue);*/
-
             var thickArrow = new ThickArrow();
 
             var blockReference = MainFunction.CreateBlock(thickArrow);
