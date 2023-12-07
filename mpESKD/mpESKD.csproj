@@ -146,6 +146,10 @@
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16.png" />
+	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16_dark.png" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2022.3.1" ExcludeAssets="runtime" />
@@ -204,6 +208,8 @@
 		<Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpView_16x16.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpView_16x16_dark.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
