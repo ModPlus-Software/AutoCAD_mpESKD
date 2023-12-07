@@ -74,7 +74,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
 
     /// <summary> Количество стрелок</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p115", 1, 1, 2, nameSymbol: "t1")]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p115", 1, 1, 2, nameSymbol: "n")]
     [SaveToXData]
     public int ArrowQuantity { get; set; } = 1;
 
