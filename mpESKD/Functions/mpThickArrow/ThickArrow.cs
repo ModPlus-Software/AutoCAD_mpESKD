@@ -62,8 +62,8 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
     /// <inheritdoc />
     /// В примитиве не используется!
-    [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
-    [SaveToXData]
+   // [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
+   // [SaveToXData]
     public override string TextStyle { get; set; }
 
     #endregion 
@@ -74,7 +74,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
 
     /// <summary> Количество стрелок</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p115", 1, 1, 2, nameSymbol: "n")]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p115", 1, 1, 2)]
     [SaveToXData]
     public int ArrowQuantity { get; set; } = 1;
 
@@ -85,12 +85,12 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
 
     /// <summary>Длина стрелки</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p47", 5.0, 1.0, 10.0, nameSymbol: "e")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p47", 5.0, 1.0, 10.0, nameSymbol: "e")]
     [SaveToXData]
     public double ArrowLength { get; set; } = 5.0;
 
     /// <summary>Толщина стрелки</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p48", 1.5, 1.0, 3.0, nameSymbol: "t2")]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p48", 1.5, 1.0, 3.0, nameSymbol: "t2")]
     [SaveToXData]
     public double ArrowWidth { get; set; } = 1.5;
 
