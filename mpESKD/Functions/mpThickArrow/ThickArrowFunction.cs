@@ -11,7 +11,6 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpView;
 
 /// <inheritdoc />
 public class ThickArrowFunction : ISmartEntityFunction

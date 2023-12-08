@@ -7,9 +7,6 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpThickArrow.Grips;
-using mpESKD.Functions.mpThickArrow;
-using System.Diagnostics;
 
 
 /// <inheritdoc />
@@ -180,6 +177,4 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                 ExceptionBox.Show(exception);
         }
     }
-
-
 }

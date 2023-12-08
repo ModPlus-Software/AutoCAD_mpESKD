@@ -29,38 +29,41 @@
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p109}"/>
-            <TextBox Grid.Row="0"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p115}"/>
+            <mps:NumericBox Grid.Row="0"
                      Grid.Column="1"
-                     Name="TbDesignation"
-                     MaxLength="20"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+                     Minimum="1"
+                     Maximum="2"
+                     Name="ArrowQuantityNumBox"/>
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p52}"/>
-            <TextBox Grid.Row="1"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p114}"/>
+            <mps:NumericBox Grid.Row="1"
                      Grid.Column="1"
-                     Name="TbDesignationPrefix"
-                     MaxLength="3"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+                     Minimum="0.1"
+                     Maximum="3.0"
+                     Name="ShelfWidthNumBox"/>
 
             <TextBlock Grid.Row="2"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p53}"/>
-            <TextBox Grid.Row="2"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p47}"/>
+            <mps:NumericBox Grid.Row="2"
                      Grid.Column="1"
-                     Name="TbSheetNumber" 
-                     MaxLength="5"
-                     mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"/>
+                     Minimum="1.0"
+                     Maximum="10.0"
+                     Name="ArrowLengthNumBox"/>
+            
+            <TextBlock Grid.Row="3"
+                       Grid.Column="0"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p48}"/>
+            <mps:NumericBox Grid.Row="3"
+                     Grid.Column="1"
+                     Minimum="0.5"
+                     Maximum="5.0"
+                     Name="ArrowWidthNumBox" 
+/>
 
-            <CheckBox Grid.Row="3"
-                      Grid.Column="0"
-                      Content="{Binding Source={StaticResource Lang}, XPath=h93}"
-                      Name="ChkRestoreTextPosition"/>
         </Grid>
     </mps:Card>
 </UserControl>

@@ -1,9 +1,9 @@
 ﻿namespace mpESKD.Functions.mpThickArrow;
 
-using System;
-using System.Collections.Generic;
 using Base.Abstractions;
 using ModPlusAPI;
+using System;
+using System.Collections.Generic;
 
 /// <inheritdoc />
 public class ThickArrowDescriptor : ISmartEntityDescriptor

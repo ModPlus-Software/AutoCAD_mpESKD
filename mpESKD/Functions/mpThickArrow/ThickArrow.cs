@@ -19,10 +19,9 @@ using System.Collections.Generic;
 public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 {
     #region Entities
-    /// <summary>
-    /// Полка
-    /// </summary>
-    private Polyline _shelf;
+
+    /// <summary>Линия</summary>
+    private Polyline _line;
 
     /// <summary>
     /// Стрелка первая
@@ -62,27 +61,22 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
     /// <inheritdoc />
     /// В примитиве не используется!
-   // [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
-   // [SaveToXData]
     public override string TextStyle { get; set; }
 
-    #endregion 
-
+    #endregion
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => ShelfWidth * 20;
-
+    public override double MinDistanceBetweenPoints => LineWidth * 20;
 
     /// <summary> Количество стрелок</summary>
     [EntityProperty(PropertiesCategory.Geometry, 1, "p115", 1, 1, 2)]
     [SaveToXData]
     public int ArrowQuantity { get; set; } = 1;
 
-    /// <summary>Толщина полки</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p114", 0.5, 0.1, 5, nameSymbol: "t1")]
+    /// <summary>Толщина линии</summary>
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p114", 0.5, 0.1, 3.0, nameSymbol: "t1")]
     [SaveToXData]
-    public double ShelfWidth { get; set; } = 0.5;
-
+    public double LineWidth { get; set; } = 0.5;
 
     /// <summary>Длина стрелки</summary>
     [EntityProperty(PropertiesCategory.Geometry, 3, "p47", 5.0, 1.0, 10.0, nameSymbol: "e")]
@@ -90,10 +84,9 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     public double ArrowLength { get; set; } = 5.0;
 
     /// <summary>Толщина стрелки</summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p48", 1.5, 1.0, 3.0, nameSymbol: "t2")]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p48", 1.5, 0.5, 5.0, nameSymbol: "t2")]
     [SaveToXData]
     public double ArrowWidth { get; set; } = 1.5;
-
 
     /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
     public Point3d MiddlePoint => new Point3d(
@@ -110,7 +103,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
             {
                _firstArrow,
                _secondArrow,
-               _shelf,
+               _line,
             };
 
             foreach (var e in entities)
@@ -125,9 +118,8 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
-        yield return InsertionPoint; // TODO: посм. итераторы
+        yield return InsertionPoint;
         yield return EndPoint;
-        // TODO: Добавить 3ю точку?
     }
 
     /// <summary>
@@ -135,15 +127,13 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// </summary>
     public override void UpdateEntities()
     {
-        // TODO: разобрать по примеру mpView
         try
         {
-            // var scale = GetScale();
-            var scale = GetFullScale();
+            var scale = GetScale();
+
             if (EndPointOCS.Equals(Point3d.Origin))
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X + (MinDistanceBetweenPoints * scale),
                     InsertionPointOCS.Y, InsertionPointOCS.Z);
@@ -167,45 +157,43 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     {
         var normalVector = (endPoint - insertionPoint).GetNormal();
 
-        // Полная длина
         var fullLength = endPoint.DistanceTo(insertionPoint);
 
-        // Длина стрелки 
         var arrowLength = ArrowLength * scale;
 
         // Если места для стрелок достаточно
         if (arrowLength < (ArrowQuantity == 1 ? fullLength * 0.9 : fullLength / 2))
         {
-            // Длина полки
-            var shelfLength = fullLength - (ArrowQuantity == 1 ? arrowLength : 2 * arrowLength);
+            var lineLength = fullLength - (ArrowQuantity == 1 ? arrowLength : 2 * arrowLength);
 
-            // Ширина стрелки у основания
             var arrowWidth = ArrowWidth * scale;
 
-            // Точка конца полки
             var lineEndPoint = insertionPoint + (normalVector *
-                (ArrowQuantity == 1 ? shelfLength : shelfLength + arrowLength));
+                (ArrowQuantity == 1 ? lineLength : lineLength + arrowLength));
 
-            // Линия полки
-            _shelf = new Polyline(2);
+            // Чтобы толщина линии не превысила ширину основания стрелки
+            if (LineWidth > ArrowWidth)
+                LineWidth = ArrowWidth;
 
-            // 1я вершина полки
-            _shelf.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, ShelfWidth * scale, ShelfWidth * scale);
+            _line = new Polyline(2);
 
-            if (ArrowQuantity == 1) // Если стрелка одна
+            // Нужно присваивать null, иначе если в окне редактирования по двойному клику 
+            // количество стрелок с 2 изменить на 1, после нажатия "принять" вторая стрелка не удалится
+            _secondArrow = null;
+
+            _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+
+            if (ArrowQuantity == 1)
             {
-                // 2я вершина полки
-                _shelf.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, ShelfWidth * scale, ShelfWidth * scale);
+                _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
             }
-            else // Если стрелок две
+            else
             {
                 // Точка основания второй стрелки
                 var secondArrowPoint = insertionPoint + (normalVector * arrowLength);
 
-                // 2я вершина полки
-                _shelf.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, ShelfWidth * scale, ShelfWidth * scale);
+                _line.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
 
-                // Вторая стрелка
                 _secondArrow = new Polyline(2);
                 _secondArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
                 _secondArrow.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
@@ -216,19 +204,17 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
             _firstArrow.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
             _firstArrow.AddVertexAt(1, lineEndPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
         }
-        else // Если места для стрелок не хватает
+        else
         {
-            // Удаляется стрелка 1
             _firstArrow = null;
 
-            // Удаляется стрелка 2
             _secondArrow = null;
 
-            // На всю длину создается полка без стрелок
-            _shelf = new Polyline(2);
-            _shelf.AddVertexAt(0, (insertionPoint + (normalVector * fullLength)).ToPoint2d(),
-                0.0, ShelfWidth * scale, ShelfWidth * scale);
-            _shelf.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, ShelfWidth * scale, ShelfWidth * scale);
+            // На всю длину создается линия без стрелок
+            _line = new Polyline(2);
+            _line.AddVertexAt(0, (insertionPoint + (normalVector * fullLength)).ToPoint2d(),
+                0.0, LineWidth * scale, LineWidth * scale);
+            _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
         }
     }
 

@@ -24,7 +24,6 @@ public class ThickArrowGrip : SmartEntityGripData
     public ThickArrowGrip(ThickArrow thickArrow, GripName gripName)
     {
         ThickArrow = thickArrow;
-        //GripIndex = index;
         GripName = gripName;
         GripType = GripType.Point;
     }
@@ -32,7 +31,7 @@ public class ThickArrowGrip : SmartEntityGripData
     /// <summary>
     /// Экземпляр класса <see cref="mpThickArrow.ThickArrow"/>
     /// </summary>
-    public ThickArrow ThickArrow { get;  }
+    public ThickArrow ThickArrow { get; }
 
     /// <summary>
     /// Имя ручки
