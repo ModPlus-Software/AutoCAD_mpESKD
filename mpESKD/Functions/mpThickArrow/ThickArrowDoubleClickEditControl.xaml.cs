@@ -30,7 +30,7 @@ public partial class ThickArrowDoubleClickEditControl : IDoubleClickEditControl
 
         _thickArrow = thickArrow;
 
-        ArrowQuantityNumBox.Value = _thickArrow.ArrowQuantity;
+        ArrowQuantityNumBox.Value = _thickArrow.ArrowCount;
         ShelfWidthNumBox.Value = _thickArrow.LineWidth;
         ArrowLengthNumBox.Value = _thickArrow.ArrowLength;
         ArrowWidthNumBox.Value = _thickArrow.ArrowWidth;
@@ -40,7 +40,7 @@ public partial class ThickArrowDoubleClickEditControl : IDoubleClickEditControl
     /// <inheritdoc/>
     public void OnAccept()
     {
-        _thickArrow.ArrowQuantity = (int)(ArrowQuantityNumBox.Value!.Value);
+        _thickArrow.ArrowCount = (int)(ArrowQuantityNumBox.Value!.Value);
         _thickArrow.UpdateEntities();
 
         _thickArrow.LineWidth = ShelfWidthNumBox.Value!.Value < _thickArrow.ArrowWidth ? ShelfWidthNumBox.Value!.Value : _thickArrow.ArrowWidth;

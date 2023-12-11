@@ -75,7 +75,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 1, "p115", 1, 1, 2)]
     [SaveToXData]
-    public int ArrowQuantity { get; set; } = 1;
+    public int ArrowCount { get; set; } = 1;
 
     /// <summary>
     /// Толщина линии
@@ -174,14 +174,14 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         var arrowLength = ArrowLength * scale;
 
         // Если места для стрелок достаточно
-        if (arrowLength < (ArrowQuantity == 1 ? fullLength * 0.9 : fullLength / 2))
+        if (arrowLength < (ArrowCount == 1 ? fullLength * 0.9 : fullLength / 2))
         {
-            var lineLength = fullLength - (ArrowQuantity == 1 ? arrowLength : 2 * arrowLength);
+            var lineLength = fullLength - (ArrowCount == 1 ? arrowLength : 2 * arrowLength);
 
             var arrowWidth = ArrowWidth * scale;
 
             var lineEndPoint = insertionPoint + (normalVector *
-                (ArrowQuantity == 1 ? lineLength : lineLength + arrowLength));
+                (ArrowCount == 1 ? lineLength : lineLength + arrowLength));
 
             // Чтобы толщина линии не превысила ширину основания стрелки
             if (LineWidth > ArrowWidth)
@@ -195,7 +195,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
             _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
 
-            if (ArrowQuantity == 1)
+            if (ArrowCount == 1)
             {
                 _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
             }
