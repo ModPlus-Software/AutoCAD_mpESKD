@@ -20,7 +20,9 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 {
     #region Entities
 
-    /// <summary>Линия</summary>
+    /// <summary>
+    /// Линия
+    /// </summary>
     private Polyline _line;
 
     /// <summary>
@@ -68,27 +70,37 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => LineWidth * 20;
 
-    /// <summary> Количество стрелок</summary>
+    /// <summary> 
+    /// Количество стрелок
+    /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 1, "p115", 1, 1, 2)]
     [SaveToXData]
     public int ArrowQuantity { get; set; } = 1;
 
-    /// <summary>Толщина линии</summary>
+    /// <summary>
+    /// Толщина линии
+    /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 2, "p114", 0.5, 0.1, 3.0, nameSymbol: "t1")]
     [SaveToXData]
     public double LineWidth { get; set; } = 0.5;
 
-    /// <summary>Длина стрелки</summary>
+    /// <summary>
+    /// Длина стрелки
+    /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 3, "p47", 5.0, 1.0, 10.0, nameSymbol: "e")]
     [SaveToXData]
     public double ArrowLength { get; set; } = 5.0;
 
-    /// <summary>Толщина стрелки</summary>
+    /// <summary>
+    /// Толщина стрелки
+    /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 4, "p48", 1.5, 0.5, 5.0, nameSymbol: "t2")]
     [SaveToXData]
     public double ArrowWidth { get; set; } = 1.5;
 
-    /// <summary>Средняя точка. Нужна для перемещения  примитива</summary>
+    /// <summary>
+    /// Средняя точка. Нужна для перемещения примитива
+    /// </summary>
     public Point3d MiddlePoint => new Point3d(
         (InsertionPoint.X + EndPoint.X) / 2,
         (InsertionPoint.Y + EndPoint.Y) / 2,

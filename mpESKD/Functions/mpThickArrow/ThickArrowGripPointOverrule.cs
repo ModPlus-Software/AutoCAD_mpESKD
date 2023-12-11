@@ -8,7 +8,6 @@ using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
 
-
 /// <inheritdoc />
 public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickArrow.ThickArrow>
 {

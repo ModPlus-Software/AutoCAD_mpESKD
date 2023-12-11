@@ -64,7 +64,6 @@ public class ThickArrowFunction : ISmartEntityFunction
         CreateThickArrow(true);
     }
 
-
     private static void CreateThickArrow(bool isSimple)
     {
         SmartEntityUtils.SendStatistic<ThickArrow>();
@@ -154,7 +153,5 @@ public class ThickArrowFunction : ISmartEntityFunction
                 tr.Commit();
             }
         }
-
     }
-
 }
