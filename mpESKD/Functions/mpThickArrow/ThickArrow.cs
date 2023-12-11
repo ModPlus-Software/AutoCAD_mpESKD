@@ -165,6 +165,9 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
     private void CreateEntities(Point3d insertionPoint, Point3d endPoint, double scale)
     {
+        _firstArrow = null;
+        _secondArrow = null;
+
         var normalVector = (endPoint - insertionPoint).GetNormal();
 
         var fullLength = endPoint.DistanceTo(insertionPoint);
@@ -186,10 +189,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
                 LineWidth = ArrowWidth;
 
             _line = new Polyline(2);
-
-            // Нужно присваивать null, иначе если в окне редактирования по двойному клику 
-            // количество стрелок с 2 изменить на 1, после нажатия "принять" вторая стрелка не удалится
-            _secondArrow = null;
 
             _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
 
@@ -216,10 +215,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         }
         else
         {
-            _firstArrow = null;
-
-            _secondArrow = null;
-
             // На всю длину создается линия без стрелок
             _line = new Polyline(2);
             _line.AddVertexAt(0, (insertionPoint + (normalVector * fullLength)).ToPoint2d(),
