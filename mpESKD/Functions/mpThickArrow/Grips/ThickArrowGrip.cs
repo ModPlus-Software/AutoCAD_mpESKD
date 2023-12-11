@@ -20,6 +20,7 @@ public class ThickArrowGrip : SmartEntityGripData
     /// Initializes a new instance of the <see cref="ThickArrowGrip"/> class.
     /// </summary>
     /// <param name="thickArrow">Экземпляр класса <see cref="mpThickArrow.ThickArrow"/></param>
+    /// <param name="gripName">Название ручки из <see cref="Grips.mpGripName"/></param>
     public ThickArrowGrip(ThickArrow thickArrow, GripName gripName)
     {
         ThickArrow = thickArrow;
@@ -36,11 +37,6 @@ public class ThickArrowGrip : SmartEntityGripData
     /// Имя ручки
     /// </summary>
     public GripName GripName { get; }
-
-    /// <summary>
-    /// Индекс ручки
-    /// </summary>
-    public int GripIndex { get; }
 
     /// <inheritdoc />
     public override string GetTooltip()
