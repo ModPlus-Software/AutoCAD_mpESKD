@@ -78,15 +78,11 @@ public class ThickArrowFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<ThickArrow>();
 
             var style = StyleManager.GetCurrentStyle(typeof(ThickArrow));
-            /* не нужно - нет обозначений
-            var thickArrowLastLetterValue = string.Empty;
-            var thickArrowLastIntegerValue = string.Empty;*/
 
-            /* не нужно - нет обозначений
-             * FindLastViewValues(ref thickArrowLastLetterValue, ref thickArrowLastIntegerValue);*/
             var thickArrow = new ThickArrow();
 
             var blockReference = MainFunction.CreateBlock(thickArrow);
+
             thickArrow.ApplyStyle(style, true);
 
             InsertThickArrowWithJig(isSimple, thickArrow, blockReference);
