@@ -41,7 +41,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     public ThickArrow() { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="View"/> class.
+    /// Initializes a new instance of the <see cref="ThickArrow"/> class.
     /// </summary>
     /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
     public ThickArrow(ObjectId objectId)
