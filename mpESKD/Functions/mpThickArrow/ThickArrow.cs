@@ -156,8 +156,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
                 // Задание любой другой точки
                 CreateEntities(InsertionPointOCS, EndPointOCS, scale);
             }
-
-            //// Задание первой точки (точки вставки). Она же точка начала отсчета
         }
         catch (Exception exception)
         {
