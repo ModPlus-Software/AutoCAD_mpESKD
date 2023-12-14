@@ -21,10 +21,9 @@ public class ThickArrowGrip : SmartEntityGripData
     /// </summary>
     /// <param name="thickArrow">Экземпляр класса <see cref="mpThickArrow.ThickArrow"/></param>
     /// <param name="gripName">Название ручки из <see cref="Grips.mpGripName"/></param>
-    public ThickArrowGrip(ThickArrow thickArrow, GripName gripName)
+    public ThickArrowGrip(ThickArrow thickArrow)
     {
         ThickArrow = thickArrow;
-        GripName = gripName;
         GripType = GripType.Point;
     }
 
@@ -36,7 +35,7 @@ public class ThickArrowGrip : SmartEntityGripData
     /// <summary>
     /// Имя ручки
     /// </summary>
-    public GripName GripName { get; }
+    public GripName GripName { get; set; }
 
     /// <inheritdoc />
     public override string GetTooltip()
@@ -69,21 +68,8 @@ public class ThickArrowGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                if (GripName == GripName.StartGrip)
-                {
-                    _startGripTmp = GripPoint;
-                }
-
-                if (GripName == GripName.EndGrip)
-                {
-                    _endGripTmp = GripPoint;
-                }
-
-                if (GripName == GripName.MiddleGrip)
-                {
-                    _startGripTmp = ThickArrow.InsertionPoint;
-                    _endGripTmp = ThickArrow.EndPoint;
-                }
+                _startGripTmp = ThickArrow.InsertionPoint;
+                _endGripTmp = ThickArrow.EndPoint;
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -107,21 +93,8 @@ public class ThickArrowGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_startGripTmp != null & GripName == GripName.StartGrip)
-                {
-                    ThickArrow.InsertionPoint = GripPoint;
-                }
-
-                if (GripName == GripName.MiddleGrip & _startGripTmp != null & _endGripTmp != null)
-                {
-                    ThickArrow.InsertionPoint = _startGripTmp;
-                    ThickArrow.EndPoint = _endGripTmp;
-                }
-
-                if (_endGripTmp != null & GripName == GripName.EndGrip)
-                {
-                    ThickArrow.EndPoint = GripPoint;
-                }
+                ThickArrow.InsertionPoint = _startGripTmp;
+                ThickArrow.EndPoint = _endGripTmp;
             }
 
             base.OnGripStatusChanged(entityId, newStatus);

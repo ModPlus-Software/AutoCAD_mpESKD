@@ -7,10 +7,13 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
 public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickArrow.ThickArrow>
 {
+    private Point3d _initInsertionPoint;
+
     /// <inheritdoc />
     public override void GetGripPoints(
         Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
@@ -49,23 +52,27 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                 if (thickArrow != null)
                 {
                     // Получаем первую ручку (совпадает с точкой вставки блока)
-                    var gp = new ThickArrowGrip(thickArrow, GripName.StartGrip)
+                    var gp = new ThickArrowGrip(thickArrow)
                     {
-                        GripPoint = thickArrow.InsertionPoint
+                        GripName = GripName.StartGrip,
+                        GripPoint = thickArrow.InsertionPoint,
                     };
                     grips.Add(gp);
+                    _initInsertionPoint = thickArrow.InsertionPoint;
 
                     // получаем среднюю ручку
-                    gp = new ThickArrowGrip(thickArrow, GripName.MiddleGrip)
+                    gp = new ThickArrowGrip(thickArrow)
                     {
-                        GripPoint = thickArrow.MiddlePoint
+                        GripName = GripName.MiddleGrip,
+                        GripPoint = thickArrow.MiddlePoint,
                     };
                     grips.Add(gp);
 
                     // получаем конечную ручку
-                    gp = new ThickArrowGrip(thickArrow, GripName.EndGrip)
+                    gp = new ThickArrowGrip(thickArrow)
                     {
-                        GripPoint = thickArrow.EndPoint
+                        GripName = GripName.EndGrip,
+                        GripPoint = thickArrow.EndPoint,
                     };
                     grips.Add(gp);
                 }
@@ -89,34 +96,42 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                 // Проходим по коллекции ручек
                 foreach (var gripData in grips)
                 {
-                    if (gripData is ThickArrowGrip gripPoint)
+                    // Приводим ручку к моему классу
+                    var gripPoint = gripData as ThickArrowGrip;
+
+                    // Проверяем, что это та ручка, что мне нужна. 
+                    if (gripPoint != null)
                     {
+                        // Далее, в зависимости от имени ручки произвожу действия
                         var thickArrow = gripPoint.ThickArrow;
                         var scale = thickArrow.GetFullScale();
 
-                        // Далее, в зависимости от имени ручки произвожу действия
                         if (gripPoint.GripName == GripName.StartGrip)
                         {
                             // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                             // Все точки всегда совпадают (+ ручка)
                             var newPt = gripPoint.GripPoint + offset;
+
                             var length = thickArrow.EndPoint.DistanceTo(newPt);
 
-                            if (length < thickArrow.MinDistanceBetweenPoints * scale)
+                            var minDistance = thickArrow.MinDistanceBetweenPoints;
+
+                            if (length < minDistance * scale)
                             {
                                 /* Если новая точка получается на расстоянии меньше минимального, то
                                  * переносим ее в направлении между двумя точками на минимальное расстояние
                                  */
                                 var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                                     thickArrow.EndPoint, newPt, thickArrow.EndPoint,
-                                    thickArrow.MinDistanceBetweenPoints * scale);
+                                    minDistance * scale);
 
                                 if (thickArrow.EndPoint.Equals(newPt))
                                 {
                                     // Если точки совпали, то задаем минимальное значение
                                     tmpInsertionPoint = new Point3d(
-                                        thickArrow.EndPoint.X + (thickArrow.MinDistanceBetweenPoints * scale),
-                                        thickArrow.EndPoint.Y, thickArrow.EndPoint.Z);
+                                        thickArrow.EndPoint.X,
+                                        thickArrow.EndPoint.Y - (minDistance * scale),
+                                        thickArrow.EndPoint.Z);
                                 }
 
                                 ((BlockReference)entity).Position = tmpInsertionPoint;
@@ -125,7 +140,7 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                             else
                             {
                                 ((BlockReference)entity).Position = gripPoint.GripPoint + offset;
-                                thickArrow.InsertionPoint = gripPoint.GripPoint + offset;
+                                thickArrow.InsertionPoint = newPt;
                             }
                         }
 
@@ -141,17 +156,34 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                         if (gripPoint.GripName == GripName.EndGrip)
                         {
                             var newPt = gripPoint.GripPoint + offset;
-                            if (newPt.Equals(((BlockReference)entity).Position))
-                            {
-                                thickArrow.EndPoint = new Point3d(
-                                    ((BlockReference)entity).Position.X + (thickArrow.MinDistanceBetweenPoints * scale),
-                                    ((BlockReference)entity).Position.Y, ((BlockReference)entity).Position.Z);
-                            }
 
-                            // С конечной точкой все просто
+                            var length = thickArrow.InsertionPoint.DistanceTo(newPt);
+
+                            var minDistance = thickArrow.MinDistanceBetweenPoints;
+
+                            if (length < minDistance * scale)
+                            {
+                                /* Если новая точка получается на расстоянии меньше минимального, то
+                                 * переносим ее в направлении между двумя точками на минимальное расстояние
+                                 */
+                                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    thickArrow.InsertionPoint, newPt, thickArrow.InsertionPoint,
+                                    minDistance * scale);
+
+                                if (thickArrow.InsertionPoint.Equals(newPt))
+                                {
+                                    // Если точки совпали, то задаем минимальное значение
+                                    tmpEndPoint = new Point3d(
+                                        thickArrow.InsertionPoint.X,
+                                        thickArrow.InsertionPoint.Y - (minDistance * scale),
+                                        thickArrow.InsertionPoint.Z);
+                                }
+
+                                thickArrow.EndPoint = tmpEndPoint;
+                            }
                             else
                             {
-                                thickArrow.EndPoint = gripPoint.GripPoint + offset;
+                                thickArrow.EndPoint = newPt;
                             }
                         }
 

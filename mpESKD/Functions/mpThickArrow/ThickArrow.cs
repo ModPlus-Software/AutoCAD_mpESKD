@@ -68,14 +68,15 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     #endregion
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => LineWidth * 20;
+    public override double MinDistanceBetweenPoints => this.ArrowLength;
+
 
     /// <summary> 
     /// Количество стрелок
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p115", 1, 1, 2)]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p115", ThickArrowCount.First, descLocalKey: "d87")]
     [SaveToXData]
-    public int ArrowCount { get; set; } = 1;
+    public ThickArrowCount ArrowCount { get; set; } = ThickArrowCount.First;
 
     /// <summary>
     /// Толщина линии
@@ -141,6 +142,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     {
         try
         {
+            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
 
             if (EndPointOCS.Equals(Point3d.Origin))
@@ -167,22 +169,46 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     {
         _firstArrow = null;
         _secondArrow = null;
+        _line = null;
+
+        // мин. длина
+        var minDistance = ArrowCount == ThickArrowCount.Both ? MinDistanceBetweenPoints * scale * 2 :
+            MinDistanceBetweenPoints * scale;
 
         var normalVector = (endPoint - insertionPoint).GetNormal();
-
         var fullLength = endPoint.DistanceTo(insertionPoint);
 
         var arrowLength = ArrowLength * scale;
+        var arrowWidth = ArrowWidth * scale;
 
         // Если места для стрелок достаточно
-        if (arrowLength < (ArrowCount == 1 ? fullLength * 0.9 : fullLength / 2))
+        if (fullLength > minDistance)
         {
-            var lineLength = fullLength - (ArrowCount == 1 ? arrowLength : 2 * arrowLength);
+            double lineLength;
+            Point3d lineEndPoint;
 
-            var arrowWidth = ArrowWidth * scale;
+            // Точка основания второй стрелки
+            var secondArrowPoint = insertionPoint + (normalVector * arrowLength);
 
-            var lineEndPoint = insertionPoint + (normalVector *
-                (ArrowCount == 1 ? lineLength : lineLength + arrowLength));
+            switch (ArrowCount)
+            {
+                case ThickArrowCount.Both:
+                    lineLength = fullLength - (arrowLength * 2);
+                    lineEndPoint = insertionPoint + (normalVector * (lineLength + arrowLength));
+                    break;
+                case ThickArrowCount.First:
+                    lineLength = fullLength - arrowLength;
+                    lineEndPoint = insertionPoint + (normalVector * lineLength);
+                    break;
+                case ThickArrowCount.Second:
+                    lineLength = fullLength - arrowLength;
+                    lineEndPoint = secondArrowPoint + (normalVector * lineLength);
+                    break;
+                default: // Both
+                    lineLength = fullLength - arrowLength;
+                    lineEndPoint = insertionPoint + (normalVector * lineLength);
+                    break;
+            }
 
             // Чтобы толщина линии не превысила ширину основания стрелки
             if (LineWidth > ArrowWidth)
@@ -192,35 +218,76 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
 
             _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
 
-            if (ArrowCount == 1)
-            {
+            if (ArrowCount == ThickArrowCount.First)
                 _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
-            }
-            else
-            {
-                // Точка основания второй стрелки
-                var secondArrowPoint = insertionPoint + (normalVector * arrowLength);
 
+            if (ArrowCount == ThickArrowCount.Second)
                 _line.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+
+            if (ArrowCount == ThickArrowCount.Both)
+                _line.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+
+
+            // Стрелки
+            if (ArrowCount == ThickArrowCount.First)
+            {
+                _firstArrow = new Polyline(2);
+                _firstArrow.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
+                _firstArrow.AddVertexAt(1, lineEndPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
+            }
+
+            if (ArrowCount == ThickArrowCount.Second)
+            {
+                _secondArrow = new Polyline(2);
+                _secondArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
+                _secondArrow.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
+            }
+
+            if (ArrowCount == ThickArrowCount.Both)
+            {
+                _firstArrow = new Polyline(2);
+                _firstArrow.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
+                _firstArrow.AddVertexAt(1, lineEndPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
 
                 _secondArrow = new Polyline(2);
                 _secondArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
                 _secondArrow.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
             }
 
-            // Одна стрелка создается всегда
-            _firstArrow = new Polyline(2);
-            _firstArrow.AddVertexAt(0, endPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
-            _firstArrow.AddVertexAt(1, lineEndPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
         }
         else
         {
-            // На всю длину создается линия без стрелок
-            _line = new Polyline(2);
-            _line.AddVertexAt(0, (insertionPoint + (normalVector * fullLength)).ToPoint2d(),
-                0.0, LineWidth * scale, LineWidth * scale);
-            _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+            if (ArrowCount != ThickArrowCount.Both)
+            {
+                // Задана одна стрелка, но общая длина при пом. ручки указана меньше, чем длина стрелки.
+                // Строится одна стрелка 
+                var endPointMin = insertionPoint + (normalVector * arrowLength);
+
+                if (ArrowCount == ThickArrowCount.First)
+                {
+                    _firstArrow = new Polyline(2);
+                    _firstArrow.AddVertexAt(0, endPointMin.ToPoint2d(), 0.0, 0.0, arrowWidth);
+                    _firstArrow.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
+                }
+
+                if (ArrowCount == ThickArrowCount.Second)
+                {
+                    _firstArrow = new Polyline(2);
+                    _firstArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
+                    _firstArrow.AddVertexAt(1, endPointMin.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
+                }
+            }
+            else
+            {
+                // Заданы обе стрелки, но общая длина при пом. ручки указана меньше, чем удвоенная длина стрелки.
+                // Строится линия без стрелок, т.к. пользователь должен иметь возможность
+                // устанавливать длину меньше допустимой 
+                var lineEndPoint = insertionPoint + (normalVector * fullLength);
+
+                _line = new Polyline(2);
+                _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+                _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+            }
         }
     }
-
 }
