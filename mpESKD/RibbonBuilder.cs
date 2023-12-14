@@ -25,6 +25,7 @@ using Functions.mpWeldJoint;
 using ModPlus.Helpers;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using Functions.mpThickArrow;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 /// <summary>
@@ -305,6 +306,9 @@ public class RibbonBuilder
 
         // mpFragmentMarker
         ribRowPanel.Items.Add(GetBigButton(GetDescriptor<FragmentMarker>()));
+
+        // mpThickArrow
+        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<ThickArrow>()));
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }

@@ -208,8 +208,10 @@
 		<Resource Include="Functions\mpSection\Icons\mpSectionFromPolyline_32x32_dark.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSection_32x32.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSection_32x32_dark.png" />
-		<Resource Include="Functions\mpThickArrow\Icons\mpView_16x16.png" />
-		<Resource Include="Functions\mpThickArrow\Icons\mpView_16x16_dark.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpThickArrow_16x16.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpThickArrow_16x16_dark.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpThickArrow_32x32.png" />
+		<Resource Include="Functions\mpThickArrow\Icons\mpThickArrow_32x32_dark.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpSectionLabel_16x16_dark.png" />
 		<Resource Include="Functions\mpViewLabel\Icons\mpViewLabel_16x16.png" />
