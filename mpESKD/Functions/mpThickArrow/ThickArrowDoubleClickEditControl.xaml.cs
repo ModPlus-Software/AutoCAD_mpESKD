@@ -42,8 +42,12 @@ public partial class ThickArrowDoubleClickEditControl : IDoubleClickEditControl
     {
         _thickArrow.ArrowCount = (ThickArrowCount)CbArrowCount.SelectedItem;
 
-        _thickArrow.LineWidth = ShelfWidthNumBox.Value!.Value < _thickArrow.ArrowWidth ? ShelfWidthNumBox.Value!.Value : _thickArrow.ArrowWidth;
-        _thickArrow.ArrowLength=ArrowLengthNumBox.Value!.Value; 
-        _thickArrow.ArrowWidth= ArrowWidthNumBox.Value!.Value > _thickArrow.LineWidth ? ArrowWidthNumBox.Value!.Value : _thickArrow.LineWidth;
+        _thickArrow.LineWidth = ShelfWidthNumBox.Value!.Value < _thickArrow.ArrowWidth ? 
+            ShelfWidthNumBox.Value!.Value : _thickArrow.ArrowWidth;
+
+        _thickArrow.ArrowLength = ArrowLengthNumBox.Value!.Value;
+
+        _thickArrow.ArrowWidth = ArrowWidthNumBox.Value!.Value > _thickArrow.LineWidth ? 
+            ArrowWidthNumBox.Value!.Value : _thickArrow.LineWidth;
     }
 }

@@ -70,7 +70,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// <inheritdoc />
     public override double MinDistanceBetweenPoints => this.ArrowLength;
 
-
     /// <summary> 
     /// Количество стрелок
     /// </summary>
@@ -171,7 +170,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         _secondArrow = null;
         _line = null;
 
-        // мин. длина
+        // Минимальная длина для создания стрелок
         var minDistance = ArrowCount == ThickArrowCount.Both ? MinDistanceBetweenPoints * scale * 2 :
             MinDistanceBetweenPoints * scale;
 
@@ -182,7 +181,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
         var arrowWidth = ArrowWidth * scale;
 
         // Если места для стрелок достаточно
-        if (fullLength > minDistance)
+        if (fullLength >= minDistance)
         {
             double lineLength;
             Point3d lineEndPoint;
@@ -227,7 +226,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
             if (ArrowCount == ThickArrowCount.Both)
                 _line.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
 
-
             // Стрелки
             if (ArrowCount == ThickArrowCount.First)
             {
@@ -253,41 +251,14 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
                 _secondArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
                 _secondArrow.AddVertexAt(1, secondArrowPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
             }
-
         }
         else
         {
-            if (ArrowCount != ThickArrowCount.Both)
-            {
-                // Задана одна стрелка, но общая длина при пом. ручки указана меньше, чем длина стрелки.
-                // Строится одна стрелка 
-                var endPointMin = insertionPoint + (normalVector * arrowLength);
+            var lineEndPoint = insertionPoint + (normalVector * fullLength);
 
-                if (ArrowCount == ThickArrowCount.First)
-                {
-                    _firstArrow = new Polyline(2);
-                    _firstArrow.AddVertexAt(0, endPointMin.ToPoint2d(), 0.0, 0.0, arrowWidth);
-                    _firstArrow.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
-                }
-
-                if (ArrowCount == ThickArrowCount.Second)
-                {
-                    _firstArrow = new Polyline(2);
-                    _firstArrow.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, arrowWidth);
-                    _firstArrow.AddVertexAt(1, endPointMin.ToPoint2d(), 0.0, arrowWidth, arrowWidth);
-                }
-            }
-            else
-            {
-                // Заданы обе стрелки, но общая длина при пом. ручки указана меньше, чем удвоенная длина стрелки.
-                // Строится линия без стрелок, т.к. пользователь должен иметь возможность
-                // устанавливать длину меньше допустимой 
-                var lineEndPoint = insertionPoint + (normalVector * fullLength);
-
-                _line = new Polyline(2);
-                _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
-                _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
-            }
+            _line = new Polyline(2);
+            _line.AddVertexAt(0, lineEndPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
+            _line.AddVertexAt(1, insertionPoint.ToPoint2d(), 0.0, LineWidth * scale, LineWidth * scale);
         }
     }
 }

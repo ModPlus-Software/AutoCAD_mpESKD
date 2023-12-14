@@ -1,4 +1,5 @@
 ﻿namespace mpESKD.Functions.mpThickArrow;
+
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -37,11 +38,9 @@ public class ThickArrowFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<ThickArrow>();
 
             var thickArrow = new ThickArrow();
-
             var blockReference = MainFunction.CreateBlock(thickArrow);
 
             thickArrow.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
-
             InsertThickArrowWithJig(true, thickArrow, blockReference);
 
         }
@@ -78,13 +77,10 @@ public class ThickArrowFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<ThickArrow>();
 
             var style = StyleManager.GetCurrentStyle(typeof(ThickArrow));
-
             var thickArrow = new ThickArrow();
-
             var blockReference = MainFunction.CreateBlock(thickArrow);
 
             thickArrow.ApplyStyle(style, true);
-
             InsertThickArrowWithJig(isSimple, thickArrow, blockReference);
         }
         catch (System.Exception exception)
