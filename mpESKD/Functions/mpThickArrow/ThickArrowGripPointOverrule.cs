@@ -12,8 +12,6 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 /// <inheritdoc />
 public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickArrow.ThickArrow>
 {
-    private Point3d _initInsertionPoint;
-
     /// <inheritdoc />
     public override void GetGripPoints(
         Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
@@ -58,7 +56,6 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                         GripPoint = thickArrow.InsertionPoint,
                     };
                     grips.Add(gp);
-                    _initInsertionPoint = thickArrow.InsertionPoint;
 
                     // получаем среднюю ручку
                     gp = new ThickArrowGrip(thickArrow)

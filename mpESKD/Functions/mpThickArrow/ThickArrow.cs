@@ -40,7 +40,9 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// <summary>
     /// Initializes a new instance of the <see cref="ThickArrow"/> class.
     /// </summary>
-    public ThickArrow() { }
+    public ThickArrow() 
+    { 
+    }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ThickArrow"/> class.
@@ -101,7 +103,7 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     /// <summary>
     /// Средняя точка. Нужна для перемещения примитива
     /// </summary>
-    public Point3d MiddlePoint => new Point3d(
+    public Point3d MiddlePoint => new (
         (InsertionPoint.X + EndPoint.X) / 2,
         (InsertionPoint.Y + EndPoint.Y) / 2,
         (InsertionPoint.Z + EndPoint.Z) / 2);
@@ -141,7 +143,6 @@ public class ThickArrow : SmartEntity, IWithDoubleClickEditor
     {
         try
         {
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
 
             if (EndPointOCS.Equals(Point3d.Origin))

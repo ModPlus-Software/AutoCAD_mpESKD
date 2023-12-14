@@ -42,7 +42,6 @@ public class ThickArrowFunction : ISmartEntityFunction
 
             thickArrow.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
             InsertThickArrowWithJig(true, thickArrow, blockReference);
-
         }
         catch (System.Exception exception)
         {
