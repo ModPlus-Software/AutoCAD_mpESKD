@@ -50,25 +50,22 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                 if (thickArrow != null)
                 {
                     // Получаем первую ручку (совпадает с точкой вставки блока)
-                    var gp = new ThickArrowGrip(thickArrow)
+                    var gp = new ThickArrowGrip(thickArrow, GripName.StartGrip)
                     {
-                        GripName = GripName.StartGrip,
                         GripPoint = thickArrow.InsertionPoint,
                     };
                     grips.Add(gp);
 
                     // получаем среднюю ручку
-                    gp = new ThickArrowGrip(thickArrow)
+                    gp = new ThickArrowGrip(thickArrow, GripName.MiddleGrip)
                     {
-                        GripName = GripName.MiddleGrip,
                         GripPoint = thickArrow.MiddlePoint,
                     };
                     grips.Add(gp);
 
                     // получаем конечную ручку
-                    gp = new ThickArrowGrip(thickArrow)
+                    gp = new ThickArrowGrip(thickArrow, GripName.EndGrip)
                     {
-                        GripName = GripName.EndGrip,
                         GripPoint = thickArrow.EndPoint,
                     };
                     grips.Add(gp);
@@ -103,29 +100,29 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                         var thickArrow = gripPoint.ThickArrow;
                         var scale = thickArrow.GetFullScale();
 
+                        var minDistance = thickArrow.MinDistanceBetweenPoints * scale;
+
                         if (gripPoint.GripName == GripName.StartGrip)
                         {
                             // Переношу точку вставки блока, и точку, описывающую первую точку в примитиве
                             // Все точки всегда совпадают (+ ручка)
                             var newPt = gripPoint.GripPoint + offset;
                             var length = thickArrow.EndPoint.DistanceTo(newPt);
-                            var minDistance = thickArrow.MinDistanceBetweenPoints;
 
-                            if (length < minDistance * scale)
+                            if (length < minDistance)
                             {
                                 /* Если новая точка получается на расстоянии меньше минимального, то
                                  * переносим ее в направлении между двумя точками на минимальное расстояние
                                  */
                                 var tmpInsertionPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                    thickArrow.EndPoint, newPt, thickArrow.EndPoint,
-                                    length);
+                                    thickArrow.EndPoint, newPt, thickArrow.EndPoint, minDistance);
 
                                 if (thickArrow.EndPoint.Equals(newPt))
                                 {
                                     // Если точки совпали, то задаем минимальное значение
                                     tmpInsertionPoint = new Point3d(
                                         thickArrow.EndPoint.X,
-                                        thickArrow.EndPoint.Y - (minDistance * scale / 10),
+                                        thickArrow.EndPoint.Y - minDistance, 
                                         thickArrow.EndPoint.Z);
                                 }
 
@@ -152,23 +149,22 @@ public class ThickArrowGripPointOverrule : BaseSmartEntityGripOverrule<mpThickAr
                         {
                             var newPt = gripPoint.GripPoint + offset;
                             var length = thickArrow.InsertionPoint.DistanceTo(newPt);
-                            var minDistance = thickArrow.MinDistanceBetweenPoints;
 
-                            if (length < minDistance * scale)
+                            if (length < minDistance)
                             {
                                 /* Если новая точка получается на расстоянии меньше минимального, то
                                  * переносим ее в направлении между двумя точками на минимальное расстояние
                                  */
                                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
                                     thickArrow.InsertionPoint, newPt, thickArrow.InsertionPoint,
-                                    length);
-
+                                    minDistance);
+                                
                                 if (thickArrow.InsertionPoint.Equals(newPt))
                                 {
                                     // Если точки совпали, то задаем минимальное значение
                                     tmpEndPoint = new Point3d(
                                         thickArrow.InsertionPoint.X,
-                                        thickArrow.InsertionPoint.Y - (minDistance * scale / 10),
+                                        thickArrow.InsertionPoint.Y - minDistance,
                                         thickArrow.InsertionPoint.Z);
                                 }
 

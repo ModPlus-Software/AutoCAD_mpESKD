@@ -9,8 +9,6 @@ using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
-using ThickArrow = mpThickArrow.ThickArrow;
-
 /// <summary>
 /// Ручка вершин
 /// </summary>
@@ -20,11 +18,12 @@ public class ThickArrowGrip : SmartEntityGripData
     /// Initializes a new instance of the <see cref="ThickArrowGrip"/> class.
     /// </summary>
     /// <param name="thickArrow">Экземпляр класса <see cref="mpThickArrow.ThickArrow"/></param>
-    /// <param name="gripName">Название ручки из <see cref="Grips.mpGripName"/></param>
-    public ThickArrowGrip(ThickArrow thickArrow)
+    /// <param name="gripName">Название ручки из <see cref="GripName"/></param>
+    public ThickArrowGrip(ThickArrow thickArrow, GripName gripName)
     {
         ThickArrow = thickArrow;
         GripType = GripType.Point;
+        GripName = gripName;    
     }
 
     /// <summary>
@@ -35,7 +34,7 @@ public class ThickArrowGrip : SmartEntityGripData
     /// <summary>
     /// Имя ручки
     /// </summary>
-    public GripName GripName { get; set; }
+    public GripName GripName { get;  }
 
     /// <inheritdoc />
     public override string GetTooltip()
