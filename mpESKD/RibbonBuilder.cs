@@ -328,7 +328,7 @@ public class RibbonBuilder
                 _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntities_32x32_dark.png",
-                Language.GetItem("tab13"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                Language.GetItem("tab13"), Orientation.Vertical, string.Empty, string.Empty, "autocadplugins/mpeskd"));
 
         // Search by values
         ribRowPanel.Items.Add(
@@ -338,7 +338,7 @@ public class RibbonBuilder
                 _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/SearchEntitiesByValues_32x32_dark.png",
-                Language.GetItem("tab14"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                Language.GetItem("tab14"), Orientation.Vertical, string.Empty, string.Empty, "autocadplugins/mpeskd"));
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }
@@ -360,7 +360,7 @@ public class RibbonBuilder
                 _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/StyleEditor_32x32_dark.png",
-                Language.GetItem("tab5"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                Language.GetItem("tab5"), Orientation.Vertical, string.Empty, string.Empty, "autocadplugins/mpeskd"));
         ribRowPanel.Items.Add(
             RibbonHelpers.AddBigButton(
                 "mpPropertiesPalette",
@@ -368,7 +368,7 @@ public class RibbonBuilder
                 _colorTheme == 1 // 1 - light
                     ? $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32.png"
                     : $"pack://application:,,,/mpESKD_{ModPlusConnector.Instance.AvailProductExternalVersion};component/Resources/Properties_32x32_dark.png",
-                Language.GetItem("tab7"), Orientation.Vertical, string.Empty, string.Empty, "help/mpeskd"));
+                Language.GetItem("tab7"), Orientation.Vertical, string.Empty, string.Empty, "autocadplugins/mpeskd"));
         ribSourcePanel.Items.Add(ribRowPanel);
     }
 
@@ -459,7 +459,7 @@ public class RibbonBuilder
             orientation,
             descriptor.FullDescription,
             GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
-            "help/mpeskd");
+            "autocadplugins/mpeskd");
     }
 
     /// <summary>
@@ -477,7 +477,7 @@ public class RibbonBuilder
             orientation,
             descriptor.FullDescription,
             GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
-            "help/mpeskd");
+            "autocadplugins/mpeskd");
     }
 
     /// <summary>
@@ -493,7 +493,7 @@ public class RibbonBuilder
             descriptor.Description,
             descriptor.FullDescription,
             GetHelpImageForFunction(descriptor.Name, descriptor.ToolTipHelpImage),
-            "help/mpeskd");
+            "autocadplugins/mpeskd");
     }
 
     /// <summary>
@@ -510,7 +510,7 @@ public class RibbonBuilder
             descriptor.SubDescriptions[subFunctionIndex],
             descriptor.SubFullDescriptions[subFunctionIndex],
             GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[subFunctionIndex]),
-            "help/mpeskd");
+            "autocadplugins/mpeskd");
     }
 
     /// <summary>
@@ -536,7 +536,7 @@ public class RibbonBuilder
                 orientation,
                 descriptor.SubFullDescriptions[i],
                 GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i]),
-                "help/mpeskd"));
+                "autocadplugins/mpeskd"));
         }
 
         return buttons;
@@ -563,7 +563,7 @@ public class RibbonBuilder
                 orientation,
                 descriptor.SubFullDescriptions[i],
                 GetHelpImageForFunction(descriptor.Name, descriptor.SubHelpImages[i]),
-                "help/mpeskd"));
+                "autocadplugins/mpeskd"));
         }
 
         return buttons;

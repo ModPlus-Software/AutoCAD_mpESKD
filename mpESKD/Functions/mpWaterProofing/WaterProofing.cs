@@ -64,7 +64,7 @@ public class WaterProofing : SmartLinearEntity
     }
 
     /// <inheritdoc />
-    public override double MinDistanceBetweenPoints => 20.0;
+    public override double MinDistanceBetweenPoints => 2.0;
 
     /// <summary>
     /// Отступ первого штриха в каждом сегменте полилинии

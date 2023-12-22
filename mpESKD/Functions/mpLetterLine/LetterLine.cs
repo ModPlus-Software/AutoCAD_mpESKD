@@ -62,7 +62,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     }
 
     /// <inheritdoc/>
-    public override double MinDistanceBetweenPoints => 10.0;
+    public override double MinDistanceBetweenPoints => 2.0;
 
     /// <inheritdoc />
     [EntityProperty(PropertiesCategory.General, 2, "p35", "Continuous", descLocalKey: "d35")]
