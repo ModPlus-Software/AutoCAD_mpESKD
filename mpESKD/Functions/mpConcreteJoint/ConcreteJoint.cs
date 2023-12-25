@@ -15,8 +15,8 @@ using mpESKD.Functions.mpGroundLine;
 /// <summary>
 /// Шов бетонирования
 /// </summary>
-[SmartEntityDisplayNameKey("h73")]
-[SystemStyleDescriptionKey("h78")]
+[SmartEntityDisplayNameKey("h191")]
+[SystemStyleDescriptionKey("h196")]
 public class ConcreteJoint : SmartLinearEntity
 {
     /// <summary>
