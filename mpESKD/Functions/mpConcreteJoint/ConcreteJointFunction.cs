@@ -9,7 +9,7 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI.Windows;
 
-
+/// <inheritdoc />
 public class ConcreteJointFunction : ISmartEntityFunction
 {
     /// <inheritdoc />
@@ -35,12 +35,12 @@ public class ConcreteJointFunction : ISmartEntityFunction
              */
             ExtendedDataUtils.AddRegAppTableRecord<ConcreteJoint>();
 
-            var groundLine = new ConcreteJoint();
-            var blockReference = MainFunction.CreateBlock(groundLine);
+            var concreteJoint = new ConcreteJoint();
+            var blockReference = MainFunction.CreateBlock(concreteJoint);
 
-            groundLine.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+            concreteJoint.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-            LinearEntityUtils.InsertWithJig(groundLine, blockReference);
+            LinearEntityUtils.InsertWithJig(concreteJoint, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -56,11 +56,28 @@ public class ConcreteJointFunction : ISmartEntityFunction
     /// Команда создания шва бетонирования
     /// </summary>
     [CommandMethod("ModPlus", "mpConcreteJoint", CommandFlags.Modal)]
-    public void CreateGroundLineCommand()
+    public void CreateConcreteJointCommand()
     {
         SmartEntityUtils.SendStatistic<ConcreteJoint>();
 
         CreateConcreteJoint();
+    }
+
+    /// <summary>
+    /// Команда создания шва бетонирования из полилинии
+    /// </summary>
+    [CommandMethod("ModPlus", "mpConcreteJointFromPolyline", CommandFlags.Modal)]
+    public void CreateGroundLineFromPolylineCommand()
+    {
+        SmartEntityUtils.SendStatistic<ConcreteJoint>();
+
+        /* Регистрация ЕСКД приложения должна запускаться при запуске
+         * функции, т.к. регистрация происходит в текущем документе
+         * При инициализации плагина регистрации нет!
+         */
+        ExtendedDataUtils.AddRegAppTableRecord<ConcreteJoint>();
+
+        LinearEntityUtils.CreateFromPolyline<ConcreteJoint>();
     }
 
     private void CreateConcreteJoint()

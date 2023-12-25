@@ -53,10 +53,19 @@ public class ConcreteJoint : SmartLinearEntity
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 20.0;
-    public override string LineType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public override double LineTypeScale { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-    public override string TextStyle { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+    /// <inheritdoc />
+    [EntityProperty(PropertiesCategory.General, 4, "p35", "Continuous", descLocalKey: "d35")]
+    public override string LineType { get; set; }
+
+    /// <inheritdoc />
+    [EntityProperty(PropertiesCategory.General, 5, "p6", 1.0, 0.0, 1.0000E+99, descLocalKey: "d6")]
+    public override double LineTypeScale { get; set; }
+
+
+    /// <inheritdoc />
+    /// Не используется!
+    public override string TextStyle { get; set; }
     #endregion
 
 
@@ -121,6 +130,14 @@ public class ConcreteJoint : SmartLinearEntity
                InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
+            else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
+            {
+                // Задание второй точки - случай когда расстояние между точками меньше минимального
+                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+            }
             else
             {
                 // Задание любой другой точки
@@ -138,7 +155,7 @@ public class ConcreteJoint : SmartLinearEntity
 
     private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
     {
-        /*
+        
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
         _mainPolyline = new Polyline(points.Count);
         SetImmutablePropertiesToNestedEntity(_mainPolyline);
@@ -146,7 +163,7 @@ public class ConcreteJoint : SmartLinearEntity
         {
             _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
         }
-
+        /*
         // create strokes
         _strokes.Clear();
         if (_mainPolyline.Length >= MinDistanceBetweenPoints * scale)
@@ -155,17 +172,36 @@ public class ConcreteJoint : SmartLinearEntity
             {
                 var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
                 var currentPoint = _mainPolyline.GetPoint3dAt(i);
-                _strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
+                //_strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
+                _strokes.AddRange(new List<Line> {
+                    new Line(currentPoint, previousPoint)
+                });
             }
         }*/
 
+        /*
         _mainPolyline= new Polyline();
 
         _mainPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, 0.0);
         _mainPolyline.AddVertexAt(1, endPoint.ToPoint2d(), 0.0, 0.0, 0.0);
-
+        */
 
     }
+
+
+
+    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
+    {
+        // ReSharper disable once UseObjectOrCollectionInitializer
+        var points = new Point2dCollection();
+
+        points.Add(insertionPoint.ToPoint2d());
+        middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
+        points.Add(endPoint.ToPoint2d());
+
+        return points;
+    }
+
 
 
 
