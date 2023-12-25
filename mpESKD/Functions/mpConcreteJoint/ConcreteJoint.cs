@@ -1,16 +1,14 @@
 ﻿namespace mpESKD.Functions.mpConcreteJoint;
 
-using System;
-using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
-using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpGroundLine;
+using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Шов бетонирования
@@ -22,7 +20,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Initializes a new instance of the <see cref="ConcreteJoint"/> class.
     /// </summary>
-    public ConcreteJoint() 
+    public ConcreteJoint()
     {
     }
 
@@ -30,8 +28,8 @@ public class ConcreteJoint : SmartLinearEntity
     /// Initializes a new instance of the <see cref="ConcreteJoint"/> class.
     /// </summary>
     /// <param name="objectId">ObjectId анонимного блока, представляющего интеллектуальный объект</param>
-    public ConcreteJoint(ObjectId objectId) 
-        : base(objectId) 
+    public ConcreteJoint(ObjectId objectId)
+        : base(objectId)
     {
     }
 
@@ -62,13 +60,28 @@ public class ConcreteJoint : SmartLinearEntity
     [EntityProperty(PropertiesCategory.General, 5, "p6", 1.0, 0.0, 1.0000E+99, descLocalKey: "d6")]
     public override double LineTypeScale { get; set; }
 
-
     /// <inheritdoc />
     /// Не используется!
     public override string TextStyle { get; set; }
+
+    /// <summary>
+    /// Ширина излома
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 5, 1, 20, nameSymbol: "w")]
+    [SaveToXData]
+    public double BreakWidth { get; set; } = 5;
+
+    /// <summary>
+    /// Высота излома
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 5, 1, 20, nameSymbol: "h")]
+    [SaveToXData]
+    public double BreakHeight { get; set; } = 5;
+
+
     #endregion
 
-
+    //private Logger _logger = new Logger(@"g:\Prog\AutoCAD API\Projects\ModPlus\ConcreteJoint\ConcreteJoint.log");
 
 
 
@@ -78,12 +91,15 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Главная полилиния примитива
     /// </summary>
-    private Polyline _mainPolyline;
+    //private Polyline _mainPolyline;
 
     /// <summary>
     /// Список штрихов
     /// </summary>
-    private readonly List<Line> _strokes = new List<Line>();
+   // private readonly List<Line> _strokes = new List<Line>();
+
+    private List<Line> _lines = new List<Line>();
+
 
 
 
@@ -92,15 +108,16 @@ public class ConcreteJoint : SmartLinearEntity
         get
         {
             var entities = new List<Entity>();
-            entities.AddRange(_strokes);
+            entities.AddRange(_lines);
             foreach (var e in entities)
             {
-                SetImmutablePropertiesToNestedEntity(e);
+                //SetImmutablePropertiesToNestedEntity(e);
+                SetChangeablePropertiesToNestedEntity(e);
             }
 
-            SetChangeablePropertiesToNestedEntity(_mainPolyline);
+            //SetChangeablePropertiesToNestedEntity(_mainPolyline);
 
-            entities.Add(_mainPolyline);
+            //entities.Add(_mainPolyline);
 
             return entities;
         }
@@ -119,25 +136,28 @@ public class ConcreteJoint : SmartLinearEntity
 
     public override void UpdateEntities()
     {
+        //_logger.WriteToLogFile("UpdateEntities! start");
         try
         {
             var length = EndPointOCS.DistanceTo(InsertionPointOCS);
+            //_logger.WriteToLogFile($"UpdateEntities! length: {length}");
+
             var scale = GetScale();
             if (EndPointOCS.Equals(Point3d.Origin))
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                var tmpEndPoint = new Point3d(
-               InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                /* var tmpEndPoint = new Point3d(
+                InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);*/
             }
-            else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
-            {
-                // Задание второй точки - случай когда расстояние между точками меньше минимального
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-            }
+             else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
+             {
+                 // Задание второй точки - случай когда расстояние между точками меньше минимального
+                 var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                 InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
+                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                 EndPoint = tmpEndPoint.TransformBy(BlockTransform);
+             }
             else
             {
                 // Задание любой другой точки
@@ -155,36 +175,102 @@ public class ConcreteJoint : SmartLinearEntity
 
     private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
     {
-        
+
+        _lines.Clear();
+
+        // _logger.WriteToLogFile($"CreateEntities! start");
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
-        _mainPolyline = new Polyline(points.Count);
-        SetImmutablePropertiesToNestedEntity(_mainPolyline);
+
+        //int ii = 1;
+        //foreach (var point in points)
+        //{
+
+        //    _logger.WriteToLogFile($"CreateEntities! point {ii}: {point}; ");
+        //    ii++;
+        //}
+
+        //_mainPolyline = new Polyline(points.Count);
+
+        // SetImmutablePropertiesToNestedEntity(_mainPolyline);
+
+        // для каждой пары точек из points
         for (var i = 0; i < points.Count; i++)
         {
-            _mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+            //_mainPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+            if (i + 1 < points.Count)
+                CreateBreakBlocksBetween2Points(points[i], points[i + 1], scale);
         }
-        /*
-        // create strokes
-        _strokes.Clear();
-        if (_mainPolyline.Length >= MinDistanceBetweenPoints * scale)
+
+
+        foreach (var e in _lines)
         {
-            for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
+            SetChangeablePropertiesToNestedEntity(e);
+        }
+
+    }
+
+
+    // рисую нужное количество изломов между 2 точками
+    private void CreateBreakBlocksBetween2Points(Point2d point1, Point2d point2, double scale)
+    {
+        // длина отрезка между точками
+        var length = point1.GetDistanceTo(point2);
+
+        // количество целых изломов
+        int breakBlocksCount = (int)(length / BreakWidth / scale);
+
+        // хвостик
+        double remnant = length % BreakWidth;
+
+        var normalVector = (point2 - point1).GetNormal();
+        // var secondArrowPoint = insertionPoint + (normalVector * arrowLength);
+
+        // массив крайних точек изломов
+        Point2d[] limitBlockPoints = new Point2d[breakBlocksCount];
+        for (int i = 0; i < breakBlocksCount; i++)
+        {
+            limitBlockPoints[i] = point1 + (normalVector * BreakWidth * (i + 1) * scale);
+        }
+
+        // угол поворота координат - против часовой от напр. оси Х
+        var angleAxis = Vector2d.XAxis.GetAngleTo(normalVector); //.RadianToDegree();
+
+       // _logger.WriteToLogFile($"CreateBreakBlocksBetween2Points! angleAxis: {angleAxis}");
+
+        
+        for (int i = 0; i < breakBlocksCount; i++)
+        {
+            if (i + 1 < breakBlocksCount)
             {
-                var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
-                var currentPoint = _mainPolyline.GetPoint3dAt(i);
-                //_strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));
-                _strokes.AddRange(new List<Line> {
-                    new Line(currentPoint, previousPoint)
-                });
+                var perpendicular = normalVector.GetPerpendicularVector();
+
+                // точка на 1/4 отрезка излома
+                var point12start = limitBlockPoints[i] + (normalVector * BreakWidth * scale / 4);
+                // отложить от нее перпендикуляр на расст h/2
+                var point12 = point12start + (perpendicular * BreakHeight * scale / 2);
+
+                var point13start = limitBlockPoints[i] + (normalVector * BreakWidth * scale * 3 / 4);
+                var point13 = point13start + (perpendicular.Negate() * BreakHeight * scale / 2);
+                //var point12 = new Point2d(
+                //    (limitBlockPoints[i].X + (BreakWidth * scale / 4)) * Math.Cos(angleAxis),
+                //    (limitBlockPoints[i].Y + (BreakHeight * scale / 2)) * Math.Sin(angleAxis));
+
+
+                /*
+                var point13 = new Point2d(
+                   (limitBlockPoints[i].X + (3 * BreakWidth * scale / 4)) * Math.Cos(angleAxis),
+                   (limitBlockPoints[i].Y - (BreakHeight * scale / 2)) * Math.Sin(angleAxis));*/
+
+                _lines.Add(new Line(limitBlockPoints[i].ToPoint3d(), point12.ToPoint3d()));
+                _lines.Add(new Line(point12.ToPoint3d(), point13.ToPoint3d()));
+                _lines.Add(new Line(point13.ToPoint3d(), limitBlockPoints[i + 1].ToPoint3d()));
             }
-        }*/
+        }
 
-        /*
-        _mainPolyline= new Polyline();
 
-        _mainPolyline.AddVertexAt(0, insertionPoint.ToPoint2d(), 0.0, 0.0, 0.0);
-        _mainPolyline.AddVertexAt(1, endPoint.ToPoint2d(), 0.0, 0.0, 0.0);
-        */
+        // кусочек, которого не хватило на полный пик, рисую линией
+
+
 
     }
 
