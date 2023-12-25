@@ -5,30 +5,59 @@ using System.Collections.Generic;
 using Base.Abstractions;
 using ModPlusAPI;
 
-
-
+/// <inheritdoc />
 public class ConcreteJointDescriptor : ISmartEntityDescriptor
 {
-    Type ISmartEntityDescriptor.EntityType => typeof(ConcreteJoint);
+    /// <inheritdoc/>
+    public Type EntityType => typeof(ConcreteJoint);
 
-    string ISmartEntityDescriptor.Name => "mpConcreteJoint";
+    /// <inheritdoc />
+    public string Name => "mpConcreteJoint";
 
-    string ISmartEntityDescriptor.LName => throw new NotImplementedException();
+    /// <inheritdoc />
+    // "Шов бетонирования";
+    public string LName => Language.GetItem("h191");
 
-    string ISmartEntityDescriptor.Description => throw new NotImplementedException();
+    /// <inheritdoc />
+    // "Отрисовка линии шва бетонирования";
+    public string Description => Language.GetItem("h192");
 
-    string ISmartEntityDescriptor.FullDescription => throw new NotImplementedException();
+    /// <inheritdoc />
+    // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию шва бетонирования";
+    public string FullDescription => Language.GetItem("h193");
 
-    string ISmartEntityDescriptor.ToolTipHelpImage => throw new NotImplementedException();
+    /// <inheritdoc />
+    public string ToolTipHelpImage => string.Empty;
 
-    List<string> ISmartEntityDescriptor.SubFunctionsNames => throw new NotImplementedException();
+    /// <inheritdoc />
+    public List<string> SubFunctionsNames => new List<string>
+    {
+        "mpConcreteJointFromPolyline"
+    };
 
-    List<string> ISmartEntityDescriptor.SubFunctionsLNames => throw new NotImplementedException();
+    /// <inheritdoc />
+    public List<string> SubFunctionsLNames => new List<string>
+    {
+        // "Линия шва бетонирования из полилинии"
+        Language.GetItem("h194")
+    };
 
-    List<string> ISmartEntityDescriptor.SubDescriptions => throw new NotImplementedException();
+    /// <inheritdoc />
+    public List<string> SubDescriptions => new List<string>
+    {
+        // "Конвертирование выбранной полилинии в линию обозначения шва бетонирования"
+        Language.GetItem("h195")
+    };
 
-    List<string> ISmartEntityDescriptor.SubFullDescriptions => throw new NotImplementedException();
+    /// <inheritdoc />
+    public List<string> SubFullDescriptions => new List<string>
+    {
+        string.Empty
+    };
 
-    List<string> ISmartEntityDescriptor.SubHelpImages => throw new NotImplementedException();
+    /// <inheritdoc />
+    public List<string> SubHelpImages => new List<string>
+    {
+        string.Empty
+    };
 }
-
