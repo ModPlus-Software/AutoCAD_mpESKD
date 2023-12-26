@@ -124,6 +124,7 @@ public class AxisFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
                     entityJig.JigState = JigState.PromptNextPoint;
+                    entityJig.PreviousPoint = axis.InsertionPoint;
                 }
                 else
                 {

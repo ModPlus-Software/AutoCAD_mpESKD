@@ -4,7 +4,6 @@ using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using ModPlusAPI.Exceptions;
 
 /// <summary>
 /// Утилиты работы с геометрией
@@ -127,5 +126,33 @@ public static class GeometryUtils
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 3Д точка по направлению. Направление берется как единичный вектор из точки pt2 к точке pt1, перемножается на указанную
+    /// длину и откладывается от точки pt1. Если между точками нулевое расстояние, будет использован вектор <see cref="Vector3d.XAxis"/>
+    /// </summary>
+    /// <param name="pt1">Первая точка для получения единичного вектора</param>
+    /// <param name="pt2">Вторая точка для получения единичного вектора</param>
+    /// <param name="length">Расстояние на котором нужно получить точку</param>
+    /// <returns>3Д точка</returns>
+    public static Point3d Point3dAtDirection(Point3d pt1, Point3d pt2, double length) => 
+        Point3dAtDirection(pt1, pt2, length, Vector3d.XAxis);
+
+    /// <summary>
+    /// 3Д точка по направлению. Направление берется как единичный вектор из точки pt2 к точке pt1, перемножается на указанную
+    /// длину и откладывается от точки pt1
+    /// </summary>
+    /// <param name="pt1">Первая точка для получения единичного вектора</param>
+    /// <param name="pt2">Вторая точка для получения единичного вектора</param>
+    /// <param name="length">Расстояние на котором нужно получить точку</param>
+    /// <param name="zeroCaseVector">Единичный вектор, используемый если между точками нулевое расстояние</param>
+    /// <returns>3Д точка</returns>
+    public static Point3d Point3dAtDirection(Point3d pt1, Point3d pt2, double length, Vector3d zeroCaseVector)
+    {
+        var vector3d = (pt2 - pt1).GetNormal();
+        if (vector3d.IsZeroLength())
+            vector3d = zeroCaseVector;
+        return pt1 + (vector3d * length);
     }
 }

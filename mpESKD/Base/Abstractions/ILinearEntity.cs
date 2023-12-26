@@ -35,4 +35,9 @@ public interface ILinearEntity
     /// Перестроение точек - помещение EndPoint в список
     /// </summary>
     void RebasePoints();
+
+    /// <summary>
+    /// Возвращает все точки линейного объекта. В список добавляется InsertionPoint, затем MiddlePoints и в конце EndPoint
+    /// </summary>
+    List<Point3d> GetAllPoints();
 }

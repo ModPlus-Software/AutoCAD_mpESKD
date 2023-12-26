@@ -144,7 +144,7 @@ public class FragmentMarkerFunction : ISmartEntityFunction
                     entityJig.PromptForCustomPoint = leaderPointPrompt;
                         
                     // Тут не нужна привязка к предыдущей точке
-                    entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                    entityJig.PreviousPoint = null;
                     entityJig.JigState = JigState.CustomPoint;
                 }
                 else

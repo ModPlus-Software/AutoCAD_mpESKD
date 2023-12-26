@@ -343,12 +343,9 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
             if (EndPointOCS.Equals(Point3d.Origin))
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                MakeSimplyEntity(UpdateVariant.SetInsertionPoint, scale);
-            }
-            else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
-            {
-                // Задание второй точки - случай когда расстояние между точками меньше минимального
-                MakeSimplyEntity(UpdateVariant.SetEndPointMinLength, scale);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else
             {
@@ -361,30 +358,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
             ExceptionBox.Show(exception);
         }
     }
-
-    private void MakeSimplyEntity(UpdateVariant variant, double scale)
-    {
-        if (variant == UpdateVariant.SetInsertionPoint)
-        {
-            /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
-             * Примерно аналогично созданию, только точки не создаются, а меняются
-            */
-            var tmpEndPoint = new Point3d(
-                InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-            CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-        }
-        else if (variant == UpdateVariant.SetEndPointMinLength)
-        {
-            /* Изменение базовых примитивов в момент указания второй точки
-            * при условии что расстояние от второй точки до первой больше минимального допустимого
-            */
-            var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-            CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-            EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-        }
-    }
-
+    
     private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
     {
         _intermittentStrokes = new List<Line>();

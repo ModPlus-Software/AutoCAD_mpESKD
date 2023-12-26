@@ -15,6 +15,8 @@ using Utils;
 /// </summary>
 public class LinearEntityAddVertexGrip : SmartEntityGripData
 {
+    private readonly double _minDistance;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="LinearEntityAddVertexGrip"/> class.
     /// </summary>
@@ -28,6 +30,7 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
         GripRightPoint = rightPoint;
         GripType = GripType.Plus;
         RubberBandLineDisabled = true;
+        _minDistance = smartEntity.MinDistanceBetweenPoints * smartEntity.GetFullScale();
     }
 
     /// <summary>
@@ -129,9 +132,21 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
     {
         try
         {
+            var newPoint = pointMonitorEventArgs.Context.ComputedPoint;
+
+            if (GripLeftPoint.HasValue && GripLeftPoint.Value.DistanceTo(newPoint) < _minDistance)
+            {
+                newPoint = GeometryUtils.Point3dAtDirection(GripLeftPoint.Value, newPoint, _minDistance);
+            }
+            
+            if (GripRightPoint.HasValue && GripRightPoint.Value.DistanceTo(newPoint) < _minDistance)
+            {
+                newPoint = GeometryUtils.Point3dAtDirection(GripRightPoint.Value, newPoint, _minDistance);
+            }
+
             if (GripLeftPoint.HasValue)
             {
-                var leftLine = new Line(GripLeftPoint.Value, pointMonitorEventArgs.Context.ComputedPoint)
+                var leftLine = new Line(GripLeftPoint.Value, newPoint)
                 {
                     ColorIndex = 150
                 };
@@ -140,7 +155,7 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
 
             if (GripRightPoint.HasValue)
             {
-                var rightLine = new Line(pointMonitorEventArgs.Context.ComputedPoint, GripRightPoint.Value)
+                var rightLine = new Line(newPoint, GripRightPoint.Value)
                 {
                     ColorIndex = 150
                 };

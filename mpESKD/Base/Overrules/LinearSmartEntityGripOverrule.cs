@@ -54,30 +54,82 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                 {
                     if (gripData is LinearEntityVertexGrip vertexGrip)
                     {
-                        var intellectualEntity = vertexGrip.SmartEntity;
-
+                        var linearEntity = (SmartLinearEntity)vertexGrip.SmartEntity;
+                        var scale = linearEntity.GetFullScale();
+                        var minDistance = linearEntity.MinDistanceBetweenPoints * scale;
+                        var newPoint = vertexGrip.GripPoint + offset;
+                        var allPoints = linearEntity.GetAllPoints();
+                        
                         if (vertexGrip.GripIndex == 0)
                         {
-                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
-                            intellectualEntity.InsertionPoint = vertexGrip.GripPoint + offset;
+                            // У линейного объекта не может быть менее двух точек, поэтому смело беру следующую ручку из коллекции
+                            var nextPoint = allPoints[1];
+                            
+                            if (newPoint.DistanceTo(nextPoint) < minDistance)
+                            {
+                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    nextPoint, newPoint, nextPoint, minDistance);
+                            }
+
+                            ((BlockReference)entity).Position = newPoint;
+                            linearEntity.InsertionPoint = newPoint;
                         }
-                        else if (vertexGrip.GripIndex == ((ILinearEntity)intellectualEntity).MiddlePoints.Count + 1)
+                        else if (vertexGrip.GripIndex == linearEntity.MiddlePoints.Count + 1)
                         {
-                            intellectualEntity.EndPoint = vertexGrip.GripPoint + offset;
+                            var previousGrip = allPoints[vertexGrip.GripIndex - 1];
+
+                            if (newPoint.DistanceTo(previousGrip) < minDistance)
+                            {
+                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    previousGrip, newPoint, previousGrip, minDistance);
+                            }
+
+                            linearEntity.EndPoint = newPoint;
                         }
                         else
                         {
-                            ((ILinearEntity)intellectualEntity).MiddlePoints[vertexGrip.GripIndex - 1] =
-                                vertexGrip.GripPoint + offset;
+                            var previousGrip = allPoints[vertexGrip.GripIndex - 1];
+                            var nextGrip = allPoints[vertexGrip.GripIndex + 1];
+
+                            if (newPoint.DistanceTo(nextGrip) < minDistance)
+                            {
+                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    nextGrip, newPoint, nextGrip, minDistance);
+                            }
+                            else if (newPoint.DistanceTo(previousGrip) < minDistance)
+                            {
+                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                    previousGrip, newPoint, previousGrip, minDistance);
+                            }
+
+                            linearEntity.MiddlePoints[vertexGrip.GripIndex - 1] = newPoint;
                         }
 
                         // Вот тут происходит перерисовка примитивов внутри блока
-                        intellectualEntity.UpdateEntities();
-                        intellectualEntity.BlockRecord.UpdateAnonymousBlocks();
+                        linearEntity.UpdateEntities();
+                        linearEntity.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else if (gripData is LinearEntityAddVertexGrip addVertexGrip)
                     {
-                        addVertexGrip.NewPoint = addVertexGrip.GripPoint + offset;
+                        var linearEntity = (SmartLinearEntity)addVertexGrip.SmartEntity;
+                        var scale = linearEntity.GetFullScale();
+                        var minDistance = linearEntity.MinDistanceBetweenPoints * scale;
+                        var newPoint = addVertexGrip.GripPoint + offset;
+                        var previousGrip = addVertexGrip.GripLeftPoint;
+                        var nextGrip = addVertexGrip.GripRightPoint;
+
+                        if (nextGrip.HasValue && newPoint.DistanceTo(nextGrip.Value) < minDistance)
+                        {
+                            newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                nextGrip.Value, newPoint, nextGrip.Value, minDistance);
+                        }
+                        else if (previousGrip.HasValue && newPoint.DistanceTo(previousGrip.Value) < minDistance)
+                        {
+                            newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                previousGrip.Value, newPoint, previousGrip.Value, minDistance);
+                        }
+
+                        addVertexGrip.NewPoint = newPoint;
                     }
                     else
                     {

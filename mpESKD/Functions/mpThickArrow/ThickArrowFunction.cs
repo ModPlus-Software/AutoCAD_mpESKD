@@ -94,7 +94,6 @@ public class ThickArrowFunction : ISmartEntityFunction
 
     private static void InsertThickArrowWithJig(bool isSimple, ThickArrow thickArrow, BlockReference blockReference)
     {
-        var nextPointPrompt = Language.GetItem("msg5");
         var entityJig = new DefaultEntityJig(
             thickArrow,
             blockReference,
@@ -110,7 +109,7 @@ public class ThickArrowFunction : ISmartEntityFunction
                     if (entityJig.JigState == JigState.PromptInsertPoint)
                     {
                         entityJig.JigState = JigState.PromptNextPoint;
-                        entityJig.PromptForNextPoint = nextPointPrompt;
+                        entityJig.PreviousPoint = thickArrow.InsertionPoint;
                     }
                     else
                     {

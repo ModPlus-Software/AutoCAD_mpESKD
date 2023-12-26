@@ -120,6 +120,7 @@ public class BreakLineFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
                     entityJig.JigState = JigState.PromptNextPoint;
+                    entityJig.PreviousPoint = breakLine.InsertionPoint;
                 }
                 else
                 {
