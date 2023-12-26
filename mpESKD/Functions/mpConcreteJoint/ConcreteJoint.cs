@@ -131,17 +131,6 @@ public class ConcreteJoint : SmartLinearEntity
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
                 //_logger.WriteToLogFile($"UpdateEntities: 134");
             }
-            else if (length < MinDistanceBetweenPoints * scale && MiddlePoints.Count == 0)
-            {
-                // Задание второй точки - случай когда расстояние между точками меньше минимального
-                var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * scale);
-                //_logger.WriteToLogFile($"UpdateEntities: 135");
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-                // _logger.WriteToLogFile($"UpdateEntities: 136");
-                EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-                //_logger.WriteToLogFile($"UpdateEntities: 137");
-            }
             else
             {
                 // Задание любой другой точки
