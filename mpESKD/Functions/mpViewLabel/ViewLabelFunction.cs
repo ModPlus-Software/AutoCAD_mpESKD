@@ -117,7 +117,6 @@ public class ViewLabelFunction : ISmartEntityFunction
 
     private static void InsertLabelWithJig(ViewLabel viewLabel, BlockReference blockReference)
     {
-        var nextPointPrompt = Language.GetItem("msg5");
         var entityJig = new DefaultEntityJig(
             viewLabel,
             blockReference,
@@ -125,13 +124,10 @@ public class ViewLabelFunction : ISmartEntityFunction
 
         var status = AcadUtils.Editor.Drag(entityJig).Status;
         if (status != PromptStatus.OK)
+        {
+            EntityUtils.Erase(blockReference.Id);
             return;
-
-        entityJig.JigState = JigState.PromptNextPoint;
-        entityJig.PromptForNextPoint = nextPointPrompt;
-
-        if (viewLabel.BlockId.IsErased)
-            return;
+        }
 
         using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
         {

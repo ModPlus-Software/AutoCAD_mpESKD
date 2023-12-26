@@ -14,6 +14,23 @@ using View;
 public static class EntityUtils
 {
     /// <summary>
+    /// Удалить объект
+    /// </summary>
+    /// <param name="objectId">Идентификатор объекта</param>
+    public static void Erase(ObjectId objectId)
+    {
+        using (AcadUtils.Document.LockDocument())
+        {
+            using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
+            {
+                var obj = tr.GetObject(objectId, OpenMode.ForWrite, true, true);
+                obj.Erase(true);
+                tr.Commit();
+            }
+        }
+    }
+
+    /// <summary>
     /// Установка свойств для однострочного текста
     /// </summary>
     /// <param name="dbText">Однострочный текст</param>

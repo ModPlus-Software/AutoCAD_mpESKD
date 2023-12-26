@@ -86,7 +86,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2022</ExternalVersion>
+		<ExternalVersion>2024</ExternalVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -102,8 +102,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<!--<OutputPath>D:\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>--> 
-		<OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+		<OutputPath>D:\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+		<!--<OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>-->
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='A2013'">
@@ -144,7 +144,7 @@
 		<PackageReference Include="ModPlus.AutoCAD.Module.2024" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
+		<PackageReference Include="ModPlus.AutoCAD.Module.2024" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16.png" />

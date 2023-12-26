@@ -120,16 +120,7 @@ public class ThickArrowFunction : ISmartEntityFunction
             }
             else
             {
-                using (AcadUtils.Document.LockDocument())
-                {
-                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                    {
-                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                        obj.Erase(true);
-                        tr.Commit();
-                    }
-                }
-
+                EntityUtils.Erase(blockReference.Id);
                 break;
             }
         }
