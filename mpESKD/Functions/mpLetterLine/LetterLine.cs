@@ -248,12 +248,10 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
             if (EndPointOCS.Equals(Point3d.Origin))
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
-                MakeSimplyEntity(UpdateVariant.SetInsertionPoint);
-            }
-            else if (length < MinDistanceBetweenPoints * _scale && MiddlePoints.Count == 0)
-            {
-                // Задание второй точки - случай когда расстояние между точками меньше минимального
-                MakeSimplyEntity(UpdateVariant.SetEndPointMinLength);
+                var tmpEndPoint = new Point3d(
+                    InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale), InsertionPointOCS.Y,
+                    InsertionPointOCS.Z);
+                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
             }
             else
             {
@@ -265,30 +263,6 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
         catch (Exception exception)
         {
             ExceptionBox.Show(exception);
-        }
-    }
-
-    private void MakeSimplyEntity(UpdateVariant variant)
-    {
-        if (variant == UpdateVariant.SetInsertionPoint)
-        {
-            /* Изменение базовых примитивов в момент указания второй точки при условии второй точки нет
-             * Примерно аналогично созданию, только точки не создаются, а меняются
-            */
-            var tmpEndPoint = new Point3d(
-                InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale), InsertionPointOCS.Y,
-                InsertionPointOCS.Z);
-            CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
-        }
-        else if (variant == UpdateVariant.SetEndPointMinLength)
-        {
-            /* Изменение базовых примитивов в момент указания второй точки
-            * при условии что расстояние от второй точки до первой больше минимального допустимого
-            */
-            var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                InsertionPointOCS, EndPointOCS, InsertionPointOCS, MinDistanceBetweenPoints * _scale);
-            CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
-            EndPoint = tmpEndPoint.TransformBy(BlockTransform);
         }
     }
 

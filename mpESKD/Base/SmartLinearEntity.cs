@@ -61,4 +61,13 @@ public abstract class SmartLinearEntity : SmartEntity, ILinearEntity
             MiddlePoints.Add(EndPoint);
         }
     }
+
+    /// <inheritdoc />
+    public List<Point3d> GetAllPoints()
+    {
+        var list = new List<Point3d> { InsertionPoint };
+        list.AddRange(MiddlePoints);
+        list.Add(EndPoint);
+        return list;
+    }
 }

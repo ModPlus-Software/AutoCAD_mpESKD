@@ -163,12 +163,7 @@ public class SectionFunction : ISmartEntityFunction
                 // "Удалить исходную полилинию?"
                 if (MessageBox.ShowYesNo(Language.GetItem("msg7"), MessageBoxIcon.Question))
                 {
-                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                    {
-                        var dbObj = tr.GetObject(plineId, OpenMode.ForWrite, true, true);
-                        dbObj.Erase(true);
-                        tr.Commit();
-                    }
+                    EntityUtils.Erase(plineId);
                 }
             }
         }
@@ -264,16 +259,7 @@ public class SectionFunction : ISmartEntityFunction
                 }
                 else
                 {
-                    // if no middle points - remove entity
-                    using (AcadUtils.Document.LockDocument())
-                    {
-                        using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                        {
-                            var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                            obj.Erase(true);
-                            tr.Commit();
-                        }
-                    }
+                    EntityUtils.Erase(blockReference.Id);
                 }
 
                 break;

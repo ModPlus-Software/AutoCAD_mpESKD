@@ -35,9 +35,12 @@ public class JigUtils
             return Acquire(prompts, GetDefaultOptions(message, basePoint), updater);
         }
 
-        public SamplerStatus Acquire(JigPrompts prompts, JigPromptPointOptions options, Action<Point3d> updater)
+        private SamplerStatus Acquire(
+            JigPrompts prompts, 
+            JigPromptPointOptions options,
+            Action<Point3d> updater)
         {
-            PromptPointResult promptPointResult = prompts.AcquirePoint(options);
+            var promptPointResult = prompts.AcquirePoint(options);
             if (promptPointResult.Status != PromptStatus.OK)
             {
                 if (promptPointResult.Status == PromptStatus.Other)
@@ -53,34 +56,35 @@ public class JigUtils
                 return SamplerStatus.NoChange;
             }
 
-            var value = promptPointResult.Value;
-            var point3D = value;
-            Value = value;
-            updater(point3D);
+            Value = promptPointResult.Value;
+
+            updater(Value);
             return SamplerStatus.OK;
         }
 
-        public static JigPromptPointOptions GetDefaultOptions(string message)
+        private static JigPromptPointOptions GetDefaultOptions(string message)
         {
-            var jigPromptPointOption = new JigPromptPointOptions(message);
-            jigPromptPointOption.UserInputControls = (UserInputControls)2272;
+            var jigPromptPointOption = new JigPromptPointOptions(message)
+            {
+                UserInputControls = (UserInputControls)2272
+            };
             return jigPromptPointOption;
         }
 
-        public static JigPromptPointOptions GetDefaultOptions(string message, Point3d basePoint)
+        private static JigPromptPointOptions GetDefaultOptions(string message, Point3d basePoint)
         {
-            var jigPromptPointOption = new JigPromptPointOptions(message);
-            jigPromptPointOption.BasePoint = basePoint;
-            jigPromptPointOption.UseBasePoint = true;
-            jigPromptPointOption.UserInputControls =
-                UserInputControls.GovernedByUCSDetect |
-                UserInputControls.GovernedByOrthoMode |
-                UserInputControls.NoDwgLimitsChecking |
-                UserInputControls.NoNegativeResponseAccepted |
-                UserInputControls.Accept3dCoordinates |
-                UserInputControls.AcceptOtherInputString |
-                UserInputControls.UseBasePointElevation;
-            return jigPromptPointOption;
+            return new JigPromptPointOptions(message)
+            {
+                BasePoint = basePoint,
+                UseBasePoint = true,
+                UserInputControls = UserInputControls.GovernedByUCSDetect |
+                                    UserInputControls.GovernedByOrthoMode |
+                                    UserInputControls.NoDwgLimitsChecking |
+                                    UserInputControls.NoNegativeResponseAccepted |
+                                    UserInputControls.Accept3dCoordinates |
+                                    UserInputControls.AcceptOtherInputString |
+                                    UserInputControls.UseBasePointElevation
+            };
         }
     }
 }

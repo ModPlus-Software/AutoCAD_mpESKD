@@ -120,6 +120,7 @@ public class BreakLineFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
                     entityJig.JigState = JigState.PromptNextPoint;
+                    entityJig.PreviousPoint = breakLine.InsertionPoint;
                 }
                 else
                 {
@@ -128,17 +129,7 @@ public class BreakLineFunction : ISmartEntityFunction
             }
             else
             {
-                // mark to remove
-                using (AcadUtils.Document.LockDocument())
-                {
-                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                    {
-                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                        obj.Erase(true);
-                        tr.Commit();
-                    }
-                }
-
+                EntityUtils.Erase(blockReference.Id);
                 break;
             }
         }

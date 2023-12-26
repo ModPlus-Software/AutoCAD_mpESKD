@@ -144,7 +144,7 @@ public class FragmentMarkerFunction : ISmartEntityFunction
                     entityJig.PromptForCustomPoint = leaderPointPrompt;
                         
                     // Тут не нужна привязка к предыдущей точке
-                    entityJig.PreviousPoint = fragmentMarker.InsertionPoint;
+                    entityJig.PreviousPoint = null;
                     entityJig.JigState = JigState.CustomPoint;
                 }
                 else
@@ -154,17 +154,7 @@ public class FragmentMarkerFunction : ISmartEntityFunction
             }
             else
             {
-                // mark to remove
-                using (AcadUtils.Document.LockDocument())
-                {
-                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                    {
-                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                        obj.Erase(true);
-                        tr.Commit();
-                    }
-                }
-
+                EntityUtils.Erase(blockReference.Id);
                 break;
             }
         }

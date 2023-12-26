@@ -89,17 +89,27 @@ public class DefaultEntityJig : EntityJig
                     {
                         _smartEntity.InsertionPoint = value;
                     });
+
                 case JigState.PromptNextPoint:
                 {
                     var basePoint = _insertionPoint.Value;
-                    if (PreviousPoint != null)
+                    if (PreviousPoint.HasValue)
                     {
                         basePoint = PreviousPoint.Value;
                     }
 
-                    return _nextPoint.Acquire(prompts, $"\n{PromptForNextPoint}", basePoint, value =>
+                    return _nextPoint.Acquire(prompts, $"\n{PromptForNextPoint}", basePoint, point3d =>
                     {
-                        _smartEntity.EndPoint = value;
+                        if (PreviousPoint.HasValue)
+                        {
+                            var minDistance = _smartEntity.MinDistanceBetweenPoints * _smartEntity.GetFullScale();
+                            if (PreviousPoint.Value.DistanceTo(point3d) < minDistance)
+                            {
+                                point3d = GeometryUtils.Point3dAtDirection(PreviousPoint.Value, point3d, minDistance);
+                            }
+                        }
+
+                        _smartEntity.EndPoint = point3d;
                     });
                 }
                     
@@ -113,9 +123,18 @@ public class DefaultEntityJig : EntityJig
                             basePoint = PreviousPoint.Value;
                         }
                                 
-                        return _customPoint.Acquire(prompts, $"\n{PromptForCustomPoint}", basePoint, value =>
+                        return _customPoint.Acquire(prompts, $"\n{PromptForCustomPoint}", basePoint, point3d =>
                         {
-                            _customPointAction.Invoke(value);
+                            if (PreviousPoint.HasValue)
+                            {
+                                var minDistance = _smartEntity.MinDistanceBetweenPoints * _smartEntity.GetFullScale();
+                                if (PreviousPoint.Value.DistanceTo(point3d) < minDistance)
+                                {
+                                    point3d = GeometryUtils.Point3dAtDirection(PreviousPoint.Value, point3d, minDistance);
+                                }
+                            }
+
+                            _customPointAction.Invoke(point3d);
                         });
                     }
 

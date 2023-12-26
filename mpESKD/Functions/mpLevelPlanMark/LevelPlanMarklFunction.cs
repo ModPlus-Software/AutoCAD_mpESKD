@@ -99,7 +99,6 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
 
     private static void InsertLevelPlanMarkWithJig(LevelPlanMark levelPlanMark, BlockReference blockReference)
     {
-        var nextPointPrompt = Language.GetItem("msg5");
         var entityJig = new DefaultEntityJig(
             levelPlanMark,
             blockReference,
@@ -107,14 +106,11 @@ public class LevelPlanMarkFunction : ISmartEntityFunction
 
         var status = AcadUtils.Editor.Drag(entityJig).Status;
         if (status != PromptStatus.OK)
+        {
+            EntityUtils.Erase(blockReference.Id);
             return;
-
-        entityJig.JigState = JigState.PromptNextPoint;
-        entityJig.PromptForNextPoint = nextPointPrompt;
-
-        if (levelPlanMark.BlockId.IsErased)
-            return;
-
+        }
+        
         using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
         {
             var ent = tr.GetObject(levelPlanMark.BlockId, OpenMode.ForWrite, true, true);

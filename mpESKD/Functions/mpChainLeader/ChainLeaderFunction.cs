@@ -99,16 +99,10 @@ public class ChainLeaderFunction : ISmartEntityFunction
 
     private static void InsertChainLeaderWithJig(ChainLeader chainLeader, BlockReference blockReference)
     {
-        // <msg1>Укажите точку вставки:</msg1>
-        var insertionPointPrompt = Language.GetItem("msg1");
-
-        // <msg17>Укажите точку выноски:</msg17> 
+        // Укажите точку выноски:
         var leaderPointPrompt = Language.GetItem("msg18");
 
-        var entityJig = new DefaultEntityJig(chainLeader, blockReference, new Point3d(0, 0, 0))
-        {
-            PromptForInsertionPoint = insertionPointPrompt
-        };
+        var entityJig = new DefaultEntityJig(chainLeader, blockReference, new Point3d(0, 0, 0));
         
         chainLeader.JigState = ChainLeaderJigState.InsertionPoint;
         do
@@ -133,17 +127,7 @@ public class ChainLeaderFunction : ISmartEntityFunction
             }
             else
             {
-                // mark to remove
-                using (AcadUtils.Document.LockDocument())
-                {
-                    using (var tr = AcadUtils.Document.TransactionManager.StartTransaction())
-                    {
-                        var obj = (BlockReference)tr.GetObject(blockReference.Id, OpenMode.ForWrite, true, true);
-                        obj.Erase(true);
-                        tr.Commit();
-                    }
-                }
-
+                EntityUtils.Erase(blockReference.Id);
                 break;
             }
         }
