@@ -127,20 +127,16 @@ public class ConcreteJoint : SmartLinearEntity
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
                 InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                //_logger.WriteToLogFile($"UpdateEntities: 132");
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
-                //_logger.WriteToLogFile($"UpdateEntities: 134");
             }
             else
             {
                 // Задание любой другой точки
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS, scale);
-                //_logger.WriteToLogFile($"UpdateEntities: 151");
             }
         }
         catch (System.Exception exception)
         {
-            //_logger.WriteToLogFile($"UpdateEntities: {exception.Message}");
             ExceptionBox.Show(exception);
         }
     }
@@ -178,11 +174,9 @@ public class ConcreteJoint : SmartLinearEntity
 
         // количество целых изломов
         int breakBlocksCount = (int)(length / BreakWidth / scale);
-        //_logger.WriteToLogFile($"CreateBreakBlocksBetween2Points: 189");
 
         if (breakBlocksCount > 0)
         {
-            //_logger.WriteToLogFile($"CreateBreakBlocksBetween2Points: 193");
             // массив граничных точек изломов
             Point2d[] limitBlockPoints = new Point2d[breakBlocksCount + 1];
             for (int i = 0; i < limitBlockPoints.Count(); i++)
@@ -190,7 +184,6 @@ public class ConcreteJoint : SmartLinearEntity
                 limitBlockPoints[i] = i == 0 ? point1 : point1 + (normalVector * BreakWidth * i * scale);
             }
 
-            //_logger.WriteToLogFile($"CreateBreakBlocksBetween2Points: 201");
 
             for (int i = 0; i < limitBlockPoints.Count() - 1; i++)
             {
@@ -212,10 +205,8 @@ public class ConcreteJoint : SmartLinearEntity
                 _lines.Add(new Line(point13.ToPoint3d(), limitBlockPoints[i + 1].ToPoint3d()));
             }
 
-            //_logger.WriteToLogFile($"CreateBreakBlocksBetween2Points: 224");
-
             // хвостик, которого не хватило на полный излом
-            double remnant = length - (breakBlocksCount * BreakWidth * scale); //length % (BreakWidth * scale);
+            double remnant = length - (breakBlocksCount * BreakWidth * scale);
 
             if (remnant != 0)
             {
@@ -232,15 +223,13 @@ public class ConcreteJoint : SmartLinearEntity
                     // отложить от нее перпендикуляр на расст h/2
                     var point12 = point12start + (perpendicular * BreakHeight * scale / 2);
 
-                    var midPoint= limitBlockPoints.Last() + (normalVector * BreakWidth * scale / 2);
+                    var midPoint = limitBlockPoints.Last() + (normalVector * BreakWidth * scale / 2);
 
                     _lines.Add(new Line(limitBlockPoints.Last().ToPoint3d(), point12.ToPoint3d()));
                     _lines.Add(new Line(point12.ToPoint3d(), midPoint.ToPoint3d()));
-                    _lines.Add(new Line(midPoint.ToPoint3d(),point2.ToPoint3d()));
+                    _lines.Add(new Line(midPoint.ToPoint3d(), point2.ToPoint3d()));
                 }
             }
-
-            //_logger.WriteToLogFile($"CreateBreakBlocksBetween2Points: 231");
         }
     }
 
