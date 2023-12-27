@@ -119,8 +119,6 @@ public class ConcreteJoint : SmartLinearEntity
     {
         try
         {
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
-
             var scale = GetScale();
             if (EndPointOCS.Equals(Point3d.Origin))
             {
