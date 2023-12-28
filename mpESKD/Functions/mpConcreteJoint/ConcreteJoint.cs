@@ -63,16 +63,16 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Ширина излома
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 5, 1, 20, nameSymbol: "w")]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 6, 1, 20, nameSymbol: "w")]
     [SaveToXData]
-    public double BreakWidth { get; set; } = 5;
+    public double BreakWidth { get; set; } = 6;
 
     /// <summary>
     /// Высота излома
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 5, 1, 20, nameSymbol: "h")]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 4, 1, 20, nameSymbol: "h")]
     [SaveToXData]
-    public double BreakHeight { get; set; } = 5;
+    public double BreakHeight { get; set; } = 4;
 
     #endregion
 
@@ -173,6 +173,12 @@ public class ConcreteJoint : SmartLinearEntity
         // количество целых изломов
         int breakBlocksCount = (int)(length / BreakWidth / scale);
 
+        // вектор длиной, равной ширине излома, в направлении линии шва
+        var breakVector = normalVector * BreakWidth * scale;
+
+        // вектор длиной, равной высоте излома, перпендикулярный линии шва
+        var breakVectorPerpendicular = perpendicular * BreakHeight * scale;
+
         if (breakBlocksCount > 0)
         {
             // массив граничных точек изломов
@@ -187,16 +193,16 @@ public class ConcreteJoint : SmartLinearEntity
             {
 
                 // точка на 1/4 отрезка излома
-                var point12start = limitBlockPoints[i] + (normalVector * BreakWidth * scale / 4);
+                var point12start = limitBlockPoints[i] + (breakVector * 0.25);
 
                 // отложить от нее перпендикуляр на расст h/2
-                var point12 = point12start + (perpendicular * BreakHeight * scale / 2);
+                var point12 = point12start + (breakVectorPerpendicular * 0.50);
 
                 // точка на 3/4 отрезка излома
-                var point13start = limitBlockPoints[i] + (normalVector * BreakWidth * scale * 3 / 4);
+                var point13start = limitBlockPoints[i] + (breakVector * 0.75);
 
                 // отложить от нее перпендикуляр на расст -h/2
-                var point13 = point13start + (perpendicular.Negate() * BreakHeight * scale / 2);
+                var point13 = point13start + (breakVectorPerpendicular.Negate() * 0.50); //(perpendicular.Negate() * BreakHeight * scale / 2);
 
                 _lines.Add(new Line(limitBlockPoints[i].ToPoint3d(), point12.ToPoint3d()));
                 _lines.Add(new Line(point12.ToPoint3d(), point13.ToPoint3d()));
@@ -205,28 +211,83 @@ public class ConcreteJoint : SmartLinearEntity
 
             // хвостик, которого не хватило на полный излом
             double remnant = length - (breakBlocksCount * BreakWidth * scale);
+            var revativeRemant = remnant / BreakWidth / scale;
 
-            if (remnant != 0)
+            //AcadUtils.WriteMessageInDebug($"Remant: {remnant}");
+            //AcadUtils.WriteMessageInDebug($"revativeRemant: {revativeRemant}");
+
+
+            if (remnant > 0)
             {
-                if (remnant < BreakWidth * scale / 2)
+
+                // граничные точки  хвостика 
+                // первая точка
+                var remnantPoint1 = limitBlockPoints.Last();
+
+                // точка излома на 1/4 ширины изома от начала
+                var remnantPoint12 = remnantPoint1 + (breakVector * 0.25);
+
+                // точка излома на 1/4 ширины изома от начала, вверх на половину высоты
+                var remnantPoint2 = remnantPoint12 + (breakVectorPerpendicular * 0.50);
+
+                // точка на середине излома
+                var remnantPoint3 = remnantPoint1 + (breakVector * 0.50);
+
+                // точка излома на 3/4 ширины изома от начала
+                var remnantPoint4Start = remnantPoint1 + (breakVector * 0.75);
+
+                // точка излома на 3/4 ширины изома от начала, вниз на половину высоты
+                var remnantPoint4 = remnantPoint4Start + (breakVectorPerpendicular.Negate() * 0.50);
+
+                var remnantEndPoint = remnantPoint1 + (normalVector * remnant);
+
+                var h = BreakHeight * scale;
+                var w = BreakWidth * scale;
+
+                switch (revativeRemant)
                 {
-                    _lines.Add(new Line(limitBlockPoints.Last().ToPoint3d(), point2.ToPoint3d()));
+                    case var x when x < 0.25:
+                        // рисуем линию в диапазоне от точки 1 до точки 2
+                        var point12Remnant = remnantEndPoint + (perpendicular * (2 * h * remnant / w));
+                        _lines.Add(new Line(remnantPoint1.ToPoint3d(), point12Remnant.ToPoint3d()));
+                        break;
+                    case var x when x >= 0.25 && x < 0.50:
+                        // рисуем сразу линию от 1 до 2
+                        _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
+                        // затем рисуем остаток
+                        var point23Remnant = remnantEndPoint + (perpendicular * 2 * h / w * ((w / 2) - remnant));
+                        _lines.Add(new Line(remnantPoint2.ToPoint3d(), point23Remnant.ToPoint3d()));
+                        break;
+                    case var x when x >= 0.50 && x < 0.75:
+                        // рисуем сразу линию от 1 до 2
+                        _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
+                        // рисуем сразу линию от 2 до 3 (середина)
+                        _lines.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint3.ToPoint3d()));
+                        // затем рисуем остаток
+                        var point34Remnant = remnantEndPoint + (perpendicular.Negate() * (2 * h * (remnant - (w / 2)) / w));
+                        _lines.Add(new Line(remnantPoint3.ToPoint3d(), point34Remnant.ToPoint3d()));
+                        break;
+                    case var x when x >= 0.75:
+                        // рисуем сразу линию от 1 до 2
+                        _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
+                        // рисуем сразу линию от 2 до 4
+                        _lines.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint4.ToPoint3d()));
+                        // затем рисуем остаток
+                        var point45Remnant = remnantEndPoint + (perpendicular.Negate() * 2 * h / w * ((w / 2) - (remnant - (w / 2))));
+                        _lines.Add(new Line(remnantPoint4.ToPoint3d(), point45Remnant.ToPoint3d()));
+                        break;
+                    default:
+                        break;
                 }
 
-                if (remnant >= BreakWidth * scale / 2)
-                {
-                    // точка на 1/4 отрезка излома
-                    var point12start = limitBlockPoints.Last() + (normalVector * BreakWidth * scale / 4);
 
-                    // отложить от нее перпендикуляр на расст h/2
-                    var point12 = point12start + (perpendicular * BreakHeight * scale / 2);
 
-                    var midPoint = limitBlockPoints.Last() + (normalVector * BreakWidth * scale / 2);
+                /*
+                var point23RemnantStart = limitBlockPoints.Last() + (normalVector * remnant);
+                var point23Remnant = point23RemnantStart + (perpendicular * scale * 2 * BreakHeight / BreakWidth * ((BreakWidth / 2) - remnant));
+                _lines.Add(new Line(point12Remnant.ToPoint3d(), point23Remnant.ToPoint3d()));*/
 
-                    _lines.Add(new Line(limitBlockPoints.Last().ToPoint3d(), point12.ToPoint3d()));
-                    _lines.Add(new Line(point12.ToPoint3d(), midPoint.ToPoint3d()));
-                    _lines.Add(new Line(midPoint.ToPoint3d(), point2.ToPoint3d()));
-                }
+
             }
         }
     }
