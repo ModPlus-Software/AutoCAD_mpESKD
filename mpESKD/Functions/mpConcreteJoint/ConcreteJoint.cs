@@ -227,7 +227,8 @@ public class ConcreteJoint : SmartLinearEntity
 
             // тут рисуется префикс излома (хвостик в нач. участка)
             // TODO: DrawPrefixBreak in work!
-            DrawPrefixBreak();
+
+            pointStart = pointStart + (normalVector * DrawPrefixBreak(point1, pointStart, pointStartBreak, scale, normalVector, breakPerpendicularVector));
         }
 
         // длина отрезка между точками
@@ -281,9 +282,153 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Отрисовка префикса излома (хвостика в начале участка)
     /// </summary>
-    private void DrawPrefixBreak()
+    private double DrawPrefixBreak(Point2d point1, Point2d pointStart, (Point2d, double) pointStartBreak, double scale, Vector2d normalVector, Vector2d breakPerpendicularVector)
     {
+        // double result = 0;
 
+        var h = BreakHeight * scale;
+        var w = BreakWidth * scale;
+
+        var revativePrevRemant = pointStartBreak.Item2; // / BreakWidth / scale;
+        // длина префикса
+        var prevRemnant = pointStartBreak.Item2 * w;
+
+        // точка пика излома на 1/4 от нач.
+        switch (revativePrevRemant)
+        {
+            case var x when x < 0.25:
+
+                var distStartBreakToStartPoint = pointStartBreak.Item1.GetDistanceTo(pointStart);
+
+
+                double distPerpendicularStartBreakToPoint2FE;
+                if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
+                    distPerpendicularStartBreakToPoint2FE = (h / 2) - distStartBreakToStartPoint;
+                else
+                    distPerpendicularStartBreakToPoint2FE = (h / 2) + distStartBreakToStartPoint;
+
+                var distanceToPoint2Start = w / (2 * h) * distPerpendicularStartBreakToPoint2FE;
+                var deltaDistx = (w * 0.25) - prevRemnant - distanceToPoint2Start;
+
+                // точка излома на 1/4 ширины изома от начала
+                //var point2Start = pointStartBreak.Item1 + (normalVector * ((w * 0.25) - prevRemnant));
+                var point2Start = pointStartBreak.Item1 + (normalVector * distanceToPoint2Start);
+
+                // точка излома на 1/4 ширины изома от начала, вверх на половину высоты
+                var point2 = point2Start + (normalVector.GetPerpendicularVector() * distPerpendicularStartBreakToPoint2FE);
+
+                // точка на середине излома
+                var point3 = pointStart + (normalVector * ((w * 0.50) - prevRemnant - deltaDistx));  //(distanceToPoint2Start + (0.25 * w))); //((w * 0.50) - prevRemnant));
+
+                // точка излома на 3/4 ширины изома от начала
+                var point4Start = pointStart + (normalVector * ((w * 0.75) - prevRemnant - deltaDistx)); //(distanceToPoint2Start + (0.50 * w))); //((w * 0.75) - prevRemnant));
+
+                // точка излома на 3/4 ширины изома от начала, вниз на половину высоты
+                var point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
+
+                var endPoint = pointStart + (normalVector * (w - prevRemnant - deltaDistx));//(distanceToPoint2Start + (0.75 * w))); //(w - prevRemnant));
+
+                // дорисуем остальные линии
+                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point2.ToPoint3d()));
+                //_lines.Add(new Line(point2.ToPoint3d(), point4.ToPoint3d()));
+                _lines.Add(new Line(point2.ToPoint3d(), point3.ToPoint3d()));
+                _lines.Add(new Line(point3.ToPoint3d(), point4.ToPoint3d()));
+                _lines.Add(new Line(point4.ToPoint3d(), endPoint.ToPoint3d()));
+
+                AcadUtils.WriteMessageInDebug($" when x < 0.25 => revativePrevRemant:{revativePrevRemant}, " +
+                    $"distanceToPoint2Start:{distanceToPoint2Start}, angle Vectors: {normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree()}");
+
+                return endPoint.GetDistanceTo(pointStart); //w - prevRemnant;
+
+            case var x when x >= 0.25 && x < 0.50:
+                var distStartBreakToStartPointCD = pointStartBreak.Item1.GetDistanceTo(pointStart);
+
+                /*
+                var distStartBreakToPoint1AC = pointStartBreak.Item1.GetDistanceTo(point1);
+                var distPoint1ToPointDirectAB = (w / 2) - prevRemnant;
+                var distStartBreakToPoint3 = distPoint1ToPointDirectAB * distStartBreakToStartPointCD / distStartBreakToPoint1AC;*/
+
+
+                var distStartBreakToPoint3 = w / (2 * h) * distStartBreakToStartPointCD;
+                var deltaDist = (w * 0.50) - prevRemnant - distStartBreakToPoint3;
+
+                // точка излома на 1/4 ширины изома от начала
+                // var point2Start = pointStartBreak.Item1 + (normalVector * ((w * 0.25) - prevRemnant));
+
+                // точка излома на 1/4 ширины изома от начала, вверх на половину высоты
+                // var point2 = point2Start + (normalVector.GetPerpendicularVector() * distPerpendicularStartBreakToPoint2FE);
+
+                // точка на середине излома
+                var point3x = pointStart + (normalVector * distStartBreakToPoint3); //((w * 0.50) - prevRemnant));
+
+                // точка излома на 3/4 ширины изома от начала
+                var point4Startx = pointStart + (normalVector * ((w * 0.75) - prevRemnant - deltaDist));
+
+                // точка излома на 3/4 ширины изома от начала, вниз на половину высоты
+                var point4x = point4Startx + (breakPerpendicularVector.Negate() * 0.50);
+
+                var endPointx = pointStart + (normalVector * (w - prevRemnant - deltaDist));
+
+                // дорисуем остальные линии
+                //_lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point4x.ToPoint3d()));
+                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point3x.ToPoint3d()));
+                _lines.Add(new Line(point3x.ToPoint3d(), point4x.ToPoint3d()));
+                _lines.Add(new Line(point4x.ToPoint3d(), endPointx.ToPoint3d()));
+
+
+                AcadUtils.WriteMessageInDebug($" when x >= 0.25 && x < 0.50 => revativePrevRemant:{revativePrevRemant}, deltaDistx:{deltaDist}");
+                return endPointx.GetDistanceTo(pointStart);
+
+            case var x when x >= 0.50 && x < 0.75:
+
+                var distStartBreakToStartPointBE = pointStartBreak.Item1.GetDistanceTo(pointStart);
+
+                double distPerpendicularStartBreakToPoint4CE;
+                if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
+                    distPerpendicularStartBreakToPoint4CE = (h / 2) - distStartBreakToStartPointBE;
+                else
+                    distPerpendicularStartBreakToPoint4CE = (h / 2) + distStartBreakToStartPointBE;
+
+                var distanceToPoint4StartDE = w / (2 * h) * distPerpendicularStartBreakToPoint4CE;
+
+                // точка излома на 3/4 ширины изома от начала
+                //var point4Startz = pointStart + (normalVector * ((w * 0.75) - prevRemnant));
+                //var point4Startz = pointStart + (normalVector * ((w * 0.75) - prevRemnant));
+                var point4Startz = pointStart + (normalVector * distanceToPoint4StartDE);
+
+                // точка излома на 3/4 ширины изома от начала, вниз на половину высоты
+                var point4z = point4Startz + (breakPerpendicularVector.Negate() * 0.50);
+
+                var endPointz = pointStart + (normalVector * (distanceToPoint4StartDE + (w * 0.25)));
+
+                // дорисуем остальные линии
+                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point4z.ToPoint3d()));
+                _lines.Add(new Line(point4z.ToPoint3d(), endPointz.ToPoint3d()));
+
+
+                AcadUtils.WriteMessageInDebug(@" when x >= 0.50 && x < 0.75");
+                return endPointz.GetDistanceTo(pointStart);
+
+
+            case var x when x >= 0.75:
+                var distStartBreakToStartPointTS = pointStartBreak.Item1.GetDistanceTo(pointStart);
+                //distPerpendicularStartBreakToPoint4CE = (h / 2) - distStartBreakToStartPointBE;
+
+                var tk = w / (2 * h) * distStartBreakToStartPointTS;
+
+                var endPointv = pointStart + (normalVector * tk);
+
+                // дорисуем остальные линии
+                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), endPointv.ToPoint3d()));
+
+                AcadUtils.WriteMessageInDebug(@" when x >= 0.75");
+                return endPointv.GetDistanceTo(pointStart);
+
+            default:
+                return default;
+        }
+
+        // return result;
     }
 
 
@@ -299,10 +444,10 @@ public class ConcreteJoint : SmartLinearEntity
         var remnantPoint1 = limitBlockPoints.Last();
 
         // точка излома на 1/4 ширины изома от начала
-        var remnantPoint12 = remnantPoint1 + (breakNormalVector * 0.25);
+        var remnantPoint2Start = remnantPoint1 + (breakNormalVector * 0.25);
 
         // точка излома на 1/4 ширины изома от начала, вверх на половину высоты
-        var remnantPoint2 = remnantPoint12 + (breakPerpendicularVector * 0.50);
+        var remnantPoint2 = remnantPoint2Start + (breakPerpendicularVector * 0.50);
 
         // точка на середине излома
         var remnantPoint3 = remnantPoint1 + (breakNormalVector * 0.50);
