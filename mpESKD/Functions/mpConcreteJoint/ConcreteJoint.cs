@@ -97,6 +97,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// </summary>
     private List<Line> _lines = new ();
 
+    /// <inheritdoc/>
     public override IEnumerable<Entity> Entities
     {
         get
@@ -112,6 +113,7 @@ public class ConcreteJoint : SmartLinearEntity
         }
     }
 
+    /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
         yield return InsertionPoint;
@@ -122,6 +124,7 @@ public class ConcreteJoint : SmartLinearEntity
         }
     }
 
+    /// <inheritdoc/>
     public override void UpdateEntities()
     {
         try
@@ -152,12 +155,20 @@ public class ConcreteJoint : SmartLinearEntity
 
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
 
+        AcadUtils.WriteMessageInDebug($"points.Count={points.Count} =>");
+        AcadUtils.WriteMessageInDebug($"point 1: ({points[0].X},{points[0].Y})");
+        AcadUtils.WriteMessageInDebug($"point 2: ({points[1].X},{points[1].Y})\n");
+
         // точка обрыва излома в конце предыдущего сегмента = точка начала излома текущего сегмента
         (Point2d, double) pointStartBreak = (insertionPoint.ToPoint2d(), 0.0);
 
         for (var i = 0; i < points.Count; i++)
         {
-            if (i + 1 < points.Count)
+            //if (IsLightCreation && )
+
+            AcadUtils.WriteMessageInDebug($"i={i}\n");
+
+            if (i  < points.Count -1)
                 pointStartBreak = CreateBreakBlocksBetween2Points(points[i], points[i + 1], pointStartBreak, scale);
         }
 
@@ -239,16 +250,16 @@ public class ConcreteJoint : SmartLinearEntity
             for (int i = 0; i < limitBlockPoints.Count() - 1; i++)
             {
                 // точка на 1/4 отрезка излома
-                var point12start = limitBlockPoints[i] + (breakNormalVector * 0.25);
+                var point12Start = limitBlockPoints[i] + (breakNormalVector * 0.25);
 
-                // отложить от нее перпендикуляр на расст h/2
-                var point12 = point12start + (breakPerpendicularVector * 0.50);
+                // отложить от нее перпендикуляр на расстоянии h/2
+                var point12 = point12Start + (breakPerpendicularVector * 0.50);
 
                 // точка на 3/4 отрезка излома
-                var point14start = limitBlockPoints[i] + (breakNormalVector * 0.75);
+                var point14Start = limitBlockPoints[i] + (breakNormalVector * 0.75);
 
-                // отложить от нее перпендикуляр на расст -h/2
-                var point14 = point14start + (breakPerpendicularVector.Negate() * 0.50);
+                // отложить от нее перпендикуляр на расстоянии -h/2
+                var point14 = point14Start + (breakPerpendicularVector.Negate() * 0.50);
 
                 _lines.Add(new Line(limitBlockPoints[i].ToPoint3d(), point12.ToPoint3d()));
                 _lines.Add(new Line(point12.ToPoint3d(), point14.ToPoint3d()));
@@ -342,13 +353,13 @@ public class ConcreteJoint : SmartLinearEntity
                 point3 = pointStart + (normalVector * distanceToPoint3Start);
                 point4Start = pointStart + (normalVector * (distanceToPoint3Start + (0.25 * w)));
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
-                var endPointx = pointStart + (normalVector * (distanceToPoint3Start + (0.50 * w)));
+                endPoint = pointStart + (normalVector * (distanceToPoint3Start + (0.50 * w)));
 
                 _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point3.ToPoint3d()));
                 _lines.Add(new Line(point3.ToPoint3d(), point4.ToPoint3d()));
-                _lines.Add(new Line(point4.ToPoint3d(), endPointx.ToPoint3d()));
+                _lines.Add(new Line(point4.ToPoint3d(), endPoint.ToPoint3d()));
 
-                return endPointx.GetDistanceTo(pointStart);
+                return endPoint.GetDistanceTo(pointStart);
 
             case var x when x >= 0.50 && x < 0.75:
                 double distanceToPoint4;
