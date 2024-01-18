@@ -31,8 +31,7 @@ public static class LinearEntityUtils
             linearEntity,
             blockReference,
             new Point3d(20, 0, 0));
-        linearEntity.IsLightCreation = true;
-
+        
         do
         {
             var status = AcadUtils.Editor.Drag(entityJig).Status;
@@ -48,6 +47,7 @@ public static class LinearEntityUtils
                 }
                 else
                 {
+                    linearEntity.IsLightCreation = true;
                     linearEntity.RebasePoints();
                     entityJig.PreviousPoint = linearEntity.MiddlePoints.Last();
                 }

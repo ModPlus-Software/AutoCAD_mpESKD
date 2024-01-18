@@ -248,7 +248,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
-                    InsertionPointOCS.X + (MinDistanceBetweenPoints * _scale), InsertionPointOCS.Y,
+                    InsertionPointOCS.X + (30 * _scale), InsertionPointOCS.Y,
                     InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
             }
