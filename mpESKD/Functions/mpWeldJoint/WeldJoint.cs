@@ -3,6 +3,7 @@ namespace mpESKD.Functions.mpWeldJoint;
 
 using System;
 using System.Collections.Generic;
+using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -338,7 +339,6 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
     {
         try
         {
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             var scale = GetScale();
             if (EndPointOCS.Equals(Point3d.Origin))
             {
@@ -363,6 +363,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
     {
         _intermittentStrokes = new List<Line>();
         _tickMarksOrCrosses = new List<Line>();
+        _solidPolyline = null;
 
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
 
@@ -370,6 +371,14 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         {
             _solidPolyline = new Polyline(points.Count);
             for (var i = 0; i < points.Count; i++)
+            {
+                _solidPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
+            }
+        }
+        else if (IsLightCreation && points.Count > 2)
+        {
+            _solidPolyline = new Polyline(points.Count - 1);
+            for (var i = 0; i < points.Count - 1; i++)
             {
                 _solidPolyline.AddVertexAt(i, points[i], 0.0, 0.0, 0.0);
             }
@@ -1199,6 +1208,10 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         for (var i = 1; i < points.Count; i++)
         {
             var segment = new Segment(points[i - 1], points[i]);
+
+            // При "легком" создании обрабатываем только последний сегмент
+            if (IsLightCreation && i < points.Count - 1)
+                continue;
 
             action.Invoke(segment);
         }

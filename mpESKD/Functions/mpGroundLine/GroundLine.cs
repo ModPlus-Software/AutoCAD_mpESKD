@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
-using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
@@ -183,6 +182,10 @@ public class GroundLine : SmartLinearEntity
         {
             for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
             {
+                // При "легком" создании обрабатываем только последний сегмент
+                if (IsLightCreation && i < _mainPolyline.NumberOfVertices - 1)
+                    continue;
+
                 var previousPoint = _mainPolyline.GetPoint3dAt(i - 1);
                 var currentPoint = _mainPolyline.GetPoint3dAt(i);
                 _strokes.AddRange(CreateStrokesOnMainPolylineSegment(currentPoint, previousPoint, scale));

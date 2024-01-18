@@ -32,6 +32,11 @@ public interface ILinearEntity
     double Length { get; }
 
     /// <summary>
+    /// Указывает, что для интеллектуального объекта включено "легкое" создание (рисование)
+    /// </summary>
+    bool IsLightCreation { get; set; }
+
+    /// <summary>
     /// Перестроение точек - помещение EndPoint в список
     /// </summary>
     void RebasePoints();
