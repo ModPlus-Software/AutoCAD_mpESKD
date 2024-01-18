@@ -53,6 +53,9 @@ public abstract class SmartLinearEntity : SmartEntity, ILinearEntity
         }
     }
 
+    /// <inheritdoc />
+    public bool IsLightCreation { get; set; }
+
     /// <inheritdoc/>
     public void RebasePoints()
     {

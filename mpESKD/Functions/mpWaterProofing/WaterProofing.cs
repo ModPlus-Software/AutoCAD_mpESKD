@@ -189,6 +189,10 @@ public class WaterProofing : SmartLinearEntity
         {
             for (var i = 1; i < _mainPolyline.NumberOfVertices; i++)
             {
+                // При "легком" создании обрабатываем только последний сегмент
+                if (IsLightCreation && i < _mainPolyline.NumberOfVertices - 1)
+                    continue;
+
                 var segmentStartPoint = _mainPolyline.GetPoint3dAt(i - 1);
                 var segmentEndPoint = _mainPolyline.GetPoint3dAt(i);
                 Vector3d? previousSegmentVector = null;

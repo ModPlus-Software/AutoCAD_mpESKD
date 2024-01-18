@@ -243,7 +243,6 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     {
         try
         {
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
             _scale = GetScale();
             if (EndPointOCS.Equals(Point3d.Origin))
             {
@@ -276,20 +275,20 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
 
         CreateMainPolyline(points);
 
-        if (!LineGeneration)
-        {
-            _texts.AddRange(CreateMTextsByInsertionPoints(points));
-            if (LetterLineType == LetterLineType.Composite)
-            {
-                CreateLinesByInsertionPoints(points);
-            }
-        }
-        else
+        if (LineGeneration)
         {
             CreateMTextOnWholeLengthOfPolyline();
             if (LetterLineType == LetterLineType.Composite)
             {
                 CreateLinesByLineGeneration();
+            }
+        }
+        else
+        {
+            _texts.AddRange(CreateMTextsByInsertionPoints(points));
+            if (LetterLineType == LetterLineType.Composite)
+            {
+                CreateLinesByInsertionPoints(points);
             }
         }
     }
@@ -309,8 +308,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     /// <summary>
     /// создание линий по всем вводимым точкам
     /// </summary>
-    /// <param name="points"></param>
-    /// <returns></returns>
+    /// <param name="points">Points</param>
     private void CreateLinesByInsertionPoints(Point3dCollection points)
     {
         var mTextWidthWithOffset = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
