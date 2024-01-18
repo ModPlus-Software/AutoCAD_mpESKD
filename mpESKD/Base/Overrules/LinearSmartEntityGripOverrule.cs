@@ -28,8 +28,11 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                 var groundLine = EntityReaderService.Instance.GetFromEntity<TEntity>(entity);
                 if (groundLine != null)
                 {
-                    foreach (var grip in GetLinearEntityGeneralGrips(groundLine, curViewUnitSize))
+                    foreach (var grip in GetLinearEntityGeneralGrips(groundLine, curViewUnitSize).Reverse())
                     {
+                        if (grip is LinearEntityRemoveVertexGrip && 
+                            grips.OfType<LinearEntityRemoveVertexGrip>().OrderBy(g => g.GripIndex).Any(g => g.GripPoint.DistanceTo(grip.GripPoint) == 0.0))
+                            continue;
                         grips.Add(grip);
                     }
                 }
