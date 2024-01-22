@@ -18,6 +18,11 @@ using System.Linq;
 public class ConcreteJoint : SmartLinearEntity
 {
     /// <summary>
+    /// Коллекция сегментов
+    /// </summary>
+    private readonly List<ConcreteJointLineSegment> _segments = new ();
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="ConcreteJoint"/> class.
     /// </summary>
     public ConcreteJoint()
@@ -42,8 +47,6 @@ public class ConcreteJoint : SmartLinearEntity
             return points;
         }
     }
-
-    #region Properties
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5.0;
@@ -88,22 +91,18 @@ public class ConcreteJoint : SmartLinearEntity
     [SaveToXData]
     public double EdgeLineWidth { get; set; } = 1;
 
-    #endregion
-
-    #region Geometry
-
-    /// <summary>
-    /// Коллекция линий-изломов
-    /// </summary>
-    private List<Line> _lines = new ();
-
     /// <inheritdoc/>
     public override IEnumerable<Entity> Entities
     {
         get
         {
             var entities = new List<Entity>();
-            entities.AddRange(_lines);
+
+            foreach (var segment in _segments)
+            {
+                entities.AddRange(segment.Lines);
+            }
+
             foreach (var e in entities)
             {
                 SetChangeablePropertiesToNestedEntity(e);
@@ -134,7 +133,7 @@ public class ConcreteJoint : SmartLinearEntity
             {
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
-                InsertionPointOCS.X + (MinDistanceBetweenPoints * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
+                InsertionPointOCS.X + (15 * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
                 CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
             }
             else
@@ -151,40 +150,57 @@ public class ConcreteJoint : SmartLinearEntity
 
     private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
     {
-        _lines.Clear();
-
+        _segments.Clear();
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
-
-        AcadUtils.WriteMessageInDebug($"points.Count={points.Count} =>");
-        AcadUtils.WriteMessageInDebug($"point 1: ({points[0].X},{points[0].Y})");
-        AcadUtils.WriteMessageInDebug($"point 2: ({points[1].X},{points[1].Y})\n");
-
-        // точка обрыва излома в конце предыдущего сегмента = точка начала излома текущего сегмента
-        (Point2d, double) pointStartBreak = (insertionPoint.ToPoint2d(), 0.0);
 
         for (var i = 0; i < points.Count; i++)
         {
-            //if (IsLightCreation && )
+            if (i < points.Count - 1)
+            {
+                if (IsLightCreation && i < points.Count - 2)
+                {
+                    _segments.Add(new ConcreteJointLineSegment(
+                        new List<Line> { new (points[i].ToPoint3d(), points[i + 1].ToPoint3d()) },
+                        points[i + 1],
+                        0));
 
-            AcadUtils.WriteMessageInDebug($"i={i}\n");
+                    continue;
+                }
 
-            if (i  < points.Count -1)
-                pointStartBreak = CreateBreakBlocksBetween2Points(points[i], points[i + 1], pointStartBreak, scale);
+                if (i == 0)
+                {
+                    _segments.Add(CreateSegment(points[i], points[i + 1],
+                        insertionPoint.ToPoint2d(), 0, scale));
+                }
+                else
+                {
+                    _segments.Add(CreateSegment(points[i], points[i + 1],
+                        _segments[i - 1].EndPointLineBreak, _segments[i - 1].RemnantAtEnd, scale));
+                }
+            }
         }
 
-        foreach (var e in _lines)
+        foreach (var segment in _segments)
         {
-            SetChangeablePropertiesToNestedEntity(e);
+            foreach (var line in segment.Lines)
+            {
+                SetChangeablePropertiesToNestedEntity(line);
+            }
         }
     }
 
     /// <summary>
     /// Отрисовка изломов между крайними точками сегмента
     /// </summary>
-    /// <returns>кортеж (точка обрыва излома в конце сегмента , длина неполного излома в конце сегмента в о.е.)</returns>
-    private (Point2d, double) CreateBreakBlocksBetween2Points(Point2d point1, Point2d point2, (Point2d, double) pointStartBreak, double scale)
+    /// <param name="point1">начальная точка сегмента</param>
+    /// <param name="point2">конечная точка сегмента</param>
+    /// <param name="pointPrevEndBreak">точка обрыва излома в конце предыдущего сегмента</param>
+    /// <param name="prevRemnant">длина неполного излома в конце предыдущего сегмента</param>
+    /// <returns>Сегмент линии шва <see cref="ConcreteJointLineSegment"/></returns>
+    private ConcreteJointLineSegment CreateSegment(Point2d point1, Point2d point2,
+        Point2d pointPrevEndBreak, double prevRemnant, double scale)
     {
-        var result = (point2, 0.0);
+        ConcreteJointLineSegment result = new (new List<Line>(), Point2d.Origin, 0d);
 
         var normalVector = (point2 - point1).GetNormal();
         var perpendicularVector = normalVector.GetPerpendicularVector();
@@ -195,13 +211,13 @@ public class ConcreteJoint : SmartLinearEntity
         // вектор длиной, равной высоте излома, перпендикулярный линии шва
         var breakPerpendicularVector = perpendicularVector * BreakHeight * scale;
 
-        // точка на средней линии, на кот. опускается перпендикуляр от точки pointStartBreak
+        // точка на средней линии, на кот. опускается перпендикуляр от точки pointPrevEndBreak
         Point2d pointStart;
 
-        // Если первая точка на средней линии шва не совпадает с последней точкой излома предыдущего участка
-        if (!point1.Equals(pointStartBreak.Item1))
+        // Если первая точка на оси шва не совпадает с последней точкой излома предыдущего участка
+        if (!point1.Equals(pointPrevEndBreak))
         {
-            pointStart = GetIntersectBetweenVectors(pointStartBreak.Item1, perpendicularVector, point1, normalVector);
+            pointStart = GetIntersectBetweenVectors(pointPrevEndBreak, perpendicularVector, point1, normalVector);
 
             // если нет наклона текущего участка по отношению к предыдущему
             if (pointStart == default)
@@ -212,42 +228,51 @@ public class ConcreteJoint : SmartLinearEntity
             if (!EdgeLineVisible)
             {
                 // отрисовка излома-префикса и определение точки начала отрисовки основного блока изломов
-                pointStart += normalVector * DrawPrefixBreak(pointStart, pointStartBreak, scale, normalVector, breakPerpendicularVector);
+                var prefixBreak = GetPrefixBreak(pointStart, pointPrevEndBreak, prevRemnant, scale, normalVector,
+                    breakPerpendicularVector);
+                var prefixBreakLines = prefixBreak.Item1;
+                var prefixBreakLenght = prefixBreak.Item2;
+
+                pointStart += normalVector * prefixBreakLenght;
+
+                result.Lines.AddRange(prefixBreakLines);
             }
             else
             {
                 pointStart = point1 + (normalVector * EdgeLineWidth * scale);
-                _lines.Add(new Line(point1.ToPoint3d(), pointStart.ToPoint3d()));
+
+                // Рисуется префикс как линия вдоль оси шва
+                result.Lines.Add(new Line(point1.ToPoint3d(), pointStart.ToPoint3d()));
             }
         }
         else
         {
-            if (EdgeLineVisible)
+            if (!EdgeLineVisible)
             {
-                pointStart = point1 + (normalVector * EdgeLineWidth * scale);
-                _lines.Add(new Line(point1.ToPoint3d(), pointStart.ToPoint3d()));
+                pointStart = point1;
             }
             else
             {
-                pointStart = point1;
+                pointStart = point1 + (normalVector * EdgeLineWidth * scale);
+                result.Lines.Add(new Line(point1.ToPoint3d(), pointStart.ToPoint3d()));
             }
         }
 
         var length = pointStart.GetDistanceTo(point2) - (EdgeLineVisible ? (EdgeLineWidth * scale) : 0);
 
         // количество целых изломов
-        int breakBlocksCount = (int)(length / BreakWidth / scale);
+        var breakBlocksCount = (int)(length / BreakWidth / scale);
 
         if (breakBlocksCount > 0)
         {
             // массив граничных точек изломов
-            Point2d[] limitBlockPoints = new Point2d[breakBlocksCount + 1];
+            var limitBlockPoints = new Point2d[breakBlocksCount + 1];
             for (int i = 0; i < limitBlockPoints.Count(); i++)
             {
                 limitBlockPoints[i] = i == 0 ? pointStart : pointStart + (normalVector * BreakWidth * i * scale);
             }
 
-            for (int i = 0; i < limitBlockPoints.Count() - 1; i++)
+            for (var i = 0; i < limitBlockPoints.Count() - 1; i++)
             {
                 // точка на 1/4 отрезка излома
                 var point12Start = limitBlockPoints[i] + (breakNormalVector * 0.25);
@@ -261,9 +286,9 @@ public class ConcreteJoint : SmartLinearEntity
                 // отложить от нее перпендикуляр на расстоянии -h/2
                 var point14 = point14Start + (breakPerpendicularVector.Negate() * 0.50);
 
-                _lines.Add(new Line(limitBlockPoints[i].ToPoint3d(), point12.ToPoint3d()));
-                _lines.Add(new Line(point12.ToPoint3d(), point14.ToPoint3d()));
-                _lines.Add(new Line(point14.ToPoint3d(), limitBlockPoints[i + 1].ToPoint3d()));
+                result.Lines.Add(new Line(limitBlockPoints[i].ToPoint3d(), point12.ToPoint3d()));
+                result.Lines.Add(new Line(point12.ToPoint3d(), point14.ToPoint3d()));
+                result.Lines.Add(new Line(point14.ToPoint3d(), limitBlockPoints[i + 1].ToPoint3d()));
             }
 
             // длина неполного излома в конце сегмента
@@ -271,22 +296,32 @@ public class ConcreteJoint : SmartLinearEntity
 
             if (remnant > 0)
             {
-                result = DrawSuffixBreak(limitBlockPoints, remnant, scale, breakNormalVector,
+                result.RemnantAtEnd = remnant;
+
+                var suffixBreak = DrawSuffixBreak(limitBlockPoints, remnant, scale, breakNormalVector,
                     breakPerpendicularVector, normalVector, perpendicularVector);
 
+                var suffixBreakLines = suffixBreak.Item1;
+                var suffixBreakEndPoint = suffixBreak.Item2;
+
+                result.Lines.AddRange(suffixBreakLines);
+                result.EndPointLineBreak = suffixBreakEndPoint;
+
                 if (EdgeLineVisible)
-                    _lines.Add(new Line(result.Item1.ToPoint3d(), point2.ToPoint3d()));
+                {
+                    result.Lines.Add(new Line(suffixBreakEndPoint.ToPoint3d(), point2.ToPoint3d()));
+                }
             }
             else if (EdgeLineVisible)
             {
-                _lines.Add(new Line(limitBlockPoints.Last().ToPoint3d(), point2.ToPoint3d()));
+                result.Lines.Add(new Line(limitBlockPoints.Last().ToPoint3d(), point2.ToPoint3d()));
             }
         }
         else
         {
             if (EdgeLineVisible)
             {
-                _lines.Add(new Line(pointStart.ToPoint3d(), point2.ToPoint3d()));
+                result.Lines.Add(new Line(pointStart.ToPoint3d(), point2.ToPoint3d()));
             }
         }
 
@@ -294,17 +329,18 @@ public class ConcreteJoint : SmartLinearEntity
     }
 
     /// <summary>
-    /// Отрисовка префикса (неполного излома в начале сегмента)
+    /// Возвращает префикс (неполный излом в начале сегмента)
     /// </summary>
-    private double DrawPrefixBreak(Point2d pointStart, (Point2d, double) pointStartBreak,
+    /// <returns>Кортеж (список_линий_префикса, длина_префикса)</returns>
+    private (List<Line>, double) GetPrefixBreak(Point2d pointStart, Point2d pointStartBreak, double prevRemnant,
         double scale, Vector2d normalVector, Vector2d breakPerpendicularVector)
     {
         var h = BreakHeight * scale;
         var w = BreakWidth * scale;
 
-        var revativePrevRemant = pointStartBreak.Item2;
+        var revativePrevRemnant = prevRemnant / BreakWidth / scale;
 
-        var distanceStartBreakPointToStartPoint = pointStartBreak.Item1.GetDistanceTo(pointStart);
+        var distanceStartBreakPointToStartPoint = pointStartBreak.GetDistanceTo(pointStart);
 
         // точка на середине излома
         Point2d point3;
@@ -317,9 +353,9 @@ public class ConcreteJoint : SmartLinearEntity
 
         Point2d endPoint;
 
-        switch (revativePrevRemant)
+        switch (revativePrevRemnant)
         {
-            case var x when x < 0.25:
+            case < 0.25:
 
                 double distanceToPoint2;
                 if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
@@ -330,7 +366,7 @@ public class ConcreteJoint : SmartLinearEntity
                 var distanceToPoint2Start = w / (2 * h) * distanceToPoint2;
 
                 // точка излома на 1/4 ширины излома от начала
-                var point2Start = pointStartBreak.Item1 + (normalVector * distanceToPoint2Start);
+                var point2Start = pointStartBreak + (normalVector * distanceToPoint2Start);
 
                 // точка излома на 1/4 ширины излома от начала, вверх на половину высоты
                 var point2 = point2Start + (normalVector.GetPerpendicularVector() * distanceToPoint2);
@@ -340,14 +376,16 @@ public class ConcreteJoint : SmartLinearEntity
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
                 endPoint = pointStart + (normalVector * (distanceToPoint2Start + (0.75 * w)));
 
-                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point2.ToPoint3d()));
-                _lines.Add(new Line(point2.ToPoint3d(), point3.ToPoint3d()));
-                _lines.Add(new Line(point3.ToPoint3d(), point4.ToPoint3d()));
-                _lines.Add(new Line(point4.ToPoint3d(), endPoint.ToPoint3d()));
+                return (new List<Line>
+                    {
+                        new (pointStartBreak.ToPoint3d(), point2.ToPoint3d()),
+                        new (point2.ToPoint3d(), point3.ToPoint3d()),
+                        new (point3.ToPoint3d(), point4.ToPoint3d()),
+                        new (point4.ToPoint3d(), endPoint.ToPoint3d()),
+                    },
+                    endPoint.GetDistanceTo(pointStart));
 
-                return endPoint.GetDistanceTo(pointStart);
-
-            case var x when x >= 0.25 && x < 0.50:
+            case >= 0.25 and < 0.50:
                 var distanceToPoint3Start = w / (2 * h) * distanceStartBreakPointToStartPoint;
 
                 point3 = pointStart + (normalVector * distanceToPoint3Start);
@@ -355,13 +393,15 @@ public class ConcreteJoint : SmartLinearEntity
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
                 endPoint = pointStart + (normalVector * (distanceToPoint3Start + (0.50 * w)));
 
-                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point3.ToPoint3d()));
-                _lines.Add(new Line(point3.ToPoint3d(), point4.ToPoint3d()));
-                _lines.Add(new Line(point4.ToPoint3d(), endPoint.ToPoint3d()));
+                return (new List<Line>
+                    {
+                        new (pointStartBreak.ToPoint3d(), point3.ToPoint3d()),
+                        new (point3.ToPoint3d(), point4.ToPoint3d()),
+                        new (point4.ToPoint3d(), endPoint.ToPoint3d()),
+                    },
+                    endPoint.GetDistanceTo(pointStart));
 
-                return endPoint.GetDistanceTo(pointStart);
-
-            case var x when x >= 0.50 && x < 0.75:
+            case >= 0.50 and < 0.75:
                 double distanceToPoint4;
                 if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
                     distanceToPoint4 = (h / 2) - distanceStartBreakPointToStartPoint;
@@ -373,18 +413,22 @@ public class ConcreteJoint : SmartLinearEntity
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
                 endPoint = pointStart + (normalVector * (distanceToPoint4Start + (w * 0.25)));
 
-                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), point4.ToPoint3d()));
-                _lines.Add(new Line(point4.ToPoint3d(), endPoint.ToPoint3d()));
+                return (new List<Line>
+                    {
+                        new (pointStartBreak.ToPoint3d(), point4.ToPoint3d()),
+                        new (point4.ToPoint3d(), endPoint.ToPoint3d()),
+                    },
+                    endPoint.GetDistanceTo(pointStart));
 
-                return endPoint.GetDistanceTo(pointStart);
-
-            case var x when x >= 0.75:
+            case >= 0.75:
                 var distanceToEndPoint = w / (2 * h) * distanceStartBreakPointToStartPoint;
                 endPoint = pointStart + (normalVector * distanceToEndPoint);
 
-                _lines.Add(new Line(pointStartBreak.Item1.ToPoint3d(), endPoint.ToPoint3d()));
-
-                return endPoint.GetDistanceTo(pointStart);
+                return (new List<Line>
+                    {
+                        new (pointStartBreak.ToPoint3d(), endPoint.ToPoint3d()),
+                    },
+                    endPoint.GetDistanceTo(pointStart));
 
             default:
                 return default;
@@ -394,7 +438,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Отрисовка суффикса (неполного излома в конце сегмента)
     /// </summary>
-    private (Point2d, double) DrawSuffixBreak(Point2d[] limitBlockPoints, double remnant,
+    private (List<Line>, Point2d) DrawSuffixBreak(Point2d[] limitBlockPoints, double remnant,
         double scale, Vector2d breakNormalVector, Vector2d breakPerpendicularVector, Vector2d normalVector,
         Vector2d perpendicularVector)
     {
@@ -424,65 +468,92 @@ public class ConcreteJoint : SmartLinearEntity
 
         switch (revativeRemant)
         {
-            case var x when x < 0.25:
+            case < 0.25:
                 var point12Remnant = remnantEndPoint + (perpendicularVector * (2 * h * remnant / w));
 
                 if (!EdgeLineVisible)
                 {
-                    _lines.Add(new Line(remnantPoint1.ToPoint3d(), point12Remnant.ToPoint3d()));
-                    return (point12Remnant, revativeRemant);
+                    return (new List<Line>
+                        {
+                            new (remnantPoint1.ToPoint3d(), point12Remnant.ToPoint3d()),
+                        },
+                        point12Remnant);
                 }
                 else
                 {
-                    _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantEndPoint.ToPoint3d()));
-                    return (remnantEndPoint, 0);
+                    return (new List<Line>
+                        {
+                            new (remnantPoint1.ToPoint3d(), remnantEndPoint.ToPoint3d()),
+                        },
+                        remnantEndPoint);
                 }
 
-            case var x when x >= 0.25 && x < 0.50:
+            case >= 0.25 and < 0.50:
                 if (!EdgeLineVisible)
                 {
-                    _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
                     var point23Remnant = remnantEndPoint + (perpendicularVector * 2 * h / w * ((w / 2) - remnant));
-                    _lines.Add(new Line(remnantPoint2.ToPoint3d(), point23Remnant.ToPoint3d()));
-                    return (point23Remnant, revativeRemant);
+
+                    return (new List<Line>
+                        {
+                            new (remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()),
+                            new (remnantPoint2.ToPoint3d(), point23Remnant.ToPoint3d()),
+                        },
+                        point23Remnant);
                 }
                 else
                 {
-                    _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantEndPoint.ToPoint3d()));
-                    return (remnantEndPoint, 0);
+                    return (new List<Line>
+                        {
+                            new (remnantPoint1.ToPoint3d(), remnantEndPoint.ToPoint3d()),
+                        },
+                        remnantEndPoint);
                 }
 
-            case var x when x >= 0.50 && x < 0.75:
-                _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
-                _lines.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint3.ToPoint3d()));
+            case >= 0.50 and < 0.75:
+                var linesNext50 = new List<Line>
+                {
+                    new (remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()),
+                    new (remnantPoint2.ToPoint3d(), remnantPoint3.ToPoint3d()),
+                };
 
                 if (!EdgeLineVisible)
                 {
-                    var point34Remnant = remnantEndPoint + (perpendicularVector.Negate() * (2 * h * (remnant - (w / 2)) / w));
-                    _lines.Add(new Line(remnantPoint3.ToPoint3d(), point34Remnant.ToPoint3d()));
-                    return (point34Remnant, revativeRemant);
+                    var point34Remnant = remnantEndPoint +
+                                         (perpendicularVector.Negate() * (2 * h * (remnant - (w / 2)) / w));
+
+                    linesNext50.Add(new (remnantPoint3.ToPoint3d(), point34Remnant.ToPoint3d()));
+
+                    return (linesNext50, point34Remnant);
                 }
                 else
                 {
-                    _lines.Add(new Line(remnantPoint3.ToPoint3d(), remnantEndPoint.ToPoint3d()));
-                    return (remnantEndPoint, 0);
+                    linesNext50.Add(new (remnantPoint3.ToPoint3d(), remnantEndPoint.ToPoint3d()));
+
+                    return (linesNext50, remnantEndPoint);
                 }
 
-            case var x when x >= 0.75:
-                _lines.Add(new Line(remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()));
+            case >= 0.75:
+                var linesNext75 = new List<Line>
+                {
+                    new (remnantPoint1.ToPoint3d(), remnantPoint2.ToPoint3d()),
+                };
 
                 if (!EdgeLineVisible)
                 {
-                    _lines.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint4.ToPoint3d()));
-                    var point45Remnant = remnantEndPoint + (perpendicularVector.Negate() * 2 * h / w * ((w / 2) - (remnant - (w / 2))));
-                    _lines.Add(new Line(remnantPoint4.ToPoint3d(), point45Remnant.ToPoint3d()));
-                    return (point45Remnant, revativeRemant);
+                    var point45Remnant = remnantEndPoint +
+                                         (perpendicularVector.Negate() * 2 * h / w * ((w / 2) - (remnant - (w / 2))));
+
+                    linesNext75.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint4.ToPoint3d()));
+                    linesNext75.Add(new Line(remnantPoint4.ToPoint3d(), point45Remnant.ToPoint3d()));
+
+                    return (linesNext75, point45Remnant);
                 }
                 else
                 {
-                    _lines.Add(new Line(remnantPoint2.ToPoint3d(), remnantPoint3.ToPoint3d()));
-                    _lines.Add(new Line(remnantPoint3.ToPoint3d(), remnantEndPoint.ToPoint3d()));
-                    return (remnantEndPoint, 0);
+                    linesNext75.Add(new (remnantPoint2.ToPoint3d(), remnantPoint3.ToPoint3d()));
+                    linesNext75.Add(new (remnantPoint3.ToPoint3d(), remnantEndPoint.ToPoint3d()));
+
+                    return (linesNext75, remnantEndPoint);
                 }
 
             default:
@@ -500,21 +571,21 @@ public class ConcreteJoint : SmartLinearEntity
 
         // далее по уравнению прямой по двум точкам
 
-        var x1_1 = point1.X;
-        var y1_1 = point1.Y;
-        var x2_1 = v1.X;
-        var y2_1 = v1.Y;
+        var x11 = point1.X;
+        var y11 = point1.Y;
+        var x21 = v1.X;
+        var y21 = v1.Y;
 
-        var x1_2 = point2.X;
-        var y1_2 = point2.Y;
-        var x2_2 = v2.X;
-        var y2_2 = v2.Y;
+        var x12 = point2.X;
+        var y12 = point2.Y;
+        var x22 = v2.X;
+        var y22 = v2.Y;
 
-        var a1 = (y2_1 - y1_1) / (x2_1 - x1_1);
-        var a2 = (y2_2 - y1_2) / (x2_2 - x1_2);
+        var a1 = (y21 - y11) / (x21 - x11);
+        var a2 = (y22 - y12) / (x22 - x12);
 
-        var b1 = ((y1_1 * (x2_1 - x1_1)) + (x1_1 * (y1_1 - y2_1))) / (x2_1 - x1_1);
-        var b2 = ((y1_2 * (x2_2 - x1_2)) + (x1_2 * (y1_2 - y2_2))) / (x2_2 - x1_2);
+        var b1 = ((y11 * (x21 - x11)) + (x11 * (y11 - y21))) / (x21 - x11);
+        var b2 = ((y12 * (x22 - x12)) + (x12 * (y12 - y22))) / (x22 - x12);
 
         var x = (b1 - b2) / (a2 - a1);
         var y = (a2 * x) + b2;
@@ -522,7 +593,8 @@ public class ConcreteJoint : SmartLinearEntity
         return !double.IsNaN(x) || !double.IsNaN(y) ? new Point2d(x, y) : default;
     }
 
-    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
+    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints,
+        Point3d endPoint)
     {
         // ReSharper disable once UseObjectOrCollectionInitializer
         var points = new Point2dCollection
@@ -535,6 +607,4 @@ public class ConcreteJoint : SmartLinearEntity
 
         return points;
     }
-
-    #endregion
 }
