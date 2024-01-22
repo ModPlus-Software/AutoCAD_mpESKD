@@ -10,7 +10,7 @@ using DocumentFormat.OpenXml.ExtendedProperties;
 /// </summary>
 internal struct ConcreteJointLineSegment
 {
-    internal ConcreteJointLineSegment(List<Line> lines, Point2d endPointLineBreak,
+    internal ConcreteJointLineSegment(List<Polyline> lines, Point2d endPointLineBreak,
         double remnantAtEnd)
     {
         Lines = lines;
@@ -21,7 +21,7 @@ internal struct ConcreteJointLineSegment
     /// <summary>
     /// Линии, из которых состоит сегмент
     /// </summary>
-    internal List<Line> Lines { get; set; }
+    internal List<Polyline> Lines { get; set; }
 
     /// <summary>
     /// Точка, в которой прерывается линия шва в конце сегмента
