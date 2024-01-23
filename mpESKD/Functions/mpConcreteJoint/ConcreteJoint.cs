@@ -100,20 +100,6 @@ public class ConcreteJoint : SmartLinearEntity
     {
         get
         {
-            ////var entities = new List<Entity>();
-
-            ////foreach (var segment in _segments)
-            ////{
-            ////    entities.AddRange(segment.Polylines);
-            ////}
-
-            ////foreach (var e in entities)
-            ////{
-            ////    SetChangeablePropertiesToNestedEntity(e);
-            ////}
-
-            ////return entities;
-
             if (_mainPolyline != null)
             {
                 SetChangeablePropertiesToNestedEntity(_mainPolyline);
