@@ -147,6 +147,14 @@
 		<PackageReference Include="ModPlus.AutoCAD.Module.2024" Version="10.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16_dark.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32_dark.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16_dark.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32.png" />
+	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32_dark.png" />
 	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16.png" />
 	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16_dark.png" />
 	</ItemGroup>
@@ -176,6 +184,14 @@
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLine_32x32_dark.png" />
 		<Resource Include="Functions\mpChainLeader\Icons\mpChainLeader_32x32.png" />
 		<Resource Include="Functions\mpChainLeader\Icons\mpChainLeader_32x32_dark.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16_dark.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32_dark.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16_dark.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32.png" />
+		<Resource Include="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32_dark.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_16x16_dark.png" />
 		<Resource Include="Functions\mpFragmentMarker\Icons\mpFragmentMarker_32x32.png" />
@@ -287,10 +303,6 @@
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
 		</Page>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Functions\mpConcreteJoint\Icons\" />
 	</ItemGroup>
 
 </Project>
