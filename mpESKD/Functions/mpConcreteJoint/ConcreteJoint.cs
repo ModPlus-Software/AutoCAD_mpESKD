@@ -22,6 +22,16 @@ public class ConcreteJoint : SmartLinearEntity
     /// </summary>
     private readonly List<ConcreteJointLineSegment> _segments = new ();
 
+    private List<Point3d> MiddlePointsOCS
+    {
+        get
+        {
+            var points = new List<Point3d>();
+            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
+            return points;
+        }
+    }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ConcreteJoint"/> class.
     /// </summary>
@@ -38,15 +48,6 @@ public class ConcreteJoint : SmartLinearEntity
     {
     }
 
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5.0;
