@@ -3,13 +3,18 @@
 using System.Collections.Generic;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using DocumentFormat.OpenXml.ExtendedProperties;
 
 /// <summary>
 /// Сегмент линии шва бетонирования
 /// </summary>
 internal struct ConcreteJointLineSegment
 {
+    /// <summary>
+    /// Сегмент шва
+    /// </summary>
+    /// <param name="polylines">Полилинии, из которых состоит сегмент</param>
+    /// <param name="endPointLineBreak">Точка, в которой прерывается линия шва в конце сегмента</param>
+    /// <param name="remnantAtEnd">Длина неполного излома в конце сегмента, вдоль центральной линии</param>
     internal ConcreteJointLineSegment(List<Polyline> polylines, Point2d endPointLineBreak, double remnantAtEnd)
     {
         Polylines = polylines;
@@ -18,7 +23,7 @@ internal struct ConcreteJointLineSegment
     }
 
     /// <summary>
-    /// Линии, из которых состоит сегмент
+    /// Полилинии, из которых состоит сегмент
     /// </summary>
     internal List<Polyline> Polylines { get; }
 

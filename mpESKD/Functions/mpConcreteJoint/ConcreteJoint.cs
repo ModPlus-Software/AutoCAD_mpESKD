@@ -512,12 +512,12 @@ public class ConcreteJoint : SmartLinearEntity
                 return (line, remnantEndPoint);
 
             case >= 0.25 and < 0.50:
-                line.AddVertexAt(0, remnantPoint1, 0, 0, 0);
+                line.AddVertexAt(0, remnantPoint2, 0, 0, 0);
 
                 if (!EdgeLineVisible)
                 {
                     var point23Remnant = remnantEndPoint + (perpendicularVector * 2 * h / w * ((w / 2) - remnant));
-                    line.AddVertexAt(1, remnantPoint2, 0, 0, 0);
+                    line.AddVertexAt(1, point23Remnant, 0, 0, 0);
                     return (line, point23Remnant);
                 }
 
