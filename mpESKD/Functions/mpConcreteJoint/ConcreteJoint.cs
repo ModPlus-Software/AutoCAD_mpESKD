@@ -9,6 +9,7 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using ModPlus.Extensions;
 
 /// <summary>
 /// Шов бетонирования
@@ -22,15 +23,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// </summary>
     private readonly List<ConcreteJointLineSegment> _segments = new ();
 
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
+    private Polyline _mainPolyline;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConcreteJoint"/> class.
@@ -48,6 +41,16 @@ public class ConcreteJoint : SmartLinearEntity
     {
     }
 
+    // ReSharper disable once InconsistentNaming
+    private List<Point3d> MiddlePointsOCS
+    {
+        get
+        {
+            var points = new List<Point3d>();
+            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
+            return points;
+        }
+    }
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5.0;
@@ -97,19 +100,11 @@ public class ConcreteJoint : SmartLinearEntity
     {
         get
         {
-            var entities = new List<Entity>();
-
-            foreach (var segment in _segments)
+            if (_mainPolyline != null)
             {
-                entities.AddRange(segment.Lines);
+                SetChangeablePropertiesToNestedEntity(_mainPolyline);
+                yield return _mainPolyline;
             }
-
-            foreach (var e in entities)
-            {
-                SetChangeablePropertiesToNestedEntity(e);
-            }
-
-            return entities;
         }
     }
 
@@ -154,46 +149,44 @@ public class ConcreteJoint : SmartLinearEntity
         _segments.Clear();
         var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
 
-        for (var i = 0; i < points.Count; i++)
+        for (var i = 0; i < points.Count - 1; i++)
         {
-            if (i < points.Count - 1)
+            if (i == 0)
             {
-                if (IsLightCreation && i < points.Count - 2)
-                {
-                   
-                    var newLine = new Polyline();
-                    newLine.AddVertexAt(0, points[i], 0, 0, 0);
-                    newLine.AddVertexAt(0, points[i + 1], 0, 0, 0);
-
-                    _segments.Add(new ConcreteJointLineSegment(
-                        new List<Polyline>
-                        {
-                            newLine
-                        },
-                        points[i + 1],
-                        0));
-
-                    continue;
-                }
-
-                if (i == 0)
-                {
-                    _segments.Add(CreateSegment(points[i], points[i + 1],
-                        insertionPoint.ToPoint2d(), 0, scale));
-                }
-                else
-                {
-                    _segments.Add(CreateSegment(points[i], points[i + 1],
-                        _segments[i - 1].EndPointLineBreak, _segments[i - 1].RemnantAtEnd, scale));
-                }
+                _segments.Add(CreateSegment(points[i], points[i + 1], insertionPoint.ToPoint2d(), 0, scale));
+            }
+            else
+            {
+                _segments.Add(CreateSegment(
+                    points[i],
+                    points[i + 1],
+                    _segments[i - 1].EndPointLineBreak,
+                    _segments[i - 1].RemnantAtEnd,
+                    scale));
             }
         }
 
-        foreach (var segment in _segments)
+        _mainPolyline = new Polyline();
+        var index = 0;
+        for (var si = 0; si < _segments.Count; si++)
         {
-            foreach (var line in segment.Lines)
+            var segment = _segments[si];
+            if (IsLightCreation && si < _segments.Count - 1)
             {
-                SetChangeablePropertiesToNestedEntity(line);
+                _mainPolyline.AddVertexAt(index, segment.Polylines.First().GetPoint2dAt(0), 0, 0, 0);
+                _mainPolyline.AddVertexAt(index + 1, segment.Polylines.Last().GetPoint2dAt(segment.Polylines.Last().NumberOfVertices - 1), 0, 0, 0);
+                index += 2;
+            }
+            else
+            {
+                foreach (var polyline in segment.Polylines)
+                {
+                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                    {
+                        _mainPolyline.AddVertexAt(index, polyline.GetPoint2dAt(i), 0, 0, 0);
+                        index++;
+                    }
+                }
             }
         }
     }
@@ -205,6 +198,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// <param name="point2">конечная точка сегмента</param>
     /// <param name="pointPrevEndBreak">точка обрыва излома в конце предыдущего сегмента</param>
     /// <param name="prevRemnant">длина неполного излома в конце предыдущего сегмента</param>
+    /// <param name="scale">Масштаб</param>
     /// <returns>Сегмент линии шва <see cref="ConcreteJointLineSegment"/></returns>
     private ConcreteJointLineSegment CreateSegment(Point2d point1, Point2d point2,
         Point2d pointPrevEndBreak, double prevRemnant, double scale)
@@ -244,18 +238,18 @@ public class ConcreteJoint : SmartLinearEntity
 
                 pointStart += normalVector * prefixBreakLenght;
 
-                result.Lines.Add(prefixBreakLines);
+                result.Polylines.Add(prefixBreakLines);
             }
             else
             {
                 pointStart = point1 + (normalVector * EdgeLineWidth * scale);
 
                 var line = new Polyline();
-                line.AddVertexAt(0,point1,0,0,0);
+                line.AddVertexAt(0, point1, 0, 0, 0);
                 line.AddVertexAt(1, pointStart, 0, 0, 0);
 
                 // Рисуется префикс как линия вдоль оси шва
-                result.Lines.Add(line);
+                result.Polylines.Add(line);
             }
         }
         else
@@ -273,7 +267,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(1, pointStart, 0, 0, 0);
 
                 // Рисуется префикс как линия вдоль оси шва
-                result.Lines.Add(line);
+                result.Polylines.Add(line);
             }
         }
 
@@ -286,12 +280,12 @@ public class ConcreteJoint : SmartLinearEntity
         {
             // массив граничных точек изломов
             var limitBlockPoints = new Point2d[breakBlocksCount + 1];
-            for (int i = 0; i < limitBlockPoints.Count(); i++)
+            for (int i = 0; i < limitBlockPoints.Length; i++)
             {
                 limitBlockPoints[i] = i == 0 ? pointStart : pointStart + (normalVector * BreakWidth * i * scale);
             }
 
-            for (var i = 0; i < limitBlockPoints.Count() - 1; i++)
+            for (var i = 0; i < limitBlockPoints.Length - 1; i++)
             {
                 // точка на 1/4 отрезка излома
                 var point12Start = limitBlockPoints[i] + (breakNormalVector * 0.25);
@@ -306,12 +300,12 @@ public class ConcreteJoint : SmartLinearEntity
                 var point14 = point14Start + (breakPerpendicularVector.Negate() * 0.50);
 
                 var line = new Polyline();
-                line.AddVertexAt(0, limitBlockPoints[i],0,0,0);
+                line.AddVertexAt(0, limitBlockPoints[i], 0, 0, 0);
                 line.AddVertexAt(1, point12, 0, 0, 0);
                 line.AddVertexAt(2, point14, 0, 0, 0);
-                line.AddVertexAt(3, limitBlockPoints[i+1], 0, 0, 0);
+                line.AddVertexAt(3, limitBlockPoints[i + 1], 0, 0, 0);
 
-                result.Lines.Add(line);
+                result.Polylines.Add(line);
             }
 
             // длина неполного излома в конце сегмента
@@ -327,7 +321,7 @@ public class ConcreteJoint : SmartLinearEntity
                 var remnantLine = suffixBreak.Item1;
                 var suffixBreakEndPoint = suffixBreak.Item2;
 
-                result.Lines.Add(remnantLine);
+                result.Polylines.Add(remnantLine);
                 result.EndPointLineBreak = suffixBreakEndPoint;
 
                 if (EdgeLineVisible)
@@ -336,7 +330,7 @@ public class ConcreteJoint : SmartLinearEntity
                     line.AddVertexAt(0, suffixBreakEndPoint, 0, 0, 0);
                     line.AddVertexAt(1, point2, 0, 0, 0);
 
-                    result.Lines.Add(line);
+                    result.Polylines.Add(line);
                 }
             }
             else if (EdgeLineVisible)
@@ -345,7 +339,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(0, limitBlockPoints.Last(), 0, 0, 0);
                 line.AddVertexAt(1, point2, 0, 0, 0);
 
-                result.Lines.Add(line);
+                result.Polylines.Add(line);
             }
         }
         else
@@ -356,7 +350,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(0, pointStart, 0, 0, 0);
                 line.AddVertexAt(1, point2, 0, 0, 0);
 
-                result.Lines.Add(line);
+                result.Polylines.Add(line);
             }
         }
 
@@ -413,12 +407,12 @@ public class ConcreteJoint : SmartLinearEntity
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
                 endPoint = pointStart + (normalVector * (distanceToPoint2Start + (0.75 * w)));
 
-                line.AddVertexAt(0, pointStartBreak,0,0,0);
+                line.AddVertexAt(0, pointStartBreak, 0, 0, 0);
                 line.AddVertexAt(1, point2, 0, 0, 0);
                 line.AddVertexAt(2, point3, 0, 0, 0);
                 line.AddVertexAt(3, point4, 0, 0, 0);
                 line.AddVertexAt(4, endPoint, 0, 0, 0);
-                
+
                 return (line, endPoint.GetDistanceTo(pointStart));
 
             case >= 0.25 and < 0.50:
@@ -429,7 +423,7 @@ public class ConcreteJoint : SmartLinearEntity
                 point4 = point4Start + (breakPerpendicularVector.Negate() * 0.50);
                 endPoint = pointStart + (normalVector * (distanceToPoint3Start + (0.50 * w)));
 
-                line.AddVertexAt(0, pointStartBreak,0,0,0);
+                line.AddVertexAt(0, pointStartBreak, 0, 0, 0);
                 line.AddVertexAt(1, point3, 0, 0, 0);
                 line.AddVertexAt(2, point4, 0, 0, 0);
                 line.AddVertexAt(3, endPoint, 0, 0, 0);
@@ -506,7 +500,7 @@ public class ConcreteJoint : SmartLinearEntity
             case < 0.25:
                 var point12Remnant = remnantEndPoint + (perpendicularVector * (2 * h * remnant / w));
 
-                line.AddVertexAt(0,remnantPoint1,0,0,0);
+                line.AddVertexAt(0, remnantPoint1, 0, 0, 0);
 
                 if (!EdgeLineVisible)
                 {
