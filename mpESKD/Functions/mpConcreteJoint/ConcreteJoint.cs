@@ -165,23 +165,6 @@ public class ConcreteJoint : SmartLinearEntity
 
         for (var i = 0; i < points.Count - 1; i++)
         {
-            //if (IsLightCreation && i < points.Count - 2)
-            //{
-            //    var newLine = new Polyline();
-            //    newLine.AddVertexAt(0, points[i], 0, 0, 0);
-            //    newLine.AddVertexAt(0, points[i + 1], 0, 0, 0);
-
-            //    _segments.Add(new ConcreteJointLineSegment(
-            //        new List<Polyline>
-            //        {
-            //            newLine
-            //        },
-            //        points[i + 1],
-            //        0));
-
-            //    continue;
-            //}
-
             if (i == 0)
             {
                 _segments.Add(CreateSegment(points[i], points[i + 1], insertionPoint.ToPoint2d(), 0, scale));
@@ -199,14 +182,24 @@ public class ConcreteJoint : SmartLinearEntity
 
         _mainPolyline = new Polyline();
         var index = 0;
-        foreach (var segment in _segments)
+        for (var si = 0; si < _segments.Count; si++)
         {
-            foreach (var polyline in segment.Polylines)
+            var segment = _segments[si];
+            if (IsLightCreation && si < _segments.Count - 1)
             {
-                for (int i = 0; i < polyline.NumberOfVertices; i++)
+                _mainPolyline.AddVertexAt(index, segment.Polylines.First().GetPoint2dAt(0), 0, 0, 0);
+                _mainPolyline.AddVertexAt(index + 1, segment.Polylines.Last().GetPoint2dAt(segment.Polylines.Last().NumberOfVertices - 1), 0, 0, 0);
+                index += 2;
+            }
+            else
+            {
+                foreach (var polyline in segment.Polylines)
                 {
-                    _mainPolyline.AddVertexAt(index, polyline.GetPoint2dAt(i), 0, 0, 0);
-                    index++;
+                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                    {
+                        _mainPolyline.AddVertexAt(index, polyline.GetPoint2dAt(i), 0, 0, 0);
+                        index++;
+                    }
                 }
             }
         }
