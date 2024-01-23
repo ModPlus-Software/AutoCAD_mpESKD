@@ -15,15 +15,15 @@ public class ConcreteJointDescriptor : ISmartEntityDescriptor
     public string Name => "mpConcreteJoint";
 
     /// <inheritdoc />
-    // "Шов бетонирования";
+    /// Шов бетонирования
     public string LName => Language.GetItem("h191");
 
     /// <inheritdoc />
-    // "Отрисовка линии шва бетонирования";
+    /// Создание шва бетонирования
     public string Description => Language.GetItem("h192");
 
     /// <inheritdoc />
-    // "Создание интеллектуального объекта на основе анонимного блока, описывающего линию шва бетонирования";
+    /// Создание интеллектуального объекта на основе анонимного блока, описывающего шов бетонирования
     public string FullDescription => Language.GetItem("h193");
 
     /// <inheritdoc />
@@ -38,14 +38,14 @@ public class ConcreteJointDescriptor : ISmartEntityDescriptor
     /// <inheritdoc />
     public List<string> SubFunctionsLNames => new List<string>
     {
-        // "Линия шва бетонирования из полилинии"
+        // Шов бетонирования из полилинии
         Language.GetItem("h194")
     };
 
     /// <inheritdoc />
     public List<string> SubDescriptions => new List<string>
     {
-        // "Конвертирование выбранной полилинии в линию обозначения шва бетонирования"
+        // Конвертирование выбранной полилинии в линию обозначения шва бетонирования
         Language.GetItem("h195")
     };
 

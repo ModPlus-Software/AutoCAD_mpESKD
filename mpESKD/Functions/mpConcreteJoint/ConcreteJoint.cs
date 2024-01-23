@@ -9,7 +9,6 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using System.Collections.Generic;
 using System.Linq;
-using ModPlus.Extensions;
 
 /// <summary>
 /// Шов бетонирования
@@ -68,30 +67,30 @@ public class ConcreteJoint : SmartLinearEntity
     public override string TextStyle { get; set; }
 
     /// <summary>
-    /// Ширина излома линии шва
+    /// Ширина излома
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 1, "p116", 6, 1, 20, nameSymbol: "w")]
     [SaveToXData]
     public double BreakWidth { get; set; } = 6;
 
     /// <summary>
-    /// Высота излома линии шва
+    /// Высота излома
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 2, "p119", 4, 1, 20, nameSymbol: "h")]
     [SaveToXData]
     public double BreakHeight { get; set; } = 4;
 
     /// <summary>
-    /// Видимость линии по краям сегментов
+    /// Видимость линий по краям
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p118", false, descLocalKey: "p118")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p118", false, descLocalKey: "d118")]
     [SaveToXData]
     public bool EdgeLineVisible { get; set; } = false;
 
     /// <summary>
-    /// Длина линии на левом краю сегмента шва
+    /// Длина линии у левого края
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p117", 1, 0.5, 30, nameSymbol: "e")]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p117", 1, 0.5, 30, descLocalKey: "d117", nameSymbol: "e")]
     [SaveToXData]
     public double EdgeLineWidth { get; set; } = 1;
 
@@ -170,16 +169,16 @@ public class ConcreteJoint : SmartLinearEntity
         var index = 0;
         for (var si = 0; si < _segments.Count; si++)
         {
-            var segment = _segments[si];
             if (IsLightCreation && si < _segments.Count - 1)
             {
-                _mainPolyline.AddVertexAt(index, segment.Polylines.First().GetPoint2dAt(0), 0, 0, 0);
-                _mainPolyline.AddVertexAt(index + 1, segment.Polylines.Last().GetPoint2dAt(segment.Polylines.Last().NumberOfVertices - 1), 0, 0, 0);
+                _mainPolyline.AddVertexAt(index, _segments[si].StartBasePoint, 0, 0, 0);
+                _mainPolyline.AddVertexAt(index + 1, _segments[si + 1].StartBasePoint, 0, 0, 0);
+
                 index += 2;
             }
             else
             {
-                foreach (var polyline in segment.Polylines)
+                foreach (var polyline in _segments[si].Polylines)
                 {
                     for (int i = 0; i < polyline.NumberOfVertices; i++)
                     {
@@ -194,16 +193,15 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Отрисовка изломов между крайними точками сегмента
     /// </summary>
-    /// <param name="point1">начальная точка сегмента</param>
-    /// <param name="point2">конечная точка сегмента</param>
-    /// <param name="pointPrevEndBreak">точка обрыва излома в конце предыдущего сегмента</param>
-    /// <param name="prevRemnant">длина неполного излома в конце предыдущего сегмента</param>
+    /// <param name="point1">Начальная точка сегмента</param>
+    /// <param name="point2">Конечная точка сегмента</param>
+    /// <param name="pointPrevEndBreak">Точка обрыва излома в конце предыдущего сегмента</param>
+    /// <param name="prevRemnant">Длина неполного излома в конце предыдущего сегмента</param>
     /// <param name="scale">Масштаб</param>
     /// <returns>Сегмент линии шва <see cref="ConcreteJointLineSegment"/></returns>
-    private ConcreteJointLineSegment CreateSegment(Point2d point1, Point2d point2,
-        Point2d pointPrevEndBreak, double prevRemnant, double scale)
+    private ConcreteJointLineSegment CreateSegment(Point2d point1, Point2d point2, Point2d pointPrevEndBreak, double prevRemnant, double scale)
     {
-        ConcreteJointLineSegment result = new (new List<Polyline>(), Point2d.Origin, 0d);
+        ConcreteJointLineSegment result = new (new List<Polyline>(), Point2d.Origin, 0d, point1);
 
         var normalVector = (point2 - point1).GetNormal();
         var perpendicularVector = normalVector.GetPerpendicularVector();
@@ -231,13 +229,11 @@ public class ConcreteJoint : SmartLinearEntity
             if (!EdgeLineVisible)
             {
                 // отрисовка излома-префикса и определение точки начала отрисовки основного блока изломов
-                var prefixBreak = GetPrefixBreak(pointStart, pointPrevEndBreak, prevRemnant, scale, normalVector,
-                    breakPerpendicularVector);
+                var prefixBreak = GetPrefixBreak(pointStart, pointPrevEndBreak, prevRemnant, scale, normalVector, breakPerpendicularVector);
                 var prefixBreakLines = prefixBreak.Item1;
                 var prefixBreakLenght = prefixBreak.Item2;
 
                 pointStart += normalVector * prefixBreakLenght;
-
                 result.Polylines.Add(prefixBreakLines);
             }
             else
@@ -315,8 +311,14 @@ public class ConcreteJoint : SmartLinearEntity
             {
                 result.RemnantAtEnd = remnant;
 
-                var suffixBreak = DrawSuffixBreak(limitBlockPoints, remnant, scale, breakNormalVector,
-                    breakPerpendicularVector, normalVector, perpendicularVector);
+                var suffixBreak = GetSuffixBreak(
+                    limitBlockPoints, 
+                    remnant, 
+                    scale, 
+                    breakNormalVector, 
+                    breakPerpendicularVector, 
+                    normalVector, 
+                    perpendicularVector);
 
                 var remnantLine = suffixBreak.Item1;
                 var suffixBreakEndPoint = suffixBreak.Item2;
@@ -360,9 +362,14 @@ public class ConcreteJoint : SmartLinearEntity
     /// <summary>
     /// Возвращает префикс (неполный излом в начале сегмента)
     /// </summary>
-    /// <returns>Кортеж (список_линий_префикса, длина_префикса)</returns>
-    private (Polyline, double) GetPrefixBreak(Point2d pointStart, Point2d pointStartBreak, double prevRemnant,
-        double scale, Vector2d normalVector, Vector2d breakPerpendicularVector)
+    /// <returns>Кортеж (полилиния_префикса, длина_префикса)</returns>
+    private (Polyline, double) GetPrefixBreak(
+        Point2d pointStart,
+        Point2d pointStartBreak, 
+        double prevRemnant, 
+        double scale, 
+        Vector2d normalVector, 
+        Vector2d breakPerpendicularVector)
     {
         var h = BreakHeight * scale;
         var w = BreakWidth * scale;
@@ -390,9 +397,13 @@ public class ConcreteJoint : SmartLinearEntity
 
                 double distanceToPoint2;
                 if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
+                {
                     distanceToPoint2 = (h / 2) - distanceStartBreakPointToStartPoint;
+                }
                 else
+                {
                     distanceToPoint2 = (h / 2) + distanceStartBreakPointToStartPoint;
+                }
 
                 var distanceToPoint2Start = w / (2 * h) * distanceToPoint2;
 
@@ -433,9 +444,13 @@ public class ConcreteJoint : SmartLinearEntity
             case >= 0.50 and < 0.75:
                 double distanceToPoint4;
                 if (normalVector.GetAngleTo(Vector2d.XAxis).RadianToDegree() <= 90)
+                {
                     distanceToPoint4 = (h / 2) - distanceStartBreakPointToStartPoint;
+                }
                 else
+                {
                     distanceToPoint4 = (h / 2) + distanceStartBreakPointToStartPoint;
+                }
 
                 var distanceToPoint4Start = w / (2 * h) * distanceToPoint4;
                 point4Start = pointStart + (normalVector * distanceToPoint4Start);
@@ -463,10 +478,16 @@ public class ConcreteJoint : SmartLinearEntity
     }
 
     /// <summary>
-    /// Отрисовка суффикса (неполного излома в конце сегмента)
+    /// Возвращает суффикс (неполный излом в конце сегмента)
     /// </summary>
-    private (Polyline, Point2d) DrawSuffixBreak(Point2d[] limitBlockPoints, double remnant,
-        double scale, Vector2d breakNormalVector, Vector2d breakPerpendicularVector, Vector2d normalVector,
+    /// <returns>Кортеж (полилиния_суффикса, точка_обрыва_суффикса)</returns>
+    private (Polyline, Point2d) GetSuffixBreak(
+        Point2d[] limitBlockPoints, 
+        double remnant, 
+        double scale, 
+        Vector2d breakNormalVector, 
+        Vector2d breakPerpendicularVector, 
+        Vector2d normalVector,
         Vector2d perpendicularVector)
     {
         var h = BreakHeight * scale;
@@ -531,8 +552,7 @@ public class ConcreteJoint : SmartLinearEntity
 
                 if (!EdgeLineVisible)
                 {
-                    var point34Remnant = remnantEndPoint +
-                                         (perpendicularVector.Negate() * (2 * h * (remnant - (w / 2)) / w));
+                    var point34Remnant = remnantEndPoint + (perpendicularVector.Negate() * (2 * h * (remnant - (w / 2)) / w));
 
                     line.AddVertexAt(3, point34Remnant, 0, 0, 0);
                     return (line, point34Remnant);
@@ -547,8 +567,7 @@ public class ConcreteJoint : SmartLinearEntity
 
                 if (!EdgeLineVisible)
                 {
-                    var point45Remnant = remnantEndPoint +
-                                         (perpendicularVector.Negate() * 2 * h / w * ((w / 2) - (remnant - (w / 2))));
+                    var point45Remnant = remnantEndPoint + (perpendicularVector.Negate() * 2 * h / w * ((w / 2) - (remnant - (w / 2))));
 
                     line.AddVertexAt(2, remnantPoint4, 0, 0, 0);
                     line.AddVertexAt(3, point45Remnant, 0, 0, 0);

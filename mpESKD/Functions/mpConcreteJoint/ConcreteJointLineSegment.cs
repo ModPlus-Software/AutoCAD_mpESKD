@@ -15,11 +15,13 @@ internal struct ConcreteJointLineSegment
     /// <param name="polylines">Полилинии, из которых состоит сегмент</param>
     /// <param name="endPointLineBreak">Точка, в которой прерывается линия шва в конце сегмента</param>
     /// <param name="remnantAtEnd">Длина неполного излома в конце сегмента, вдоль центральной линии</param>
-    internal ConcreteJointLineSegment(List<Polyline> polylines, Point2d endPointLineBreak, double remnantAtEnd)
+    /// <param name="startBasePoint">Первая точка сегмента на центральной линии</param>
+    internal ConcreteJointLineSegment(List<Polyline> polylines, Point2d endPointLineBreak, double remnantAtEnd, Point2d startBasePoint)
     {
         Polylines = polylines;
         EndPointLineBreak = endPointLineBreak;
         RemnantAtEnd = remnantAtEnd;
+        StartBasePoint = startBasePoint;
     }
 
     /// <summary>
@@ -36,4 +38,10 @@ internal struct ConcreteJointLineSegment
     /// Длина неполного излома в конце сегмента, вдоль центральной линии
     /// </summary>
     internal double RemnantAtEnd { get; set; }
+
+    /// <summary>
+    /// Первая точка сегмента на центральной линии 
+    /// </summary>
+    internal Point2d StartBasePoint { get; }
+
 }
