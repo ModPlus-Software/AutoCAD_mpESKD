@@ -179,9 +179,18 @@ public class ConcreteJoint : SmartLinearEntity
             }
             else
             {
-                foreach (var polyline in _segments[si].Polylines)
+                for (var pi = 0; pi < _segments[si].Polylines.Count; pi++)
                 {
-                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                    var polyline = _segments[si].Polylines[pi];
+                    
+                    // Так как последняя точка предыдущей полилинии совпадает с первой точкой последующей
+                    // полилинии, нужно пропускать последнюю точку в полилинии. За исключением случая, когда
+                    // это последняя полилиния последнего сегмента
+                    var numberOfVertices = polyline.NumberOfVertices - 1;
+                    if (si == _segments.Count - 1 && pi == _segments[si].Polylines.Count - 1)
+                        numberOfVertices = polyline.NumberOfVertices;
+
+                    for (var i = 0; i < numberOfVertices; i++)
                     {
                         _mainPolyline.AddVertexAt(index, polyline.GetPoint2dAt(i), 0, 0, 0);
                         index++;
