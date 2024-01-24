@@ -12,6 +12,7 @@ using Base.Utils;
 using Functions.mpAxis;
 using Functions.mpBreakLine;
 using Functions.mpChainLeader;
+using Functions.mpConcreteJoint;
 using Functions.mpFragmentMarker;
 using Functions.mpGroundLine;
 using Functions.mpLetterLine;
@@ -255,6 +256,11 @@ public class RibbonBuilder
 
         // mpWaterProofing
         ribRowPanel.Items.Add(GetSmallSplitButton(GetDescriptor<WaterProofing>()));
+
+        ribRowPanel.Items.Add(new RibbonRowBreak());
+
+        // mpConcreteJoint
+        ribRowPanel.Items.Add(GetSmallSplitButton(GetDescriptor<ConcreteJoint>()));
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }
