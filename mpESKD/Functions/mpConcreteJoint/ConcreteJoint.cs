@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Functions.mpConcreteJoint;
 
+using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -373,7 +374,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// Возвращает префикс (неполный излом в начале сегмента)
     /// </summary>
     /// <returns>Кортеж (полилиния_префикса, длина_префикса)</returns>
-    private (Polyline, double) GetPrefixBreak(
+    private Tuple<Polyline, double> GetPrefixBreak(
         Point2d pointStart,
         Point2d pointStartBreak, 
         double prevRemnant, 
@@ -434,7 +435,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(3, point4, 0, 0, 0);
                 line.AddVertexAt(4, endPoint, 0, 0, 0);
 
-                return (line, endPoint.GetDistanceTo(pointStart));
+                return new Tuple<Polyline, double>(line, endPoint.GetDistanceTo(pointStart));
 
             case >= 0.25 and < 0.50:
                 var distanceToPoint3Start = w / (2 * h) * distanceStartBreakPointToStartPoint;
@@ -449,7 +450,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(2, point4, 0, 0, 0);
                 line.AddVertexAt(3, endPoint, 0, 0, 0);
 
-                return (line, endPoint.GetDistanceTo(pointStart));
+                return new Tuple<Polyline, double>(line, endPoint.GetDistanceTo(pointStart));
 
             case >= 0.50 and < 0.75:
                 double distanceToPoint4;
@@ -471,7 +472,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(1, point4, 0, 0, 0);
                 line.AddVertexAt(2, endPoint, 0, 0, 0);
 
-                return (line, endPoint.GetDistanceTo(pointStart));
+                return new Tuple<Polyline, double>(line, endPoint.GetDistanceTo(pointStart));
 
             case >= 0.75:
                 var distanceToEndPoint = w / (2 * h) * distanceStartBreakPointToStartPoint;
@@ -480,7 +481,7 @@ public class ConcreteJoint : SmartLinearEntity
                 line.AddVertexAt(0, pointStartBreak, 0, 0, 0);
                 line.AddVertexAt(1, endPoint, 0, 0, 0);
 
-                return (line, endPoint.GetDistanceTo(pointStart));
+                return new Tuple<Polyline, double>(line, endPoint.GetDistanceTo(pointStart));
 
             default:
                 return default;
@@ -491,7 +492,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// Возвращает суффикс (неполный излом в конце сегмента)
     /// </summary>
     /// <returns>Кортеж (полилиния_суффикса, точка_обрыва_суффикса)</returns>
-    private (Polyline, Point2d) GetSuffixBreak(
+    private Tuple<Polyline, Point2d> GetSuffixBreak(
         Point2d[] limitBlockPoints, 
         double remnant, 
         double scale, 
@@ -536,11 +537,11 @@ public class ConcreteJoint : SmartLinearEntity
                 if (!EdgeLineVisible)
                 {
                     line.AddVertexAt(1, point12Remnant, 0, 0, 0);
-                    return (line, point12Remnant);
+                    return new Tuple<Polyline, Point2d>(line, point12Remnant);
                 }
 
                 line.AddVertexAt(1, remnantEndPoint, 0, 0, 0);
-                return (line, remnantEndPoint);
+                return new Tuple<Polyline, Point2d>(line, remnantEndPoint);
 
             case >= 0.25 and < 0.50:
                 line.AddVertexAt(0, remnantPoint2, 0, 0, 0);
@@ -549,11 +550,11 @@ public class ConcreteJoint : SmartLinearEntity
                 {
                     var point23Remnant = remnantEndPoint + (perpendicularVector * 2 * h / w * ((w / 2) - remnant));
                     line.AddVertexAt(1, point23Remnant, 0, 0, 0);
-                    return (line, point23Remnant);
+                    return new Tuple<Polyline, Point2d>(line, point23Remnant);
                 }
 
                 line.AddVertexAt(1, remnantEndPoint, 0, 0, 0);
-                return (line, remnantEndPoint);
+                return new Tuple<Polyline, Point2d>(line, remnantEndPoint);
 
             case >= 0.50 and < 0.75:
                 line.AddVertexAt(0, remnantPoint1, 0, 0, 0);
@@ -565,11 +566,11 @@ public class ConcreteJoint : SmartLinearEntity
                     var point34Remnant = remnantEndPoint + (perpendicularVector.Negate() * (2 * h * (remnant - (w / 2)) / w));
 
                     line.AddVertexAt(3, point34Remnant, 0, 0, 0);
-                    return (line, point34Remnant);
+                    return new Tuple<Polyline, Point2d>(line, point34Remnant);
                 }
 
                 line.AddVertexAt(3, remnantEndPoint, 0, 0, 0);
-                return (line, remnantEndPoint);
+                return new Tuple<Polyline, Point2d>(line, remnantEndPoint);
 
             case >= 0.75:
                 line.AddVertexAt(0, remnantPoint1, 0, 0, 0);
@@ -581,15 +582,15 @@ public class ConcreteJoint : SmartLinearEntity
 
                     line.AddVertexAt(2, remnantPoint4, 0, 0, 0);
                     line.AddVertexAt(3, point45Remnant, 0, 0, 0);
-                    return (line, point45Remnant);
+                    return new Tuple<Polyline, Point2d>(line, point45Remnant);
                 }
 
                 line.AddVertexAt(2, remnantPoint3, 0, 0, 0);
                 line.AddVertexAt(3, remnantEndPoint, 0, 0, 0);
-                return (line, remnantEndPoint);
+                return new Tuple<Polyline, Point2d>(line, remnantEndPoint);
 
             default:
-                return (default, default);
+                return new Tuple<Polyline, Point2d>(default, default);
         }
     }
 
