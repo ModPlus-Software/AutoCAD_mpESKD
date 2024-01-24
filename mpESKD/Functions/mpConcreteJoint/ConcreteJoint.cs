@@ -84,6 +84,7 @@ public class ConcreteJoint : SmartLinearEntity
     /// Видимость линий по краям
     /// </summary>
     [EntityProperty(PropertiesCategory.Geometry, 3, "p118", false, descLocalKey: "d118")]
+    [PropertyVisibilityDependency(new[] { nameof(EdgeLineWidth) })]
     [SaveToXData]
     public bool EdgeLineVisible { get; set; } = false;
 
