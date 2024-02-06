@@ -43,11 +43,17 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
         _levelMark.Note = TbNote.Text;
 
         if (!LevelNumBox.Value.HasValue)
+        {
             return;
+        }
+
         var levelValue = _levelMark.InsertionPoint.Y + _levelMark.InsertionPointOCS.Y + LevelNumBox.Value.Value;
         _levelMark.ObjectPoint = new Point3d(_levelMark.ObjectPoint.X, levelValue, _levelMark.ObjectPoint.Z);
         _levelMark.BottomShelfStartPoint = new Point3d(_levelMark.BottomShelfStartPoint.X, levelValue, _levelMark.BottomShelfStartPoint.Z);
         _levelMark.EndPoint = new Point3d(_levelMark.EndPoint.X, levelValue, _levelMark.EndPoint.Z);
-        _levelMark.ShelfPoint = new Point3d(_levelMark.ShelfPoint.X, levelValue + _levelMark.DistanceBetweenShelfs, _levelMark.ShelfPoint.Z);
+        _levelMark.ShelfPoint = new Point3d(
+            _levelMark.ShelfPoint.X,
+            levelValue + (_levelMark.IsDownState ? -_levelMark.DistanceBetweenShelfs : _levelMark.DistanceBetweenShelfs), 
+            _levelMark.ShelfPoint.Z);
     }
 }
