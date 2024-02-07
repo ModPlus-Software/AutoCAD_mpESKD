@@ -461,13 +461,13 @@ public static class AcadUtils
 
         return loaded;
     }
-
+    
     /// <summary>
     /// Возвращает идентификатор текстового стиля по имени
     /// </summary>
     /// <param name="textStyleName">Имя текстового стиля</param>
     /// <returns><see cref="ObjectId"/></returns>
-    public static ObjectId GetTextStyleIdByName(string textStyleName)
+    public static TextStyleTableRecord GetTextStyleByName(string textStyleName)
     {
         using (Document.LockDocument())
         {
@@ -479,13 +479,13 @@ public static class AcadUtils
                     var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
                     if (txtStl.Name.Equals(textStyleName))
                     {
-                        return objectId;
+                        return txtStl;
                     }
                 }
             }
         }
 
-        return ObjectId.Null;
+        return null;
     }
 
     /// <summary>

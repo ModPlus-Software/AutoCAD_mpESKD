@@ -174,16 +174,13 @@ public class ViewLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var textContents = GetTextContents();
         if (string.IsNullOrEmpty(textContents)) 
             return;
-        var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-        var textHeight = MainTextHeight * scale;
         _mText = new MText
         {
-            TextStyleId = textStyleId,
             Contents = textContents,
-            TextHeight = textHeight,
             Attachment = AttachmentPoint.MiddleCenter,
             Location = insertionPoint
         };
+        _mText.SetProperties(TextStyle, MainTextHeight * scale);
             
         if (!HideTextBackground) 
             return;

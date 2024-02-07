@@ -774,17 +774,13 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
 
     private MText GetMTextAtDist(Point3d textLocation)
     {
-        var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-        var textHeight = MainTextHeight * _scale;
-
         var mText = new MText
         {
-            TextStyleId = textStyleId,
             Contents = GetTextContents(),
-            TextHeight = textHeight,
             Attachment = AttachmentPoint.MiddleCenter,
             Location = textLocation
         };
+        mText.SetProperties(TextStyle, MainTextHeight * _scale);
 
         return mText;
     }

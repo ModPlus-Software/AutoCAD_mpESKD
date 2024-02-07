@@ -75,8 +75,7 @@ public class View : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// </summary>
     [SaveToXData]
     public Point3d TextDesignationPoint { get; private set; } = Point3d.Origin;
-
-
+    
     /// <inheritdoc />
     /// В примитиве не используется!
     public override string LineType { get; set; }
@@ -264,15 +263,12 @@ public class View : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 
         if (!string.IsNullOrEmpty(textContentsForTopText))
         {
-            var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-            var textHeight = MainTextHeight * scale;
             _mText = new MText
             {
-                TextStyleId = textStyleId,
                 Contents = textContentsForTopText,
-                TextHeight = textHeight,
                 Attachment = AttachmentPoint.MiddleCenter
             };
+            _mText.SetProperties(TextStyle, MainTextHeight * scale);
 
             // text
             var alongShelfTextOffset = _mText.ActualWidth / 2;
@@ -281,13 +277,13 @@ public class View : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
             if (double.IsNaN(AlongTopShelfTextOffset) && double.IsNaN(AcrossTopShelfTextOffset))
             {
                 var tempPoint = shelfEndPoint - (normalVector * alongShelfTextOffset);
-                var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * (2*scale + acrossShelfTextOffset));
+                var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * ((2 * scale) + acrossShelfTextOffset));
                 _mText.Location = topTextCenterPoint;
             }
             else
             {
-                var tempPoint = shelfEndPoint - (normalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth/2)));
-                var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * ((2*scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight/2))));
+                var tempPoint = shelfEndPoint - (normalVector * (AlongTopShelfTextOffset + (_mText.ActualWidth / 2)));
+                var topTextCenterPoint = tempPoint + (normalVector.GetPerpendicularVector() * ((2 * scale) + (AcrossTopShelfTextOffset + (_mText.ActualHeight / 2))));
                 _mText.Location = topTextCenterPoint;
             }
 

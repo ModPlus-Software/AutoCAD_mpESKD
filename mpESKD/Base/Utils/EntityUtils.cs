@@ -34,15 +34,42 @@ public static class EntityUtils
     /// Установка свойств для однострочного текста
     /// </summary>
     /// <param name="dbText">Однострочный текст</param>
-    /// <param name="textStyle">имя текстового стиля</param>
+    /// <param name="textStyleName">Имя текстового стиля</param>
     /// <param name="height">Высота текста (с учетом масштаба блока)</param>
-    public static void SetProperties(this DBText dbText, string textStyle, double height)
+    public static void SetProperties(this DBText dbText, string textStyleName, double height)
     {
         dbText.Height = height;
         dbText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         dbText.Linetype = "ByBlock";
         dbText.LineWeight = LineWeight.ByBlock;
-        dbText.TextStyleId = AcadUtils.GetTextStyleIdByName(textStyle);
+        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        if (textStyle != null)
+        {
+            dbText.TextStyleId = textStyle.Id;
+
+            // https://adn-cis.org/forum/index.php?topic=8236.0
+            dbText.Oblique = textStyle.ObliquingAngle;
+            dbText.WidthFactor = textStyle.XScale;
+        }
+    }
+
+    /// <summary>
+    /// Установка свойств для многострочного текста
+    /// </summary>
+    /// <param name="mText">Многострочный текст</param>
+    /// <param name="textStyleName">Имя текстового стиля</param>
+    /// <param name="height">Высота текста (с учетом масштаба блока)</param>
+    public static void SetProperties(this MText mText, string textStyleName, double height)
+    {
+        mText.Height = height;
+        mText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
+        mText.Linetype = "ByBlock";
+        mText.LineWeight = LineWeight.ByBlock;
+        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        if (textStyle != null)
+        {
+            mText.TextStyleId = textStyle.Id;
+        }
     }
 
     /// <summary>

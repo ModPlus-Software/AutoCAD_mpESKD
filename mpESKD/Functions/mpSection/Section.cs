@@ -452,26 +452,19 @@ public class Section : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
         var textContentsForBottomText = GetTextContents(false);
         if (!string.IsNullOrEmpty(textContentsForTopText) && !string.IsNullOrEmpty(textContentsForBottomText))
         {
-            var textStyleId = AcadUtils.GetTextStyleIdByName(TextStyle);
-            var textHeight = MainTextHeight * scale;
             _topMText = new MText
             {
-                TextStyleId = textStyleId,
                 Contents = textContentsForTopText,
-                TextHeight = textHeight,
                 Attachment = AttachmentPoint.MiddleCenter
             };
+            _topMText.SetProperties(TextStyle, MainTextHeight * scale);
 
             _bottomMText = new MText
             {
-                TextStyleId = textStyleId,
                 Contents = textContentsForBottomText,
-                TextHeight = textHeight,
                 Attachment = AttachmentPoint.MiddleCenter
             };
-
-            // TextActualHeight = _topMText.ActualHeight;
-            // TextActualWidth = _topMText.ActualWidth;
+            _bottomMText.SetProperties(TextStyle, MainTextHeight * scale);
 
             var check = 1 / Math.Sqrt(2);
 
