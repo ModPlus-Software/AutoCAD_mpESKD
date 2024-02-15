@@ -244,6 +244,13 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
             BorderHeight = MinDistanceBetweenPoints * _scale;
         }
 
+        // Проверка на ширину текста, при изменении стиля на более широкий
+        var dbTextWidth = _dbText.GetLength();
+        if (BorderWidth < dbTextWidth)
+        {
+            BorderWidth = dbTextWidth;
+        }
+
         var borderHalfLength = BorderWidth / 2 * _scale;
         var borderHalfHeight = BorderHeight / 2 * _scale;
 

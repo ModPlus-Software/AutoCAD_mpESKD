@@ -1,5 +1,10 @@
-﻿namespace mpESKD.Base.Utils;
+﻿using System.Collections.Generic;
+using System.Drawing.Text;
+using ModPlus.Extensions;
 
+namespace mpESKD.Base.Utils;
+
+using System.Linq;
 using Abstractions;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -7,6 +12,9 @@ using Autodesk.AutoCAD.Geometry;
 using Enums;
 using System;
 using View;
+using DocumentFormat.OpenXml.Drawing;
+using iTextSharp.text.pdf.parser.clipper;
+using DocumentFormat.OpenXml.Drawing.Charts;
 
 /// <summary>
 /// Утилиты для объектов
@@ -45,6 +53,7 @@ public static class EntityUtils
         var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
         if (textStyle != null)
         {
+            AcadUtils.WriteMessageInDebug($"\n SetProperties for dbText: {dbText}; TextStyle: {textStyleName} \n");
             dbText.TextStyleId = textStyle.Id;
 
             // https://adn-cis.org/forum/index.php?topic=8236.0
@@ -190,26 +199,33 @@ public static class EntityUtils
     /// </summary>
     /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
     /// <param name="offset">Отступ</param>
-    public static Wipeout GetBackgroundMask(this DBText dbText, double offset)
-    {
-        if (dbText == null)
-            return null;
-        AcadUtils.WriteMessageInDebug($"\n dbText.TextString {dbText.TextString} dbText.GeometricExtents {dbText.GeometricExtents} \n");
-        return GetBackgroundMask(dbText.GeometricExtents, offset);
-    }
-
-    /// <summary>
-    /// Возвращает маскировку, созданную по контуру текста с указанным отступом
-    /// </summary>
-    /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
-    /// <param name="offset">Отступ</param>
     /// <param name="center">Средняя точка прямоугольной маскировки</param>
     public static Wipeout GetBackgroundMask(this DBText dbText, double offset, Point3d center)
     {
         if (dbText == null)
             return null;
-        
-        return GetBackgroundMask(dbText.GeometricExtents, offset, center);
+
+        var framePoints = GetOverallDimensionsPoints<DBText>(dbText, offset, center);
+
+        return GetBackgroundMask(framePoints);
+    } // Использует NodalLeader
+
+    /// <summary>
+    /// <inheritdoc cref="GetBackgroundMask"/>
+    /// </summary>
+    /// <param name="mText"></param>
+    /// <param name="offset"></param>
+    /// <returns></returns>
+    public static Wipeout GetBackgroundMask(this MText mText, double offset)
+    {
+        if (mText == null)
+            return null;
+
+        var center = GeometryUtils.GetMiddlePoint3d(
+            mText.GeometricExtents.MinPoint, 
+            mText.GeometricExtents.MaxPoint);
+
+        return GetBackgroundMask(mText, offset, center);
     }
 
     /// <summary>
@@ -217,16 +233,18 @@ public static class EntityUtils
     /// </summary>
     /// <param name="mText">Экземпляр <see cref="DBText"/></param>
     /// <param name="offset">Отступ</param>
-    public static Wipeout GetBackgroundMask(this MText mText, double offset)
+    /// <param name="center"></param>
+    public static Wipeout GetBackgroundMask(this MText mText, double offset, Point3d center)
     {
         if (mText == null)
             return null;
 
-        return GetBackgroundMask(mText.GeometricExtents, offset);
+        var framePoints = GetOverallDimensionsPoints<MText>(mText, offset, center);
+        return GetBackgroundMask(framePoints);
     }
 
     /// <summary>
-    /// Возвращает маскировку, созданную по контуру полилини
+    /// Возвращает маскировку, созданную по контуру полилинии
     /// </summary>
     /// <param name="polyline">Экземпляр <see cref="Polyline"/></param>
     public static Wipeout GetBackgroundMask(this Polyline polyline)
@@ -242,40 +260,29 @@ public static class EntityUtils
             vertexCollection.Add(vertex);
         }
 
-        vertexCollection.Add(vertexCollection[0]);
-
-        var wipeout = new Wipeout();
-        wipeout.SetFrom(vertexCollection, Vector3d.ZAxis);
+        var wipeout = GetBackgroundMask(vertexCollection);
         return wipeout;
     }
 
-    /// <summary>
-    /// Возвращает маскировку, созданную по контуру с указанным отступом
-    /// </summary>
-    /// <param name="extents3d">Крайние границы</param>
-    /// <param name="offset">Отступ</param>
-    /// <param name="center">Средняя точка прямоугольной маскировки</param>
-    private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset, Point3d center)
+    private static Wipeout GetBackgroundMask(Point2dCollection points)
     {
         try
         {
-            var minPoint = extents3d.MinPoint;
-            var maxPoint = extents3d.MaxPoint;
-            var halfWidth = (Math.Abs(maxPoint.X - minPoint.X) + (offset * 2)) / 2;
-            var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
-            
-            var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
-            var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
-            var topRightPoint = new Point2d(center.X + halfWidth, center.Y + halfHeight);
-            var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
-            
+            if (points == null)
+                return null;
+
+            var pointsWipeout = points.ToArray().ToList();
+            pointsWipeout.Add(pointsWipeout.First());
+
+            var points2dWipeout = new Point2dCollection();
+            foreach (var point in pointsWipeout)
+            {
+                points2dWipeout.Add(point);
+            }
+
             var wipeout = new Wipeout();
-            wipeout.SetFrom(
-                new Point2dCollection
-                {
-                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
-                }, Vector3d.ZAxis);
-            
+            wipeout.SetFrom(points2dWipeout, Vector3d.ZAxis);
+
             return wipeout;
         }
         catch (Autodesk.AutoCAD.Runtime.Exception ex)
@@ -290,40 +297,120 @@ public static class EntityUtils
     }
 
     /// <summary>
-    /// Возвращает маскировку, созданную по контуру с указанным отступом
+    /// Возвращает точки габаритного контура с заданными отступом
     /// </summary>
-    /// <param name="extents3d">Крайние границы</param>
+    /// <param name="textObject">Объект текста</param>
     /// <param name="offset">Отступ</param>
-    private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset)
+    /// <returns>коллекция точек контура: слева внизу, справа внизу, справа вверху, слева вверху</returns>
+    private static Point2dCollection GetOverallDimensionsPoints<T>(this T textObject, double offset, Point3d center) 
+        where T : Entity 
     {
-        try
+        if (textObject == null || typeof(T) != typeof(DBText) & typeof(T) != typeof(MText))
         {
-            var minPoint = extents3d.MinPoint;
-            var maxPoint = extents3d.MaxPoint;
-            
-            var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
-            var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
-            var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
-            var bottomRightPoint = new Point2d(maxPoint.X + offset, minPoint.Y - offset);
-            
-            var wipeout = new Wipeout();
-            wipeout.SetFrom(
-                new Point2dCollection
-                {
-                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
-                }, Vector3d.ZAxis);
-            
-            return wipeout;
+            return null;
         }
-        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+
+
+
+        //AcadUtils.WriteMessageInDebug($"\nHANDLE start");
+
+        //var handle = textObject.Handle;
+        //long handleValue = handle.Value;
+
+        //AcadUtils.WriteMessageInDebug($"\nHANDLE AS LONG: {handleValue}");
+
+        Extents3d extents3d;
+        Point3d minPoint=Point3d.Origin;
+        Point3d maxPoint=Point3d.Origin;
+
+        double obliquityLength = 0;
+        double widthFactor = 1;
+        double halfWidthToLeft = 0;
+        double halfWidthToRight = 0;
+
+        if (textObject is DBText dbText)
         {
-            if (ex.Message == "eNullExtents")
+            extents3d = dbText.GeometricExtents;
+            minPoint = extents3d.MinPoint;
+            maxPoint = extents3d.MaxPoint;
+
+            var style = AcadUtils.GetTextStyleByName(dbText.TextStyleName);
+            var obliquity = style.ObliquingAngle;
+            obliquityLength = dbText.Height * Math.Tan(obliquity) / 2;
+
+            halfWidthToLeft  = (Math.Abs(maxPoint.X - minPoint.X) - (obliquityLength / 2) + (offset * 2)) / 2 ;
+            halfWidthToRight = (Math.Abs(maxPoint.X - minPoint.X) + (obliquityLength / 2) + (offset * 2)) / 2;
+        }
+        else if (textObject is MText mText)
+        {
+            extents3d = mText.GeometricExtents;
+            minPoint = extents3d.MinPoint;
+            maxPoint = extents3d.MaxPoint;
+
+            var style = AcadUtils.GetTextStyleByName(mText.TextStyleName);
+
+            //AcadUtils.WriteMessageInDebug($"\n****\n" +
+            //                              $"style: ");
+
+            //AcadUtils.WriteMessageInDebug($"\nstyle.FileName: {style.FileName}");
+            //AcadUtils.WriteMessageInDebug($"\n****\nstyle.Font: {style.Font.ToString()}");
+            //AcadUtils.WriteMessageInDebug($"\nstyle.BigFontFileName: {style.BigFontFileName}");
+            //AcadUtils.WriteMessageInDebug($"\nstyle.Font.TypeFace: {style.Font.TypeFace}");
+            //AcadUtils.WriteMessageInDebug($"\nstyle.Font.GetType().FullName: {style.Font.GetType().FullName}");
+            //AcadUtils.WriteMessageInDebug($"\nmText.FaceStyleId.ToString(): {mText.FaceStyleId.ToString()}");
+            //AcadUtils.WriteMessageInDebug($"\nmText.ActualWidth: {mText.ActualWidth}");
+
+            widthFactor = style.XScale;
+
+      
+
+            //height += 2 * (mt.BackgroundScaleFactor - 1.0) * mt.TextHeight;
+
+            //var mTextRealWidth = mText.ActualWidth + (2 * (mText.BackgroundScaleFactor - 1) * mText.Width);
+
+            /*
+            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
             {
-                return null;
+                var modifyEntity = tr.GetObject( mText.ObjectId, OpenMode.ForRead) as Entity;
+                AcadUtils.WriteMessageInDebug($"\nmodifyEntity.ObjectId: {modifyEntity.ObjectId}");
+
             }
 
-            throw;
+            AcadUtils.WriteMessageInDebug($"\nId: {mText.Id}");
+            AcadUtils.WriteMessageInDebug($"\newMtext.ObjectId.ToString(): {mText.ObjectId.ToString()}");
+
+            var dxf = AcadDxf.DXFGet(((Entity)mText).ObjectId);
+            var strMess = "\n*** D X F ***";
+            if (dxf != null)
+            {
+                foreach (var valueTuple in dxf)
+                {
+                    strMess += $"\n({valueTuple.Item1} . {valueTuple.Item2})";
+                }
+
+                AcadUtils.WriteMessageInDebug(strMess);
+            }
+            */
+
+
+            halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * widthFactor) + (offset * 2)) / 2;
+            //halfWidthToLeft = (mTextRealWidth  + offset * 2) / 2;
+            //halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * mText.BackgroundScaleFactor) + (offset * 2)) / 2;
+
+            halfWidthToRight = halfWidthToLeft;
         }
+
+        var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
+
+        var bottomLeftPoint = new Point2d(center.X - halfWidthToLeft, center.Y - halfHeight);
+        var topLeftPoint = new Point2d(center.X - halfWidthToLeft, center.Y + halfHeight);
+        var topRightPoint = new Point2d(center.X + halfWidthToRight, center.Y + halfHeight);
+        var bottomRightPoint = new Point2d(center.X + halfWidthToRight, center.Y - halfHeight);
+
+        return new Point2dCollection
+        {
+            bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint
+        };
     }
 
     /// <summary>
