@@ -362,38 +362,51 @@ public static class EntityUtils
 
             widthFactor = style.XScale;
 
-      
-
-            //height += 2 * (mt.BackgroundScaleFactor - 1.0) * mt.TextHeight;
-
-            //var mTextRealWidth = mText.ActualWidth + (2 * (mText.BackgroundScaleFactor - 1) * mText.Width);
-
-            /*
-            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+            List<Point3d> boundingPoints = new();
+            foreach (Point3d pt in mText.GetBoundingPoints())
             {
-                var modifyEntity = tr.GetObject( mText.ObjectId, OpenMode.ForRead) as Entity;
-                AcadUtils.WriteMessageInDebug($"\nmodifyEntity.ObjectId: {modifyEntity.ObjectId}");
-
+                boundingPoints.Add(pt);
             }
 
-            AcadUtils.WriteMessageInDebug($"\nId: {mText.Id}");
-            AcadUtils.WriteMessageInDebug($"\newMtext.ObjectId.ToString(): {mText.ObjectId.ToString()}");
-
-            var dxf = AcadDxf.DXFGet(((Entity)mText).ObjectId);
-            var strMess = "\n*** D X F ***";
-            if (dxf != null)
+            var boundingPtsStr = "\n*** Bouding ***\n";
+            foreach (Point3d point in boundingPoints)
             {
-                foreach (var valueTuple in dxf)
-                {
-                    strMess += $"\n({valueTuple.Item1} . {valueTuple.Item2})";
-                }
-
-                AcadUtils.WriteMessageInDebug(strMess);
+                boundingPtsStr += $"\npoint: ({point.X},{point.Y})";
             }
-            */
+
+            AcadUtils.WriteMessageInDebug(boundingPtsStr);
 
 
-            halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * widthFactor) + (offset * 2)) / 2;
+           //height += 2 * (mt.BackgroundScaleFactor - 1.0) * mt.TextHeight;
+
+           //var mTextRealWidth = mText.ActualWidth + (2 * (mText.BackgroundScaleFactor - 1) * mText.Width);
+
+           /*
+           using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+           {
+               var modifyEntity = tr.GetObject( mText.ObjectId, OpenMode.ForRead) as Entity;
+               AcadUtils.WriteMessageInDebug($"\nmodifyEntity.ObjectId: {modifyEntity.ObjectId}");
+
+           }
+
+           AcadUtils.WriteMessageInDebug($"\nId: {mText.Id}");
+           AcadUtils.WriteMessageInDebug($"\newMtext.ObjectId.ToString(): {mText.ObjectId.ToString()}");
+
+           var dxf = AcadDxf.DXFGet(((Entity)mText).ObjectId);
+           var strMess = "\n*** D X F ***";
+           if (dxf != null)
+           {
+               foreach (var valueTuple in dxf)
+               {
+                   strMess += $"\n({valueTuple.Item1} . {valueTuple.Item2})";
+               }
+
+               AcadUtils.WriteMessageInDebug(strMess);
+           }
+           */
+
+
+           halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * widthFactor) + (offset * 2)) / 2;
             //halfWidthToLeft = (mTextRealWidth  + offset * 2) / 2;
             //halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * mText.BackgroundScaleFactor) + (offset * 2)) / 2;
 
