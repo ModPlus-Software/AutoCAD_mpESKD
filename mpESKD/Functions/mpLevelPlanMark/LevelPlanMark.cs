@@ -245,11 +245,14 @@ public class LevelPlanMark : SmartEntity, ITextValueEntity, INumericValueEntity,
         }
 
         // Проверка на ширину текста, при изменении стиля на более широкий
+        // todo Возможно, это лишнее, т.к. пользователь сам задает рамку через палитру
         var dbTextWidth = _dbText.GetLength();
         if (BorderWidth < dbTextWidth)
         {
             BorderWidth = dbTextWidth;
         }
+
+        // todo Обратная проблема - если стиль меняется на более узкий, остается слишком широкая рамка
 
         var borderHalfLength = BorderWidth / 2 * _scale;
         var borderHalfHeight = BorderHeight / 2 * _scale;

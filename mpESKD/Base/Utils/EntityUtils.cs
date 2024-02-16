@@ -43,16 +43,33 @@ public static class EntityUtils
         dbText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         dbText.Linetype = "ByBlock";
         dbText.LineWeight = LineWeight.ByBlock;
+
+        var textStyleStandard = AcadUtils.GetTextStyleByName(@"Standard");
         var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+
         if (textStyle != null)
         {
-            AcadUtils.WriteMessageInDebug($"\n SetProperties for dbText: {dbText}; TextStyle: {textStyleName} \n");
+            AcadUtils.WriteMessageInDebug($"\n** SetProperties for dbText: {dbText}; TextStyle: {textStyleName} \n");
             dbText.TextStyleId = textStyle.Id;
 
             // https://adn-cis.org/forum/index.php?topic=8236.0
             dbText.Oblique = textStyle.ObliquingAngle;
             dbText.WidthFactor = textStyle.XScale;
+
+            dbText.TextStyleId=textStyleStandard.Id;
+            dbText.TextStyleId = textStyle.Id;
         }
+         
+        /*
+        AcadUtils.WriteMessageInDebug($"\n** Properties: " + "\n*\n" +
+                                      $"dbText.Height{dbText.Height}; " +
+                                      $"height: {height}; " +
+                                      $"size: {textStyle.TextSize}" + "\n*\n"+
+                                      $"dbText.Oblique: {dbText.Oblique}" +
+                                      $"textStyle.ObliquingAngle: {textStyle.ObliquingAngle}" + "\n*\n" +
+                                      $"dbText.WidthFactor: {dbText.WidthFactor}" +
+                                      $"textStyle.XScale: {textStyle.XScale}" +
+                                      $"\n");*/
     }
 
     /// <summary>
@@ -198,7 +215,7 @@ public static class EntityUtils
         if (dbText == null)
             return null;
 
-        var framePoints = GetOverallDimensionsPoints<DBText>(dbText, offset, center);
+        var framePoints = GetTextBoundsPoints<DBText>(dbText, offset, center);
 
         return GetBackgroundMask(framePoints);
     } // Использует NodalLeader
@@ -232,7 +249,7 @@ public static class EntityUtils
         if (mText == null)
             return null;
 
-        var framePoints = GetOverallDimensionsPoints<MText>(mText, offset, center);
+        var framePoints = GetTextBoundsPoints<MText>(mText, offset, center);
         return GetBackgroundMask(framePoints);
     }
 
@@ -296,7 +313,7 @@ public static class EntityUtils
     /// <param name="offset">Отступ</param>
     /// <param name="center"></param>
     /// <returns>коллекция точек контура: слева внизу, справа внизу, справа вверху, слева вверху</returns>
-    private static Point2dCollection GetOverallDimensionsPoints<T>(this T textObject, double offset, Point3d center) 
+    private static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center) 
         where T : Entity 
     {
         if (textObject == null || typeof(T) != typeof(DBText) & typeof(T) != typeof(MText))
@@ -307,7 +324,8 @@ public static class EntityUtils
         var textSize = (0d, 0d);
         if (textObject is DBText dbText)
         {
-            textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName);
+            var extents = dbText.GeometricExtents;
+            textSize=((extents.MaxPoint.X - extents.MinPoint.X), dbText.Height);
         }
         else if (textObject is MText mText)
         {
@@ -316,8 +334,8 @@ public static class EntityUtils
 
         if (textSize.Item1 != 0 && textSize.Item2 != 0)
         {
-            var halfWidth = textSize.Item1 / 2;
-            var halfHeight = textSize.Item2 / 2;
+            var halfWidth = (textSize.Item1 + offset) / 2;
+            var halfHeight = (textSize.Item2 + offset)/ 2;
 
             var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
             var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
