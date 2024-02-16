@@ -71,8 +71,8 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                     grips.Add(new NodalFrameTypeGrip(nodalLeader)
                     {
                         GripPoint = new Point3d(
-                                (nodalLeader.EndPoint.X - nodalLeader.InsertionPoint.X) * -1 + nodalLeader.InsertionPoint.X, 
-                            (nodalLeader.EndPoint.Y-nodalLeader.InsertionPoint.Y)*-1 + nodalLeader.InsertionPoint.Y, 
+                            ((nodalLeader.EndPoint.X - nodalLeader.InsertionPoint.X) * -1) + nodalLeader.InsertionPoint.X,
+                            ((nodalLeader.EndPoint.Y - nodalLeader.InsertionPoint.Y) * -1) + nodalLeader.InsertionPoint.Y,
                             nodalLeader.EndPoint.Z)
                     });
 
@@ -181,7 +181,7 @@ public class NodalLeaderGripPointOverrule : BaseSmartEntityGripOverrule<NodalLea
                         }
 
                         // Вот тут происходит перерисовка примитивов внутри блока
-                        nodalLeader.UpdateEntities();
+                        nodalLeader.UpdateEntities(); 
                         nodalLeader.BlockRecord.UpdateAnonymousBlocks();
                     }
                     else
