@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing.Text;
-using ModPlus.Extensions;
-
-namespace mpESKD.Base.Utils;
+﻿namespace mpESKD.Base.Utils;
 
 using System.Linq;
 using Abstractions;
@@ -12,9 +8,6 @@ using Autodesk.AutoCAD.Geometry;
 using Enums;
 using System;
 using View;
-using DocumentFormat.OpenXml.Drawing;
-using iTextSharp.text.pdf.parser.clipper;
-using DocumentFormat.OpenXml.Drawing.Charts;
 
 /// <summary>
 /// Утилиты для объектов
@@ -301,6 +294,7 @@ public static class EntityUtils
     /// </summary>
     /// <param name="textObject">Объект текста</param>
     /// <param name="offset">Отступ</param>
+    /// <param name="center"></param>
     /// <returns>коллекция точек контура: слева внизу, справа внизу, справа вверху, слева вверху</returns>
     private static Point2dCollection GetOverallDimensionsPoints<T>(this T textObject, double offset, Point3d center) 
         where T : Entity 
@@ -310,120 +304,33 @@ public static class EntityUtils
             return null;
         }
 
-
-
-        //AcadUtils.WriteMessageInDebug($"\nHANDLE start");
-
-        //var handle = textObject.Handle;
-        //long handleValue = handle.Value;
-
-        //AcadUtils.WriteMessageInDebug($"\nHANDLE AS LONG: {handleValue}");
-
-        Extents3d extents3d;
-        Point3d minPoint=Point3d.Origin;
-        Point3d maxPoint=Point3d.Origin;
-
-        double obliquityLength = 0;
-        double widthFactor = 1;
-        double halfWidthToLeft = 0;
-        double halfWidthToRight = 0;
-
+        var textSize = (0d, 0d);
         if (textObject is DBText dbText)
         {
-            extents3d = dbText.GeometricExtents;
-            minPoint = extents3d.MinPoint;
-            maxPoint = extents3d.MaxPoint;
-
-            var style = AcadUtils.GetTextStyleByName(dbText.TextStyleName);
-            var obliquity = style.ObliquingAngle;
-            obliquityLength = dbText.Height * Math.Tan(obliquity) / 2;
-
-            halfWidthToLeft  = (Math.Abs(maxPoint.X - minPoint.X) - (obliquityLength / 2) + (offset * 2)) / 2 ;
-            halfWidthToRight = (Math.Abs(maxPoint.X - minPoint.X) + (obliquityLength / 2) + (offset * 2)) / 2;
+            textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName);
         }
         else if (textObject is MText mText)
         {
-            extents3d = mText.GeometricExtents;
-            minPoint = extents3d.MinPoint;
-            maxPoint = extents3d.MaxPoint;
-
-            var style = AcadUtils.GetTextStyleByName(mText.TextStyleName);
-
-            //AcadUtils.WriteMessageInDebug($"\n****\n" +
-            //                              $"style: ");
-
-            //AcadUtils.WriteMessageInDebug($"\nstyle.FileName: {style.FileName}");
-            //AcadUtils.WriteMessageInDebug($"\n****\nstyle.Font: {style.Font.ToString()}");
-            //AcadUtils.WriteMessageInDebug($"\nstyle.BigFontFileName: {style.BigFontFileName}");
-            //AcadUtils.WriteMessageInDebug($"\nstyle.Font.TypeFace: {style.Font.TypeFace}");
-            //AcadUtils.WriteMessageInDebug($"\nstyle.Font.GetType().FullName: {style.Font.GetType().FullName}");
-            //AcadUtils.WriteMessageInDebug($"\nmText.FaceStyleId.ToString(): {mText.FaceStyleId.ToString()}");
-            //AcadUtils.WriteMessageInDebug($"\nmText.ActualWidth: {mText.ActualWidth}");
-
-            widthFactor = style.XScale;
-
-            List<Point3d> boundingPoints = new();
-            foreach (Point3d pt in mText.GetBoundingPoints())
-            {
-                boundingPoints.Add(pt);
-            }
-
-            var boundingPtsStr = "\n*** Bouding ***\n";
-            foreach (Point3d point in boundingPoints)
-            {
-                boundingPtsStr += $"\npoint: ({point.X},{point.Y})";
-            }
-
-            AcadUtils.WriteMessageInDebug(boundingPtsStr);
-
-
-           //height += 2 * (mt.BackgroundScaleFactor - 1.0) * mt.TextHeight;
-
-           //var mTextRealWidth = mText.ActualWidth + (2 * (mText.BackgroundScaleFactor - 1) * mText.Width);
-
-           /*
-           using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
-           {
-               var modifyEntity = tr.GetObject( mText.ObjectId, OpenMode.ForRead) as Entity;
-               AcadUtils.WriteMessageInDebug($"\nmodifyEntity.ObjectId: {modifyEntity.ObjectId}");
-
-           }
-
-           AcadUtils.WriteMessageInDebug($"\nId: {mText.Id}");
-           AcadUtils.WriteMessageInDebug($"\newMtext.ObjectId.ToString(): {mText.ObjectId.ToString()}");
-
-           var dxf = AcadDxf.DXFGet(((Entity)mText).ObjectId);
-           var strMess = "\n*** D X F ***";
-           if (dxf != null)
-           {
-               foreach (var valueTuple in dxf)
-               {
-                   strMess += $"\n({valueTuple.Item1} . {valueTuple.Item2})";
-               }
-
-               AcadUtils.WriteMessageInDebug(strMess);
-           }
-           */
-
-
-           halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * widthFactor) + (offset * 2)) / 2;
-            //halfWidthToLeft = (mTextRealWidth  + offset * 2) / 2;
-            //halfWidthToLeft = ((Math.Abs(maxPoint.X - minPoint.X) * mText.BackgroundScaleFactor) + (offset * 2)) / 2;
-
-            halfWidthToRight = halfWidthToLeft;
+            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName);
         }
 
-        var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
-
-        var bottomLeftPoint = new Point2d(center.X - halfWidthToLeft, center.Y - halfHeight);
-        var topLeftPoint = new Point2d(center.X - halfWidthToLeft, center.Y + halfHeight);
-        var topRightPoint = new Point2d(center.X + halfWidthToRight, center.Y + halfHeight);
-        var bottomRightPoint = new Point2d(center.X + halfWidthToRight, center.Y - halfHeight);
-
-        return new Point2dCollection
+        if (textSize.Item1 != 0 && textSize.Item2 != 0)
         {
-            bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint
-        };
+            var halfWidth = textSize.Item1 / 2;
+            var halfHeight = textSize.Item2 / 2;
+
+            var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
+            var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
+            var topRightPoint = new Point2d(center.X + halfWidth, center.Y + halfHeight);
+            var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
+
+            return new Point2dCollection
+            {
+                bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint
+            };
+        }
+
+        return null;
     }
 
     /// <summary>
