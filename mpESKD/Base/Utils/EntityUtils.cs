@@ -64,7 +64,7 @@ public static class EntityUtils
     /// <param name="height">Высота текста (с учетом масштаба блока)</param>
     public static void SetProperties(this MText mText, string textStyleName, double height)
     {
-        mText.Height = height;
+        mText.TextHeight = height;
         mText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         mText.Linetype = "ByBlock";
         mText.LineWeight = LineWeight.ByBlock;
@@ -234,6 +234,7 @@ public static class EntityUtils
             return null;
 
         var framePoints = GetTextBoundsPoints(mText, offset, center);
+
         return GetBackgroundMask(framePoints);
     }
 
@@ -305,21 +306,32 @@ public static class EntityUtils
             return null;
         }
 
-        var textSize = (0d, 0d);
+        var textWidth = 0d;
+        var textHeight = 0d;
+
         if (textObject is DBText dbText)
         {
-            var extents = dbText.GeometricExtents;
-            textSize = (extents.MaxPoint.X - extents.MinPoint.X, dbText.Height);
+            //var extents = dbText.GeometricExtents;
+            //textWidth = extents.MaxPoint.X - extents.MinPoint.X;
+            //textHeight = dbText.Height;
+
+            var textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName, dbText.Height);
+            textWidth = textSize.Item1;
+            textHeight = textSize.Item2;
+
+            AcadUtils.WriteMessageInDebug($"DBText => textWidth: {textWidth}, textHeight: {textHeight}");
         }
         else if (textObject is MText mText)
         {
-            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName);
+            var textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName, mText.ActualHeight);
+             textWidth = textSize.Item1;
+             textHeight = textSize.Item2;
         }
 
-        if (textSize.Item1 != 0 && textSize.Item2 != 0)
+        if (textWidth != 0 && textHeight != 0)
         {
-            var halfWidth = (textSize.Item1 + offset) / 2;
-            var halfHeight = (textSize.Item2 + offset) / 2;
+            var halfWidth = (textWidth  + offset) / 2;
+            var halfHeight = (textHeight  + offset) / 2;
 
             var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
             var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);

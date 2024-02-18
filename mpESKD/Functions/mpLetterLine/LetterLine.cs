@@ -778,10 +778,10 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
         {
             Contents = GetTextContents(),
             Attachment = AttachmentPoint.MiddleCenter,
-            Location = textLocation
+            Location = textLocation,
         };
-        mText.SetProperties(TextStyle, MainTextHeight * _scale);
 
+        mText.SetProperties(TextStyle, MainTextHeight * _scale);
         return mText;
     }
 
@@ -797,11 +797,11 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     /// <returns>форматированное содержимое</returns>
     private string GetTextContents()
     {
-        var prefixAndDesignation = MainText;
+        var prefixAndDesignation = $"{{\\H1x;{MainText}}}";
 
         if (!string.IsNullOrEmpty(SmallText))
         {
-            prefixAndDesignation = $"{prefixAndDesignation}{{\\H{SecondTextHeight / MainTextHeight}x;{SmallText}}}";
+            prefixAndDesignation += $"{{\\H{SecondTextHeight / MainTextHeight}x;{SmallText}}}";
         }
 
         return prefixAndDesignation;

@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Base.Utils;
+﻿using ModPlusAPI.IO;
+
+namespace mpESKD.Base.Utils;
 
 // https://adndevblog.typepad.com/autocad/2012/05/actual-width-and-height-of-a-text-string.html
 // To get the mangled name use dumpbin.exe. For ex :
@@ -27,21 +29,23 @@ internal static class TextStyleArx
         CallingConvention = CallingConvention.Cdecl,
         EntryPoint = "?fromAcDbTextStyle@@YA?AW4ErrorStatus@Acad@@AEAVAcGiTextStyle@@AEBVAcDbObjectId@@@Z")
     ]
-    private static extern ErrorStatus fromAcDbTextStyle(System.IntPtr style, ref ObjectId id); // todo fromAcDbTextStyle ? так это для DBText? поискать для MText
-
+    private static extern ErrorStatus fromAcDbTextStyle(System.IntPtr style, ref ObjectId id); 
     /// <summary>
     /// Для тестирования размеров текста, с учетом стиля текста
     /// </summary>
     [CommandMethod("mpTextTrueWidthMessage")]
     public static void TrueTextSizeMessage()
     {
-        PromptResult prText = Ed.GetString("\nEnter a string: ");
-        PromptResult prTextStyle = Ed.GetString("\nEnter a TextStyle: ");
+        PromptResult prText = Ed.GetString("\nEnter a String: ");
+        PromptResult prTextStyle = Ed.GetString("\nEnter a Text Style: ");
+        PromptResult prTextHeight = Ed.GetDouble("\nEnter a Text Height: ");
 
-        if (prText.Status != PromptStatus.OK && prTextStyle.Status != PromptStatus.OK)
+        if (prText.Status != PromptStatus.OK 
+            && prTextStyle.Status != PromptStatus.OK 
+            && prTextHeight.Status != PromptStatus.OK)
             return;
 
-        var textSize = GetTrueTextSize(prText.StringResult, prTextStyle.StringResult);
+        var textSize = GetTrueTextSize(prText.StringResult, prTextStyle.StringResult, prTextHeight.StringResult.ToDouble());
 
         Ed.WriteMessage($"\nWidth - {textSize.Item1}\nHeight - {textSize.Item2}");
     }
@@ -53,7 +57,7 @@ internal static class TextStyleArx
     /// <param name="textStyleName">Стиль текста</param>
     /// <returns>Кортеж (<see cref="double"/> , <see cref="double"/>):  (ширина_текста , высота_текста)</returns>
     /// <remarks>Применяется для многострочного текста <see cref="MText"/></remarks>
-    internal static (double, double) GetTrueTextSize(string text, string textStyleName)
+    internal static (double, double) GetTrueTextSize(string text, string textStyleName, double textHeight)
     {
         double width = 0.0;
         double height = 0.0;
@@ -68,13 +72,17 @@ internal static class TextStyleArx
 
                 Autodesk.AutoCAD.GraphicsInterface.TextStyle iStyle = new Autodesk.AutoCAD.GraphicsInterface.TextStyle();
 
+
                 if (fromAcDbTextStyle(iStyle.UnmanagedObject, ref textStyleId) == ErrorStatus.OK)
                 {
+                    iStyle.TextSize = textHeight;
+
                     Extents2d extents = iStyle.ExtentsBox(text, false, true, null);
 
                     width = extents.MaxPoint.X - extents.MinPoint.X;
                     height = extents.MaxPoint.Y - extents.MinPoint.Y;
                 }
+                AcadUtils.WriteMessageInDebug($"GetTrueTextSize => iStyle.TextSize: {iStyle.TextSize}");
             }
 
             tr.Commit();
