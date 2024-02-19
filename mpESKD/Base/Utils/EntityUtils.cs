@@ -306,32 +306,24 @@ public static class EntityUtils
             return null;
         }
 
-        var textWidth = 0d;
-        var textHeight = 0d;
+        var textSize = (0d, 0d);
 
         if (textObject is DBText dbText)
         {
-            //var extents = dbText.GeometricExtents;
-            //textWidth = extents.MaxPoint.X - extents.MinPoint.X;
-            //textHeight = dbText.Height;
-
-            var textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName, dbText.Height);
-            textWidth = textSize.Item1;
-            textHeight = textSize.Item2;
-
-            AcadUtils.WriteMessageInDebug($"DBText => textWidth: {textWidth}, textHeight: {textHeight}");
+            textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName, dbText.Height);
         }
         else if (textObject is MText mText)
         {
-            var textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName, mText.ActualHeight);
-             textWidth = textSize.Item1;
-             textHeight = textSize.Item2;
+            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName, mText.ActualHeight);
         }
+
+        var textWidth = textSize.Item1;
+        var textHeight = textSize.Item2;
 
         if (textWidth != 0 && textHeight != 0)
         {
-            var halfWidth = (textWidth  + offset) / 2;
-            var halfHeight = (textHeight  + offset) / 2;
+            var halfWidth = (textWidth + offset) / 2;
+            var halfHeight = (textHeight + offset) / 2;
 
             var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
             var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
