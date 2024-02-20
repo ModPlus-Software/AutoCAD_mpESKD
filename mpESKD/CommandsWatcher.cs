@@ -25,6 +25,11 @@ public static class CommandsWatcher
     public static bool Rotation { get; private set; }
 
     /// <summary>
+    /// Возвращает true, если в данный момент выполняется команда STYLE
+    /// </summary>
+    public static bool Style { get; private set; }
+
+    /// <summary>
     /// Инициализация
     /// </summary>
     public static void Initialize()
