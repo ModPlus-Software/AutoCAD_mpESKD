@@ -297,7 +297,7 @@ public static class EntityUtils
     /// <param name="textObject">Объект текста <see cref="MText"/>, <see cref="DBText"/></param>
     /// <param name="offset">Отступ</param>
     /// <param name="center">Средняя точка прямоугольной области контура</param>
-    /// <returns>коллекция <see cref="Point2dCollection"/> точек контура: слева внизу, слева вверху, справа вверху, справа внизу </returns>
+    /// <returns>Коллекция <see cref="Point2dCollection"/> точек контура: слева внизу, слева вверху, справа вверху, справа внизу </returns>
     private static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center)
         where T : Entity
     {
@@ -309,7 +309,6 @@ public static class EntityUtils
             return null;
         }
 
-        //Tuple<double, double> textSize = new (0,0);
         var textSize = Tuple.Create(0d, 0d);
 
         if (textObject is DBText dbText)
