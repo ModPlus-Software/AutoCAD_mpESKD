@@ -119,14 +119,4 @@ public static class SmartEntityUtils
             Debug.Print(exception.Message);
         }
     }
-
-    private static void WriteToEd(List<string> values, string caption)
-    {
-        var str = $"{caption}: ";
-        foreach (var value in values)
-        {
-            str += value + ", ";
-        }
-        AcadUtils.WriteMessageInDebug(str);
-    }
 }
