@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using System.Runtime.InteropServices;
+using System;
 
 // https://adndevblog.typepad.com/autocad/2012/05/actual-width-and-height-of-a-text-string.html
 // To get the mangled name use dumpbin.exe. For ex :
@@ -48,13 +49,13 @@ public static class TextStyleArx
         EntryPoint = "?fromAcDbTextStyle@@YA?AW4ErrorStatus@Acad@@AEAVAcGiTextStyle@@AEBVAcDbObjectId@@@Z")]
     private static extern ErrorStatus fromAcDbTextStyle(System.IntPtr style, ref ObjectId id);
 
+#if DEBUG
     /// <summary>
     /// Для тестирования размеров текста, с учетом стиля текста
     /// </summary>
     [CommandMethod("mpTextTrueWidthMessage")]
     public static void TrueTextSizeMessage()
     {
-#if DEBUG
         var ed = AcadUtils.Editor;
 
         PromptResult prText = ed.GetString("\nEnter a String: ");
@@ -83,12 +84,12 @@ public static class TextStyleArx
                                           $"Width: {textSize.Item1}, " +
                                           $"Height: {textSize.Item2}");
         }
-        catch (Exception e)
+        catch (System.Exception e)
         {
             AcadUtils.WriteMessageInDebug($"e.Source: {e.Source}; e.StackTrace: {e.StackTrace}");
         }
-#endif
     }
+#endif
 
     /// <summary>
     /// Возвращает актуальные размеры текста, с учетом стиля текста
@@ -98,34 +99,26 @@ public static class TextStyleArx
     /// <param name="textHeight">Высота текста</param>
     /// <returns>Кортеж (<see cref="double"/>, <see cref="double"/>):  (ширина_текста, высота_текста)</returns>
     /// <remarks>Применяется для многострочного текста <see cref="MText"/></remarks>
-    internal static (double, double) GetTrueTextSize(string text, string textStyleName, double textHeight)
+    internal static Tuple<double, double> GetTrueTextSize(string text, string textStyleName, double textHeight)
     {
         double width = 0.0;
         double height = 0.0;
-        var db = AcadUtils.Database;
 
-        using (Transaction tr = db.TransactionManager.StartTransaction())
+        if (AcadUtils.GetTextStyleByName(textStyleName) is { } textStyleTableRecord)
         {
-            TextStyleTable textStyleTable = tr.GetObject(db.TextStyleTableId, OpenMode.ForRead) as TextStyleTable;
+            Autodesk.AutoCAD.GraphicsInterface.TextStyle iStyle = new ();
+            var objectId = textStyleTableRecord.ObjectId;
 
-            if (textStyleTable != null && textStyleTable.Has(textStyleName))
+            if (fromAcDbTextStyle(iStyle.UnmanagedObject, ref objectId) == ErrorStatus.OK)
             {
-                var textStyleId = textStyleTable[textStyleName];
-                Autodesk.AutoCAD.GraphicsInterface.TextStyle iStyle = new Autodesk.AutoCAD.GraphicsInterface.TextStyle();
+                iStyle.TextSize = textHeight;
+                Extents2d extents = iStyle.ExtentsBox(text, false, true, null);
 
-                if (fromAcDbTextStyle(iStyle.UnmanagedObject, ref textStyleId) == ErrorStatus.OK)
-                {
-                    iStyle.TextSize = textHeight;
-                    Extents2d extents = iStyle.ExtentsBox(text, false, true, null);
-
-                    width = extents.MaxPoint.X - extents.MinPoint.X;
-                    height = extents.MaxPoint.Y - extents.MinPoint.Y;
-                }
+                width = extents.MaxPoint.X - extents.MinPoint.X;
+                height = extents.MaxPoint.Y - extents.MinPoint.Y;
             }
-
-            tr.Commit();
         }
 
-        return (width, height);
+        return Tuple.Create(width, height);
     }
 }

@@ -304,16 +304,17 @@ public static class EntityUtils
         if (textObject == null)
             return null;
 
-        if ( typeof(T) != typeof(DBText) & typeof(T) != typeof(MText)) 
+        if (typeof(T) != typeof(DBText) & typeof(T) != typeof(MText)) 
         {
             return null;
         }
 
-        (double,double) textSize = (0.0, 0.0);
+        //Tuple<double, double> textSize = new (0,0);
+        var textSize = Tuple.Create(0d, 0d);
 
         if (textObject is DBText dbText)
         {
-            textSize = (GetLength(dbText), GetHeight(dbText));
+            textSize = new Tuple<double, double>(GetLength(dbText), GetHeight(dbText));
 
         }
         else if (textObject is MText mText)

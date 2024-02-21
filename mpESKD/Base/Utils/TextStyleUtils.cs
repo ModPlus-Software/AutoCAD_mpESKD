@@ -85,6 +85,11 @@ public static class TextStyleUtils
         return textStyleCreated;
     }
 
+    /// <summary>
+    /// Возвращает идентификатор текстового стиля по имени
+    /// </summary>
+    /// <param name="textStyleName">Имя текстового стиля</param>
+    /// <remarks>Таблица стилей открывается на запись?</remarks>
     public static TextStyleTableRecord GetTextStyleTableRecordByName(string textStyleName)
     {
         using (AcadUtils.Document.LockDocument())
