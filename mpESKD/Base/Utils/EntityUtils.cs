@@ -301,7 +301,10 @@ public static class EntityUtils
     private static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center)
         where T : Entity
     {
-        if (textObject == null || typeof(T) != typeof(DBText) & typeof(T) != typeof(MText))
+        if (textObject == null)
+            return null;
+
+        if ( typeof(T) != typeof(DBText) & typeof(T) != typeof(MText)) 
         {
             return null;
         }
