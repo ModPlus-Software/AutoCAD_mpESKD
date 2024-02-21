@@ -73,17 +73,24 @@ public static class CommandsWatcher
     {
         Mirroring = false;
         Rotation = false;
+        Style = false;
     }
 
     private static void CommandEnded(object sender, CommandEventArgs e)
     {
         Mirroring = false;
         Rotation = false;
+        Style = false;
 
         if (e.GlobalCommandName is "REGEN" or "REGENALL")
         {
             SmartEntityUtils.UpdateSmartObjects(false);
         }
+        else if (e.GlobalCommandName is "STYLE")
+        {
+            SmartEntityUtils.UpdateTextualSmartObjects(false);
+        }
+
     }
 
     private static void CommandWillStart(object sender, CommandEventArgs e)
@@ -95,6 +102,10 @@ public static class CommandsWatcher
         else if (e.GlobalCommandName == "ROTATE")
         {
             Rotation = true;
+        }
+        else if (e.GlobalCommandName == "STYLE")
+        {
+            Style = true;
         }
     }
 }
