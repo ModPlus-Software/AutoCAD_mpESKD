@@ -306,11 +306,12 @@ public static class EntityUtils
             return null;
         }
 
-        var textSize = (0d, 0d);
+        (double,double) textSize = (0.0, 0.0);
 
         if (textObject is DBText dbText)
         {
-            textSize = TextStyleArx.GetTrueTextSize(dbText.TextString, dbText.TextStyleName, dbText.Height);
+            textSize = (GetLength(dbText), GetHeight(dbText));
+
         }
         else if (textObject is MText mText)
         {
