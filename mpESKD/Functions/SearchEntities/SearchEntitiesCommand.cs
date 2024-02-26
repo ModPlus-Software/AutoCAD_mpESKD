@@ -11,7 +11,6 @@ using Base.Enums;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Abstractions;
 
 /// <summary>
 /// Поиск интеллектуальных объектов в чертеже
@@ -158,11 +157,13 @@ public static class SearchEntitiesCommand
     /// <summary>
     /// Найти блоки в текущем пространстве, являющиеся интеллектуальными объектами
     /// </summary>
-    /// <param name="typeNames">Список имен типов, интеллектуальные объекты которых нужно найти</param>
+    /// <param name="commandNames">Список командных имен интеллектуальных объектов, которые нужно найти.
+    /// Командные имена состоят из префикса mp и имени типа.
+    /// Т.е. если тип называется "Axis", то команда должна называться "mpAxis"</param>
     /// <param name="tr">Открытая транзакция</param>
     /// <returns>Коллекция блоков</returns>
     public static IEnumerable<BlockReference> GetBlockReferencesOfSmartEntities(
-        ICollection<string> typeNames, Transaction tr)
+        ICollection<string> commandNames, Transaction tr)
     {
         var btr = (BlockTableRecord)tr.GetObject(AcadUtils.Database.CurrentSpaceId, OpenMode.ForRead);
         foreach (var objectId in btr)
@@ -172,7 +173,7 @@ public static class SearchEntitiesCommand
             {
                 var typedValue = blockReference.XData.AsArray()
                     .FirstOrDefault(tv => tv.TypeCode == (int)DxfCode.ExtendedDataRegAppName);
-                if (typeNames.Contains(typedValue.Value as string))
+                if (commandNames.Contains(typedValue.Value as string))
                 {
                     yield return blockReference;
                 }

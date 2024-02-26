@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Base.Utils;
 
+using System.Linq;
 using Abstractions;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -42,7 +43,9 @@ public static class EntityUtils
         dbText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         dbText.Linetype = "ByBlock";
         dbText.LineWeight = LineWeight.ByBlock;
+
         var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+
         if (textStyle != null)
         {
             dbText.TextStyleId = textStyle.Id;
@@ -61,7 +64,7 @@ public static class EntityUtils
     /// <param name="height">Высота текста (с учетом масштаба блока)</param>
     public static void SetProperties(this MText mText, string textStyleName, double height)
     {
-        mText.Height = height;
+        mText.TextHeight = height;
         mText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         mText.Linetype = "ByBlock";
         mText.LineWeight = LineWeight.ByBlock;
@@ -102,9 +105,9 @@ public static class EntityUtils
     /// <param name="scaleFactorX">Значение зеркальности</param>
     /// <returns></returns>
     public static Vector3d GetMovementPositionVector(
-        TextHorizontalAlignment valueHorizontalAlignment, 
-        bool isRight, 
-        Vector3d textHalfMovementHorV, 
+        TextHorizontalAlignment valueHorizontalAlignment,
+        bool isRight,
+        Vector3d textHalfMovementHorV,
         double scaleFactorX)
     {
         if ((isRight && valueHorizontalAlignment == TextHorizontalAlignment.Right) ||
@@ -190,43 +193,53 @@ public static class EntityUtils
     /// </summary>
     /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
     /// <param name="offset">Отступ</param>
-    public static Wipeout GetBackgroundMask(this DBText dbText, double offset)
-    {
-        if (dbText == null)
-            return null;
-        AcadUtils.WriteMessageInDebug($"\n dbText.TextString {dbText.TextString} dbText.GeometricExtents {dbText.GeometricExtents} \n");
-        return GetBackgroundMask(dbText.GeometricExtents, offset);
-    }
-
-    /// <summary>
-    /// Возвращает маскировку, созданную по контуру текста с указанным отступом
-    /// </summary>
-    /// <param name="dbText">Экземпляр <see cref="DBText"/></param>
-    /// <param name="offset">Отступ</param>
     /// <param name="center">Средняя точка прямоугольной маскировки</param>
     public static Wipeout GetBackgroundMask(this DBText dbText, double offset, Point3d center)
     {
         if (dbText == null)
             return null;
-        
-        return GetBackgroundMask(dbText.GeometricExtents, offset, center);
+
+        var framePoints = GetTextBoundsPoints(dbText, offset, center);
+
+        return GetBackgroundMask(framePoints);
     }
 
     /// <summary>
     /// Возвращает маскировку, созданную по контуру текста с указанным отступом
     /// </summary>
-    /// <param name="mText">Экземпляр <see cref="DBText"/></param>
+    /// <param name="mText">Экземпляр <see cref="MText"/></param>
     /// <param name="offset">Отступ</param>
+    /// <returns>Маскировка <see cref="Wipeout"/></returns>
     public static Wipeout GetBackgroundMask(this MText mText, double offset)
     {
         if (mText == null)
             return null;
 
-        return GetBackgroundMask(mText.GeometricExtents, offset);
+        var center = GeometryUtils.GetMiddlePoint3d(
+            mText.GeometricExtents.MinPoint,
+            mText.GeometricExtents.MaxPoint);
+
+        return GetBackgroundMask(mText, offset, center);
     }
 
     /// <summary>
-    /// Возвращает маскировку, созданную по контуру полилини
+    /// Возвращает маскировку, созданную по контуру текста с указанным отступом
+    /// </summary>
+    /// <param name="mText">Экземпляр <see cref="MText"/></param>
+    /// <param name="offset">Отступ</param>
+    /// <param name="center">Средняя точка прямоугольной маскировки</param>
+    public static Wipeout GetBackgroundMask(this MText mText, double offset, Point3d center)
+    {
+        if (mText == null)
+            return null;
+
+        var framePoints = GetTextBoundsPoints(mText, offset, center);
+
+        return GetBackgroundMask(framePoints);
+    }
+
+    /// <summary>
+    /// Возвращает маскировку, созданную по контуру полилинии
     /// </summary>
     /// <param name="polyline">Экземпляр <see cref="Polyline"/></param>
     public static Wipeout GetBackgroundMask(this Polyline polyline)
@@ -242,88 +255,89 @@ public static class EntityUtils
             vertexCollection.Add(vertex);
         }
 
-        vertexCollection.Add(vertexCollection[0]);
-
-        var wipeout = new Wipeout();
-        wipeout.SetFrom(vertexCollection, Vector3d.ZAxis);
+        var wipeout = GetBackgroundMask(vertexCollection);
         return wipeout;
     }
 
-    /// <summary>
-    /// Возвращает маскировку, созданную по контуру с указанным отступом
-    /// </summary>
-    /// <param name="extents3d">Крайние границы</param>
-    /// <param name="offset">Отступ</param>
-    /// <param name="center">Средняя точка прямоугольной маскировки</param>
-    private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset, Point3d center)
+    private static Wipeout GetBackgroundMask(Point2dCollection points)
     {
         try
         {
-            var minPoint = extents3d.MinPoint;
-            var maxPoint = extents3d.MaxPoint;
-            var halfWidth = (Math.Abs(maxPoint.X - minPoint.X) + (offset * 2)) / 2;
-            var halfHeight = (Math.Abs(maxPoint.Y - minPoint.Y) + (offset * 2)) / 2;
-            
+            if (points == null)
+                return null;
+
+            var pointsWipeout = points.ToArray().ToList();
+            pointsWipeout.Add(pointsWipeout.First());
+
+            var points2dWipeout = new Point2dCollection();
+            foreach (var point in pointsWipeout)
+            {
+                points2dWipeout.Add(point);
+            }
+
+            var wipeout = new Wipeout();
+            wipeout.SetFrom(points2dWipeout, Vector3d.ZAxis);
+
+            return wipeout;
+        }
+        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+        {
+            if (ex.Message == "eNullExtents")
+            {
+                return null;
+            }
+
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Возвращает точки габаритного контура с заданными отступом
+    /// </summary>
+    /// <param name="textObject">Объект текста <see cref="MText"/>, <see cref="DBText"/></param>
+    /// <param name="offset">Отступ</param>
+    /// <param name="center">Средняя точка прямоугольной области контура</param>
+    /// <returns>Коллекция <see cref="Point2dCollection"/> точек контура: слева внизу, слева вверху, справа вверху, справа внизу </returns>
+    private static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center)
+        where T : Entity
+    {
+        if (textObject == null || (typeof(T) != typeof(DBText) && typeof(T) != typeof(MText)))
+        {
+            return null;
+        }
+
+        var textSize = Tuple.Create(0d, 0d);
+
+        if (textObject is DBText dbText)
+        {
+            textSize = new Tuple<double, double>(GetLength(dbText), GetHeight(dbText));
+
+        }
+        else if (textObject is MText mText)
+        {
+            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName, mText.ActualHeight);
+        }
+
+        var textWidth = textSize.Item1;
+        var textHeight = textSize.Item2;
+
+        if (textWidth != 0 && textHeight != 0)
+        {
+            var halfWidth = (textWidth + offset) / 2;
+            var halfHeight = (textHeight + offset) / 2;
+
             var bottomLeftPoint = new Point2d(center.X - halfWidth, center.Y - halfHeight);
             var topLeftPoint = new Point2d(center.X - halfWidth, center.Y + halfHeight);
             var topRightPoint = new Point2d(center.X + halfWidth, center.Y + halfHeight);
             var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
-            
-            var wipeout = new Wipeout();
-            wipeout.SetFrom(
-                new Point2dCollection
-                {
-                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
-                }, Vector3d.ZAxis);
-            
-            return wipeout;
-        }
-        catch (Autodesk.AutoCAD.Runtime.Exception ex)
-        {
-            if (ex.Message == "eNullExtents")
+
+            return new Point2dCollection
             {
-                return null;
-            }
-
-            throw;
+                bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint
+            };
         }
-    }
 
-    /// <summary>
-    /// Возвращает маскировку, созданную по контуру с указанным отступом
-    /// </summary>
-    /// <param name="extents3d">Крайние границы</param>
-    /// <param name="offset">Отступ</param>
-    private static Wipeout GetBackgroundMask(Extents3d extents3d, double offset)
-    {
-        try
-        {
-            var minPoint = extents3d.MinPoint;
-            var maxPoint = extents3d.MaxPoint;
-            
-            var bottomLeftPoint = new Point2d(minPoint.X - offset, minPoint.Y - offset);
-            var topLeftPoint = new Point2d(minPoint.X - offset, maxPoint.Y + offset);
-            var topRightPoint = new Point2d(maxPoint.X + offset, maxPoint.Y + offset);
-            var bottomRightPoint = new Point2d(maxPoint.X + offset, minPoint.Y - offset);
-            
-            var wipeout = new Wipeout();
-            wipeout.SetFrom(
-                new Point2dCollection
-                {
-                    bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint
-                }, Vector3d.ZAxis);
-            
-            return wipeout;
-        }
-        catch (Autodesk.AutoCAD.Runtime.Exception ex)
-        {
-            if (ex.Message == "eNullExtents")
-            {
-                return null;
-            }
-
-            throw;
-        }
+        return null;
     }
 
     /// <summary>

@@ -79,6 +79,11 @@ public static class CommandsWatcher
         {
             SmartEntityUtils.UpdateSmartObjects(false);
         }
+        else if (e.GlobalCommandName is "STYLE")
+        {
+            SmartEntityUtils.UpdateTextualSmartObjects();
+        }
+
     }
 
     private static void CommandWillStart(object sender, CommandEventArgs e)
