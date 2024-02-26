@@ -77,6 +77,19 @@ public class TypeFactory
     }
 
     /// <summary>
+    /// Возвращает список имен команд, реализующих ITextValueEntity.
+    /// Имя команды - это имя типа примитива с приставкой "mp"
+    /// <remarks>Используется в расширенных данных (XData) блоков</remarks>
+    /// </summary>
+    public List<string> GetTextualEntityCommands()
+    {
+        return GetEntityTypes()
+            .Where(t => t.GetInterfaces().Contains(typeof(ITextValueEntity)))
+            .Select(t => t.Name)
+            .ToList();
+    }
+
+    /// <summary>
     /// Возвращает экземпляр редактора по двойному клику для типа интеллектуального объекта
     /// </summary>
     /// <param name="entityType">Тип интеллектуального объекта</param>

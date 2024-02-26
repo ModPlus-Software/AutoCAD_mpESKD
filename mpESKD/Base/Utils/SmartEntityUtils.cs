@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿namespace mpESKD.Base.Utils;
 
-namespace mpESKD.Base.Utils;
-
-using System.Linq;
 using Abstractions;
 using Functions.SearchEntities;
 using System.Diagnostics;
@@ -78,14 +73,17 @@ public static class SmartEntityUtils
         }
     }
 
+    /// <summary>
+    /// Принудительная перерисовка всех интеллектуальных объектов, найденных в текущем пространств,
+    /// реализующих ITextValueEntity
+    /// </summary>
+    /// <remarks>
+    /// Опция "Только на листах" нужна для решения проблемы, когда переключаются с модели на лист,
+    /// но обновление интеллектуальных объектов не происходит
+    /// </remarks>
+    /// <param name="onlyInLayout">True - только на листах</param>
     public static void UpdateTextualSmartObjects(bool onlyInLayout)
     {
-        // Список типов интеллектуальных объектов, реализующих ITextValueEntity
-        var typesToProceedNames = TypeFactory.Instance.GetEntityTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(ITextValueEntity)))
-            .Select(t => t.Name)
-            .ToList();
-
         try
         {
             if (onlyInLayout && AcadUtils.IsInModel())
@@ -94,16 +92,12 @@ public static class SmartEntityUtils
             using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
             {
                 foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfSmartEntities(
-                             TypeFactory.Instance.GetEntityCommandNames(), tr))
+                             TypeFactory.Instance.GetTextualEntityCommands(), tr))
                 {
                     var smartEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
                     if (smartEntity != null)
                     {
-                        if (typesToProceedNames.Contains(smartEntity.GetType().Name))
                         {
-#if DEBUG
-                            AcadUtils.WriteMessageInDebug($"Valid textual object: {smartEntity.GetType().Name}");
-#endif
                             blockReference.UpgradeOpen();
                             smartEntity.UpdateEntities();
                             smartEntity.GetBlockTableRecordForUndo(blockReference)?.UpdateAnonymousBlocks();
