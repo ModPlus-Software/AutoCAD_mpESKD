@@ -25,11 +25,6 @@ public static class CommandsWatcher
     public static bool Rotation { get; private set; }
 
     /// <summary>
-    /// Возвращает true, если в данный момент выполняется команда STYLE
-    /// </summary>
-    public static bool Style { get; private set; }
-
-    /// <summary>
     /// Инициализация
     /// </summary>
     public static void Initialize()
@@ -73,14 +68,12 @@ public static class CommandsWatcher
     {
         Mirroring = false;
         Rotation = false;
-        Style = false;
     }
 
     private static void CommandEnded(object sender, CommandEventArgs e)
     {
         Mirroring = false;
         Rotation = false;
-        Style = false;
 
         if (e.GlobalCommandName is "REGEN" or "REGENALL")
         {
@@ -102,10 +95,6 @@ public static class CommandsWatcher
         else if (e.GlobalCommandName == "ROTATE")
         {
             Rotation = true;
-        }
-        else if (e.GlobalCommandName == "STYLE")
-        {
-            Style = true;
         }
     }
 }
