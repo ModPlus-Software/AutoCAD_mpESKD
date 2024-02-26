@@ -77,22 +77,14 @@ public static class SmartEntityUtils
     /// Принудительная перерисовка всех интеллектуальных объектов, найденных в текущем пространств,
     /// реализующих ITextValueEntity
     /// </summary>
-    /// <remarks>
-    /// Опция "Только на листах" нужна для решения проблемы, когда переключаются с модели на лист,
-    /// но обновление интеллектуальных объектов не происходит
-    /// </remarks>
-    /// <param name="onlyInLayout">True - только на листах</param>
-    public static void UpdateTextualSmartObjects(bool onlyInLayout)
+    public static void UpdateTextualSmartObjects()
     {
         try
         {
-            if (onlyInLayout && AcadUtils.IsInModel())
-                return;
-
             using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
             {
                 foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfSmartEntities(
-                             TypeFactory.Instance.GetTextualEntityCommands(), tr))
+                             TypeFactory.Instance.GetTextualEntityCommandNames(), tr))
                 {
                     var smartEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
                     if (smartEntity != null)

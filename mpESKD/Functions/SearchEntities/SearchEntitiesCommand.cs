@@ -11,7 +11,6 @@ using Base.Enums;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Abstractions;
 
 /// <summary>
 /// Поиск интеллектуальных объектов в чертеже

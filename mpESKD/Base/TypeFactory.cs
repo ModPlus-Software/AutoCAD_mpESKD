@@ -81,11 +81,11 @@ public class TypeFactory
     /// Имя команды - это имя типа примитива с приставкой "mp"
     /// <remarks>Используется в расширенных данных (XData) блоков</remarks>
     /// </summary>
-    public List<string> GetTextualEntityCommands()
+    public List<string> GetTextualEntityCommandNames()
     {
         return GetEntityTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(ITextValueEntity)))
-            .Select(t => t.Name)
+            .Select(t => $"mp{t.Name}")
             .ToList();
     }
 

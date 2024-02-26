@@ -81,7 +81,7 @@ public static class CommandsWatcher
         }
         else if (e.GlobalCommandName is "STYLE")
         {
-            SmartEntityUtils.UpdateTextualSmartObjects(false);
+            SmartEntityUtils.UpdateTextualSmartObjects();
         }
 
     }
