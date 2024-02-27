@@ -21,6 +21,7 @@
 		<Prefer32Bit>false</Prefer32Bit>
 		<UseWpf>true</UseWpf>
 		<MSBuildWarningsAsMessages>MSB3270</MSBuildWarningsAsMessages>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
