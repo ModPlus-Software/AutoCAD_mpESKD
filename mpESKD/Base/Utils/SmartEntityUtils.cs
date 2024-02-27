@@ -72,4 +72,37 @@ public static class SmartEntityUtils
             Debug.Print(exception.Message);
         }
     }
+
+    /// <summary>
+    /// Принудительная перерисовка всех интеллектуальных объектов, найденных в текущем пространств,
+    /// реализующих ITextValueEntity
+    /// </summary>
+    public static void UpdateTextualSmartObjects()
+    {
+        try
+        {
+            using (var tr = AcadUtils.Document.TransactionManager.StartOpenCloseTransaction())
+            {
+                foreach (var blockReference in SearchEntitiesCommand.GetBlockReferencesOfSmartEntities(
+                             TypeFactory.Instance.GetTextualEntityCommandNames(), tr))
+                {
+                    var smartEntity = EntityReaderService.Instance.GetFromEntity(blockReference);
+                    if (smartEntity != null)
+                    {
+                        {
+                            blockReference.UpgradeOpen();
+                            smartEntity.UpdateEntities();
+                            smartEntity.GetBlockTableRecordForUndo(blockReference)?.UpdateAnonymousBlocks();
+                        }
+                    }
+                }
+
+                tr.Commit();
+            }
+        }
+        catch (System.Exception exception)
+        {
+            Debug.Print(exception.Message);
+        }
+    }
 }
