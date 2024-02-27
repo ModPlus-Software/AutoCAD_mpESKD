@@ -156,7 +156,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 3.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 25.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 
@@ -375,6 +375,9 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
 
         var topTextLength = topFirstTextLength + topSecondTextLength;
         var largestTextLength = Math.Max(topTextLength, bottomTextLength);
+
+        bool isTopTextLagest = largestTextLength.Equals(topTextLength);
+
         var shelfLength = textIndent + largestTextLength + shelfLedge;
         Point3d topFirstTextPosition;
         var topSecondTextPosition = default(Point3d);
@@ -383,11 +386,12 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         if (isRight)
         {
             topFirstTextPosition = new Point3d(
-                leaderPoint.X + (topFirstTextLength / 2) + ((shelfLength - topTextLength) / 2),
-                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2),
-                0);
+                leaderPoint.X + textIndent +
+                ((isTopTextLagest ? topFirstTextLength : largestTextLength - topSecondTextLength) / 2),
+                leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+
             bottomTextPosition = new Point3d(
-                leaderPoint.X + (bottomTextLength / 2) + ((shelfLength - bottomTextLength) / 2),
+                leaderPoint.X + textIndent + (largestTextLength / 2),
                 leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topFirstDbText != null)
@@ -405,10 +409,13 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
         else
         {
             topFirstTextPosition = new Point3d(
-                leaderPoint.X - (topFirstTextLength / 2) - topSecondTextLength - ((shelfLength - topTextLength) / 2),
+                leaderPoint.X - textIndent -
+                ((isTopTextLagest ? topFirstTextLength : largestTextLength - topSecondTextLength) / 2) -
+                topSecondTextLength,
                 leaderPoint.Y + textVerticalOffset + (mainTextHeight / 2), 0);
+
             bottomTextPosition = new Point3d(
-                leaderPoint.X - (bottomTextLength / 2) - ((shelfLength - bottomTextLength) / 2),
+                leaderPoint.X - textIndent - (largestTextLength / 2),
                 leaderPoint.Y - textVerticalOffset - (bottomTextHeight / 2), 0);
 
             if (_topFirstDbText != null)
