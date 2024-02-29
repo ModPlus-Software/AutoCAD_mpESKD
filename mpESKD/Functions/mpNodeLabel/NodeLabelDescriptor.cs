@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using Base.Abstractions;
 using ModPlusAPI;
-using mpESKD.Functions.mpNodeLabel;
 
  public class NodeLabelDescriptor : ISmartEntityDescriptor
 {

@@ -179,7 +179,7 @@ public class NodeLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     /// <summary>
     /// Высота текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 2, "p18", 5.0, 0.000000001, 1.0000E+99, descLocalKey: "d18", nameSymbol: "h1")]
+    [EntityProperty(PropertiesCategory.Content, 2, "p18", 5.0, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
     [SaveToXData]
     public double MainTextHeight { get; set; } = 5.0;
 

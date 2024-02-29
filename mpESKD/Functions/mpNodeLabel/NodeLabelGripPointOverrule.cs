@@ -7,10 +7,8 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Functions.mpNodeLabel.Grips;
-using mpESKD.Functions.mpViewLabel.Grips;
 
-public class NodeLabelGripPointOverrule : BaseSmartEntityGripOverrule<mpNodeLabel.NodeLabel>
+public class NodeLabelGripPointOverrule : BaseSmartEntityGripOverrule<NodeLabel>
 {
     /// <inheritdoc />
     public override void GetGripPoints(
@@ -23,7 +21,7 @@ public class NodeLabelGripPointOverrule : BaseSmartEntityGripOverrule<mpNodeLabe
                 // Удаляю все ручки - это удалит ручку вставки блока
                 grips.Clear();
 
-                var nodeLabel = EntityReaderService.Instance.GetFromEntity<mpNodeLabel.NodeLabel>(entity);
+                var nodeLabel = EntityReaderService.Instance.GetFromEntity<NodeLabel>(entity);
                 if (nodeLabel != null)
                 {
                     // insertion (start) grip

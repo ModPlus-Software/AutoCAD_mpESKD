@@ -10,12 +10,12 @@ using Base;
 using Base.Overrules;
 using Base.Styles;
 using Base.Utils;
-using ModPlusAPI;
 using ModPlusAPI.IO;
 using ModPlusAPI.Windows;
+using Base.Abstractions;
 
 /// <inheritdoc />
-public class NodeLabelFunction
+public class NodeLabelFunction : ISmartEntityFunction
 {
     /// <inheritdoc />
     public void Initialize()
@@ -104,7 +104,6 @@ public class NodeLabelFunction
 
     private static void InsertNodeLabelWithJig(NodeLabel nodeLabel, BlockReference blockReference)
     {
-        var nextPointPrompt = Language.GetItem("msg5");
         var entityJig = new DefaultEntityJig(
             nodeLabel,
             blockReference,
