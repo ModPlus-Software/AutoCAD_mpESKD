@@ -297,6 +297,23 @@ public class MainSettings : ObservableObject
 
     #endregion
 
+    #region NodeLabel
+
+    /// <summary>
+    /// Продолжать нумерацию узла при создании новой узловой выноски
+    /// </summary>
+    public bool NodeLabelContinueNodeNumber
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
     #region SecantNodalLeader
 
     /// <summary>
