@@ -1,98 +1,141 @@
 ﻿<mps:ModPlusWindow x:Class="mpESKD.Base.View.StyleEditor"
                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                   xmlns:local="clr-namespace:mpESKD.Base.Styles"
-                   xmlns:mps="https://modplus.org/winfx/xaml/controls"
-                   xmlns:mpEskd="clr-namespace:mpESKD"
                    xmlns:apiConverters="clr-namespace:ModPlusAPI.Converters;assembly=ModPlusAPI"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:enums="clr-namespace:mpESKD.Base.Enums"
-                   
-                   mc:Ignorable="d" SizeToContent="WidthAndHeight" 
-                   ResizeMode="CanResizeWithGrip"
-                   MinHeight="410" MinWidth="580"
+                   xmlns:local="clr-namespace:mpESKD.Base.Styles"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:mpEskd="clr-namespace:mpESKD"
+                   xmlns:mps="https://modplus.org/winfx/xaml/controls"
+                   MinWidth="580"
+                   MinHeight="410"
                    Closed="StyleEditor_OnClosed"
-                   Closing="StyleEditor_OnClosing">
+                   Closing="StyleEditor_OnClosing"
+                   ResizeMode="CanResizeWithGrip"
+                   SizeToContent="WidthAndHeight"
+                   mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
-                <ResourceDictionary Source="../Controls/ControlStylesForEditor.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="../Controls/ControlStylesForEditor.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
-            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <XmlDataProvider x:Key="Lang" XPath="ModPlus/mpESKD" />
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Window.Resources>
     <TabControl>
         <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h14}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*" Name="TopRow" MinHeight="50"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*" MinHeight="150"></RowDefinition>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Name="TopRow"
+                                   Height="*"
+                                   MinHeight="50" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*"
+                                   MinHeight="150" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MinWidth="200"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*" Name="RightColumn" MinWidth="200"></ColumnDefinition>
+                    <ColumnDefinition Width="*"
+                                      MinWidth="200" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Name="RightColumn"
+                                      Width="*"
+                                      MinWidth="200" />
                 </Grid.ColumnDefinitions>
                 <Grid.Resources>
-                    <Path x:Key="Folder" Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" Fill="Black" />
+                    <Path x:Key="Folder"
+                          Data="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z"
+                          Fill="Black" />
                 </Grid.Resources>
 
-                <!--Controls-->
-                <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
+                <!-- Controls -->
+                <Grid Grid.Row="0"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <!--Add style-->
-                    <Button Grid.Column="0" Name="BtAddNewStyle" Click="BtAddNewStyle_OnClick"
-                            Style="{DynamicResource ModPlusTransparentRoundButton}" Width="32" Height="32"
-                            IsEnabled="False" ToolTip="{Binding Source={StaticResource Lang}, XPath=h16}"
-                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True">
-                        <Viewbox Width="24" Height="24">
-                            <Canvas Width="24" Height="24">
-                                <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" 
+                    <!-- Add style -->
+                    <Button Name="BtAddNewStyle"
+                            Grid.Column="0"
+                            Width="32"
+                            Height="32"
+                            Click="BtAddNewStyle_OnClick"
+                            IsEnabled="False"
+                            Style="{DynamicResource ModPlusTransparentRoundButton}"
+                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h16}"
+                            ToolTipService.InitialShowDelay="0"
+                            ToolTipService.ShowOnDisabled="True">
+                        <Viewbox Width="24"
+                                 Height="24">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Data="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"
                                       Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                             </Canvas>
                         </Viewbox>
                     </Button>
-                    <!--Remove style-->
-                    <Button Grid.Column="1" Name="BtRemoveStyle" Click="BtRemoveStyle_OnClick"
-                            Style="{DynamicResource ModPlusTransparentRoundButton}" Width="32" Height="32"
-                            IsEnabled="False" ToolTip="{Binding Source={StaticResource Lang}, XPath=h17}"
-                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True">
-                        <Viewbox Width="20" Height="20">
-                            <Canvas Width="24" Height="24">
-                                <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" 
+                    <!-- Remove style -->
+                    <Button Name="BtRemoveStyle"
+                            Grid.Column="1"
+                            Width="32"
+                            Height="32"
+                            Click="BtRemoveStyle_OnClick"
+                            IsEnabled="False"
+                            Style="{DynamicResource ModPlusTransparentRoundButton}"
+                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h17}"
+                            ToolTipService.InitialShowDelay="0"
+                            ToolTipService.ShowOnDisabled="True">
+                        <Viewbox Width="20"
+                                 Height="20">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Data="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
                                       Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                             </Canvas>
                         </Viewbox>
                     </Button>
-                    <!--set default style-->
-                    <Button Grid.Column="2" Name="BtSetCurrentStyle" Click="BtSetCurrentStyle_OnClick"
-                            Style="{DynamicResource ModPlusTransparentRoundButton}" Width="32" Height="32"
-                            IsEnabled="False" ToolTip="{Binding Source={StaticResource Lang}, XPath=h18}"
-                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True">
-                        <Viewbox Width="18" Height="18">
-                            <Canvas Width="24" Height="24">
-                                <Path Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" 
+                    <!-- set default style -->
+                    <Button Name="BtSetCurrentStyle"
+                            Grid.Column="2"
+                            Width="32"
+                            Height="32"
+                            Click="BtSetCurrentStyle_OnClick"
+                            IsEnabled="False"
+                            Style="{DynamicResource ModPlusTransparentRoundButton}"
+                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h18}"
+                            ToolTipService.InitialShowDelay="0"
+                            ToolTipService.ShowOnDisabled="True">
+                        <Viewbox Width="18"
+                                 Height="18">
+                            <Canvas Width="24"
+                                    Height="24">
+                                <Path Data="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
                                       Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                             </Canvas>
                         </Viewbox>
                     </Button>
-                    <!--create from ent-->
-                    <Button Grid.Column="3" Name="BtCreateStyleFromEntity" Click="BtCreateStyleFromEntity_OnClick"
-                            Style="{DynamicResource ModPlusTransparentRoundButton}" Width="32" Height="32"
-                            IsEnabled="False" ToolTip="{Binding Source={StaticResource Lang}, XPath=h19}"
-                            ToolTipService.InitialShowDelay="0" ToolTipService.ShowOnDisabled="True">
-                        <Viewbox Width="24" Height="24">
-                            <Canvas Width="24" Height="24">
+                    <!-- create from ent -->
+                    <Button Name="BtCreateStyleFromEntity"
+                            Grid.Column="3"
+                            Width="32"
+                            Height="32"
+                            Click="BtCreateStyleFromEntity_OnClick"
+                            IsEnabled="False"
+                            Style="{DynamicResource ModPlusTransparentRoundButton}"
+                            ToolTip="{Binding Source={StaticResource Lang}, XPath=h19}"
+                            ToolTipService.InitialShowDelay="0"
+                            ToolTipService.ShowOnDisabled="True">
+                        <Viewbox Width="24"
+                                 Height="24">
+                            <Canvas Width="24"
+                                    Height="24">
                                 <Path Data="M11,2V4.07C7.38,4.53 4.53,7.38 4.07,11H2V13H4.07C4.53,16.62 7.38,19.47 11,19.93V22H13V19.93C16.62,19.47 19.47,16.62 19.93,13H22V11H19.93C19.47,7.38 16.62,4.53 13,4.07V2M11,6.08V8H13V6.09C15.5,6.5 17.5,8.5 17.92,11H16V13H17.91C17.5,15.5 15.5,17.5 13,17.92V16H11V17.91C8.5,17.5 6.5,15.5 6.08,13H8V11H6.09C6.5,8.5 8.5,6.5 11,6.08M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11Z"
                                       Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                             </Canvas>
@@ -100,94 +143,137 @@
                     </Button>
                 </Grid>
 
-                <!--Styles-->
-                <TreeView Grid.Row="1" Grid.Column="0" MinHeight="50"
-                          SelectedItemChanged="TvStyles_OnSelectedItemChanged"
+                <!-- Styles -->
+                <TreeView Name="TvStyles"
+                          Grid.Row="1"
+                          Grid.Column="0"
+                          MinHeight="50"
+                          ItemsSource="{Binding Path=Styles}"
                           MouseDoubleClick="TvStyles_OnMouseDoubleClick"
-                          Name="TvStyles"
-                          ItemsSource="{Binding Path=Styles}">
+                          SelectedItemChanged="TvStyles_OnSelectedItemChanged">
                     <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Styles}" DataType="local:EntityStyles">
+                        <HierarchicalDataTemplate DataType="local:EntityStyles"
+                                                  ItemsSource="{Binding Path=Styles}">
                             <StackPanel Orientation="Horizontal">
-                                <Rectangle Width="16" Height="16" Fill="{DynamicResource AccentColorBrush}">
+                                <Rectangle Width="16"
+                                           Height="16"
+                                           Fill="{DynamicResource AccentColorBrush}">
                                     <Rectangle.OpacityMask>
-                                        <VisualBrush Visual="{StaticResource Folder}" Stretch="Uniform"/>
+                                        <VisualBrush Stretch="Uniform"
+                                                     Visual="{StaticResource Folder}" />
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
-                                <TextBlock Text="{Binding Path=DisplayName}" Margin="5,0,0,0"/>
+                                <TextBlock Margin="5 0 0 0"
+                                           Text="{Binding Path=DisplayName}" />
                             </StackPanel>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate DataType="local:SmartEntityStyle">
-                                    <TextBlock Text="{Binding Path=Name}" FontWeight="{Binding Path=FontWeight}"/>
+                                    <TextBlock FontWeight="{Binding Path=FontWeight}"
+                                               Text="{Binding Path=Name}" />
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
 
-                <mps:Card Grid.Row="3" Grid.Column="0">
-                    <Viewbox  Stretch="Uniform" Name="VbImage" />
+                <mps:Card Grid.Row="3"
+                          Grid.Column="0">
+                    <Viewbox Name="VbImage"
+                             Stretch="Uniform" />
                 </mps:Card>
 
-                <!--Image show controls-->
-                <Button Grid.Row="3" Grid.Column="0" Opacity=".4"
-                        Style="{DynamicResource ModPlusTransparentRoundButton}"
-                        HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Name="BtExpandImage" Margin="0,10,10,0" Command="{Binding Path=ExpandImageCommand}"
+                <!-- Image show controls -->
+                <Button Name="BtExpandImage"
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Margin="0 10 10 0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Click="BtExpandImage_OnClick"
+                        Command="{Binding Path=ExpandImageCommand}"
                         MouseEnter="BtExpandCollapseImage_OnMouseEnter"
                         MouseLeave="BtExpandCollapseImage_OnMouseLeave"
-                        Click="BtExpandImage_OnClick">
-                    <Viewbox Width="24" Height="24">
-                        <Canvas Width="24" Height="24">
+                        Opacity=".4"
+                        Style="{DynamicResource ModPlusTransparentRoundButton}">
+                    <Viewbox Width="24"
+                             Height="24">
+                        <Canvas Width="24"
+                                Height="24">
                             <Path Data="M9.5,13.09L10.91,14.5L6.41,19H10V21H3V14H5V17.59L9.5,13.09M10.91,9.5L9.5,10.91L5,6.41V10H3V3H10V5H6.41L10.91,9.5M14.5,13.09L19,17.59V14H21V21H14V19H17.59L13.09,14.5L14.5,13.09M13.09,9.5L17.59,5H14V3H21V10H19V6.41L14.5,10.91L13.09,9.5Z"
                                   Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                         </Canvas>
                     </Viewbox>
                 </Button>
-                <Button Grid.Row="3" Grid.Column="0" 
-                        Style="{DynamicResource ModPlusTransparentRoundButton}"
-                        HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Name="BtCollapseImage" Margin="0,10,10,0" Command="{Binding Path=CollapseImageCommand}"
-                        MouseEnter="BtExpandCollapseImage_OnMouseEnter" 
+                <Button Name="BtCollapseImage"
+                        Grid.Row="3"
+                        Grid.Column="0"
+                        Margin="0 10 10 0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Click="BtCollapseImage_OnClick"
+                        Command="{Binding Path=CollapseImageCommand}"
+                        MouseEnter="BtExpandCollapseImage_OnMouseEnter"
                         MouseLeave="BtExpandCollapseImage_OnMouseLeave"
-                        Click="BtCollapseImage_OnClick" Visibility="Collapsed">
-                    <Viewbox Width="24" Height="24">
-                        <Canvas Width="24" Height="24">
-                            <Path Data="M19.5,3.09L20.91,4.5L16.41,9H20V11H13V4H15V7.59L19.5,3.09M20.91,19.5L19.5,20.91L15,16.41V20H13V13H20V15H16.41L20.91,19.5M4.5,3.09L9,7.59V4H11V11H4V9H7.59L3.09,4.5L4.5,3.09M3.09,19.5L7.59,15H4V13H11V20H9V16.41L4.5,20.91L3.09,19.5Z" 
+                        Style="{DynamicResource ModPlusTransparentRoundButton}"
+                        Visibility="Collapsed">
+                    <Viewbox Width="24"
+                             Height="24">
+                        <Canvas Width="24"
+                                Height="24">
+                            <Path Data="M19.5,3.09L20.91,4.5L16.41,9H20V11H13V4H15V7.59L19.5,3.09M20.91,19.5L19.5,20.91L15,16.41V20H13V13H20V15H16.41L20.91,19.5M4.5,3.09L9,7.59V4H11V11H4V9H7.59L3.09,4.5L4.5,3.09M3.09,19.5L7.59,15H4V13H11V20H9V16.41L4.5,20.91L3.09,19.5Z"
                                   Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                         </Canvas>
                     </Viewbox>
                 </Button>
 
-                <GridSplitter Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" Margin="-4,0,-4,0"
-                              VerticalAlignment="Stretch" HorizontalAlignment="Center"
-                              Name="VerticalGridSplitter"
-                              BorderThickness="8,0,0,0" BorderBrush="Transparent"></GridSplitter>
+                <GridSplitter Name="VerticalGridSplitter"
+                              Grid.Row="1"
+                              Grid.RowSpan="3"
+                              Grid.Column="1"
+                              Margin="-4 0 -4 0"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Stretch"
+                              BorderBrush="Transparent"
+                              BorderThickness="8 0 0 0" />
 
-                <GridSplitter Grid.Row="2" Grid.Column="0" BorderBrush="Transparent"
-                              Name="HorizontalGridSplitter"
-                              HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                              Margin="0 -4 0 -4" BorderThickness="0,8,0,0"></GridSplitter>
+                <GridSplitter Name="HorizontalGridSplitter"
+                              Grid.Row="2"
+                              Grid.Column="0"
+                              Margin="0 -4 0 -4"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Center"
+                              BorderBrush="Transparent"
+                              BorderThickness="0 8 0 0" />
 
-                <!--Properties-->
-                <Grid Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="0,0,0,20" MinWidth="50">
+                <!-- Properties -->
+                <Grid Grid.Row="1"
+                      Grid.RowSpan="3"
+                      Grid.Column="2"
+                      MinWidth="50"
+                      Margin="0 0 0 20">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <!--Properties-->
-                    <Border Grid.Row="0" BorderBrush="{DynamicResource BoxesBorderBrush}" BorderThickness="1"
-                            Margin="{DynamicResource ModPlusDefaultMargin}">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <Border Name="BorderProperties"></Border>
+                    <!-- Properties -->
+                    <Border Grid.Row="0"
+                            Margin="{DynamicResource ModPlusDefaultMargin}"
+                            BorderBrush="{DynamicResource BoxesBorderBrush}"
+                            BorderThickness="1">
+                        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <Border Name="BorderProperties" />
                         </ScrollViewer>
                     </Border>
-                    <TextBlock Grid.Row="1" Text="{Binding Source={StaticResource Lang}, XPath=h20}"
+                    <TextBlock Grid.Row="1"
+                               Margin="{DynamicResource ModPlusDefaultMargin}"
                                FontWeight="SemiBold"
-                               Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
-                    <TextBlock Grid.Row="2" TextWrapping="Wrap" Name="TbPropertyDescription"
-                               Margin="{DynamicResource ModPlusDefaultMargin}"></TextBlock>
+                               Text="{Binding Source={StaticResource Lang}, XPath=h20}" />
+                    <TextBlock Name="TbPropertyDescription"
+                               Grid.Row="2"
+                               Margin="{DynamicResource ModPlusDefaultMargin}"
+                               TextWrapping="Wrap" />
                 </Grid>
             </Grid>
         </TabItem>
@@ -195,121 +281,128 @@
         <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h15}">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.DataContext>
-                    <mpEskd:MainSettings/>
+                    <mpEskd:MainSettings />
                 </Grid.DataContext>
                 <Grid.Resources>
-                    <Style TargetType="{x:Type CheckBox}" BasedOn="{StaticResource ModPlusCheckBox}">
-                        <Setter Property="ToolTipService.InitialShowDelay" Value="0"></Setter>
-                        <Setter Property="ToolTipService.ShowDuration" Value="30000"></Setter>
+                    <Style BasedOn="{StaticResource ModPlusCheckBox}"
+                           TargetType="{x:Type CheckBox}">
+                        <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                        <Setter Property="ToolTipService.ShowDuration" Value="30000" />
                     </Style>
-                    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ModPlusComboBox}">
-                        <Setter Property="ToolTipService.InitialShowDelay" Value="0"></Setter>
-                        <Setter Property="ToolTipService.ShowDuration" Value="30000"></Setter>
+                    <Style BasedOn="{StaticResource ModPlusComboBox}"
+                           TargetType="{x:Type ComboBox}">
+                        <Setter Property="ToolTipService.InitialShowDelay" Value="0" />
+                        <Setter Property="ToolTipService.ShowDuration" Value="30000" />
                     </Style>
                 </Grid.Resources>
-                <TextBlock Grid.Row="0" HorizontalAlignment="Center" FontSize="16" 
-                           Text="{Binding Source={StaticResource Lang}, XPath=h21}"
-                           Foreground="{DynamicResource AccentColorBrush}"></TextBlock>
-                <!--Main settings-->
+                <TextBlock Grid.Row="0"
+                           HorizontalAlignment="Center"
+                           FontSize="16"
+                           Foreground="{DynamicResource AccentColorBrush}"
+                           Text="{Binding Source={StaticResource Lang}, XPath=h21}" />
+                <!-- Main settings -->
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.Resources>
-                        <apiConverters:EnumToIntConverter x:Key="EnumToIntConverter"/>
+                        <apiConverters:EnumToIntConverter x:Key="EnumToIntConverter" />
                         <Style TargetType="{x:Type TextBlock}">
-                            <Setter Property="TextWrapping" Value="Wrap"/>
-                            <Setter Property="Margin" Value="{DynamicResource ModPlusDefaultMargin}"/>
+                            <Setter Property="TextWrapping" Value="Wrap" />
+                            <Setter Property="Margin" Value="{DynamicResource ModPlusDefaultMargin}" />
                         </Style>
                     </Grid.Resources>
-                    <!--Use scale from style-->
-                    <CheckBox Grid.Row="0" 
+                    <!-- Use scale from style -->
+                    <CheckBox Grid.Row="0"
                               Content="{Binding Source={StaticResource Lang}, XPath=h22}"
                               IsChecked="{Binding Path=UseScaleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=h23}">
-                    </CheckBox>
-                    <!--Use Layer from style-->
-                    <CheckBox Grid.Row="1"  Name="ChkUseLayerFromStyle"
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=h23}" />
+                    <!-- Use Layer from style -->
+                    <CheckBox Name="ChkUseLayerFromStyle"
+                              Grid.Row="1"
                               Content="{Binding Source={StaticResource Lang}, XPath=h24}"
                               IsChecked="{Binding Path=UseLayerFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=h25}">
-                    </CheckBox>
-                    <Grid Grid.Row="2" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=h25}" />
+                    <Grid Grid.Row="2"
+                          Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"  Text="{Binding Source={StaticResource Lang}, XPath=h26}"/>
-                        <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Source={StaticResource Lang}, XPath=h26}" />
+                        <ComboBox Grid.Column="1"
+                                  SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h27}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h28}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h28}" />
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h29}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h30}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h30}" />
                         </ComboBox>
                     </Grid>
                     <!-- Text style -->
-                    <CheckBox Grid.Row="3"  Name="ChkUseTextStyleFromStyle"
-                                  Content="{Binding Source={StaticResource Lang}, XPath=h31}"
-                                  IsChecked="{Binding Path=UseTextStyleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  ToolTip="{Binding Source={StaticResource Lang}, XPath=h32}">
-                    </CheckBox>
-                    <Grid Grid.Row="4" Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}">
+                    <CheckBox Name="ChkUseTextStyleFromStyle"
+                              Grid.Row="3"
+                              Content="{Binding Source={StaticResource Lang}, XPath=h31}"
+                              IsChecked="{Binding Path=UseTextStyleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=h32}" />
+                    <Grid Grid.Row="4"
+                          Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h33}"/>
-                        <ComboBox Grid.Column="1"  SelectedIndex="{Binding Path=IfNoTextStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Source={StaticResource Lang}, XPath=h33}" />
+                        <ComboBox Grid.Column="1"
+                                  SelectedIndex="{Binding Path=IfNoTextStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h34}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}" />
                             <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h36}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h37}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h37}" />
                         </ComboBox>
                     </Grid>
                     <!-- LayerActionOnCreateAnalog -->
                     <Grid Grid.Row="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h98}"/>
-                        <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay,
-                            UpdateSourceTrigger=PropertyChanged, 
-                            Converter={StaticResource EnumToIntConverter},
-                            ConverterParameter={x:Type enums:LayerActionOnCreateAnalog}}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la1}"></ComboBoxItem>
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la2}"></ComboBoxItem>
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}"></ComboBoxItem>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Source={StaticResource Lang}, XPath=h98}" />
+                        <ComboBox Grid.Column="1"
+                                  SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:LayerActionOnCreateAnalog}}">
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la1}" />
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la2}" />
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}" />
                         </ComboBox>
                     </Grid>
                     <!-- Global integer separator -->
                     <Grid Grid.Row="6">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h119}"/>
-                        <ComboBox Grid.Column="1" SelectedIndex="{Binding Path=GlobalNumberSeparator, Mode=TwoWay,
-                            UpdateSourceTrigger=PropertyChanged, 
-                            Converter={StaticResource EnumToIntConverter},
-                            ConverterParameter={x:Type enums:GlobalNumberSeparator}}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator1}"/>
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator2}"/>
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator3}"/>
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator4}"/>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Source={StaticResource Lang}, XPath=h119}" />
+                        <ComboBox Grid.Column="1"
+                                  SelectedIndex="{Binding Path=GlobalNumberSeparator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:GlobalNumberSeparator}}">
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator1}" />
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator2}" />
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator3}" />
+                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator4}" />
                         </ComboBox>
                     </Grid>
                     <!-- Maximum of selected objects -->
@@ -318,135 +411,145 @@
                           ToolTipService.InitialShowDelay="0"
                           ToolTipService.ShowDuration="30000">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="{Binding Source={StaticResource Lang}, XPath=h39}"/>
-                        <mps:NumericBox Grid.Column="1"  Minimum="0" Interval="50" NumericInputMode="Numbers"
-                                           Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        </mps:NumericBox>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding Source={StaticResource Lang}, XPath=h39}" />
+                        <mps:NumericBox Grid.Column="1"
+                                        Interval="50"
+                                        Minimum="0"
+                                        NumericInputMode="Numbers"
+                                        Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </Grid>
 
-                <TextBlock Grid.Row="2" HorizontalAlignment="Center" FontSize="16" 
-                           Text="{Binding Source={StaticResource Lang}, XPath=h40}"
-                           Foreground="{DynamicResource AccentColorBrush}"/>
+                <TextBlock Grid.Row="2"
+                           HorizontalAlignment="Center"
+                           FontSize="16"
+                           Foreground="{DynamicResource AccentColorBrush}"
+                           Text="{Binding Source={StaticResource Lang}, XPath=h40}" />
 
                 <!-- Settings for entities -->
-                <TabControl Grid.Row="3" TabStripPlacement="Left">
+                <TabControl Grid.Row="3"
+                            TabStripPlacement="Left">
 
                     <!-- Axis -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h41}">
-                        <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h42}"
                                           IsChecked="{Binding Path=AxisLineTypeScaleProportionScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h43}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h43}" />
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h44}"
                                           IsChecked="{Binding Path=AxisSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h45}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h45}" />
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h181}"
                                           IsChecked="{Binding Path=AxisTextRotateWithBlock, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h182}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h182}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Section -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h79}">
-                        <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h86}"
                                           IsChecked="{Binding Path=SectionSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h87}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h87}" />
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h88}"
                                           IsChecked="{Binding Path=SectionShowHelpLineOnSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h89}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h89}" />
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h90}"
                                           IsChecked="{Binding Path=SectionDependentTextMovement, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h97}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h97}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- ViewLabel -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h151}">
-                        <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h156}"
                                           IsChecked="{Binding Path=ViewLabelSaveLastTextAndContinueNew, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h157}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h157}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Level Mark -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h105}">
-                        <Border BorderThickness="1" BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h46}"
                                           IsChecked="{Binding Path=LevelMarkShowHelpLinesOnSelection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h47}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h47}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Nodal Leader -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h126}">
-                        <Border BorderThickness="1"
-                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h131}"
                                           IsChecked="{Binding Path=NodalLeaderContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h132}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h132}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Secant Nodal Leader -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h133}">
-                        <Border BorderThickness="1"
-                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h136}"
                                           IsChecked="{Binding Path=SecantNodalLeaderContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h137}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h137}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Fragment Marker -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h145}">
-                        <Border BorderThickness="1"
-                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h149}"
                                           IsChecked="{Binding Path=FragmentMarkerContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h150}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h150}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Chain Leader -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h175}">
-                        <Border BorderThickness="1"
-                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h179}"
                                           IsChecked="{Binding Path=FragmentMarkerContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h180}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h180}" />
                             </StackPanel>
                         </Border>
                     </TabItem>
 
                     <!-- Node Label -->
                     <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h197}">
-                        <Border BorderThickness="1"
-                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                        <Border BorderBrush="{DynamicResource BoxesBorderBrush}"
+                                BorderThickness="1">
                             <StackPanel Orientation="Vertical">
                                 <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h201}"
                                           IsChecked="{Binding Path=NodeLabelContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h202}"/>
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h202}" />
                             </StackPanel>
                         </Border>
                     </TabItem>

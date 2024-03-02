@@ -19,6 +19,7 @@ using Functions.mpLetterLine;
 using Functions.mpLevelMark;
 using Functions.mpLevelPlanMark;
 using Functions.mpNodalLeader;
+using Functions.mpNodeLabel;
 using Functions.mpSecantNodalLeader;
 using Functions.mpViewLabel;
 using Functions.mpWaterProofing;
@@ -310,11 +311,20 @@ public class RibbonBuilder
         ribbonTab.Panels.Add(ribPanel);
         var ribRowPanel = new RibbonRowPanel();
 
+        // mpNodeLabel
+        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<NodeLabel>()));
+
+        ribSourcePanel.Items.Add(ribRowPanel);
+
+        ribRowPanel = new RibbonRowPanel();
+
         // mpFragmentMarker
-        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<FragmentMarker>()));
+        ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<FragmentMarker>()));
+
+        ribRowPanel.Items.Add(new RibbonRowBreak());
 
         // mpThickArrow
-        ribRowPanel.Items.Add(GetBigButton(GetDescriptor<ThickArrow>()));
+        ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<ThickArrow>()));
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }
