@@ -438,6 +438,18 @@
                             </StackPanel>
                         </Border>
                     </TabItem>
+
+                    <!-- Node Label -->
+                    <TabItem Header="{Binding Source={StaticResource Lang}, XPath=h197}">
+                        <Border BorderThickness="1"
+                                BorderBrush="{DynamicResource BoxesBorderBrush}">
+                            <StackPanel Orientation="Vertical">
+                                <CheckBox Content="{Binding Source={StaticResource Lang}, XPath=h201}"
+                                          IsChecked="{Binding Path=NodeLabelContinueNodeNumber, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h202}"/>
+                            </StackPanel>
+                        </Border>
+                    </TabItem>
                 </TabControl>
             </Grid>
         </TabItem>
