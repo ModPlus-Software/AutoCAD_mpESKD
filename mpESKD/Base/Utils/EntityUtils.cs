@@ -44,7 +44,7 @@ public static class EntityUtils
         dbText.Linetype = "ByBlock";
         dbText.LineWeight = LineWeight.ByBlock;
 
-        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        var textStyle = TextStyleUtils.GetTextStyleByName(textStyleName);
 
         if (textStyle != null)
         {
@@ -68,7 +68,7 @@ public static class EntityUtils
         mText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         mText.Linetype = "ByBlock";
         mText.LineWeight = LineWeight.ByBlock;
-        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        var textStyle = TextStyleUtils.GetTextStyleByName(textStyleName);
         if (textStyle != null)
         {
             mText.TextStyleId = textStyle.Id;

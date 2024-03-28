@@ -26,6 +26,32 @@ public static class TextStyleUtils
     }
 
     /// <summary>
+    /// Возвращает идентификатор текстового стиля по имени
+    /// </summary>
+    /// <param name="textStyleName">Имя текстового стиля</param>
+    /// <returns><see cref="ObjectId"/></returns>
+    public static TextStyleTableRecord GetTextStyleByName(string textStyleName)
+    {
+        using (AcadUtils.Document.LockDocument())
+        {
+            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+            {
+                var textStyleTable = (TextStyleTable)tr.GetObject(AcadUtils.Database.TextStyleTableId, OpenMode.ForRead);
+                foreach (var objectId in textStyleTable)
+                {
+                    var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
+                    if (txtStl.Name.Equals(textStyleName))
+                    {
+                        return txtStl;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Проверка наличия текстового стиля в текущем документе
     /// </summary>
     /// <param name="textStyleName">Имя текстового стиля</param>

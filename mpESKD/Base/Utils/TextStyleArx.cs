@@ -43,6 +43,8 @@ public static class TextStyleArx
         "acdb24.dll",
 #elif A2024
         "acdb24.dll",
+#elif A2025
+        "acdb25.dll",
 #endif
         CharSet = CharSet.Unicode,
         CallingConvention = CallingConvention.Cdecl,
@@ -104,7 +106,7 @@ public static class TextStyleArx
         double width = 0.0;
         double height = 0.0;
 
-        if (AcadUtils.GetTextStyleByName(textStyleName) is { } textStyleTableRecord)
+        if (TextStyleUtils.GetTextStyleByName(textStyleName) is { } textStyleTableRecord)
         {
             Autodesk.AutoCAD.GraphicsInterface.TextStyle iStyle = new ();
             var objectId = textStyleTableRecord.ObjectId;
