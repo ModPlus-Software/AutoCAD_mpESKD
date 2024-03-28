@@ -57,6 +57,9 @@ public class ModPlusConnector : IModPlusPlugin
 #elif A2024
     /// <inheritdoc/>
     public string AvailProductExternalVersion => "2024";
+#elif A2025
+    /// <inheritdoc/>
+    public string AvailProductExternalVersion => "2025";
 #endif
 
     /// <inheritdoc/>
