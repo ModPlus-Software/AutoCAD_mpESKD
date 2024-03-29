@@ -72,6 +72,8 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
         {
             AcadUtils.Editor.TurnForcedPickOff();
             AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+
+            // Рисуется реальная линия
             using (SmartEntity)
             {
                 Point3d? newInsertionPoint = null;
@@ -101,6 +103,7 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
 
                 SmartEntity.UpdateEntities();
                 SmartEntity.BlockRecord.UpdateAnonymousBlocks();
+
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
@@ -138,7 +141,7 @@ public class LinearEntityAddVertexGrip : SmartEntityGripData
             {
                 newPoint = GeometryUtils.Point3dAtDirection(GripLeftPoint.Value, newPoint, _minDistance);
             }
-            
+
             if (GripRightPoint.HasValue && GripRightPoint.Value.DistanceTo(newPoint) < _minDistance)
             {
                 newPoint = GeometryUtils.Point3dAtDirection(GripRightPoint.Value, newPoint, _minDistance);

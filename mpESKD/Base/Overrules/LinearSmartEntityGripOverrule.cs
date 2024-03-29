@@ -30,9 +30,12 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                 {
                     foreach (var grip in GetLinearEntityGeneralGrips(groundLine, curViewUnitSize).Reverse())
                     {
-                        if (grip is LinearEntityRemoveVertexGrip && 
+                        if (grip is LinearEntityRemoveVertexGrip &&
                             grips.OfType<LinearEntityRemoveVertexGrip>().OrderBy(g => g.GripIndex).Any(g => g.GripPoint.DistanceTo(grip.GripPoint) == 0.0))
+                        {
                             continue;
+                        }
+
                         grips.Add(grip);
                     }
                 }
@@ -58,59 +61,46 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                     if (gripData is LinearEntityVertexGrip vertexGrip)
                     {
                         var linearEntity = (SmartLinearEntity)vertexGrip.SmartEntity;
+                        var vertexesPoints = linearEntity.GetAllPoints();
                         var scale = linearEntity.GetFullScale();
                         var minDistance = linearEntity.MinDistanceBetweenPoints * scale;
                         var newPoint = vertexGrip.GripPoint + offset;
-                        var allPoints = linearEntity.GetAllPoints();
-                        
+
+                        Point3d? previousGrip = null;
+                        Point3d? nextGrip = null;
+
                         if (vertexGrip.GripIndex == 0)
                         {
-                            // У линейного объекта не может быть менее двух точек, поэтому смело беру следующую ручку из коллекции
-                            var nextPoint = allPoints[1];
-                            
-                            if (newPoint.DistanceTo(nextPoint) < minDistance)
-                            {
-                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                    nextPoint, newPoint, nextPoint, minDistance);
-                            }
-
-                            ((BlockReference)entity).Position = newPoint;
-                            linearEntity.InsertionPoint = newPoint;
+                            nextGrip = vertexesPoints[1];
                         }
-                        else if (vertexGrip.GripIndex == linearEntity.MiddlePoints.Count + 1)
+                        else if (vertexGrip.GripIndex == vertexesPoints.Count - 1)
                         {
-                            var previousGrip = allPoints[vertexGrip.GripIndex - 1];
-
-                            if (newPoint.DistanceTo(previousGrip) < minDistance)
-                            {
-                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                    previousGrip, newPoint, previousGrip, minDistance);
-                            }
-
-                            linearEntity.EndPoint = newPoint;
+                            previousGrip = vertexesPoints[vertexGrip.GripIndex - 1];
                         }
                         else
                         {
-                            var previousGrip = allPoints[vertexGrip.GripIndex - 1];
-                            var nextGrip = allPoints[vertexGrip.GripIndex + 1];
-
-                            if (newPoint.DistanceTo(nextGrip) < minDistance)
-                            {
-                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                    nextGrip, newPoint, nextGrip, minDistance);
-                            }
-                            else if (newPoint.DistanceTo(previousGrip) < minDistance)
-                            {
-                                newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                    previousGrip, newPoint, previousGrip, minDistance);
-                            }
-
-                            linearEntity.MiddlePoints[vertexGrip.GripIndex - 1] = newPoint;
+                            previousGrip = vertexesPoints[vertexGrip.GripIndex - 1];
+                            nextGrip = vertexesPoints[vertexGrip.GripIndex + 1];
                         }
 
-                        // Вот тут происходит перерисовка примитивов внутри блока
-                        linearEntity.UpdateEntities();
-                        linearEntity.BlockRecord.UpdateAnonymousBlocks();
+                        if (nextGrip != null && newPoint.DistanceTo(nextGrip.Value) < minDistance)
+                        {
+                            newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                nextGrip.Value, 
+                                newPoint, 
+                                nextGrip.Value,
+                                minDistance);
+                        }
+                        else if (previousGrip != null && newPoint.DistanceTo(previousGrip.Value) < minDistance)
+                        {
+                            newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
+                                previousGrip.Value, 
+                                newPoint, 
+                                previousGrip.Value, 
+                                minDistance);
+                        }
+
+                        vertexGrip.NewPoint = newPoint;
                     }
                     else if (gripData is LinearEntityAddVertexGrip addVertexGrip)
                     {
@@ -124,12 +114,18 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                         if (nextGrip.HasValue && newPoint.DistanceTo(nextGrip.Value) < minDistance)
                         {
                             newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                nextGrip.Value, newPoint, nextGrip.Value, minDistance);
+                                nextGrip.Value, 
+                                newPoint, 
+                                nextGrip.Value, 
+                                minDistance);
                         }
                         else if (previousGrip.HasValue && newPoint.DistanceTo(previousGrip.Value) < minDistance)
                         {
                             newPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(
-                                previousGrip.Value, newPoint, previousGrip.Value, minDistance);
+                                previousGrip.Value, 
+                                newPoint, 
+                                previousGrip.Value, 
+                                minDistance);
                         }
 
                         addVertexGrip.NewPoint = newPoint;
@@ -151,7 +147,7 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                 ExceptionBox.Show(exception);
         }
     }
-        
+
     /// <summary>
     /// Возвращает стандартные ручки для линейного интеллектуального объекта:
     /// ручки вершин, добавить вершину, удалить вершину, реверс объекта
@@ -243,9 +239,7 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
             // last segment
             if (i == linearEntity.MiddlePoints.Count - 1)
             {
-                var addVertexGrip = new LinearEntityAddVertexGrip(
-                    smartEntity,
-                    linearEntity.MiddlePoints[i], linearEntity.EndPoint)
+                var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.MiddlePoints[i], linearEntity.EndPoint)
                 {
                     GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.MiddlePoints[i], linearEntity.EndPoint)
                 };
@@ -265,47 +259,55 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
 
                 addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.InsertionPoint)
                 {
-                    GripPoint = linearEntity.InsertionPoint +
-                                ((linearEntity.InsertionPoint - linearEntity.MiddlePoints.First()).GetNormal() * 40 * curViewUnitSize)
+                    GripPoint = linearEntity.InsertionPoint + ((linearEntity.InsertionPoint - linearEntity.MiddlePoints.First()).GetNormal() * 40 * curViewUnitSize)
                 };
                 yield return addVertexGrip;
             }
             else
             {
-                var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
+                // Если остается только одна точка (точка вставки и точка конца совпадают),
+                // ручки добавления вершин не создаются
+                if (!linearEntity.InsertionPoint.Equals(linearEntity.EndPoint))
                 {
-                    GripPoint = linearEntity.EndPoint +
-                                ((linearEntity.InsertionPoint - linearEntity.EndPoint).GetNormal() * 40 * curViewUnitSize)
-                };
-                yield return addVertexGrip;
+                    var addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.EndPoint, null)
+                    {
+                        GripPoint = linearEntity.EndPoint - ((linearEntity.InsertionPoint - linearEntity.EndPoint).GetNormal() * 40 * curViewUnitSize)
+                    };
+                    yield return addVertexGrip;
 
-                addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.EndPoint)
-                {
-                    GripPoint = linearEntity.InsertionPoint +
-                                ((linearEntity.EndPoint - linearEntity.InsertionPoint).GetNormal() * 40 * curViewUnitSize)
-                };
-                yield return addVertexGrip;
+                    addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, null, linearEntity.EndPoint)
+                    {
+                        GripPoint = linearEntity.InsertionPoint - ((linearEntity.EndPoint - linearEntity.InsertionPoint).GetNormal() * 40 * curViewUnitSize)
+                    };
+                    yield return addVertexGrip;
 
-                addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.InsertionPoint, linearEntity.EndPoint)
-                {
-                    GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.InsertionPoint, linearEntity.EndPoint)
-                };
-                yield return addVertexGrip;
+                    addVertexGrip = new LinearEntityAddVertexGrip(smartEntity, linearEntity.InsertionPoint, linearEntity.EndPoint)
+                    {
+                        GripPoint = GeometryUtils.GetMiddlePoint3d(linearEntity.InsertionPoint, linearEntity.EndPoint)
+                    };
+                    yield return addVertexGrip;
+                }
             }
         }
 
         #endregion
 
-        var reverseGrip = new LinearEntityReverseGrip(smartEntity)
+        // Если остается только одна точка (точка вставки и точка конца совпадают),
+        // клик по ручке реверса приведет к Fatal Error.
+        // поэтому если точек всего 2 и точка вставки и точка конца совпадают, ручка реверса не создается
+        if (!(linearEntity.MiddlePoints.Count == 0 && linearEntity.InsertionPoint.Equals(linearEntity.EndPoint)))
         {
-            GripPoint = linearEntity.InsertionPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
-        };
-        yield return reverseGrip;
+            var reverseGrip = new LinearEntityReverseGrip(smartEntity)
+            {
+                GripPoint = linearEntity.InsertionPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
+            };
+            yield return reverseGrip;
 
-        reverseGrip = new LinearEntityReverseGrip(smartEntity)
-        {
-            GripPoint = linearEntity.EndPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
-        };
-        yield return reverseGrip;
+            reverseGrip = new LinearEntityReverseGrip(smartEntity)
+            {
+                GripPoint = linearEntity.EndPoint + (Vector3d.YAxis * 20 * curViewUnitSize)
+            };
+            yield return reverseGrip;
+        }
     }
 }
