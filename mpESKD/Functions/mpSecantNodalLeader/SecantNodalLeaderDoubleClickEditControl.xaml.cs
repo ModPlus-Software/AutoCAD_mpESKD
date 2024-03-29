@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для SecantNodalLeaderDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class SecantNodalLeaderDoubleClickEditControl : IDoubleClickEditC
     public SecantNodalLeaderDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>
@@ -25,7 +26,7 @@ public partial class SecantNodalLeaderDoubleClickEditControl : IDoubleClickEditC
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
-        if (!(smartEntity is SecantNodalLeader secantNodalLeader))
+        if (smartEntity is not SecantNodalLeader secantNodalLeader)
             throw new ArgumentException("Wrong type of entity");
 
         _secantNodalLeader = secantNodalLeader;

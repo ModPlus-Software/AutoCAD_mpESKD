@@ -3,6 +3,7 @@ namespace mpESKD.Functions.mpFragmentMarker;
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Interaction logic for FragmentMarkerDoubleClickEditControl.xaml
@@ -17,7 +18,7 @@ public partial class FragmentMarkerDoubleClickEditControl : IDoubleClickEditCont
     public FragmentMarkerDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>

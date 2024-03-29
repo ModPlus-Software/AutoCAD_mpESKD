@@ -37,8 +37,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <ExternalVersion>2025</ExternalVersion>
-    <TargetFramework>net8-windows</TargetFramework>
+    <ExternalVersion>2024</ExternalVersion>
     <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
     <!--<OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>-->
   </PropertyGroup>

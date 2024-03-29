@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.Geometry;
 using Enums;
 using System;
 using View;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 /// <summary>
 /// Утилиты для объектов
@@ -151,7 +152,7 @@ public static class EntityUtils
                 TypeFactory.Instance.GetDescriptor(entityType).LName,
                 control);
 
-            if (sectionValueEditor.ShowDialog() == true)
+            if (AcApp.ShowModalWindow(sectionValueEditor) == true)
             {
                 saveBack = true;
             }

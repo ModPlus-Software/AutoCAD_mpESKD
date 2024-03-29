@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для SectionDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class SectionDoubleClickEditControl : IDoubleClickEditControl
     public SectionDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>
@@ -25,7 +26,7 @@ public partial class SectionDoubleClickEditControl : IDoubleClickEditControl
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
-        if (!(smartEntity is Section section))
+        if (smartEntity is not Section section)
             throw new ArgumentException("Wrong type of entity");
 
         _section = section;

@@ -24,6 +24,7 @@ using ModPlusStyle.Transitions;
 using Styles;
 using Utils;
 using View;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Visibility = System.Windows.Visibility;
 
 /// <summary>
@@ -917,7 +918,7 @@ public partial class PropertiesPalette
     private void LmSettings_OnClick(object sender, RoutedEventArgs e)
     {
         var lmSetting = new PaletteSettings();
-        lmSetting.ShowDialog();
+        AcApp.ShowModalWindow(lmSetting);
 
         if (MainSettings.Instance.AddToMpPalette)
             MainFunction.AddToMpPalette();

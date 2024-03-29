@@ -4,6 +4,7 @@ using System;
 using System.Windows;
 using Base.Abstractions;
 using Base.Enums;
+using Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для AxisDoubleClickEditControl.xaml
@@ -18,7 +19,7 @@ public partial class AxisDoubleClickEditControl : IDoubleClickEditControl
     public AxisDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc />
