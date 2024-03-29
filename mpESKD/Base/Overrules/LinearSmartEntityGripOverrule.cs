@@ -61,7 +61,7 @@ public class LinearSmartEntityGripOverrule<TEntity> : BaseSmartEntityGripOverrul
                     if (gripData is LinearEntityVertexGrip vertexGrip)
                     {
                         var linearEntity = (SmartLinearEntity)vertexGrip.SmartEntity;
-                        var vertexesPoints = linearEntity.GetAllPoints();
+                        var vertexesPoints = linearEntity.GetAllPoints().ToList();
                         var scale = linearEntity.GetFullScale();
                         var minDistance = linearEntity.MinDistanceBetweenPoints * scale;
                         var newPoint = vertexGrip.GripPoint + offset;

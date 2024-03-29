@@ -3,6 +3,7 @@ namespace mpESKD.Functions.mpWaterProofing;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -51,16 +52,6 @@ public class WaterProofing : SmartLinearEntity
     public WaterProofing(ObjectId objectId)
         : base(objectId)
     {
-    }
-        
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
     }
 
     /// <inheritdoc />
@@ -154,12 +145,12 @@ public class WaterProofing : SmartLinearEntity
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X + (10 * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                CreateEntities(tmpEndPoint, scale);
             }
             else
             {
                 // Задание любой другой точки
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS, scale);
+                CreateEntities(null, scale);
             }
         }
         catch (Exception exception)
@@ -168,9 +159,9 @@ public class WaterProofing : SmartLinearEntity
         }
     }
 
-    private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
+    private void CreateEntities(Point3d? endPoint, double scale)
     {
-        var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
+        var points = GetOcsAll3dPointsForDraw(endPoint).Select(p => p.ToPoint2d()).ToList();
         _mainPolyline = new Polyline(points.Count);
         for (var i = 0; i < points.Count; i++)
         {
@@ -347,17 +338,5 @@ public class WaterProofing : SmartLinearEntity
         }
 
         return strokes;
-    }
-
-    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
-    {
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        var points = new Point2dCollection();
-
-        points.Add(insertionPoint.ToPoint2d());
-        middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
-        points.Add(endPoint.ToPoint2d());
-
-        return points;
     }
 }

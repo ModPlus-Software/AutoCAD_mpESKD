@@ -40,18 +40,7 @@ public class ConcreteJoint : SmartLinearEntity
         : base(objectId)
     {
     }
-
-    // ReSharper disable once InconsistentNaming
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
-
+    
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5.0;
 
@@ -131,30 +120,30 @@ public class ConcreteJoint : SmartLinearEntity
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
                 InsertionPointOCS.X + (15 * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                CreateEntities(tmpEndPoint, scale);
             }
             else
             {
                 // Задание любой другой точки
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS, scale);
+                CreateEntities(null, scale);
             }
         }
-        catch (System.Exception exception)
+        catch (Exception exception)
         {
             ExceptionBox.Show(exception);
         }
     }
 
-    private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
+    private void CreateEntities(Point3d? endPoint, double scale)
     {
         _segments.Clear();
-        var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
-
+        var points = GetOcsAll3dPointsForDraw(endPoint).Select(p => p.ToPoint2d()).ToList();
+        
         for (var i = 0; i < points.Count - 1; i++)
         {
             if (i == 0)
             {
-                _segments.Add(CreateSegment(points[i], points[i + 1], insertionPoint.ToPoint2d(), 0, scale));
+                _segments.Add(CreateSegment(points[i], points[i + 1], points[0], 0, scale));
             }
             else
             {
@@ -624,20 +613,5 @@ public class ConcreteJoint : SmartLinearEntity
         var y = (a2 * x) + b2;
 
         return !double.IsNaN(x) || !double.IsNaN(y) ? new Point2d(x, y) : default;
-    }
-
-    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints,
-        Point3d endPoint)
-    {
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        var points = new Point2dCollection
-        {
-            insertionPoint.ToPoint2d()
-        };
-
-        middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
-        points.Add(endPoint.ToPoint2d());
-
-        return points;
     }
 }

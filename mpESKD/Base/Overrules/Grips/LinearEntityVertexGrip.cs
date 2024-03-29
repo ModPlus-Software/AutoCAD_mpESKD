@@ -33,7 +33,7 @@ public class LinearEntityVertexGrip : SmartEntityGripData
         SmartEntity = smartEntity;
         GripIndex = index;
         GripType = GripType.Point;
-        _vertexesPoints = ((ILinearEntity)SmartEntity).GetAllPoints();
+        _vertexesPoints = ((ILinearEntity)SmartEntity).GetAllPoints().ToList();
         _minDistance = SmartEntity.MinDistanceBetweenPoints * SmartEntity.GetFullScale();
     }
 

@@ -30,18 +30,13 @@ public class LinearEntityReverseGrip : SmartEntityGripData
     {
         using (SmartEntity)
         {
-            var newInsertionPoint = SmartEntity.EndPoint;
-            SmartEntity.EndPoint = SmartEntity.InsertionPoint;
-            SmartEntity.InsertionPoint = newInsertionPoint;
-            ((ILinearEntity)SmartEntity).MiddlePoints.Reverse();
-            SmartEntity.BlockTransform = SmartEntity.BlockTransform.Inverse();
+            ((ILinearEntity)SmartEntity).IsReversed = !((ILinearEntity)SmartEntity).IsReversed;
 
             SmartEntity.UpdateEntities();
             SmartEntity.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
             {
                 var blkRef = tr.GetObject(SmartEntity.BlockId, OpenMode.ForWrite, true, true);
-                ((BlockReference)blkRef).Position = newInsertionPoint;
                 using (var resBuf = SmartEntity.GetDataForXData())
                 {
                     blkRef.XData = resBuf;

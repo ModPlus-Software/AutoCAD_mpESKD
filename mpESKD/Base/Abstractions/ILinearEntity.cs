@@ -37,6 +37,11 @@ public interface ILinearEntity
     bool IsLightCreation { get; set; }
 
     /// <summary>
+    /// Смарт-объект был развернут
+    /// </summary>
+    bool IsReversed { get; set; }
+
+    /// <summary>
     /// Перестроение точек - помещение EndPoint в список
     /// </summary>
     void RebasePoints();
@@ -44,5 +49,12 @@ public interface ILinearEntity
     /// <summary>
     /// Возвращает все точки линейного объекта. В список добавляется InsertionPoint, затем MiddlePoints и в конце EndPoint
     /// </summary>
-    List<Point3d> GetAllPoints();
+    IEnumerable<Point3d> GetAllPoints();
+
+    /// <summary>
+    /// Возвращает все точки во внутренней системе координат, используемые для отрисовки.
+    /// Учитывает свойство <see cref="IsReversed"/>
+    /// </summary>
+    /// <param name="endPoint">Конечная точка. Если не null, значит использовать ее вместо <see cref="EndPoint"/></param>
+    List<Point3d> GetOcsAll3dPointsForDraw(Point3d? endPoint);
 }
