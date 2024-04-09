@@ -295,6 +295,19 @@ public class MainSettings : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Продолжать нумерацию маркера изменения при создании нового маркера изменения
+    /// </summary>
+    public bool RevisionMarkContinueNodeNumber
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region NodeLabel
