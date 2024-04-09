@@ -1,12 +1,8 @@
-﻿// ReSharper disable InconsistentNaming
-
-using System.Linq;
-using ModPlusAPI;
-
-namespace mpESKD.Functions.mpRevisionMark;
+﻿namespace mpESKD.Functions.mpRevisionMark;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -197,10 +193,27 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [SaveToXData]
     public MarkPosition MarkPosition { get; set; } = MarkPosition.Right;
 
+    /// <summary>
+    /// Стиль рамки ревизии как облака
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p123", false)]
+    [PropertyVisibilityDependency(new[] { nameof(RevisionCloudRadius) })]
+    [SaveToXData]
+    public bool IsRevisionCloud { get; set; }
+
+    /// <summary>
+    /// Вертикальный отступ текста
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 8, "p62", 2, 2, 500, nameSymbol: "v")]
+    [SaveToXData]
+    public int RevisionCloudRadius { get; set; } = 2;
+
+
+
     #endregion
 
     #region Content
-    
+
     /// <inheritdoc/>
     [EntityProperty(PropertiesCategory.Content, 1, "p41", "Standard", descLocalKey: "d41")]
     [SaveToXData]
@@ -392,26 +405,66 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             };
 
             var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-            var bulges = new[]
-            {
-                -bevelBulge,
-                0.0,
-                -bevelBulge,
-                0.0,
-                -bevelBulge,
-                0.0,
-                -bevelBulge,
-                0.0
-            };
 
-            _frameRevisionPolyline = new Polyline(points.Length);
-
-            for (var i = 0; i < points.Length; i++)
+            if (!IsRevisionCloud)
             {
-                _frameRevisionPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
+                var bulges = new[]
+                {
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0,
+                    -bevelBulge,
+                    0.0
+                };
+
+                _frameRevisionPolyline = new Polyline(points.Length);
+
+                for (var i = 0; i < points.Length; i++)
+                {
+                    _frameRevisionPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
+                }
+
+                _frameRevisionPolyline.Closed = true;
             }
+            else
+            {
+                _frameRevisionPolyline = null;
 
-            _frameRevisionPolyline.Closed = true;
+                var arcFramePoints = new List<Point2d>();
+
+                var acrDistance = 2 * RevisionCloudRadius * Math.Sin(Math.PI / 4);
+
+                for (int i = 0; i < points.Length - 1; i++)
+                {
+                    var segmentStartPoint = points[i];
+                    var segmentEndPoint = points[i + 1];    
+
+                    arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
+                        segmentStartPoint,
+                        segmentEndPoint,
+                        acrDistance));
+                }
+                
+                arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
+                    arcFramePoints.Last(),
+                    arcFramePoints.First(),
+                    acrDistance));
+
+                var arcFramePointsDistinct =  arcFramePoints.Skip(1).Distinct();
+
+                arcFramePoints = Enumerable.Repeat(arcFramePoints[0], 1)
+                    .Concat(arcFramePointsDistinct).ToList();
+
+                _frameRevisionPolyline = new Polyline(arcFramePoints.Count);
+
+                for (int i = 0; i < arcFramePoints.Count; i++)
+                {
+                    _frameRevisionPolyline.AddVertexAt(i, arcFramePoints[i], -bevelBulge, 0, 0);
+                }
+            }
         }
     }
 
@@ -571,6 +624,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         _frameRevisionText = polylineRevisionFrame;
 
+        /*
         if (FrameType == FrameType.Rectangular)
         {
             for (int i = 0; i < _frameRevisionPolyline.NumberOfVertices; i++)
@@ -579,9 +633,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                 AcadUtils.WriteMessageInDebug($"i={i}: {vert.X},{vert.Y}");
             }
         }
+        */
 
-
-        
+        /*
         if (FrameType == FrameType.Rectangular)
         {
             if (_frameRevisionPolyline != null)
@@ -627,6 +681,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                 _frameRevisionPolyline = polylineCloudFrame;
             }
         }
+        */
         
     }
 

@@ -42,8 +42,8 @@ internal static class RevisionCloud
                 AcadUtils.WriteMessageInDebug($"segmentArcCount > 1: j={j}");
 
                 var nextPoint = GeometryUtils.Point3dAtDirection(
-                    segmentEndPoint.ToPoint3d(),
                     segmentStartPoint.ToPoint3d(), 
+                    segmentEndPoint.ToPoint3d(),
                     arcDistance * (j + 1));
 
                 result.Add(nextPoint.ToPoint2d());
