@@ -2,22 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Base;
-using Base.Abstractions;
-using Base.Attributes;
-using Base.Enums;
-using Base.Utils;
-using ModPlusAPI.Windows;
 
 internal static class RevisionCloud
 {
@@ -35,7 +21,7 @@ internal static class RevisionCloud
         double revisionArcRadius)
     {
         var segmentArcPoints = new List<Point2d> { segmentStartPoint };
-        
+
         // Длина хорды дуги облака
         var chordLength = 2 * revisionArcRadius * Math.Sin(Math.PI / 4);
 
@@ -92,19 +78,17 @@ internal static class RevisionCloud
         if (cloudArcCount < 2)
             return null;
 
-        // список точек на окружности ревизии для построения дуг-облачков
         var cloudArcPoints = new List<Point2d>();
 
-        for (int i = 0; i < cloudArcCount ; i++)
+        for (int i = 0; i < cloudArcCount; i++)
         {
-            // угол откладываемый от 0 против часовой для луча из центра окружности ревизии
             var angle = i * revisionRoundChordAngle;
 
             var normalVectorPoint = new Point2d(
                 revisionRoundRadius * Math.Cos(angle),
                 revisionRoundRadius * Math.Sin(angle));
 
-            var normalVector = (normalVectorPoint - insertionPoint.ToPoint2d()  ).GetNormal();
+            var normalVector = (normalVectorPoint - insertionPoint.ToPoint2d()).GetNormal();
             var cloudArcPoint = insertionPoint.ToPoint2d() + (normalVector * revisionRoundRadius);
 
             cloudArcPoints.Add(cloudArcPoint);
