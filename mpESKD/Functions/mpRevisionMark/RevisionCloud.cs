@@ -7,56 +7,109 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.Geometry;
 using mpESKD.Base.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Base;
+using Base.Abstractions;
+using Base.Attributes;
+using Base.Enums;
+using Base.Utils;
+using ModPlusAPI.Windows;
 
 internal static class RevisionCloud
 {
     /// <summary>
-    /// Список точек сегмента 
+    /// Возвращает список точек сегмента прямоугольной области ревизии
+    /// для отрисовки дуг ревизионного облака 
     /// </summary>
-    /// <param name="segmentStartPoint"></param>
-    /// <param name="segmentEndPoint"></param>
-    /// <param name="arcDistance"></param>
-    /// <returns></returns>
+    /// <param name="segmentStartPoint">Начальная точка сегмента</param>
+    /// <param name="segmentEndPoint">Конечная точка сегмента</param>
+    /// <param name="revisionArcRadius">Радиус дуги ревизионного облака</param>
+    /// <returns>Список точек</returns>
     internal static List<Point2d> GetArcPointsOfSegment(
         Point2d segmentStartPoint,
         Point2d segmentEndPoint,
-        double arcDistance)
+        double revisionArcRadius)
     {
+        var segmentArcPoints = new List<Point2d> { segmentStartPoint };
         
-        var result = new List<Point2d>{segmentStartPoint};
+        // Длина хорды дуги облака
+        var chordLength = 2 * revisionArcRadius * Math.Sin(Math.PI / 4);
 
         var segmentLength = segmentStartPoint.GetDistanceTo(segmentEndPoint);
-        AcadUtils.WriteMessageInDebug($"segmentLength: {segmentLength}");
-
-        var segmentArcCount = (int)(segmentLength / arcDistance);
-        AcadUtils.WriteMessageInDebug($"segmentArcCount: {segmentArcCount}");
-
-        //var isExactMultiple = (segmentLength % (distanceCloudArc * 2)) == 0 ? true : false;
+        var segmentArcCount = (int)(segmentLength / chordLength);
 
         if (segmentArcCount > 1)
         {
-            // AcadUtils.WriteMessageInDebug($"segmentArcCount: {segmentArcCount}");
-
             for (int j = 0; j < segmentArcCount - 1; j++)
             {
-                AcadUtils.WriteMessageInDebug($"segmentArcCount > 1: j={j}");
-
                 var nextPoint = GeometryUtils.Point3dAtDirection(
-                    segmentStartPoint.ToPoint3d(), 
+                    segmentStartPoint.ToPoint3d(),
                     segmentEndPoint.ToPoint3d(),
-                    arcDistance * (j + 1));
+                    chordLength * (j + 1));
 
-                result.Add(nextPoint.ToPoint2d());
+                segmentArcPoints.Add(nextPoint.ToPoint2d());
             }
 
-            result.Add(segmentEndPoint);
+            segmentArcPoints.Add(segmentEndPoint);
         }
         else
         {
-            result.Add(segmentEndPoint);
+            segmentArcPoints.Add(segmentEndPoint);
         }
 
-        // return new List<Point2d>{segmentStartPoint, segmentEndPoint};
-        return result;
+        return segmentArcPoints;
+    }
+
+    /// <summary>
+    /// Возвращает список точек на круглой области ревизии
+    /// для отрисовки дуг ревизионного облака 
+    /// </summary>
+    /// <param name="insertionPoint">Точка вставки блока</param>
+    /// <param name="revisionRoundRadius">Радиус круглой области ревизии</param>
+    /// <param name="revisionArcRadius">Радиус дуги ревизионного облака</param>
+    /// <returns>Список точек</returns>
+    internal static List<Point2d> GetArcPointsOfSegment(
+        Point3d insertionPoint,
+        double revisionRoundRadius,
+        double revisionArcRadius)
+    {
+        // Длина хорды дуги облака
+        var cloudArcChordLength = 2 * revisionArcRadius * Math.Sin(Math.PI / 4);
+
+        // Угол, образующий хорду
+        var revisionRoundChordAngle = 2 * Math.Asin(cloudArcChordLength / (2 * revisionRoundRadius));
+
+        // Длина дуги на окружности круга ревизии
+        var revisionRoundArcLength = revisionRoundChordAngle * revisionRoundRadius;
+
+        var revisionRoundCircleLength = 2 * Math.PI * revisionRoundRadius;
+        var cloudArcCount = (int)(revisionRoundCircleLength / revisionRoundArcLength);
+
+        if (cloudArcCount < 2)
+            return null;
+
+        // список точек на окружности ревизии для построения дуг-облачков
+        var cloudArcPoints = new List<Point2d>();
+
+        for (int i = 0; i < cloudArcCount ; i++)
+        {
+            // угол откладываемый от 0 против часовой для луча из центра окружности ревизии
+            var angle = i * revisionRoundChordAngle;
+
+            var normalVectorPoint = new Point2d(
+                revisionRoundRadius * Math.Cos(angle),
+                revisionRoundRadius * Math.Sin(angle));
+
+            var normalVector = (normalVectorPoint - insertionPoint.ToPoint2d()  ).GetNormal();
+            var cloudArcPoint = insertionPoint.ToPoint2d() + (normalVector * revisionRoundRadius);
+
+            cloudArcPoints.Add(cloudArcPoint);
+        }
+
+        return cloudArcPoints;
     }
 }
