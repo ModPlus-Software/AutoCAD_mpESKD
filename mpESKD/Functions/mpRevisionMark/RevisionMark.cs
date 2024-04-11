@@ -19,8 +19,8 @@ using ModPlusAPI.Windows;
 [SystemStyleDescriptionKey("h206")]
 public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
-    private readonly string _lastNodeNumber;
-    private string _cachedNodeNumber;
+    private readonly string _lastRevisionNumber;
+    private string _cachedRevisionNumber;
 
     #region Entities
 
@@ -90,10 +90,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Initializes a new instance of the <see cref="RevisionMark"/> class.
     /// </summary>
-    /// <param name="lastNodeNumber">Номер узла последней созданной узловой выноски</param>
-    public RevisionMark(string lastNodeNumber)
+    /// <param name="lastRevisionNumber">Номер ревизии последнего созданного маркера изменения</param>
+    public RevisionMark(string lastRevisionNumber)
     {
-        _lastNodeNumber = lastNodeNumber;
+        _lastRevisionNumber = lastRevisionNumber;
     }
 
     /// <summary>
@@ -102,6 +102,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [SaveToXData]
     public Point3d LeaderPoint { get; set; }
 
+    // ReSharper disable once InconsistentNaming
     private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
 
     /// <summary>
@@ -475,7 +476,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
                 var arcFramePointsDistinct = arcFramePoints.Skip(1).Distinct();
 
-
                 arcFramePoints = Enumerable.Repeat(arcFramePoints[0], 1)
                     .Concat(arcFramePointsDistinct).ToList();
 
@@ -552,8 +552,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             _revisionDbText = new DBText { TextString = RevisionNumber };
             _revisionDbText.SetProperties(TextStyle, revisionTextHeight);
-            _revisionDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid,
-                AttachmentPoint.MiddleCenter);
+            _revisionDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             revisionTextLength = _revisionDbText.GetLength();
         }
         else
@@ -565,8 +564,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             _noteDbText = new DBText { TextString = $"{Note}" };
             _noteDbText.SetProperties(TextStyle, noteTextHeight);
-            _noteDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid,
-                AttachmentPoint.MiddleCenter);
+            _noteDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
             noteTextLength = _noteDbText.GetLength();
         }
         else
@@ -574,20 +572,21 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             _noteDbText = null;
         }
 
-        double fullRevisionTextLength = revisionTextLength + (revisionTextIndent * 2);
-        double fullNoteTextLength = _noteDbText != null ? noteTextLength + (noteTextIndent * 2) : 0;
+        var fullRevisionTextLength = revisionTextLength + (revisionTextIndent * 2);
+        var fullNoteTextLength = _noteDbText != null ? noteTextLength + (noteTextIndent * 2) : 0;
 
-        double fullHeight = revisionTextHeight + (textVerticalOffset * 2);
-        double diffXaxis = fullHeight / Math.Tan(60.DegreeToRadian());
+        var fullHeight = revisionTextHeight + (textVerticalOffset * 2);
+        var diffXaxis = fullHeight / Math.Tan(60.DegreeToRadian());
 
         Point3d revisionTextPosition;
         var noteTextosition = default(Point3d);
 
         if (isRight)
         {
-            revisionTextPosition =
-                new Point3d(leaderPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
-                    leaderPoint.Y + (fullHeight / 2), 0);
+            revisionTextPosition = new Point3d(
+                    leaderPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
+                    leaderPoint.Y + (fullHeight / 2),
+                    0);
 
             if (_revisionDbText != null)
             {
@@ -597,7 +596,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             if (_noteDbText != null)
             {
-                noteTextosition = new Point3d(leaderPoint.X + (fullNoteTextLength / 2),
+                noteTextosition = new Point3d(
+                    leaderPoint.X + (fullNoteTextLength / 2),
                     revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
                     0);
 
@@ -609,14 +609,17 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             if (_noteDbText != null)
             {
-                revisionTextPosition =
-                    new Point3d(leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
-                        leaderPoint.Y + fullHeight / 2, 0);
+                revisionTextPosition = new Point3d(
+                    leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
+                    leaderPoint.Y + (fullHeight / 2), 
+                    0);
             }
             else
             {
-                revisionTextPosition = new Point3d(leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
-                    leaderPoint.Y + (fullHeight / 2), 0);
+                revisionTextPosition = new Point3d(
+                    leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
+                    leaderPoint.Y + (fullHeight / 2), 
+                    0);
             }
 
             if (_revisionDbText != null)
@@ -654,10 +657,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         if (isRight)
         {
-            leftBottomPoint = leaderPoint.ToPoint2d() + Vector2d.XAxis * fullNoteTextLength;
-            rightBottomPoint = leftBottomPoint + Vector2d.XAxis * (fullRevisionTextLength + diffXaxis);
-            rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + Vector2d.YAxis * fullHeight;
-            leftTopPoint = (leftBottomPoint + (Vector2d.XAxis * diffXaxis)) + Vector2d.YAxis * fullHeight;
+            leftBottomPoint = leaderPoint.ToPoint2d() + (Vector2d.XAxis * fullNoteTextLength);
+            rightBottomPoint = leftBottomPoint + (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
+            rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
+            leftTopPoint = (leftBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
 
             _noteShelfLine = new Line(leaderPoint, leftBottomPoint.ToPoint3d());
         }
@@ -665,16 +668,16 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             if (_noteDbText != null)
             {
-                rightBottomPoint = leaderPoint.ToPoint2d() - Vector2d.XAxis * (fullNoteTextLength + diffXaxis);
+                rightBottomPoint = leaderPoint.ToPoint2d() - (Vector2d.XAxis * (fullNoteTextLength + diffXaxis));
             }
             else
             {
-                rightBottomPoint = leaderPoint.ToPoint2d() - Vector2d.XAxis * fullNoteTextLength;
+                rightBottomPoint = leaderPoint.ToPoint2d() - (Vector2d.XAxis * fullNoteTextLength);
             }
 
-            rightTopPoint = (rightBottomPoint + Vector2d.XAxis * (diffXaxis)) + (Vector2d.YAxis * fullHeight);
-            leftTopPoint = rightTopPoint - Vector2d.XAxis * (fullRevisionTextLength + diffXaxis);
-            leftBottomPoint = rightBottomPoint - Vector2d.XAxis * (fullRevisionTextLength + diffXaxis);
+            rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
+            leftTopPoint = rightTopPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
+            leftBottomPoint = rightBottomPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
 
             _noteShelfLine = new Line(leaderPoint, rightBottomPoint.ToPoint3d());
         }
@@ -693,6 +696,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         if (!IsValueCreated)
             return;
 
-        RevisionNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastNodeNumber, ref _cachedNodeNumber);
+        RevisionNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastRevisionNumber, ref _cachedRevisionNumber);
     }
 }

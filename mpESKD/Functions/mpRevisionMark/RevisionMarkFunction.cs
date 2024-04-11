@@ -60,7 +60,7 @@ public class RevisionMarkFunction : ISmartEntityFunction
     }
 
     /// <summary>
-    /// Команда создания узловой выноски
+    /// Команда создания маркера изменения
     /// </summary>
     [CommandMethod("ModPlus", "mpRevisionMark", CommandFlags.Modal)]
     public void CreateRevisionMarkCommand()
@@ -169,7 +169,7 @@ public class RevisionMarkFunction : ISmartEntityFunction
     }
 
     /// <summary>
-    /// Поиск номера узла последней созданной узловой выноски
+    /// Поиск номера узла последней созданной маркера изменения
     /// </summary>
     private static string FindLastNodeNumber()
     {

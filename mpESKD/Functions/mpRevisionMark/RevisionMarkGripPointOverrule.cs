@@ -7,7 +7,6 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Enums;
 using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -56,6 +55,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     {
                         GripPoint = revisionMark.InsertionPoint
                     };
+
                     grips.Add(gp);
 
                     // получаем конечную ручку
@@ -63,6 +63,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     {
                         GripPoint = revisionMark.EndPoint
                     };
+
                     grips.Add(gp);
 
                     // получаем ручку типа рамки
@@ -78,25 +79,13 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     if (!(!string.IsNullOrEmpty(revisionMark.RevisionNumber) |
                           !string.IsNullOrEmpty(revisionMark.Note)))
                         return;
+
                     gp = new RevisionMarkGrip(revisionMark, GripName.LeaderPoint)
                     {
                         GripPoint = revisionMark.LeaderPoint
                     };
+
                     grips.Add(gp);
-
-                    /*
-                    var shelfLength = revisionMark.RevisionNumber.Length ;
-
-                    if (revisionMark.MarkPosition == MarkPosition.Left)
-                    {
-                        shelfLength = -shelfLength;
-                    }
-
-                    if (revisionMark.ScaleFactorX < 0)
-                    {
-                        shelfLength = -shelfLength;
-                    }
-                    */
 
                     var shelfPointGrip = revisionMark.LeaderPoint +
                                          (Vector3d.YAxis *

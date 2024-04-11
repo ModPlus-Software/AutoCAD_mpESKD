@@ -1,6 +1,6 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark;
 
-using mpESKD.Base.Attributes;
+using Base.Attributes;
 
 /// <summary>
 /// Тип рамки
@@ -10,10 +10,12 @@ public enum FrameType
     /// <summary>
     /// Круглая
     /// </summary>
-    [EnumPropertyDisplayValueKey("ft1")] Round,
+    [EnumPropertyDisplayValueKey("ft1")]
+    Round,
 
     /// <summary>
     /// Прямоугольная
     /// </summary>
-    [EnumPropertyDisplayValueKey("ft2")] Rectangular
+    [EnumPropertyDisplayValueKey("ft2")]
+    Rectangular
 }
