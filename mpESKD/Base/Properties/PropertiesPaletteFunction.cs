@@ -24,6 +24,7 @@ public static class PropertiesPaletteFunction
                 MainFunction.RemoveFromMpPalette(false);
                 if (PaletteSet != null)
                 {
+                    PaletteSet.Name = Language.GetItem("h11");
                     PaletteSet.Visible = true;
                 }
                 else
@@ -56,6 +57,7 @@ public static class PropertiesPaletteFunction
             {
                 if (PaletteSet != null)
                 {
+                    PaletteSet.Name = Language.GetItem("h11");
                     PaletteSet.Visible = false;
                 }
 
