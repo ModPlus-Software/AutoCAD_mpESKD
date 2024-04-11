@@ -151,11 +151,19 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     #region Geometry
 
     /// <summary>
+    /// Для контроля видимости пункта Радиус скругления в палитре
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 10, "", "", propertyScope: PropertyScope.Hidden)]
+    [PropertyVisibilityDependency(new[] { nameof(CornerRadius) })]
+    [SaveToXData]
+    public bool CornerRadiusVisibilityDependency { get; private set; }
+
+    /// <summary>
     /// Тип рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Round)]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Rectangular)]
     [SaveToXData]
-    public FrameType FrameType { get; set; } = FrameType.Round;
+    public FrameType FrameType { get; set; } = FrameType.Rectangular;
 
     /// <summary>
     /// Радиус скругления углов прямоугольной рамки
@@ -165,37 +173,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     public int CornerRadius { get; set; } = 2;
 
     /// <summary>
-    /// Отступ текста номера ревизии
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p124", 1.0, 0.0, 3.0, nameSymbol: "t")]
-    [SaveToXData]
-    public double RevisionTextIndent { get; set; } = 1.0;
-
-    /// <summary>
-    /// Отступ текста примечания
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p125", 1.0, 0.0, 3.0, nameSymbol: "n")]
-    [SaveToXData]
-    public double NoteTextIndent { get; set; } = 1.0;
-
-    /// <summary>
-    /// Вертикальный отступ текста
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 5, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
-    [SaveToXData]
-    public double TextVerticalOffset { get; set; } = 1.0;
-    
-    /// <summary>
-    /// Положение маркера
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 6, "p126", MarkPosition.Right)]
-    [SaveToXData]
-    public MarkPosition MarkPosition { get; set; } = MarkPosition.Right;
-
-    /// <summary>
     /// Облачный стиль рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 7, "p127", false)]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p127", false)]
     [PropertyVisibilityDependency(new[] { nameof(RevisionCloudArcLength) })]
     [SaveToXData]
     public bool IsRevisionCloud { get; set; }
@@ -203,9 +183,37 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Длина дуги облака
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 8, "p128", 5.0, 1.0, 300.0)]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p128", 5.0, 1.0, 300.0)]
     [SaveToXData]
     public double RevisionCloudArcLength { get; set; } = 5.0;
+
+    /// <summary>
+    /// Отступ текста номера ревизии
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p124", 1.0, 0.0, 3.0, nameSymbol: "t")]
+    [SaveToXData]
+    public double RevisionTextIndent { get; set; } = 1.0;
+
+    /// <summary>
+    /// Отступ текста примечания
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 6, "p125", 1.0, 0.0, 3.0, nameSymbol: "n")]
+    [SaveToXData]
+    public double NoteTextIndent { get; set; } = 1.0;
+
+    /// <summary>
+    /// Вертикальный отступ текста
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p62", 1.0, 0.0, 3.0, nameSymbol: "v")]
+    [SaveToXData]
+    public double TextVerticalOffset { get; set; } = 1.0;
+    
+    /// <summary>
+    /// Положение маркера
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 8, "p126", MarkPosition.Right)]
+    [SaveToXData]
+    public MarkPosition MarkPosition { get; set; } = MarkPosition.Right;
 
     #endregion
 
@@ -349,6 +357,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     {
         if (FrameType == FrameType.Round)
         {
+            CornerRadiusVisibilityDependency = false;
             _frameRevisionPolyline = null;
 
             try
@@ -393,6 +402,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         }
         else
         {
+            CornerRadiusVisibilityDependency = true;
             _frameRevisionCircle = null;
 
             var width = Math.Abs(endPoint.X - insertionPoint.X);
