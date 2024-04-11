@@ -13,7 +13,7 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 
 /// <summary>
-/// Узловая выноска
+/// Маркер изменения
 /// </summary>
 [SmartEntityDisplayNameKey("h203")]
 [SystemStyleDescriptionKey("h206")]
@@ -33,11 +33,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// Рамка узла при типе "Круглая"
     /// </summary>
     private Circle _frameRevisionCircle;
-
-    ///// <summary>
-    ///// Рамка узла при типе "Круглая" и стиле облака ревизии
-    ///// </summary>
-    //private Polyline _frameRevisionЗщCircle;
 
     /// <summary>
     /// Линия выноски
@@ -152,8 +147,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// Не используется!
     public override double LineTypeScale { get; set; }
 
-
     #region Geometry
+
     /// <summary>
     /// Тип рамки
     /// </summary>
@@ -164,25 +159,23 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Радиус скругления углов прямоугольной рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 2, "p83", 2, 1, 10, descLocalKey: "d83", nameSymbol: "r")]
+    [EntityProperty(PropertiesCategory.Geometry, 2, "p83", 2, 1, 20, descLocalKey: "d83", nameSymbol: "r")]
     [SaveToXData]
     public int CornerRadius { get; set; } = 2;
 
     /// <summary>
     /// Отступ текста номера ревизии
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p61", 1.0, 0.0, 3.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p124", 1.0, 0.0, 3.0, nameSymbol: "t")]
     [SaveToXData]
     public double RevisionTextIndent { get; set; } = 1.0;
-
 
     /// <summary>
     /// Отступ текста примечания
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p61", 1.0, 0.0, 3.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p125", 1.0, 0.0, 3.0, nameSymbol: "n")]
     [SaveToXData]
     public double NoteTextIndent { get; set; } = 1.0;
-
 
     /// <summary>
     /// Вертикальный отступ текста
@@ -194,26 +187,24 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Положение маркера
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 6, "p78", MarkPosition.Right)]
+    [EntityProperty(PropertiesCategory.Geometry, 6, "p126", MarkPosition.Right)]
     [SaveToXData]
     public MarkPosition MarkPosition { get; set; } = MarkPosition.Right;
 
     /// <summary>
-    /// Стиль рамки ревизии как облака
+    /// Облачный стиль рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 7, "p123", false)]
-    [PropertyVisibilityDependency(new[] { nameof(RevisionCloudArcRadius) })]
+    [EntityProperty(PropertiesCategory.Geometry, 7, "p127", false)]
+    [PropertyVisibilityDependency(new[] { nameof(RevisionCloudArcLength) })]
     [SaveToXData]
     public bool IsRevisionCloud { get; set; }
 
     /// <summary>
-    /// Вертикальный отступ текста
+    /// Длина дуги облака
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 8, "p62", 2, 2, 500, nameSymbol: "v")]
+    [EntityProperty(PropertiesCategory.Geometry, 8, "p128", 5.0, 1.0, 300.0)]
     [SaveToXData]
-    public int RevisionCloudArcRadius { get; set; } = 2;
-
-
+    public double RevisionCloudArcLength { get; set; } = 5.0;
 
     #endregion
 
@@ -227,14 +218,14 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Высота текста номера изменения
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 2, "p49", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
+    [EntityProperty(PropertiesCategory.Content, 2, "p129", 3.5, 0.000000001, 1.0000E+99, nameSymbol: "h1")]
     [SaveToXData]
     public double RevisionTextHeight { get; set; } = 3.5;
 
     /// <summary>
     /// Высота текста примечания
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 3, "p50", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
+    [EntityProperty(PropertiesCategory.Content, 3, "p130", 2.5, 0.000000001, 1.0000E+99, nameSymbol: "h2")]
     [SaveToXData]
     public double NoteTextHeight { get; set; } = 2.5;
 
@@ -252,7 +243,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Текст номера изменения 
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 6, "p79", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 6, "p131", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
     public string RevisionNumber { get; set; } = string.Empty;
@@ -260,7 +251,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Текст примечания
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p81", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 7, "p132", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
     public string Note { get; set; } = string.Empty;
@@ -359,9 +350,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             _frameRevisionPolyline = null;
 
-            var send = "ERROR";
-            var sendI = 0;
-
             try
             {
                 var radius = endPoint.DistanceTo(insertionPoint);
@@ -384,33 +372,20 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                     var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
                         insertionPoint,
                         radius,
-                        RevisionCloudArcRadius * scale);
+                        RevisionCloudArcLength * scale);
 
-                    cloudArcPoints.Add(insertionPoint.ToPoint2d() + Vector2d.XAxis * radius);
+                    cloudArcPoints.Add(insertionPoint.ToPoint2d() + (Vector2d.XAxis * radius));
 
-                    AcadUtils.WriteMessageInDebug($"cloudArcPoints count: {cloudArcPoints.Count}");
+                    _frameRevisionPolyline = new Polyline(cloudArcPoints.Count);
 
-                    if (cloudArcPoints != null)
+                    for (int i = 0; i < cloudArcPoints.Count; i++)
                     {
-                        _frameRevisionPolyline = new Polyline(cloudArcPoints.Count);
-
-                        for (int i = 0; i < cloudArcPoints.Count; i++)
-                        {
-                            _frameRevisionPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
-                            AcadUtils.WriteMessageInDebug($"Vertex[{i}] created");
-                            sendI++;
-                        }
+                        _frameRevisionPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
                     }
-
-                    AcadUtils.WriteMessageInDebug($"_frameRevisionPolyline DONE");
                 }
-
-                AcadUtils.WriteMessageInDebug($"PointsToCreatePolyline DONE");
             }
             catch
             {
-                AcadUtils.WriteMessageInDebug($"{send} - {sendI}");
-
                 _frameRevisionCircle = null;
                 _frameRevisionPolyline = null;
             }
@@ -490,13 +465,13 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                     arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
                         segmentStartPoint,
                         segmentEndPoint,
-                        RevisionCloudArcRadius * scale));
+                        RevisionCloudArcLength * scale));
                 }
 
                 arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
                     arcFramePoints.Last(),
                     arcFramePoints.First(),
-                    RevisionCloudArcRadius * scale));
+                    RevisionCloudArcLength * scale));
 
                 var arcFramePointsDistinct = arcFramePoints.Skip(1).Distinct();
 
@@ -520,7 +495,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
                     var distance = currentPoint.GetDistanceTo(nextPoint);
 
-                    if (distance < 2 * RevisionCloudArcRadius)
+                    if (distance < 2 * RevisionCloudArcLength)
                     {
                         var middlePoint = GeometryUtils.GetMiddlePoint2d(currentPoint, nextPoint);
                         correctFramePoints.Add(middlePoint);
@@ -599,10 +574,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             _noteDbText = null;
         }
 
-        double fullRevisionTextLength = revisionTextLength + revisionTextIndent * 2;
-        double fullNoteTextLength = _noteDbText != null ? noteTextLength + noteTextIndent * 2 : 0;
+        double fullRevisionTextLength = revisionTextLength + (revisionTextIndent * 2);
+        double fullNoteTextLength = _noteDbText != null ? noteTextLength + (noteTextIndent * 2) : 0;
 
-        double fullHeight = revisionTextHeight + textVerticalOffset * 2;
+        double fullHeight = revisionTextHeight + (textVerticalOffset * 2);
         double diffXaxis = fullHeight / Math.Tan(60.DegreeToRadian());
 
         Point3d revisionTextPosition;
@@ -611,8 +586,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         if (isRight)
         {
             revisionTextPosition =
-                new Point3d(leaderPoint.X + fullRevisionTextLength / 2 + fullNoteTextLength + diffXaxis,
-                    leaderPoint.Y + fullHeight / 2, 0);
+                new Point3d(leaderPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
+                    leaderPoint.Y + (fullHeight / 2), 0);
 
             if (_revisionDbText != null)
             {
@@ -622,7 +597,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             if (_noteDbText != null)
             {
-                noteTextosition = new Point3d(leaderPoint.X + fullNoteTextLength / 2, revisionTextPosition.Y, 0);
+                noteTextosition = new Point3d(leaderPoint.X + (fullNoteTextLength / 2),
+                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
+                    0);
 
                 _noteDbText.Position = noteTextosition;
                 _noteDbText.AlignmentPoint = noteTextosition;
@@ -633,13 +610,13 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             if (_noteDbText != null)
             {
                 revisionTextPosition =
-                    new Point3d(leaderPoint.X - fullRevisionTextLength / 2 - fullNoteTextLength - diffXaxis,
+                    new Point3d(leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
                         leaderPoint.Y + fullHeight / 2, 0);
             }
             else
             {
-                revisionTextPosition = new Point3d(leaderPoint.X - fullRevisionTextLength / 2 - fullNoteTextLength,
-                    leaderPoint.Y + fullHeight / 2, 0);
+                revisionTextPosition = new Point3d(leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
+                    leaderPoint.Y + (fullHeight / 2), 0);
             }
 
             if (_revisionDbText != null)
@@ -650,7 +627,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             if (_noteDbText != null)
             {
-                noteTextosition = new Point3d(leaderPoint.X - fullNoteTextLength / 2, revisionTextPosition.Y, 0);
+                noteTextosition = new Point3d(
+                    leaderPoint.X - (fullNoteTextLength / 2), 
+                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2), 
+                    0);
 
                 _noteDbText.Position = noteTextosition;
                 _noteDbText.AlignmentPoint = noteTextosition;

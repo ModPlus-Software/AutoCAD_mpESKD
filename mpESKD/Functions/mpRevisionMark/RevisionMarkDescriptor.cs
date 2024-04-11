@@ -15,16 +15,16 @@ public class RevisionMarkDescriptor : ISmartEntityDescriptor
     public string Name => "mpRevisionMark";
 
     /// <inheritdoc/>
-    // Узловая выноска
-    public string LName => Language.GetItem("h126");
+    // Маркер изменения
+    public string LName => Language.GetItem("h203");
 
     /// <inheritdoc/>
-    // Создание узловой выноски
-    public string Description => Language.GetItem("h127");
+    // Создание маркера изменения
+    public string Description => Language.GetItem("h204");
 
     /// <inheritdoc/>
-    // Создание интеллектуального объекта на основе анонимного блока, описывающего узловую выноску
-    public string FullDescription => Language.GetItem("h128");
+    // Создание интеллектуального объекта на основе анонимного блока, описывающего маркер изменения
+    public string FullDescription => Language.GetItem("h205");
 
     /// <inheritdoc/>
     public string ToolTipHelpImage => string.Empty;

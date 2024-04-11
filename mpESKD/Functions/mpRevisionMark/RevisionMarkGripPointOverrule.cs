@@ -8,8 +8,6 @@ using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
 using mpESKD.Base.Enums;
-using mpESKD.Base.Overrules.Grips;
-using mpESKD.Base.Utils;
 using System;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -86,6 +84,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     };
                     grips.Add(gp);
 
+                    /*
                     var shelfLength = revisionMark.RevisionNumber.Length ;
 
                     if (revisionMark.MarkPosition == MarkPosition.Left)
@@ -97,31 +96,17 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     {
                         shelfLength = -shelfLength;
                     }
+                    */
 
                     var shelfPointGrip = revisionMark.LeaderPoint +
                                          (Vector3d.YAxis *
                                           ((revisionMark.RevisionTextHeight + revisionMark.TextVerticalOffset) *
                                            revisionMark.GetFullScale()));
 
-                    var alignGripPoint = shelfPointGrip + Vector3d.XAxis * shelfLength;
-             
-
                     grips.Add(new RevisionMarkShelfPositionGrip(revisionMark)
                     {
                         GripPoint = shelfPointGrip
                     });
-
-                    //if ((!string.IsNullOrEmpty(revisionMark.Note)) &
-                    //    ((!string.IsNullOrEmpty(revisionMark.RevisionNumber) | !string.IsNullOrEmpty(revisionMark.Note)) ||
-                    //     (!string.IsNullOrEmpty(revisionMark.RevisionNumber) & !string.IsNullOrEmpty(revisionMark.Note))))
-                    //{
-                    //    grips.Add(new EntityTextAlignGrip(revisionMark,
-                    //        () => revisionMark.ValueHorizontalAlignment,
-                    //        (setAlignEntity) => revisionMark.ValueHorizontalAlignment = setAlignEntity)
-                    //    {
-                    //        GripPoint = alignGripPoint
-                    //    });
-                    //}
                 }
             }
         }
