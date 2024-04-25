@@ -1,41 +1,48 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
+using Base.Enums;
 using Base.Overrules;
+using Base.Overrules.Grips;
 using Base.Utils;
 using ModPlusAPI;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using Base.Enums;
-using Base.Overrules.Grips;
 
 /// <summary>
-/// Ручка выбора типа рамки, меняющая тип рамки
+/// Ручка вершин
 /// </summary>
-public class RevisionFrameTypeGrip : SmartEntityGripData
+public class RevisionMarkLeaderEndTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RevisionFrameTypeGrip"/> class.
+    /// Initializes a new instance of the <see cref="RevisionMarkVertexGrip"/> class.
     /// </summary>
-    /// <param name="revisionMark">Экземпляр <see cref="mpRevisionMark.RevisionMark"/></param>
-    public RevisionFrameTypeGrip(RevisionMark revisionMark)
+    /// <param name="revisionMark">Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public RevisionMarkLeaderEndTypeGrip(RevisionMark revisionMark, int gripIndex)
     {
         RevisionMark = revisionMark;
+        GripIndex = gripIndex;
         GripType = GripType.List;
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpRevisionMark.RevisionMark"/>
+    /// Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/>
     /// </summary>
     public RevisionMark RevisionMark { get; }
+
+    /// <summary>
+    /// Индекс ручки
+    /// </summary>
+    public int GripIndex { get; }
 
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Тип рамки
-        return Language.GetItem("p82");
+        return Language.GetItem("gp7"); // Тип рамки ревизии для выноски
     }
 
     /// <inheritdoc />
@@ -56,7 +63,9 @@ public class RevisionFrameTypeGrip : SmartEntityGripData
                     Name = "Round",
                     IsCheckable = true,
                     Header = Language.GetItem("ft1"), // Круглая 
-                    IsChecked = RevisionMark.FrameType == FrameType.Round
+                    // todo Тест
+                    //IsChecked = RevisionMark.FrameType == FrameType.Round
+                    IsChecked = 
                 };
                 menuItem.Click += MenuItemOnClick;
                 cm.Items.Add(menuItem);
@@ -75,7 +84,6 @@ public class RevisionFrameTypeGrip : SmartEntityGripData
 
                 cm.IsOpen = true;
             };
-            _win.Show();
         }
 
         return ReturnValue.GetNewGripPoints;
@@ -87,7 +95,7 @@ public class RevisionFrameTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        RevisionMark.FrameType = menuItem.Name == "Round" ? FrameType.Round : FrameType.Rectangular;
+        RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();

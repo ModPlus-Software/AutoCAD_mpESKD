@@ -1,7 +1,5 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark;
 
-using System.Collections.Generic;
-using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -13,23 +11,26 @@ using Base.Overrules;
 using Base.Styles;
 using Base.Utils;
 using ModPlusAPI;
-using ModPlusAPI.IO;
 using ModPlusAPI.Windows;
 
-/// <inheritdoc/>
+/// <inheritdoc />
 public class RevisionMarkFunction : ISmartEntityFunction
 {
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Initialize()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: Initialize");
+
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new RevisionMarkGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<RevisionMark>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<RevisionMark>(), true);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateAnalog");
+
         SmartEntityUtils.SendStatistic<RevisionMark>();
 
         try
@@ -42,14 +43,14 @@ public class RevisionMarkFunction : ISmartEntityFunction
              */
             ExtendedDataUtils.AddRegAppTableRecord<RevisionMark>();
 
-            var lastNodeNumber = FindLastNodeNumber();
-            var revisionMark = new RevisionMark(lastNodeNumber);
-            var blockReference = MainFunction.CreateBlock(revisionMark);
-            revisionMark.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
+            var revisionMark = new RevisionMark();
 
+            var blockReference = MainFunction.CreateBlock(revisionMark);
+
+            revisionMark.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
             InsertRevisionMarkWithJig(revisionMark, blockReference);
         }
-        catch (Exception exception)
+        catch (System.Exception exception)
         {
             ExceptionBox.Show(exception);
         }
@@ -60,17 +61,22 @@ public class RevisionMarkFunction : ISmartEntityFunction
     }
 
     /// <summary>
-    /// Команда создания маркера изменения
+    /// Команда создания обозначения уровня
     /// </summary>
     [CommandMethod("ModPlus", "mpRevisionMark", CommandFlags.Modal)]
     public void CreateRevisionMarkCommand()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateRevisionMarkCommand");
         CreateRevisionMark();
     }
 
     private static void CreateRevisionMark()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateRevisionMark");
+
+#if !DEBUG
         SmartEntityUtils.SendStatistic<RevisionMark>();
+#endif
 
         try
         {
@@ -83,105 +89,59 @@ public class RevisionMarkFunction : ISmartEntityFunction
             ExtendedDataUtils.AddRegAppTableRecord<RevisionMark>();
 
             var style = StyleManager.GetCurrentStyle(typeof(RevisionMark));
-            var lastNodeNumber = FindLastNodeNumber();
-            var revisionMark = new RevisionMark(lastNodeNumber);
 
+            var revisionMark = new RevisionMark();
+
+            AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateRevisionMark; " +
+                                          "before [var blockReference = MainFunction.CreateBlock(revisionMark);]");
             var blockReference = MainFunction.CreateBlock(revisionMark);
-            revisionMark.ApplyStyle(style, true);
+            AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateRevisionMark; " +
+                                          "after [var blockReference = MainFunction.CreateBlock(revisionMark);]");
 
+            revisionMark.ApplyStyle(style, true);
             InsertRevisionMarkWithJig(revisionMark, blockReference);
         }
-        catch (Exception exception)
+        catch (System.Exception exception)
         {
+            AcadUtils.WriteMessageInDebug("ERROR: class: RevisionMarkFunction; metod: CreateRevisionMark");
             ExceptionBox.Show(exception);
         }
         finally
         {
             Overrule.Overruling = true;
         }
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: CreateRevisionMark => END" );
     }
 
     private static void InsertRevisionMarkWithJig(RevisionMark revisionMark, BlockReference blockReference)
     {
-        // <msg1>Укажите точку вставки:</msg1>
-        var insertionPointPrompt = Language.GetItem("msg1");
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: InsertRevisionMarkWithJig");
 
-        // <msg17>Укажите точку рамки:</msg17>
-        var framePointPrompt = Language.GetItem("msg17");
+        var entityJig = new DefaultEntityJig(
+            revisionMark,
+            blockReference,
+            new Point3d(20, 0, 0));
 
-        // <msg18>Укажите точку выноски:</msg18>
-        var leaderPointPrompt = Language.GetItem("msg18");
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: InsertRevisionMarkWithJig; " +
+                                      "before [var status = AcadUtils.Editor.Drag(entityJig).Status;]");
 
-        var entityJig = new DefaultEntityJig(revisionMark, blockReference, new Point3d(0, 0, 0), point3d =>
+        var status = AcadUtils.Editor.Drag(entityJig).Status;
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkFunction; metod: InsertRevisionMarkWithJig; " +
+                                      "after [var status = AcadUtils.Editor.Drag(entityJig).Status;]");
+
+        if (status != PromptStatus.OK)
         {
-            revisionMark.LeaderPoint = point3d;
-        })
-        {
-            PromptForInsertionPoint = insertionPointPrompt
-        };
-
-        revisionMark.JigState = RevisionMarkJigState.InsertionPoint;
-        do
-        {
-            var status = AcadUtils.Editor.Drag(entityJig).Status;
-            if (status == PromptStatus.OK)
-            {
-                if (revisionMark.JigState == RevisionMarkJigState.InsertionPoint)
-                {
-                    revisionMark.JigState = RevisionMarkJigState.EndPoint;
-                    entityJig.PromptForNextPoint = framePointPrompt;
-                    entityJig.PreviousPoint = revisionMark.InsertionPoint;
-
-                    entityJig.JigState = JigState.PromptNextPoint;
-                }
-                else if (revisionMark.JigState == RevisionMarkJigState.EndPoint)
-                {
-                    AcadUtils.Editor.WriteMessage($"{revisionMark.JigState.Value.ToString()}");
-                    revisionMark.JigState = RevisionMarkJigState.LeaderPoint;
-                    entityJig.PromptForCustomPoint = leaderPointPrompt;
-
-                    // Тут не нужна привязка к предыдущей точке
-                    entityJig.PreviousPoint = revisionMark.InsertionPoint;
-                    entityJig.JigState = JigState.CustomPoint;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            else
-            {
-                EntityUtils.Erase(blockReference.Id);
-                break;
-            }
+            EntityUtils.Erase(blockReference.Id);
+            return;
         }
-        while (true);
 
-        if (!revisionMark.BlockId.IsErased)
+        using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
         {
-            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
-            {
-                var ent = tr.GetObject(revisionMark.BlockId, OpenMode.ForWrite, true, true);
-                ent.XData = revisionMark.GetDataForXData();
-                tr.Commit();
-            }
+            var ent = tr.GetObject(revisionMark.BlockId, OpenMode.ForWrite, true, true);
+            ent.XData = revisionMark.GetDataForXData();
+            tr.Commit();
         }
-    }
-
-    /// <summary>
-    /// Поиск номера узла последней созданной маркера изменения
-    /// </summary>
-    private static string FindLastNodeNumber()
-    {
-        if (!MainSettings.Instance.RevisionMarkContinueNodeNumber)
-            return string.Empty;
-
-        var allValues = new List<string>();
-        AcadUtils.GetAllIntellectualEntitiesInCurrentSpace<RevisionMark>(typeof(RevisionMark)).ForEach(a =>
-        {
-            allValues.Add(a.RevisionNumber);
-        });
-
-        return allValues.OrderBy(s => s, new OrdinalStringComparer()).LastOrDefault();
     }
 }

@@ -7,27 +7,31 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using System;
-using Exception = Autodesk.AutoCAD.Runtime.Exception;
+using mpESKD.Base.Utils;
 
 /// <inheritdoc />
 public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<RevisionMark>
 {
     /// <inheritdoc />
     public override void GetGripPoints(
-    Entity entity, GripDataCollection grips, double curViewUnitSize, int gripSize, Vector3d curViewDir, GetGripPointsFlags bitFlags)
+        Entity entity, 
+        GripDataCollection grips, 
+        double curViewUnitSize, 
+        int gripSize, 
+        Vector3d curViewDir, 
+        GetGripPointsFlags bitFlags)
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: GetGripPoints");
+
         try
         {
-            // Проверка дополнительных условий
             if (IsApplicable(entity))
             {
-                // Чтобы "отключить" точку вставки блока, нужно получить сначала блок
-                // Т.к. мы точно знаем для какого примитива переопределение, то получаем блок:
-                var blkRef = (BlockReference)entity;
+                // Удаляю все ручки - это удалит ручку вставки блока
 
-                // Удаляем стандартную ручку позиции блока (точки вставки)
+                var blkRef = (BlockReference)entity;
                 GripData toRemove = null;
+
                 foreach (var gd in grips)
                 {
                     if (gd.GripPoint == blkRef.Position)
@@ -42,60 +46,76 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     grips.Remove(toRemove);
                 }
 
-                // Получаем экземпляр класса, который описывает как должен выглядеть примитив
-                // т.е. правила построения графики внутри блока
-                // Информация собирается по XData и свойствам самого блока
                 var revisionMark = EntityReaderService.Instance.GetFromEntity<RevisionMark>(entity);
-
-                // Паранойя программиста =)
                 if (revisionMark != null)
                 {
-                    // Получаем первую ручку (совпадает с точкой вставки блока)
-                    var gp = new RevisionMarkGrip(revisionMark, GripName.InsertionPoint)
+                    var frameCenterPoint = GeometryUtils.GetMiddlePoint3d(
+                        revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[2]);
+
+                    // insertion (start) grip
+                    var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
-                        GripPoint = revisionMark.InsertionPoint
+                        GripPoint =  revisionMark.InsertionPoint
                     };
+                    grips.Add(vertexGrip);
 
-                    grips.Add(gp);
 
-                    // получаем конечную ручку
-                    gp = new RevisionMarkGrip(revisionMark, GripName.FramePoint)
-                    {
-                        GripPoint = revisionMark.EndPoint
-                    };
 
-                    grips.Add(gp);
+                    // todo RevisionMarkGripPointOverrule: Тест 1
 
-                    // получаем ручку типа рамки
-                    grips.Add(new RevisionFrameTypeGrip(revisionMark)
+                    var BorderWidth = 30;
+                    var BorderHeight = 30;
+
+                    // получаем ручку для создания выноски
+                    grips.Add(new RevisionMarkAddLeaderGrip(revisionMark)
                     {
                         GripPoint = new Point3d(
-                            ((revisionMark.EndPoint.X - revisionMark.InsertionPoint.X) * -1) + revisionMark.InsertionPoint.X,
-                            ((revisionMark.EndPoint.Y - revisionMark.InsertionPoint.Y) * -1) + revisionMark.InsertionPoint.Y,
-                            revisionMark.EndPoint.Z)
+                            //revisionMark.InsertionPoint.X - (revisionMark.BorderWidth / 2 * revisionMark.GetFullScale()),
+                            //revisionMark.InsertionPoint.Y + (revisionMark.BorderHeight / 2 * revisionMark.GetFullScale()),
+                            revisionMark.InsertionPoint.X - (BorderWidth / 2 * revisionMark.GetFullScale()),
+                            revisionMark.InsertionPoint.Y + (BorderHeight / 2 * revisionMark.GetFullScale()),
+                            revisionMark.InsertionPoint.Z)
                     });
 
-                    // получаем ручку выноски
-                    if (!(!string.IsNullOrEmpty(revisionMark.RevisionNumber) |
-                          !string.IsNullOrEmpty(revisionMark.Note)))
-                        return;
 
-                    gp = new RevisionMarkGrip(revisionMark, GripName.LeaderPoint)
+                    // todo RevisionMarkGripPointOverrule: Тест 2
+                    // получаем ручку типа рамки
+                    /*
+                    grips.Add(new RevisionMarkFrameTypeGrip(revisionMark)
                     {
-                        GripPoint = revisionMark.LeaderPoint
-                    };
-
-                    grips.Add(gp);
-
-                    var shelfPointGrip = revisionMark.LeaderPoint +
-                                         (Vector3d.YAxis *
-                                          ((revisionMark.RevisionTextHeight + revisionMark.TextVerticalOffset) *
-                                           revisionMark.GetFullScale()));
-
-                    grips.Add(new RevisionMarkShelfPositionGrip(revisionMark)
-                    {
-                        GripPoint = shelfPointGrip
+                        GripPoint = new Point3d(
+                            revisionMark.InsertionPoint.X + (revisionMark.BorderWidth / 2 * revisionMark.GetFullScale()),
+                            revisionMark.InsertionPoint.Y - (revisionMark.BorderHeight / 2 * revisionMark.GetFullScale()),
+                            revisionMark.InsertionPoint.Z)
                     });
+                    */
+
+                    for (var i = 0; i < revisionMark.LeaderPoints.Count; i++)
+                    {
+                        // ручки переноса выносок
+                        grips.Add(new RevisionMarkLeaderMoveGrip(revisionMark, i)
+                        {
+                            GripPoint = revisionMark.LeaderPoints[i]
+                        });
+                        var deleteGripPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
+                        var leaderEndTypeGripPoint = revisionMark.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+
+                        // ручки удаления выносок
+                        grips.Add(new RevisionMarkLeaderRemoveGrip(revisionMark, i)
+                        {
+                            GripPoint = deleteGripPoint
+                        });
+
+
+                        // todo RevisionMarkGripPointOverrule: Тест 3
+                        // ручки выбора типа выносок
+                        /*
+                        grips.Add(new RevisionMarkLeaderEndTypeGrip(revisionMark, i)
+                        {
+                            GripPoint = leaderEndTypeGripPoint
+                        });
+                        */
+                    }
                 }
             }
         }
@@ -110,50 +130,36 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
+
         try
         {
             if (IsApplicable(entity))
             {
                 foreach (var gripData in grips)
                 {
-                    if (gripData is RevisionMarkGrip levelMarkGrip)
+                    if (gripData is RevisionMarkVertexGrip vertexGrip)
                     {
-                        var gripPoint = levelMarkGrip.GripPoint;
-                        var revisionMark = levelMarkGrip.RevisionMark;
-                        var scale = revisionMark.GetFullScale();
+                        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: MoveGripPointsAt");
 
-                        if (levelMarkGrip.GripName == GripName.InsertionPoint)
-                        {
-                            ((BlockReference)entity).Position = gripPoint + offset;
-                        }
-                        else if (levelMarkGrip.GripName == GripName.FramePoint)
-                        {
-                            if (revisionMark.FrameType == FrameType.Rectangular)
-                            {
-                                var currentPosition = gripPoint + offset;
-                                var frameHeight =
-                                    Math.Abs(currentPosition.Y - revisionMark.InsertionPoint.Y) / scale;
-                                var frameWidth = Math.Abs(currentPosition.X - revisionMark.InsertionPoint.X) / scale;
+                        var revisionMark = vertexGrip.RevisionMark;
 
-                                if (!(frameHeight <= revisionMark.MinDistanceBetweenPoints) &&
-                                    !(frameWidth <= revisionMark.MinDistanceBetweenPoints))
-                                {
-                                    revisionMark.EndPoint = gripPoint + offset;
-                                }
-                            }
-                            else
-                            {
-                                revisionMark.EndPoint = gripPoint + offset;
-                            }
-                        }
-                        else if (levelMarkGrip.GripName == GripName.LeaderPoint)
+                        if (vertexGrip.GripIndex == 0)
                         {
-                            revisionMark.LeaderPoint = gripPoint + offset;
+                            ((BlockReference)entity).Position = vertexGrip.GripPoint + offset;
+                            revisionMark.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
                         // Вот тут происходит перерисовка примитивов внутри блока
                         revisionMark.UpdateEntities();
                         revisionMark.BlockRecord.UpdateAnonymousBlocks();
+                    }
+                    else if (gripData is RevisionMarkAddLeaderGrip addLeaderGrip)
+                    {
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                    }
+                    else if (gripData is RevisionMarkLeaderMoveGrip moveLeaderGrip)
+                    {
+                        moveLeaderGrip.NewPoint = moveLeaderGrip.GripPoint + offset;
                     }
                     else
                     {

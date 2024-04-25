@@ -7,39 +7,49 @@ using Base.Utils;
 using ModPlusAPI;
 
 /// <summary>
-/// Ручка марки ревизии, меняющая положение полки
+/// Ручка вершин
 /// </summary>
-public class RevisionMarkShelfPositionGrip : SmartEntityGripData
+public class RevisionMarkLeaderRemoveGrip : SmartEntityGripData
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="RevisionMarkShelfPositionGrip"/> class.
+    /// Initializes a new instance of the <see cref="RevisionMarkLeaderRemoveGrip"/> class.
     /// </summary>
-    /// <param name="revisionMark">Экземпляр <see cref="mpRevisionMark.RevisionMark"/></param>
-    public RevisionMarkShelfPositionGrip(RevisionMark revisionMark)
+    /// <param name="revisionMark">Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public RevisionMarkLeaderRemoveGrip(RevisionMark revisionMark, int gripIndex)
     {
         RevisionMark = revisionMark;
-        GripType = GripType.TwoArrowsLeftRight;
+        GripIndex = gripIndex;
+        GripType = GripType.Minus;
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpRevisionMark.RevisionMark"/>
+    /// Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/>
     /// </summary>
     public RevisionMark RevisionMark { get; }
+
+    /// <summary>
+    /// Индекс ручки
+    /// </summary>
+    public int GripIndex { get; }
 
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("p78"); // "Положение полки";
+        return Language.GetItem("gp6"); // Удалить выноску
     }
 
-    /// <inheritdoc />
     public override ReturnValue OnHotGrip(ObjectId entityId, Context contextFlags)
     {
         using (RevisionMark)
         {
-            RevisionMark.MarkPosition = RevisionMark.MarkPosition == MarkPosition.Left
-                ? MarkPosition.Right
-                : MarkPosition.Left;
+            RevisionMark.LeaderPoints.RemoveAt(GripIndex);
+
+            // todo
+            /*
+            RevisionMark.RevisionFrameTypes.RemoveAt(GripIndex);
+            */
+
 
             RevisionMark.UpdateEntities();
             RevisionMark.BlockRecord.UpdateAnonymousBlocks();

@@ -12,6 +12,7 @@ using Base.Enums;
 using Base.Utils;
 using ModPlusAPI.Windows;
 
+
 /// <summary>
 /// Маркер изменения
 /// </summary>
@@ -21,6 +22,11 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 {
     private readonly string _lastRevisionNumber;
     private string _cachedRevisionNumber;
+
+    private readonly List<Line> _leaderLines = new();
+    private readonly List<Polyline> _revisionFramesAsPolilines= new();
+    private readonly List<Circle> _revisionFramesAsCircles = new();
+    private double _scale;
 
     #region Entities
 
@@ -96,19 +102,24 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         _lastRevisionNumber = lastRevisionNumber;
     }
 
-    /// <summary>
-    /// Точка рамки
+   /// <summary>
+    /// Точки выносок 
     /// </summary>
     [SaveToXData]
-    public Point3d LeaderPoint { get; set; }
+    public List<Point3d> LeaderPoints { get; set; } = new ();
+
+
+   // todo
+   /*
+    /// <summary>
+    /// Типы рамок ревизии для каждой точки выноски
+    /// </summary>
+    [SaveToXData]
+    public List<RevisionFrameType> RevisionFrameTypes { get; set; } = new ();
+   */
 
     // ReSharper disable once InconsistentNaming
-    private Point3d LeaderPointOCS => LeaderPoint.TransformBy(BlockTransform.Inverse());
-
-    /// <summary>
-    /// Состояние Jig при создании узловой выноски
-    /// </summary>
-    public RevisionMarkJigState? JigState { get; set; }
+    private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5;
@@ -120,9 +131,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             var entities = new List<Entity>
             {
-                _frameRevisionPolyline,
-                _frameRevisionCircle,
-                _leaderLine,
                 _noteShelfLine,
                 _frameRevisionText,
                 _revisionDbText,
@@ -130,6 +138,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                 _noteDbText,
                 _noteTextMask,
             };
+
+            entities.AddRange(_leaderLines);
+            entities.AddRange(_revisionFramesAsPolilines);
+            entities.AddRange(_revisionFramesAsCircles);
 
             foreach (var e in entities)
             {
@@ -156,14 +168,18 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [EntityProperty(PropertiesCategory.Geometry, 10, "", "", propertyScope: PropertyScope.Hidden)]
     [PropertyVisibilityDependency(new[] { nameof(CornerRadius) })]
     [SaveToXData]
-    public bool CornerRadiusVisibilityDependency { get; private set; }
+    public bool CornerRadiusVisibilityDependency { get;  set; }
 
+    // todo
+    /*
     /// <summary>
     /// Тип рамки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", FrameType.Rectangular)]
+    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", RevisionFrameType.Rectangular)]
     [SaveToXData]
-    public FrameType FrameType { get; set; } = FrameType.Rectangular;
+    public RevisionFrameType RevisionFrameType { get; set; } = RevisionFrameType.Rectangular;
+    */
+
 
     /// <summary>
     /// Радиус скругления углов прямоугольной рамки
@@ -267,292 +283,63 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
     #endregion
 
+    [SaveToXData] 
+    public List<Point3d> FrameRevisionTextPoints { get; set; } = new () ; //Array.Empty<Point2d>();
+
     /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: InitiGetPointsForOsnapalize");
         yield return InsertionPoint;
-        yield return EndPoint;
-        yield return LeaderPoint;
     }
 
     /// <inheritdoc/>
     public override void UpdateEntities()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities");
+
         try
         {
-            var scale = GetScale();
-            var length = EndPointOCS.DistanceTo(InsertionPointOCS);
-            //// Задание первой точки (точки вставки). Она же точка начала отсчета
-            if (JigState == RevisionMarkJigState.InsertionPoint)
-            {
-                var tempFramePoint = new Point3d(
-                    InsertionPointOCS.X + (5 * scale),
-                    InsertionPointOCS.Y + (5 * scale),
-                    InsertionPointOCS.Z);
-                PointsToCreatePolyline(scale, InsertionPointOCS, tempFramePoint);
-                EndPoint = tempFramePoint.TransformBy(BlockTransform);
-            }
-            //// Задание второй точки - точки рамки. При этом в jig устанавливается EndPoint, которая по завершении
-            //// будет перемещена в EndPoint
-            else if (JigState == RevisionMarkJigState.EndPoint)
-            {
-                // Так как FramePoint тут еще не задана, то свойства FrameWidth и FrameHeight нужно высчитывать из EndPoint
-                var frameHeight = Math.Abs(EndPointOCS.Y - InsertionPointOCS.Y);
-                var frameWidth = Math.Abs(EndPointOCS.X - InsertionPointOCS.X);
-
-                if (frameHeight <= MinDistanceBetweenPoints || frameWidth <= MinDistanceBetweenPoints ||
-                    length <= MinDistanceBetweenPoints)
-                {
-                    MakeSimplyEntity(scale);
-                }
-                else
-                {
-                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPoint);
-                }
-            }
-            else if (JigState == RevisionMarkJigState.LeaderPoint)
-            {
-                CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
-            }
-            //// Прочие случаи (включая указание точки выноски)
-            else
-            {
-                if (length <= MinDistanceBetweenPoints)
-                {
-                    MakeSimplyEntity(scale);
-                }
-                else
-                {
-                    PointsToCreatePolyline(scale, InsertionPointOCS, EndPointOCS);
-                }
-
-                CreateEntities(InsertionPointOCS, LeaderPointOCS, scale);
-            }
+            _scale = GetScale();
+            CreateEntities(InsertionPointOCS);
         }
         catch (Exception exception)
         {
+            AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities => ERROR(!)");
             ExceptionBox.Show(exception);
-
-            AcadUtils.WriteMessageInDebug($"{exception.StackTrace}");
         }
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities => END");
     }
 
-    private void MakeSimplyEntity(double scale)
+    private void CreateEntities(Point3d insertionPoint)
     {
-        var tmpEndPoint = ModPlus.Helpers.GeometryHelpers.Point3dAtDirection(InsertionPoint, EndPoint,
-            InsertionPointOCS, MinDistanceBetweenPoints * scale);
-        if (InsertionPointOCS.IsEqualTo(EndPointOCS))
-        {
-            tmpEndPoint = new Point3d(0, MinDistanceBetweenPoints * scale, 0);
-        }
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities");
 
-        PointsToCreatePolyline(scale, InsertionPointOCS, tmpEndPoint);
-        EndPoint = tmpEndPoint.TransformBy(BlockTransform);
-    }
+        _leaderLines.Clear();
+        _revisionFramesAsCircles.Clear();
+        _revisionFramesAsPolilines.Clear();
 
-    /// <summary>
-    /// Получение точек для построения базовой полилинии
-    /// </summary>
-    private void PointsToCreatePolyline(double scale, Point3d insertionPoint, Point3d endPoint)
-    {
-        if (FrameType == FrameType.Round)
-        {
-            CornerRadiusVisibilityDependency = false;
-            _frameRevisionPolyline = null;
+        // todo Тест построения области ревизии
+        /*
+        this.CreateRevisionFrame(
+            insertionPoint,
+            new Point3d(insertionPoint.X + 20, insertionPoint.Y + 20, 0),
+            RevisionFrameType.Rectangular,
+            _revisionFramesAsPolilines,
+            _revisionFramesAsCircles,
+            _scale
+        );
+        */
 
-            try
-            {
-                var radius = endPoint.DistanceTo(insertionPoint);
-                if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-                    radius = MinDistanceBetweenPoints * scale;
+        // todo
+         SetRevisionNumberOnCreation();
 
-                if (!IsRevisionCloud)
-                {
-                    _frameRevisionCircle = new Circle
-                    {
-                        Center = insertionPoint,
-                        Radius = radius
-                    };
-                }
-                else
-                {
-                    _frameRevisionCircle = null;
-                    var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-
-                    var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
-                        insertionPoint,
-                        radius,
-                        RevisionCloudArcLength * scale);
-
-                    cloudArcPoints.Add(insertionPoint.ToPoint2d() + (Vector2d.XAxis * radius));
-
-                    _frameRevisionPolyline = new Polyline(cloudArcPoints.Count);
-
-                    for (int i = 0; i < cloudArcPoints.Count; i++)
-                    {
-                        _frameRevisionPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
-                    }
-                }
-            }
-            catch
-            {
-                _frameRevisionCircle = null;
-                _frameRevisionPolyline = null;
-            }
-        }
-        else
-        {
-            CornerRadiusVisibilityDependency = true;
-            _frameRevisionCircle = null;
-
-            var width = Math.Abs(endPoint.X - insertionPoint.X);
-            var height = Math.Abs(endPoint.Y - insertionPoint.Y);
-            if (width == 0)
-            {
-                width = MinDistanceBetweenPoints * scale;
-            }
-
-            if (height == 0)
-            {
-                height = MinDistanceBetweenPoints * scale;
-            }
-
-            var cornerRadius = CornerRadius * scale;
-
-            if (((width * 2) - (cornerRadius * 2)) < (1 * scale) ||
-                ((height * 2) - (cornerRadius * 2)) < (1 * scale))
-            {
-                var minSize = Math.Min(width * 2, height * 2);
-                cornerRadius = (int)((minSize - (1 * scale)) / 2);
-            }
-
-            var points = new[]
-            {
-                new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y - height),
-                new Point2d(insertionPoint.X - width, insertionPoint.Y - height + cornerRadius),
-                new Point2d(insertionPoint.X - width, insertionPoint.Y + height - cornerRadius),
-                new Point2d(insertionPoint.X - width + cornerRadius, insertionPoint.Y + height),
-                new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y + height),
-                new Point2d(insertionPoint.X + width, insertionPoint.Y + height - cornerRadius),
-                new Point2d(insertionPoint.X + width, insertionPoint.Y - height + cornerRadius),
-                new Point2d(insertionPoint.X + width - cornerRadius, insertionPoint.Y - height)
-            };
-
-            var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-
-            if (!IsRevisionCloud)
-            {
-                var bulges = new[]
-                {
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0,
-                    -bevelBulge,
-                    0.0
-                };
-
-                _frameRevisionPolyline = new Polyline(points.Length);
-
-                for (var i = 0; i < points.Length; i++)
-                {
-                    _frameRevisionPolyline.AddVertexAt(i, points[i], bulges[i], 0.0, 0.0);
-                }
-
-                _frameRevisionPolyline.Closed = true;
-            }
-            else
-            {
-                _frameRevisionPolyline = null;
-                var arcFramePoints = new List<Point2d>();
-
-                for (int i = 0; i < points.Length - 1; i++)
-                {
-                    var segmentStartPoint = points[i];
-                    var segmentEndPoint = points[i + 1];
-
-                    arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
-                        segmentStartPoint,
-                        segmentEndPoint,
-                        RevisionCloudArcLength * scale));
-                }
-
-                arcFramePoints.AddRange(RevisionCloud.GetArcPointsOfSegment(
-                    arcFramePoints.Last(),
-                    arcFramePoints.First(),
-                    RevisionCloudArcLength * scale));
-
-                var arcFramePointsDistinct = arcFramePoints.Skip(1).Distinct();
-
-                arcFramePoints = Enumerable.Repeat(arcFramePoints[0], 1)
-                    .Concat(arcFramePointsDistinct).ToList();
-
-                var correctFramePoints = new List<Point2d>();
-                var isContinue = false;
-
-                for (int i = 0; i < arcFramePoints.Count - 1; i++)
-                {
-                    if (isContinue)
-                    {
-                        isContinue = false;
-                        continue;
-                    }
-
-                    var currentPoint = arcFramePoints[i];
-                    var nextPoint = arcFramePoints[i + 1];
-
-                    var distance = currentPoint.GetDistanceTo(nextPoint);
-
-                    if (distance < 2 * RevisionCloudArcLength)
-                    {
-                        var middlePoint = GeometryUtils.GetMiddlePoint2d(currentPoint, nextPoint);
-                        correctFramePoints.Add(middlePoint);
-                        isContinue = true;
-                    }
-                    else
-                    {
-                        correctFramePoints.Add(arcFramePoints[i]);
-                        isContinue = true;
-                    }
-                }
-
-                correctFramePoints.Add(correctFramePoints[0]);
-
-                _frameRevisionPolyline = new Polyline(correctFramePoints.Count);
-
-                for (int i = 0; i < correctFramePoints.Count; i++)
-                {
-                    _frameRevisionPolyline.AddVertexAt(i, correctFramePoints[i], -bevelBulge, 0, 0);
-                }
-            }
-        }
-    }
-
-    private void CreateEntities(Point3d insertionPoint, Point3d leaderPoint, double scale)
-    {
-        var leaderLine = new Line(insertionPoint, leaderPoint);
-        var pts = new Point3dCollection();
-
-        if (FrameType == FrameType.Round && !IsRevisionCloud)
-        {
-            _frameRevisionCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-        }
-        else
-        {
-            _frameRevisionPolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-        }
-
-        _leaderLine = pts.Count > 0 ? new Line(pts[0], leaderPoint) : leaderLine;
-
-        SetNodeNumberOnCreation();
-
-        var revisionTextHeight = RevisionTextHeight * scale;
-        var noteTextHeight = NoteTextHeight * scale;
-        var revisionTextIndent = RevisionTextIndent * scale;
-        var noteTextIndent = NoteTextIndent * scale;
-        var textVerticalOffset = TextVerticalOffset * scale;
+        var revisionTextHeight = RevisionTextHeight * _scale;
+        var noteTextHeight = NoteTextHeight * _scale;
+        var revisionTextIndent = RevisionTextIndent * _scale;
+        var noteTextIndent = NoteTextIndent * _scale;
+        var textVerticalOffset = TextVerticalOffset * _scale;
         var isRight = MarkPosition == MarkPosition.Right;
 
         var revisionTextLength = 0.0;
@@ -562,7 +349,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             _revisionDbText = new DBText { TextString = RevisionNumber };
             _revisionDbText.SetProperties(TextStyle, revisionTextHeight);
-            _revisionDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            _revisionDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid,
+                AttachmentPoint.MiddleCenter);
             revisionTextLength = _revisionDbText.GetLength();
         }
         else
@@ -574,7 +362,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         {
             _noteDbText = new DBText { TextString = $"{Note}" };
             _noteDbText.SetProperties(TextStyle, noteTextHeight);
-            _noteDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
+            _noteDbText.SetPosition(TextHorizontalMode.TextCenter, TextVerticalMode.TextVerticalMid,
+                AttachmentPoint.MiddleCenter);
             noteTextLength = _noteDbText.GetLength();
         }
         else
@@ -594,9 +383,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         if (isRight)
         {
             revisionTextPosition = new Point3d(
-                    leaderPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
-                    leaderPoint.Y + (fullHeight / 2),
-                    0);
+                insertionPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
+                insertionPoint.Y + (fullHeight / 2),
+                0);
 
             if (_revisionDbText != null)
             {
@@ -607,7 +396,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             if (_noteDbText != null)
             {
                 noteTextosition = new Point3d(
-                    leaderPoint.X + (fullNoteTextLength / 2),
+                    insertionPoint.X + (fullNoteTextLength / 2),
                     revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
                     0);
 
@@ -620,15 +409,15 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             if (_noteDbText != null)
             {
                 revisionTextPosition = new Point3d(
-                    leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
-                    leaderPoint.Y + (fullHeight / 2), 
+                    insertionPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
+                    insertionPoint.Y + (fullHeight / 2),
                     0);
             }
             else
             {
                 revisionTextPosition = new Point3d(
-                    leaderPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
-                    leaderPoint.Y + (fullHeight / 2), 
+                    insertionPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
+                    insertionPoint.Y + (fullHeight / 2),
                     0);
             }
 
@@ -641,8 +430,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             if (_noteDbText != null)
             {
                 noteTextosition = new Point3d(
-                    leaderPoint.X - (fullNoteTextLength / 2), 
-                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2), 
+                    insertionPoint.X - (fullNoteTextLength / 2),
+                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
                     0);
 
                 _noteDbText.Position = noteTextosition;
@@ -650,11 +439,16 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             }
         }
 
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => before MirrorIfNeed()");
+
         MirrorIfNeed(new[] { _revisionDbText, _noteDbText });
+
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => after MirrorIfNeed()");
 
         if (HideTextBackground)
         {
-            var offset = TextMaskOffset * scale;
+            var offset = TextMaskOffset * _scale;
             _revisionTextMask = _revisionDbText.GetBackgroundMask(offset, revisionTextPosition);
             _noteTextMask = _noteDbText.GetBackgroundMask(offset, noteTextosition);
         }
@@ -665,32 +459,37 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         Point2d rightTopPoint;
         Point2d leftTopPoint;
 
+        Vector2d toleftBottomPoint;
+
+
         if (isRight)
         {
-            leftBottomPoint = leaderPoint.ToPoint2d() + (Vector2d.XAxis * fullNoteTextLength);
+            leftBottomPoint = insertionPoint.ToPoint2d() + (Vector2d.XAxis * fullNoteTextLength);
             rightBottomPoint = leftBottomPoint + (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
             rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
             leftTopPoint = (leftBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
 
-            _noteShelfLine = new Line(leaderPoint, leftBottomPoint.ToPoint3d());
+            _noteShelfLine = new Line(insertionPoint, leftBottomPoint.ToPoint3d());
         }
         else
         {
             if (_noteDbText != null)
             {
-                rightBottomPoint = leaderPoint.ToPoint2d() - (Vector2d.XAxis * (fullNoteTextLength + diffXaxis));
+                rightBottomPoint = insertionPoint.ToPoint2d() - (Vector2d.XAxis * (fullNoteTextLength + diffXaxis));
             }
             else
             {
-                rightBottomPoint = leaderPoint.ToPoint2d() - (Vector2d.XAxis * fullNoteTextLength);
+                rightBottomPoint = insertionPoint.ToPoint2d() - (Vector2d.XAxis * fullNoteTextLength);
             }
 
             rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
             leftTopPoint = rightTopPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
             leftBottomPoint = rightBottomPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
 
-            _noteShelfLine = new Line(leaderPoint, rightBottomPoint.ToPoint3d());
+            _noteShelfLine = new Line(insertionPoint, rightBottomPoint.ToPoint3d());
         }
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 490");
 
         polylineRevisionFrame.AddVertexAt(0, leftBottomPoint, 0, 0, 0);
         polylineRevisionFrame.AddVertexAt(1, rightBottomPoint, 0, 0, 0);
@@ -698,14 +497,28 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         polylineRevisionFrame.AddVertexAt(3, leftTopPoint, 0, 0, 0);
         polylineRevisionFrame.Closed = true;
 
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 498");
+
         _frameRevisionText = polylineRevisionFrame;
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 502");
+
+        FrameRevisionTextPoints.Add( leftBottomPoint.ToPoint3d());
+        FrameRevisionTextPoints.Add(rightTopPoint.ToPoint3d());
+        FrameRevisionTextPoints.Add(rightTopPoint.ToPoint3d());
+        FrameRevisionTextPoints.Add(leftTopPoint.ToPoint3d());
+
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => END");
     }
 
-    private void SetNodeNumberOnCreation()
+    private void SetRevisionNumberOnCreation()
     {
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: SetRevisionNumberOnCreation");
+
         if (!IsValueCreated)
             return;
 
         RevisionNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastRevisionNumber, ref _cachedRevisionNumber);
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: SetRevisionNumberOnCreation => END");
     }
 }
