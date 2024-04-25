@@ -45,13 +45,23 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
         };
         */
 
+        var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
+
         AcadUtils.WriteMessageInDebug($"Перед прочтением RevisionMark.FrameRevisionTextPoints в _points в конструкторе  RevisionMarkAddLeaderGrip ");
         _points = new[]
         {
-            RevisionMark.FrameRevisionTextPoints[0].ToPoint2d(),
-            RevisionMark.FrameRevisionTextPoints[1].ToPoint2d(),
-            RevisionMark.FrameRevisionTextPoints[2].ToPoint2d(),
-            RevisionMark.FrameRevisionTextPoints[3].ToPoint2d(),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[0].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[0].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[1].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[1].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[2].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[2].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[4].Y),
         };
 
         AcadUtils.WriteMessageInDebug($"RevisionMark.FrameRevisionTextPoints прочитан в _points в конструкторе  RevisionMarkAddLeaderGrip :" +

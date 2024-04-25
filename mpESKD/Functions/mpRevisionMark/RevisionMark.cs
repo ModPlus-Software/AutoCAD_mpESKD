@@ -306,7 +306,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         catch (Exception exception)
         {
             AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities => ERROR(!)");
-            ExceptionBox.Show(exception);
+           // ExceptionBox.Show(exception);
         }
 
         AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities => END");
@@ -377,62 +377,32 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         var fullHeight = revisionTextHeight + (textVerticalOffset * 2);
         var diffXaxis = fullHeight / Math.Tan(60.DegreeToRadian());
 
-        Point3d revisionTextPosition;
         var noteTextosition = default(Point3d);
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 381");
 
-        if (isRight)
+        if (_revisionDbText != null)
         {
-            revisionTextPosition = new Point3d(
-                insertionPoint.X + (fullRevisionTextLength / 2) + fullNoteTextLength + diffXaxis,
-                insertionPoint.Y + (fullHeight / 2),
-                0);
+            AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 385");
+            _revisionDbText.Position = insertionPoint;
+            _revisionDbText.AlignmentPoint = insertionPoint;
 
-            if (_revisionDbText != null)
-            {
-                _revisionDbText.Position = revisionTextPosition;
-                _revisionDbText.AlignmentPoint = revisionTextPosition;
-            }
 
             if (_noteDbText != null)
             {
-                noteTextosition = new Point3d(
-                    insertionPoint.X + (fullNoteTextLength / 2),
-                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
-                    0);
-
-                _noteDbText.Position = noteTextosition;
-                _noteDbText.AlignmentPoint = noteTextosition;
-            }
-        }
-        else
-        {
-            if (_noteDbText != null)
-            {
-                revisionTextPosition = new Point3d(
-                    insertionPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength - diffXaxis,
-                    insertionPoint.Y + (fullHeight / 2),
-                    0);
-            }
-            else
-            {
-                revisionTextPosition = new Point3d(
-                    insertionPoint.X - (fullRevisionTextLength / 2) - fullNoteTextLength,
-                    insertionPoint.Y + (fullHeight / 2),
-                    0);
-            }
-
-            if (_revisionDbText != null)
-            {
-                _revisionDbText.Position = revisionTextPosition;
-                _revisionDbText.AlignmentPoint = revisionTextPosition;
-            }
-
-            if (_noteDbText != null)
-            {
-                noteTextosition = new Point3d(
-                    insertionPoint.X - (fullNoteTextLength / 2),
-                    revisionTextPosition.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
-                    0);
+                if (isRight)
+                {
+                    noteTextosition = new Point3d(
+                        insertionPoint.X + (fullRevisionTextLength / 2) + diffXaxis + (fullNoteTextLength / 2),
+                        insertionPoint.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
+                        0);
+                }
+                else
+                {
+                    noteTextosition = new Point3d(
+                        insertionPoint.X + (fullRevisionTextLength / 2) - diffXaxis - (fullNoteTextLength / 2),
+                        insertionPoint.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
+                        0);
+                }
 
                 _noteDbText.Position = noteTextosition;
                 _noteDbText.AlignmentPoint = noteTextosition;
@@ -443,53 +413,48 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         MirrorIfNeed(new[] { _revisionDbText, _noteDbText });
 
-
         AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => after MirrorIfNeed()");
 
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * _scale;
-            _revisionTextMask = _revisionDbText.GetBackgroundMask(offset, revisionTextPosition);
+            _revisionTextMask = _revisionDbText.GetBackgroundMask(offset, insertionPoint);
             _noteTextMask = _noteDbText.GetBackgroundMask(offset, noteTextosition);
         }
 
         var polylineRevisionFrame = new Polyline();
-        Point2d leftBottomPoint;
-        Point2d rightBottomPoint;
-        Point2d rightTopPoint;
-        Point2d leftTopPoint;
 
-        Vector2d toleftBottomPoint;
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 436");
+
+        var toLeftBottomPoint = -(Vector2d.XAxis * ( (fullRevisionTextLength / 2) + diffXaxis) ) - (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
+        var toRightBottomPoint = Vector2d.XAxis * (fullRevisionTextLength / 2) - (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
+        var toRightTopPoint = Vector2d.XAxis * ((fullRevisionTextLength / 2) + diffXaxis) + (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
+        var toLeftTopPoint = -(Vector2d.XAxis * (fullRevisionTextLength / 2)) + (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
+        
+        FrameRevisionTextPoints.AddRange(new List<Point3d>
+        {
+           (new Point2d(0,0) + toLeftBottomPoint).ToPoint3d(),
+           (new Point2d(0, 0) + toRightBottomPoint).ToPoint3d(),
+           (new Point2d(0, 0) + toRightTopPoint).ToPoint3d(),
+           (new Point2d(0, 0) + toLeftTopPoint).ToPoint3d(),
+        });
+
+        var leftBottomPoint = insertionPoint.ToPoint2d() + toLeftBottomPoint;
+        var rightBottomPoint = insertionPoint.ToPoint2d() + toRightBottomPoint;
+        var rightTopPoint = insertionPoint.ToPoint2d() + toRightTopPoint;
+        var leftTopPoint = insertionPoint.ToPoint2d() + toLeftTopPoint;
 
 
         if (isRight)
         {
-            leftBottomPoint = insertionPoint.ToPoint2d() + (Vector2d.XAxis * fullNoteTextLength);
-            rightBottomPoint = leftBottomPoint + (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
-            rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
-            leftTopPoint = (leftBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
-
-            _noteShelfLine = new Line(insertionPoint, leftBottomPoint.ToPoint3d());
+            _noteShelfLine = new Line(rightBottomPoint.ToPoint3d(), rightBottomPoint.ToPoint3d() + (Vector3d.XAxis * fullNoteTextLength));
         }
         else
         {
-            if (_noteDbText != null)
-            {
-                rightBottomPoint = insertionPoint.ToPoint2d() - (Vector2d.XAxis * (fullNoteTextLength + diffXaxis));
-            }
-            else
-            {
-                rightBottomPoint = insertionPoint.ToPoint2d() - (Vector2d.XAxis * fullNoteTextLength);
-            }
-
-            rightTopPoint = (rightBottomPoint + (Vector2d.XAxis * diffXaxis)) + (Vector2d.YAxis * fullHeight);
-            leftTopPoint = rightTopPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
-            leftBottomPoint = rightBottomPoint - (Vector2d.XAxis * (fullRevisionTextLength + diffXaxis));
-
-            _noteShelfLine = new Line(insertionPoint, rightBottomPoint.ToPoint3d());
+            _noteShelfLine = new Line(leftBottomPoint.ToPoint3d(), leftBottomPoint.ToPoint3d() - (Vector3d.XAxis * fullNoteTextLength));
         }
 
-        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 490");
+        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 459");
 
         polylineRevisionFrame.AddVertexAt(0, leftBottomPoint, 0, 0, 0);
         polylineRevisionFrame.AddVertexAt(1, rightBottomPoint, 0, 0, 0);
@@ -503,10 +468,11 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => 502");
 
-        FrameRevisionTextPoints.Add( leftBottomPoint.ToPoint3d());
-        FrameRevisionTextPoints.Add(rightTopPoint.ToPoint3d());
-        FrameRevisionTextPoints.Add(rightTopPoint.ToPoint3d());
-        FrameRevisionTextPoints.Add(leftTopPoint.ToPoint3d());
+        /*
+        FrameRevisionTextPoints.Add((new Point2d(default) + toLeftBottomPoint).ToPoint3d());
+        FrameRevisionTextPoints.Add((new Point2d(default) + toRightBottomPoint).ToPoint3d());
+        FrameRevisionTextPoints.Add((new Point2d(default) + toRightTopPoint).ToPoint3d());
+        FrameRevisionTextPoints.Add((new Point2d(default) + toLeftTopPoint).ToPoint3d());*/
 
         AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => END");
     }

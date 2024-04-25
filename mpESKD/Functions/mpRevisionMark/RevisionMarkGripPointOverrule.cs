@@ -49,9 +49,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                 var revisionMark = EntityReaderService.Instance.GetFromEntity<RevisionMark>(entity);
                 if (revisionMark != null)
                 {
-                    var frameCenterPoint = GeometryUtils.GetMiddlePoint3d(
-                        revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[2]);
-
                     // insertion (start) grip
                     var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
