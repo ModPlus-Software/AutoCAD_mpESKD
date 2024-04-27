@@ -26,28 +26,8 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
         GripType = GripType.Plus;
         RubberBandLineDisabled = true;
 
-        // todo Тест
-        /*
-        var borderHalfLength = RevisionMark.BorderWidth / 2 * RevisionMark.GetScale();
-        var borderHalfHeight = RevisionMark.BorderHeight / 2 * RevisionMark.GetScale();
-        var borderHalfLength = 30;
-        var borderHalfHeight = 30;
-
-
-
-
-        _points = new[]
-        {
-            new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight), // слева внизу
-            new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight), // справа внизу
-            new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight), // справа вверху
-            new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight)  // слева вверху
-        };
-        */
-
         var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
 
-        // AcadUtils.WriteMessageInDebug($"Перед прочтением RevisionMark.FrameRevisionTextPoints в _points в конструкторе  RevisionMarkAddLeaderGrip ");
         _points = new[]
         {
             new Point2d(
@@ -63,13 +43,6 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
                 insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
         };
-
-        // AcadUtils.WriteMessageInDebug($"RevisionMark.FrameRevisionTextPoints прочитан в _points в конструкторе  RevisionMarkAddLeaderGrip :" +
-                                      //$"points[0]: {_points[0].X}, {_points[0].Y}"+
-                                      //$"points[1]: {_points[1].X}, {_points[1].Y}"+
-                                      //$"points[2]: {_points[2].X}, {_points[2].Y}"+
-                                      //$"points[3]: {_points[3].X}, {_points[3].Y}");
-
     }
 
     /// <summary>
@@ -107,9 +80,8 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 RevisionMark.LeaderPoints.Add(NewPoint);
                 
                 // todo
-                /*
+                
                 RevisionMark.RevisionFrameTypes.Add(0);
-                */
 
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();

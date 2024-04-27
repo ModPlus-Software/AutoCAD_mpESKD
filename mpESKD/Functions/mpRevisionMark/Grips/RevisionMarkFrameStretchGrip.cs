@@ -12,22 +12,23 @@ using System.Linq;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
+public class RevisionMarkFrameStretchGrip : SmartEntityGripData
 {
     private readonly Point2d[] _points;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RevisionMarkLeaderMoveGrip"/> class.
+    /// Initializes a new instance of the <see cref="RevisionMarkFrameStretchGrip"/> class.
     /// </summary>
     /// <param name="revisionMark">Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public RevisionMarkLeaderMoveGrip(RevisionMark revisionMark, int gripIndex)
+    public RevisionMarkFrameStretchGrip(RevisionMark revisionMark, int gripIndex)
     {
         RevisionMark = revisionMark;
         GripIndex = gripIndex;
         GripType = GripType.Point;
         RubberBandLineDisabled = true;
 
+        /*
         var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
         _points = new[]
         {
@@ -43,7 +44,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
             new Point2d(
                 insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
                 insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
-        };
+        };*/
     }
 
     /// <summary>
@@ -64,7 +65,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp2"); // move
+        return Language.GetItem("gp1"); // stretch
     }
 
     /// <inheritdoc />
@@ -114,6 +115,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
     {
         try
         {
+            /*
             Line line;
             if (string.IsNullOrEmpty(RevisionMark.Note))
             {
@@ -136,7 +138,10 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
                 {
                     ColorIndex = 150
                 };
+
             }
+            */
+
 
             pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
         }

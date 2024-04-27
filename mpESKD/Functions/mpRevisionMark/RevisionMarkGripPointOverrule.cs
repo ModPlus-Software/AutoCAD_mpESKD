@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpRevisionMark;
+﻿using System.Linq;
+
+namespace mpESKD.Functions.mpRevisionMark;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -8,8 +10,6 @@ using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
 using mpESKD.Base.Utils;
-using mpESKD.Functions.mpNodalLeader.Grips;
-using mpESKD.Functions.mpNodalLeader;
 
 /// <inheritdoc />
 public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<RevisionMark>
@@ -23,8 +23,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
         Vector3d curViewDir, 
         GetGripPointsFlags bitFlags)
     {
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: GetGripPoints");
-
         try
         {
             if (IsApplicable(entity))
@@ -58,7 +56,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     };
                     grips.Add(vertexGrip);
 
-
                     Point3d addLeaderGripPosition;
                     if (!string.IsNullOrEmpty(revisionMark.Note))
                     {
@@ -81,7 +78,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                         GripPoint = addLeaderGripPosition
                     });
 
-
                     if (!string.IsNullOrEmpty(revisionMark.Note))
                     {
                         var bottomLineFrameCenter = GeometryUtils.GetMiddlePoint3d(revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[1]);
@@ -99,18 +95,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                         });
                     }
 
-                    // todo RevisionMarkGripPointOverrule: Тест 2
-                    // получаем ручку типа рамки
-                    /*
-                    grips.Add(new RevisionMarkFrameTypeGrip(revisionMark)
-                    {
-                        GripPoint = new Point3d(
-                            revisionMark.InsertionPoint.X + (revisionMark.BorderWidth / 2 * revisionMark.GetFullScale()),
-                            revisionMark.InsertionPoint.Y - (revisionMark.BorderHeight / 2 * revisionMark.GetFullScale()),
-                            revisionMark.InsertionPoint.Z)
-                    });
-                    */
-
                     for (var i = 0; i < revisionMark.LeaderPoints.Count; i++)
                     {
                         // ручки переноса выносок
@@ -119,26 +103,43 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             GripPoint = revisionMark.LeaderPoints[i]
                         });
 
-                        var deleteGripPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
-
                         // ручки удаления выносок
+                        var deleteGripPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
                         grips.Add(new RevisionMarkLeaderRemoveGrip(revisionMark, i)
                         {
                             GripPoint = deleteGripPoint
                         });
 
-                        // Ручки 
-
+                        // ручки типа рамки у выноски
                         var leaderEndTypeGripPoint = revisionMark.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
-
-                        // todo RevisionMarkGripPointOverrule: Тест 3
-                        // ручки выбора типа выносок
-                        /*
-                        grips.Add(new RevisionMarkLeaderEndTypeGrip(revisionMark, i)
+                        grips.Add(new RevisionMarkFrameTypeGrip(revisionMark, i)
                         {
                             GripPoint = leaderEndTypeGripPoint
                         });
-                        */
+
+                        // ручки размера рамки у выноски
+                        Point3d frameStretchPoint;
+                        /*
+                        if (revisionMark.RevisionFrameStretchPoints[i].Equals())
+                        {
+                            frameStretchPoint = revisionMark.LeaderPoints[i] - 
+                                                ((Vector3d.XAxis * revisionMark.RevisionFrameSize[i]  * curViewUnitSize));
+                        }
+                        else
+                        {
+                            frameStretchPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
+                        }*/
+
+                        // Если нет рамки (), то ручка не создается
+                        // if (!revisionMark.RevisionFrameStretchPoints[i].Equals(revisionMark.LeaderPoints[i]))
+                        {
+                            frameStretchPoint = revisionMark.RevisionFrameStretchPoints[i];
+
+                            grips.Add(new RevisionMarkFrameStretchGrip(revisionMark, i)
+                            {
+                                GripPoint = frameStretchPoint
+                            });
+                        }
                     }
                 }
             }

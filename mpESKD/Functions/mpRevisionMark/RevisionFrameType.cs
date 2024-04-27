@@ -14,15 +14,16 @@ public enum RevisionFrameType
     None = 0,
 
     /// <summary>
-    /// Прямоугольная
-    /// </summary>
-    [EnumPropertyDisplayValueKey("ft2")]
-    Rectangular = 1,
-
-    /// <summary>
     /// Круглая
     /// </summary>
     [EnumPropertyDisplayValueKey("ft1")]
-    Round = 2,
+    Round = 1,
+
+    /// <summary>
+    /// Прямоугольная
+    /// </summary>
+    [EnumPropertyDisplayValueKey("ft2")]
+    Rectangular = 2,
+
 
 }

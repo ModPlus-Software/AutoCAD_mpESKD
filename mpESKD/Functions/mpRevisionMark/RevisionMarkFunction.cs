@@ -103,6 +103,7 @@ public class RevisionMarkFunction : ISmartEntityFunction
         }
         catch (System.Exception exception)
         {
+            // todo
             AcadUtils.WriteMessageInDebug("ERROR: class: RevisionMarkFunction; metod: CreateRevisionMark");
             // ExceptionBox.Show(exception);
         }

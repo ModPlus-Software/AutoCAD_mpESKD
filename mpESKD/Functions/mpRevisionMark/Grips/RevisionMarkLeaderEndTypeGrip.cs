@@ -6,6 +6,7 @@ using Base.Overrules;
 using Base.Overrules.Grips;
 using Base.Utils;
 using ModPlusAPI;
+using mpESKD.Functions.mpLevelPlanMark;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,16 +14,16 @@ using System.Windows.Controls;
 /// <summary>
 /// Ручка вершин
 /// </summary>
-public class RevisionMarkLeaderEndTypeGrip : SmartEntityGripData
+public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 {
     private ContextMenuHost _win;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RevisionMarkVertexGrip"/> class.
+    /// Initializes a new instance of the <see cref="RevisionMarkFrameTypeGrip"/> class.
     /// </summary>
     /// <param name="revisionMark">Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/></param>
     /// <param name="gripIndex">Индекс ручки</param>
-    public RevisionMarkLeaderEndTypeGrip(RevisionMark revisionMark, int gripIndex)
+    public RevisionMarkFrameTypeGrip(RevisionMark revisionMark, int gripIndex)
     {
         RevisionMark = revisionMark;
         GripIndex = gripIndex;
@@ -42,7 +43,7 @@ public class RevisionMarkLeaderEndTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp7"); // Тип рамки ревизии для выноски
+        return Language.GetItem("gp7"); // todo Тип рамки ревизии для выноски
     }
 
     /// <inheritdoc />
@@ -58,32 +59,51 @@ public class RevisionMarkLeaderEndTypeGrip : SmartEntityGripData
             {
                 cm = (ContextMenu)_win.FindResource("Cm");
 
-                var menuItem = new MenuItem
+                var frameIndex = RevisionMark.RevisionFrameTypes[GripIndex];
+                
                 {
-                    Name = "Round",
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft1"), // Круглая 
-                    // todo Тест
-                    //IsChecked = RevisionMark.FrameType == FrameType.Round
-                    IsChecked = 
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                    var menuItem = new MenuItem
+                    {
+                        Name = "None",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft4"), // Нет 
+                        IsChecked = frameIndex == (int)RevisionFrameType.None,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
 
-                menuItem = new MenuItem
                 {
-                    Name = "Rectangular",
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft2"), // Прямоугольная 
-                    IsChecked = RevisionMark.FrameType == FrameType.Rectangular
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                    var menuItem = new MenuItem
+                    {
+                        Name = "Round",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft1"), // Круглая 
+                        IsChecked = frameIndex == (int)RevisionFrameType.Round,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
+
+                {
+                    var menuItem = new MenuItem
+                    {
+                        Name = "Rectangular",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft2"), // Прямоугольная 
+                        IsChecked = frameIndex == (int)RevisionFrameType.Rectangular,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
+
                 cm.MouseMove += (_, _) => _win.Close();
                 cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
 
                 cm.IsOpen = true;
             };
+
+            _win.Show();
         }
 
         return ReturnValue.GetNewGripPoints;
@@ -95,7 +115,12 @@ public class RevisionMarkLeaderEndTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+        // RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+
+        RevisionMark.RevisionFrameTypes[GripIndex] =
+            (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
+
+
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();

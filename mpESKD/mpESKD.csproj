@@ -50,7 +50,6 @@
     <Compile Remove="Functions\mpRevisionMark\Grips\GripName.cs" />
     <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkFrameTypeGrip.cs" />
     <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkGrip.cs" />
-    <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkLeaderEndTypeGrip.cs" />
     <Compile Remove="Functions\mpRevisionMark\RevisionMarkJigState.cs" />
   </ItemGroup>
 
