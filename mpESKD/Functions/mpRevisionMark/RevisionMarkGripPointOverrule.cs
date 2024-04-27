@@ -23,7 +23,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
         Vector3d curViewDir, 
         GetGripPointsFlags bitFlags)
     {
-        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: GetGripPoints");
+        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: GetGripPoints");
 
         try
         {
@@ -118,6 +118,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                         {
                             GripPoint = revisionMark.LeaderPoints[i]
                         });
+
                         var deleteGripPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
 
                         // ручки удаления выносок
@@ -162,7 +163,7 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                 {
                     if (gripData is RevisionMarkVertexGrip vertexGrip)
                     {
-                        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: MoveGripPointsAt");
+                        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: MoveGripPointsAt");
 
                         var revisionMark = vertexGrip.RevisionMark;
 

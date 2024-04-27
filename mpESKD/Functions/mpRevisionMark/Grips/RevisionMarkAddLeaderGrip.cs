@@ -47,7 +47,7 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
 
         var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
 
-        AcadUtils.WriteMessageInDebug($"Перед прочтением RevisionMark.FrameRevisionTextPoints в _points в конструкторе  RevisionMarkAddLeaderGrip ");
+        // AcadUtils.WriteMessageInDebug($"Перед прочтением RevisionMark.FrameRevisionTextPoints в _points в конструкторе  RevisionMarkAddLeaderGrip ");
         _points = new[]
         {
             new Point2d(
@@ -64,11 +64,11 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
         };
 
-        AcadUtils.WriteMessageInDebug($"RevisionMark.FrameRevisionTextPoints прочитан в _points в конструкторе  RevisionMarkAddLeaderGrip :" +
-                                      $"points[0]: {_points[0].X}, {_points[0].Y}"+
-                                      $"points[1]: {_points[1].X}, {_points[1].Y}"+
-                                      $"points[2]: {_points[2].X}, {_points[2].Y}"+
-                                      $"points[3]: {_points[3].X}, {_points[3].Y}");
+        // AcadUtils.WriteMessageInDebug($"RevisionMark.FrameRevisionTextPoints прочитан в _points в конструкторе  RevisionMarkAddLeaderGrip :" +
+                                      //$"points[0]: {_points[0].X}, {_points[0].Y}"+
+                                      //$"points[1]: {_points[1].X}, {_points[1].Y}"+
+                                      //$"points[2]: {_points[2].X}, {_points[2].Y}"+
+                                      //$"points[3]: {_points[3].X}, {_points[3].Y}");
 
     }
 
@@ -140,14 +140,30 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
     {
         try
         {
-            var nearestPoint = _points.OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
-
-            AcadUtils.WriteMessageInDebug($"");
-
-            var line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
+            Line line;
+            if (string.IsNullOrEmpty(RevisionMark.Note))
             {
-                ColorIndex = 150
-            };
+                var nearestPoint = _points
+                    .OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
+
+                line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
+                {
+                    ColorIndex = 150
+                };
+            }
+            else
+            {
+                var startPoint = new Point3d(
+                    RevisionMark.InsertionPoint.X + RevisionMark.NoteShelfLinePoints[1].X,
+                    RevisionMark.InsertionPoint.Y + RevisionMark.NoteShelfLinePoints[1].Y,
+                    RevisionMark.InsertionPoint.Z);
+
+                line = new Line(startPoint, pointMonitorEventArgs.Context.ComputedPoint)
+                {
+                    ColorIndex = 150
+                };
+            }
+
             pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
         }
         catch

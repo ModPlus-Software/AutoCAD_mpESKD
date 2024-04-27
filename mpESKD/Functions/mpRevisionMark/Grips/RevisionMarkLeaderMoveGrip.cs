@@ -38,12 +38,30 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
 
 
 
+        //_points = new[]
+        //{
+        //    new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight),
+        //    new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight),
+        //    new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight),
+        //    new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight)
+        //};
+
+        var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
+
         _points = new[]
         {
-            new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight),
-            new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y - borderHalfHeight),
-            new Point2d(RevisionMark.InsertionPoint.X + borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight),
-            new Point2d(RevisionMark.InsertionPoint.X - borderHalfLength, RevisionMark.InsertionPoint.Y + borderHalfHeight)
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[0].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[0].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[1].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[1].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[2].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[2].Y),
+            new Point2d(
+                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
         };
     }
 
