@@ -141,7 +141,8 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
 
             }
             */
-            
+
+            /*
             var circle = new Circle(
                 RevisionMark.LeaderPoints[GripIndex],
                 Vector3d.XAxis,
@@ -149,9 +150,14 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
                     .DistanceTo(pointMonitorEventArgs.Context.ComputedPoint))
             {
                 ColorIndex= 150
-            };
+            };*/
 
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(circle);
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(
+                new Circle(
+                    RevisionMark.LeaderPoints[GripIndex],
+                    Vector3d.XAxis, 
+                    pointMonitorEventArgs.Context.ComputedPoint
+                        .DistanceTo(RevisionMark.LeaderPoints[GripIndex])));
         }
         catch
         {

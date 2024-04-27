@@ -107,14 +107,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [SaveToXData]
     public List<int> RevisionFrameTypes { get; set; } = new ();
 
-    /*
-    /// <summary>
-    /// Точки для указания расположения рамки каждой выноски
-    /// </summary>
-    [SaveToXData]
-    public List<Point3d> RevisionFramePositionPoints { get; set; } = new();
-    */
-
     /// <summary>
     /// Точки растягивания рамки каждой выноски
     /// </summary>
@@ -172,17 +164,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [PropertyVisibilityDependency(new[] { nameof(CornerRadius) })]
     [SaveToXData]
     public bool CornerRadiusVisibilityDependency { get;  set; }
-
-    // todo
-    /*
-    /// <summary>
-    /// Тип рамки
-    /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 1, "p82", RevisionFrameType.Rectangular)]
-    [SaveToXData]
-    public RevisionFrameType RevisionFrameType { get; set; } = RevisionFrameType.Rectangular;
-    */
-
 
     /// <summary>
     /// Радиус скругления углов прямоугольной рамки
@@ -493,14 +474,11 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             this.CreateRevisionFrame(
                 LeaderPointsOCS[i],
-                //LeaderPointsOCS[i] - Vector3d.XAxis*30 - Vector3d.YAxis *30,
-                //LeaderPointsOCS[i] + Vector3d.XAxis * RevisionFrameSize[i],
                 RevisionFrameStretchPoints[i],
                 frameType,
                 this._revisionFramesAsPolylines,
                 this._revisionFramesAsCircles,
-                this._scale
-                );
+                this._scale);
         }
     }
 
@@ -510,11 +488,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         var line = new Line(nearestPoint.ToPoint3d(), point);
 
         return line;
-    }
-
-    private void CreateRevisionFrame()
-    {
-
     }
 
     private void SetRevisionNumberOnCreation()

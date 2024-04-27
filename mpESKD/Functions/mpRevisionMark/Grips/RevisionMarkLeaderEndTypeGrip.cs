@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpRevisionMark.Grips;
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace mpESKD.Functions.mpRevisionMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Enums;
@@ -43,7 +45,7 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        return Language.GetItem("gp7"); // todo Тип рамки ревизии для выноски
+        return Language.GetItem("p82"); // todo Тип рамки ревизии для выноски
     }
 
     /// <inheritdoc />
@@ -117,14 +119,24 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 
         // RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
 
-        var selectedItenNumber = (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
+        var selectedItemNumber = (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
 
-        RevisionMark.RevisionFrameTypes[GripIndex] = selectedItenNumber;
+        RevisionMark.RevisionFrameTypes[GripIndex] = selectedItemNumber;
 
-        //if (selectedItenNumber == 0)
-        //{
-        //    RevisionMark.RevisionFrameStretchPoints[GripIndex] = RevisionMark.LeaderPoints[GripIndex];
-        //}
+        /*
+        if (selectedItemNumber != 0)
+        {
+            var stretchPoint = RevisionMark.RevisionFrameStretchPoints[GripIndex];
+            var leaderPoint = RevisionMark.LeaderPoints[GripIndex];
+            if (stretchPoint.Equals(leaderPoint))
+            {
+                RevisionMark.RevisionFrameStretchPoints[GripIndex] = leaderPoint + Vector3d.XAxis * 20;
+            }
+        }
+        */
+
+        RevisionMark.RevisionFrameStretchPoints[GripIndex] =
+            RevisionMark.LeaderPoints[GripIndex] + Vector3d.XAxis * 20;
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();
