@@ -8,6 +8,8 @@ using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
 using mpESKD.Base.Utils;
+using mpESKD.Functions.mpNodalLeader.Grips;
+using mpESKD.Functions.mpNodalLeader;
 
 /// <inheritdoc />
 public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<RevisionMark>
@@ -52,28 +54,50 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     // insertion (start) grip
                     var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
-                        GripPoint =  revisionMark.InsertionPoint
+                        GripPoint = revisionMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
 
 
+                    Point3d addLeaderGripPosition;
+                    if (!string.IsNullOrEmpty(revisionMark.Note))
+                    {
+                        addLeaderGripPosition = new Point3d(
+                            revisionMark.InsertionPoint.X + revisionMark.NoteShelfLinePoints[1].X,
+                            revisionMark.InsertionPoint.Y + revisionMark.NoteShelfLinePoints[1].Y,
+                            revisionMark.InsertionPoint.Z);
+                    }
+                    else
+                    {
+                        addLeaderGripPosition = new Point3d(
+                            revisionMark.InsertionPoint.X + revisionMark.FrameRevisionTextPoints[0].X,
+                            revisionMark.InsertionPoint.Y + revisionMark.FrameRevisionTextPoints[0].Y,
+                            revisionMark.InsertionPoint.Z);
+                    }
 
-                    // todo RevisionMarkGripPointOverrule: Тест 1
-
-                    var BorderWidth = 30;
-                    var BorderHeight = 30;
-
-                    // получаем ручку для создания выноски
+                    // Добавляем ручку для создания выноски
                     grips.Add(new RevisionMarkAddLeaderGrip(revisionMark)
                     {
-                        GripPoint = new Point3d(
-                            //revisionMark.InsertionPoint.X - (revisionMark.BorderWidth / 2 * revisionMark.GetFullScale()),
-                            //revisionMark.InsertionPoint.Y + (revisionMark.BorderHeight / 2 * revisionMark.GetFullScale()),
-                            revisionMark.InsertionPoint.X - (BorderWidth / 2 * revisionMark.GetFullScale()),
-                            revisionMark.InsertionPoint.Y + (BorderHeight / 2 * revisionMark.GetFullScale()),
-                            revisionMark.InsertionPoint.Z)
+                        GripPoint = addLeaderGripPosition
                     });
 
+
+                    if (!string.IsNullOrEmpty(revisionMark.Note))
+                    {
+                        var bottomLineFrameCenter = GeometryUtils.GetMiddlePoint3d(revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[1]);
+
+                        var shelfPointGripPosition = new Point3d(
+                            revisionMark.InsertionPoint.X + bottomLineFrameCenter.X,
+                            revisionMark.InsertionPoint.Y + bottomLineFrameCenter.Y,
+                            revisionMark.InsertionPoint.Z
+                        );
+
+                        // Добавляем ручку для зеркалирования полки примечания
+                        grips.Add(new RevisionMarkShelfPositionGrip(revisionMark)
+                        {
+                            GripPoint = shelfPointGripPosition
+                        });
+                    }
 
                     // todo RevisionMarkGripPointOverrule: Тест 2
                     // получаем ручку типа рамки
@@ -95,7 +119,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             GripPoint = revisionMark.LeaderPoints[i]
                         });
                         var deleteGripPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
-                        var leaderEndTypeGripPoint = revisionMark.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
 
                         // ручки удаления выносок
                         grips.Add(new RevisionMarkLeaderRemoveGrip(revisionMark, i)
@@ -103,6 +126,9 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             GripPoint = deleteGripPoint
                         });
 
+                        // Ручки 
+
+                        var leaderEndTypeGripPoint = revisionMark.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
 
                         // todo RevisionMarkGripPointOverrule: Тест 3
                         // ручки выбора типа выносок

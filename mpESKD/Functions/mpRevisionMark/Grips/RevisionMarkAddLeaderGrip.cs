@@ -61,7 +61,7 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[2].Y),
             new Point2d(
                 insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[4].Y),
+                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
         };
 
         AcadUtils.WriteMessageInDebug($"RevisionMark.FrameRevisionTextPoints прочитан в _points в конструкторе  RevisionMarkAddLeaderGrip :" +
