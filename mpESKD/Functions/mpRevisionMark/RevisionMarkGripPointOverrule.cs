@@ -130,10 +130,16 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             frameStretchPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
                         }*/
 
-                        // Если нет рамки (), то ручка не создается
-                        // if (!revisionMark.RevisionFrameStretchPoints[i].Equals(revisionMark.LeaderPoints[i]))
+                        // Если нет рамки, то ручка для растягивания рамки не создается
+                         if (revisionMark.RevisionFrameTypes[i] != 0)
                         {
                             frameStretchPoint = revisionMark.RevisionFrameStretchPoints[i];
+
+                            // Если предыдущий тип рамки = None
+                            if (!frameStretchPoint.Equals(revisionMark.LeaderPoints[i]))
+                            {
+                                frameStretchPoint += Vector3d.XAxis * 30 * curViewUnitSize;
+                            }
 
                             grips.Add(new RevisionMarkFrameStretchGrip(revisionMark, i)
                             {

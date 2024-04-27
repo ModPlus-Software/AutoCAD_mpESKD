@@ -117,10 +117,14 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 
         // RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
 
-        RevisionMark.RevisionFrameTypes[GripIndex] =
-            (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
+        var selectedItenNumber = (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
 
+        RevisionMark.RevisionFrameTypes[GripIndex] = selectedItenNumber;
 
+        //if (selectedItenNumber == 0)
+        //{
+        //    RevisionMark.RevisionFrameStretchPoints[GripIndex] = RevisionMark.LeaderPoints[GripIndex];
+        //}
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();

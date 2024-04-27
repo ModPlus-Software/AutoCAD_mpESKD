@@ -47,6 +47,8 @@ public class RevisionMarkLeaderRemoveGrip : SmartEntityGripData
           
             RevisionMark.RevisionFrameTypes.RemoveAt(GripIndex);
 
+            RevisionMark.RevisionFrameStretchPoints.RemoveAt(GripIndex);
+
             RevisionMark.UpdateEntities();
             RevisionMark.BlockRecord.UpdateAnonymousBlocks();
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
