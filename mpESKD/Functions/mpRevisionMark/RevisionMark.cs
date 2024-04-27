@@ -492,7 +492,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities => END");
 
-        _leaderLines.Clear();
         for (var i = 0; i < LeaderPointsOCS.Count; i++)
         {
             if (this._noteDbText != null)
@@ -502,17 +501,16 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             }
             else
             {
-                /*
-                List<Point2d> point2ds = new List<Point2d>();
+                
+                List<Point2d> points2ds = new ();
 
                 for (int j = 0; j < frameRevisionTextPolyline.NumberOfVertices; j++)
                 {
-                    point2ds.Add(frameRevisionTextPolyline.GetPoint2dAt(j));
+                    points2ds.Add(frameRevisionTextPolyline.GetPoint2dAt(j));
                 }
-                var points2ds = this.FrameRevisionTextPoints.Select(x => x.ToPoint2d()).ToList();
-                */
+                
 
-                var points2ds = this.FrameRevisionTextPoints.Select(x => x.ToPoint2d()).ToList();
+                // var points2ds = this.FrameRevisionTextPoints.Select(x => x.ToPoint2d()).ToList();
 
                 var curLeader = CreateLeaders(LeaderPointsOCS[i], points2ds);
                 _leaderLines.Add(curLeader);

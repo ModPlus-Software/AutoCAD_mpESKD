@@ -62,7 +62,7 @@ public class RevisionMarkVertexGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                //RevisionMark.UpdateEntities();
+                RevisionMark.UpdateEntities();
                 //RevisionMark.BlockRecord.UpdateAnonymousBlocks();
 
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
