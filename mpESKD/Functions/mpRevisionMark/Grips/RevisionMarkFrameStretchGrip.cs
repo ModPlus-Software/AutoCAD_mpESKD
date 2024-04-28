@@ -85,6 +85,7 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
             using (RevisionMark)
             {
                 RevisionMark.RevisionFrameStretchPoints[GripIndex] = NewPoint;
+
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();
 
@@ -115,49 +116,15 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
     {
         try
         {
-            /*
-            Line line;
-            if (string.IsNullOrEmpty(RevisionMark.Note))
+            var line = new Line(RevisionMark.LeaderPoints[GripIndex], pointMonitorEventArgs.Context.ComputedPoint);
+         
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Circle(
+                line.StartPoint,
+                Vector3d.YAxis, 
+                line.Length)
             {
-                var nearestPoint = _points
-                    .OrderBy(p => p.GetDistanceTo(pointMonitorEventArgs.Context.ComputedPoint.ToPoint2d())).First();
-
-                line = new Line(nearestPoint.ToPoint3d(), pointMonitorEventArgs.Context.ComputedPoint)
-                {
-                    ColorIndex = 150
-                };
-            }
-            else
-            {
-                var startPoint = new Point3d(
-                    RevisionMark.InsertionPoint.X + RevisionMark.NoteShelfLinePoints[1].X,
-                    RevisionMark.InsertionPoint.Y + RevisionMark.NoteShelfLinePoints[1].Y,
-                    RevisionMark.InsertionPoint.Z);
-
-                line = new Line(startPoint, pointMonitorEventArgs.Context.ComputedPoint)
-                {
-                    ColorIndex = 150
-                };
-
-            }
-            */
-
-            /*
-            var circle = new Circle(
-                RevisionMark.LeaderPoints[GripIndex],
-                Vector3d.XAxis,
-                RevisionMark.LeaderPoints[GripIndex]
-                    .DistanceTo(pointMonitorEventArgs.Context.ComputedPoint))
-            {
-                ColorIndex= 150
-            };*/
-
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(
-                new Circle(
-                    RevisionMark.LeaderPoints[GripIndex],
-                    Vector3d.XAxis, 
-                    pointMonitorEventArgs.Context.ComputedPoint
-                        .DistanceTo(RevisionMark.LeaderPoints[GripIndex])));
+                ColorIndex = 150
+            });
         }
         catch
         {

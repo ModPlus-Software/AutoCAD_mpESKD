@@ -54,7 +54,6 @@ public class RevisionMarkVertexGrip : SmartEntityGripData
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                AcadUtils.WriteMessageInDebug("RevisionMarkVertexGrip: OnGripStatusChanged: схвачена ручка");
                 _gripTmp = GripPoint;
             }
 
@@ -62,9 +61,6 @@ public class RevisionMarkVertexGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                //RevisionMark.UpdateEntities();
-                //RevisionMark.BlockRecord.UpdateAnonymousBlocks();
-
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(RevisionMark.BlockId, OpenMode.ForWrite, true, true);

@@ -117,27 +117,9 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             GripPoint = leaderEndTypeGripPoint
                         });
 
-                        // ручки размера рамки у выноски
-                        /*
-                        if (revisionMark.RevisionFrameStretchPoints[i].Equals())
-                        {
-                            frameStretchPoint = revisionMark.LeaderPoints[i] - 
-                                                ((Vector3d.XAxis * revisionMark.RevisionFrameSize[i]  * curViewUnitSize));
-                        }
-                        else
-                        {
-                            frameStretchPoint = revisionMark.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
-                        }*/
-
                         // Если нет рамки, то ручка для растягивания рамки не создается
                          if (revisionMark.RevisionFrameTypes[i] != 0)
                         {
-                            // Если предыдущий тип рамки = None
-                            //if (!frameStretchPoint.Equals(revisionMark.LeaderPoints[i]))
-                            //{
-                            //    frameStretchPoint += Vector3d.XAxis * 30 * curViewUnitSize;
-                            //}
-
                             grips.Add(new RevisionMarkFrameStretchGrip(revisionMark, i)
                             {
                                 GripPoint = revisionMark.RevisionFrameStretchPoints[i]
@@ -188,6 +170,10 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     else if (gripData is RevisionMarkLeaderMoveGrip moveLeaderGrip)
                     {
                         moveLeaderGrip.NewPoint = moveLeaderGrip.GripPoint + offset;
+                    }
+                    else if (gripData is RevisionMarkFrameStretchGrip frameStretchGrip)
+                    {
+                        frameStretchGrip.NewPoint = frameStretchGrip.GripPoint + offset;
                     }
                     else
                     {

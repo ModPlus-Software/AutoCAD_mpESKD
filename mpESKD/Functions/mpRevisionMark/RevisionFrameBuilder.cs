@@ -34,6 +34,7 @@ public static class RevisionFrameBuilder
             revisionMark.CornerRadiusVisibilityDependency = false;
 
                 var radius = boundPoint.DistanceTo(centerPoint);
+
                 if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
                     radius = revisionMark.MinDistanceBetweenPoints * scale;
 

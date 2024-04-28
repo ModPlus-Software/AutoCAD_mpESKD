@@ -123,20 +123,15 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 
         RevisionMark.RevisionFrameTypes[GripIndex] = selectedItemNumber;
 
-        /*
         if (selectedItemNumber != 0)
         {
-            var stretchPoint = RevisionMark.RevisionFrameStretchPoints[GripIndex];
-            var leaderPoint = RevisionMark.LeaderPoints[GripIndex];
-            if (stretchPoint.Equals(leaderPoint))
+            if (RevisionMark.RevisionFrameStretchPoints[GripIndex]
+                .Equals(RevisionMark.LeaderPoints[GripIndex]))
             {
-                RevisionMark.RevisionFrameStretchPoints[GripIndex] = leaderPoint + Vector3d.XAxis * 20;
+                RevisionMark.RevisionFrameStretchPoints[GripIndex] =
+                    RevisionMark.LeaderPoints[GripIndex] + Vector3d.XAxis * 5 * RevisionMark.GetFullScale();
             }
         }
-        */
-
-        RevisionMark.RevisionFrameStretchPoints[GripIndex] =
-            RevisionMark.LeaderPoints[GripIndex] + Vector3d.XAxis * 20;
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();

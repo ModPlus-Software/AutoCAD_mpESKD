@@ -472,13 +472,21 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
                 .GetValue(RevisionFrameTypes[i]);
 
-            this.CreateRevisionFrame(
-                LeaderPointsOCS[i],
-                RevisionFrameStretchPoints[i],
-                frameType,
-                this._revisionFramesAsPolylines,
-                this._revisionFramesAsCircles,
-                this._scale);
+            AcadUtils.WriteMessageInDebug("RevisionMark: CreateEntities: " +
+                                          $"RevisionFrameStretchPoints[i]: " +
+                                          $"{RevisionFrameStretchPoints[i].X}," +
+                                          $"{RevisionFrameStretchPoints[i].Y}");
+
+            if (frameType != RevisionFrameType.None)
+            {
+                this.CreateRevisionFrame(
+                    LeaderPointsOCS[i],
+                    RevisionFrameStretchPoints[i],
+                    frameType,
+                    this._revisionFramesAsPolylines,
+                    this._revisionFramesAsCircles,
+                    this._scale);
+            }
         }
     }
 
