@@ -7,7 +7,6 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 
-
 public static class RevisionFrameBuilder
 {
     /// <summary>
@@ -22,6 +21,7 @@ public static class RevisionFrameBuilder
     /// <param name="scale"></param>
     public static void CreateRevisionFrame(
         this RevisionMark revisionMark, 
+        Point3d insertPoint,
         Point3d centerPoint,
         Point3d boundPoint, 
         RevisionFrameType frameType, 
@@ -32,41 +32,40 @@ public static class RevisionFrameBuilder
         if (frameType == RevisionFrameType.Round)
         {
             revisionMark.CornerRadiusVisibilityDependency = false;
+            var radius = boundPoint.DistanceTo(centerPoint);
 
-                var radius = boundPoint.DistanceTo(centerPoint);
+            if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
+                radius = revisionMark.MinDistanceBetweenPoints * scale;
 
-                if (double.IsNaN(radius) || double.IsInfinity(radius) || radius < 0.0)
-                    radius = revisionMark.MinDistanceBetweenPoints * scale;
-
-                if (!revisionMark.IsRevisionCloud)
-                {
-                    revisionFramesAsCircles.Add(
-                        new Circle
-                        {
-                            Center = centerPoint,
-                            Radius = radius
-                        });
-                }
-                else
-                {
-                    var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
-
-                    var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
-                        centerPoint,
-                        radius,
-                        revisionMark.RevisionCloudArcLength * scale);
-
-                    cloudArcPoints.Add(centerPoint.ToPoint2d() + (Vector2d.XAxis * radius));
-
-                    var frameCloudPolyline = new Polyline(cloudArcPoints.Count);
-
-                    for (int i = 0; i < cloudArcPoints.Count; i++)
+            if (!revisionMark.IsRevisionCloud)
+            {
+                revisionFramesAsCircles.Add(
+                    new Circle
                     {
-                        frameCloudPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
-                    }
+                        Center = insertPoint,
+                        Radius = radius
+                    });
+            }
+            else
+            {
+                var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
 
-                    revisionFramesAsPolylines.Add(frameCloudPolyline);
+                var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
+                    centerPoint,
+                    radius,
+                    revisionMark.RevisionCloudArcLength * scale);
+
+                cloudArcPoints.Add(centerPoint.ToPoint2d() + (Vector2d.XAxis * radius));
+
+                var frameCloudPolyline = new Polyline(cloudArcPoints.Count);
+
+                for (int i = 0; i < cloudArcPoints.Count; i++)
+                {
+                    frameCloudPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
                 }
+
+                revisionFramesAsPolylines.Add(frameCloudPolyline);
+            }
         }
         else if (frameType == RevisionFrameType.Rectangular)
         {
@@ -95,14 +94,14 @@ public static class RevisionFrameBuilder
 
             var points = new[]
             {
-                new Point2d(centerPoint.X - width + cornerRadius, centerPoint.Y - height),
-                new Point2d(centerPoint.X - width, centerPoint.Y - height + cornerRadius),
-                new Point2d(centerPoint.X - width, centerPoint.Y + height - cornerRadius),
-                new Point2d(centerPoint.X - width + cornerRadius, centerPoint.Y + height),
-                new Point2d(centerPoint.X + width - cornerRadius, centerPoint.Y + height),
-                new Point2d(centerPoint.X + width, centerPoint.Y + height - cornerRadius),
-                new Point2d(centerPoint.X + width, centerPoint.Y - height + cornerRadius),
-                new Point2d(centerPoint.X + width - cornerRadius, centerPoint.Y - height)
+                new Point2d(insertPoint.X - width + cornerRadius, insertPoint.Y - height),
+                new Point2d(insertPoint.X - width, insertPoint.Y - height + cornerRadius),
+                new Point2d(insertPoint.X - width, insertPoint.Y + height - cornerRadius),
+                new Point2d(insertPoint.X - width + cornerRadius, insertPoint.Y + height),
+                new Point2d(insertPoint.X + width - cornerRadius, insertPoint.Y + height),
+                new Point2d(insertPoint.X + width, insertPoint.Y + height - cornerRadius),
+                new Point2d(insertPoint.X + width, insertPoint.Y - height + cornerRadius),
+                new Point2d(insertPoint.X + width - cornerRadius, insertPoint.Y - height)
             };
 
             var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
