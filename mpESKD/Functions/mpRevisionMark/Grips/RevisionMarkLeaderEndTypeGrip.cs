@@ -129,7 +129,8 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
                 .Equals(RevisionMark.LeaderPoints[GripIndex]))
             {
                 RevisionMark.RevisionFrameStretchPoints[GripIndex] =
-                    RevisionMark.LeaderPoints[GripIndex] + Vector3d.XAxis * 5 * RevisionMark.GetFullScale();
+                    RevisionMark.LeaderPoints[GripIndex] + 
+                    ((Vector3d.XAxis + Vector3d.YAxis ) * 5 * RevisionMark.GetFullScale());
             }
         }
 

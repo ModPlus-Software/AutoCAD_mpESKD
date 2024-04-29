@@ -122,35 +122,8 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
     {
         try
         {
-            /*
-            var line = new Line(RevisionMark.LeaderPoints[GripIndex], pointMonitorEventArgs.Context.ComputedPoint)
-            {
-                ColorIndex = 120
-            };*/
-         
-            /*
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Circle(
-                line.StartPoint,
-                Vector3d.YAxis, 
-                line.Length)
-            {
-                
-                ColorIndex = 150
-            });*/
-
-           // pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
-
-            /*      
-            var tmpRevisionFrame = new Point3d(
-                RevisionMark.LeaderPoints[GripIndex],
-                RevisionMark.LeaderPoints[GripIndex],
-                pointMonitorEventArgs.Context.ComputedPoint,
-                RevisionFrameType.Rectangular,
-
-            );*/
-
-            List<Polyline> revisionFramesAsPolylines = new ();
-            List<Circle> revisionFramesAsCircles = new ();
+            List<Polyline> revisionFramesAsPolylines = new();
+            List<Circle> revisionFramesAsCircles = new();
 
             var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
                 .GetValue(RevisionMark.RevisionFrameTypes[GripIndex]);
@@ -163,24 +136,17 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
                 revisionFramesAsPolylines,
                 revisionFramesAsCircles,
                 RevisionMark.GetFullScale()
-                );
+            );
 
-            foreach (var polyline in revisionFramesAsPolylines)
+            if (revisionFramesAsPolylines.Count > 0)
             {
+                var polyline = revisionFramesAsPolylines[0];
                 polyline.ColorIndex = 150;
-
-                Point3dCollection points = new Point3dCollection();
-                for (int i = 0; i < polyline.NumberOfVertices; i++)
-                {
-                    points.Add(polyline.GetPoint2dAt(i).ToPoint3d());
-                }
-
-                pointMonitorEventArgs.Context.DrawContext.Geometry.PolylineEye(points);
-                //pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(polyline);
+                pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(polyline);
             }
-
-            foreach (var circle in revisionFramesAsCircles)
+            else if (revisionFramesAsCircles.Count > 0)
             {
+                var circle = revisionFramesAsCircles[0];
                 circle.ColorIndex = 150;
                 pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(circle);
             }

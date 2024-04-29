@@ -7,6 +7,8 @@ using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using System.Collections.Generic;
+using System;
 using System.Linq;
 
 /// <summary>
@@ -148,6 +150,43 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
             }
 
             pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
+
+            //
+            var prevLeaderPoint = RevisionMark.LeaderPoints[GripIndex];
+            var prevStretchPoint = RevisionMark.RevisionFrameStretchPoints[GripIndex];
+
+            var moveVector = pointMonitorEventArgs.Context.ComputedPoint - prevLeaderPoint;
+
+            var stretchPoint = prevStretchPoint + moveVector;
+
+            List<Polyline> revisionFramesAsPolylines = new();
+            List<Circle> revisionFramesAsCircles = new();
+
+            var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
+                .GetValue(RevisionMark.RevisionFrameTypes[GripIndex]);
+
+            RevisionMark.CreateRevisionFrame(
+                pointMonitorEventArgs.Context.ComputedPoint,
+                pointMonitorEventArgs.Context.ComputedPoint,
+                stretchPoint,
+                frameType,
+                revisionFramesAsPolylines,
+                revisionFramesAsCircles,
+                RevisionMark.GetFullScale()
+            );
+
+            if (revisionFramesAsPolylines.Count > 0)
+            {
+                var polyline = revisionFramesAsPolylines[0];
+                polyline.ColorIndex = 150;
+                pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(polyline);
+            }
+            else if (revisionFramesAsCircles.Count > 0)
+            {
+                var circle = revisionFramesAsCircles[0];
+                circle.ColorIndex = 150;
+                pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(circle);
+            }
         }
         catch
         {
