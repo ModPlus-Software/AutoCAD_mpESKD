@@ -50,6 +50,8 @@ public static class RevisionFrameBuilder
                         Center = insertPoint,
                         Radius = radius,
                     });
+
+                revisionFramesAsPolylines.Add(null);
             }
             else
             {
@@ -70,6 +72,7 @@ public static class RevisionFrameBuilder
                 }
 
                 revisionFramesAsPolylines.Add(frameCloudPolyline);
+                revisionFramesAsCircles.Add(null);
             }
         }
         else if (frameType == RevisionFrameType.Rectangular)
@@ -135,6 +138,7 @@ public static class RevisionFrameBuilder
                 frameCloudPolyline.Closed = true;
 
                 revisionFramesAsPolylines.Add(frameCloudPolyline);
+                revisionFramesAsCircles.Add(null);
             }
             else
             {
@@ -200,6 +204,7 @@ public static class RevisionFrameBuilder
                 }
 
                 revisionFramesAsPolylines.Add(frameCloudPolyline);
+                revisionFramesAsCircles.Add(null);
             }
         }
     }

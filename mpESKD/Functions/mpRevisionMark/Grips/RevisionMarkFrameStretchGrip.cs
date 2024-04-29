@@ -138,13 +138,13 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
                 RevisionMark.GetFullScale()
             );
 
-            if (revisionFramesAsPolylines.Count > 0)
+            if (revisionFramesAsPolylines[0] != null)
             {
                 var polyline = revisionFramesAsPolylines[0];
                 polyline.ColorIndex = 150;
                 pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(polyline);
             }
-            else if (revisionFramesAsCircles.Count > 0)
+            else if (revisionFramesAsCircles[0] != null)
             {
                 var circle = revisionFramesAsCircles[0];
                 circle.ColorIndex = 150;

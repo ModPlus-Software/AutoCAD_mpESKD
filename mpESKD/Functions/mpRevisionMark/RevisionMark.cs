@@ -10,6 +10,7 @@ using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 
 /// <summary>
 /// Маркер изменения
@@ -309,21 +310,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         _leaderLines.Clear();
         _revisionFramesAsCircles.Clear();
         _revisionFramesAsPolylines.Clear();
-
-        // todo Тест построения области ревизии
-        /*
-        this.CreateRevisionFrame(
-            insertionPoint,
-            new Point3d(insertionPoint.X + 20, insertionPoint.Y + 20, 0),
-            RevisionFrameType.Rectangular,
-            _revisionFramesAsPolylines,
-            _revisionFramesAsCircles,
-            _scale
-        );
-        */
-
-        // todo
-         SetRevisionNumberOnCreation();
+        
+        SetRevisionNumberOnCreation();
 
         var revisionTextHeight = RevisionTextHeight * _scale;
         var noteTextHeight = NoteTextHeight * _scale;
@@ -493,7 +481,44 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                     this._revisionFramesAsCircles,
                     this._scale);
             }
+
+            /*
+            if (FrameType == FrameType.Round)
+            {
+                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, c);
+            }
+            else
+            {
+                _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
+            }*/
         }
+
+        for (int i = 0; i < _leaderLines.Count; i++)
+        {
+            var intersectionPoints = new Point3dCollection();
+
+            if (RevisionFrameTypes[i] == 1)
+            {
+                _revisionFramesAsCircles[i].IntersectWith(_leaderLines[i], Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
+
+                //if (intersectionPoints.Count > 0)
+                //{
+                //    _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersectionPoints[0]);
+                //}
+            }
+            else if (RevisionFrameTypes[i] == 2)
+            {
+                //var pts = new Point3dCollection();
+                _revisionFramesAsPolylines[i].IntersectWith(_leaderLines[i], Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
+
+            }
+
+            if (intersectionPoints.Count > 0)
+            {
+                _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersectionPoints[0]);
+            }
+        }
+
     }
 
     private Line CreateLeaders(Point3d point, IEnumerable<Point2d> points)
