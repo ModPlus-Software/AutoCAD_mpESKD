@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpRevisionMark.Grips;
+﻿using Autodesk.AutoCAD.GraphicsInterface;
+using DocumentFormat.OpenXml.Drawing;
+
+namespace mpESKD.Functions.mpRevisionMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -7,6 +10,8 @@ using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -84,6 +89,7 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
 
             using (RevisionMark)
             {
+                // Точка ручки растяжения, относительно точки выноски, 
                 RevisionMark.RevisionFrameStretchPoints[GripIndex] = NewPoint;
 
                 RevisionMark.UpdateEntities();
@@ -116,15 +122,68 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
     {
         try
         {
-            var line = new Line(RevisionMark.LeaderPoints[GripIndex], pointMonitorEventArgs.Context.ComputedPoint);
+            /*
+            var line = new Line(RevisionMark.LeaderPoints[GripIndex], pointMonitorEventArgs.Context.ComputedPoint)
+            {
+                ColorIndex = 120
+            };*/
          
+            /*
             pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Circle(
                 line.StartPoint,
                 Vector3d.YAxis, 
                 line.Length)
             {
+                
                 ColorIndex = 150
-            });
+            });*/
+
+           // pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
+
+            /*      
+            var tmpRevisionFrame = new Point3d(
+                RevisionMark.LeaderPoints[GripIndex],
+                RevisionMark.LeaderPoints[GripIndex],
+                pointMonitorEventArgs.Context.ComputedPoint,
+                RevisionFrameType.Rectangular,
+
+            );*/
+
+            List<Polyline> revisionFramesAsPolylines = new ();
+            List<Circle> revisionFramesAsCircles = new ();
+
+            var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
+                .GetValue(RevisionMark.RevisionFrameTypes[GripIndex]);
+
+            RevisionMark.CreateRevisionFrame(
+                RevisionMark.LeaderPoints[GripIndex],
+                RevisionMark.LeaderPoints[GripIndex],
+                pointMonitorEventArgs.Context.ComputedPoint,
+                frameType,
+                revisionFramesAsPolylines,
+                revisionFramesAsCircles,
+                RevisionMark.GetFullScale()
+                );
+
+            foreach (var polyline in revisionFramesAsPolylines)
+            {
+                polyline.ColorIndex = 150;
+
+                Point3dCollection points = new Point3dCollection();
+                for (int i = 0; i < polyline.NumberOfVertices; i++)
+                {
+                    points.Add(polyline.GetPoint2dAt(i).ToPoint3d());
+                }
+
+                pointMonitorEventArgs.Context.DrawContext.Geometry.PolylineEye(points);
+                //pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(polyline);
+            }
+
+            foreach (var circle in revisionFramesAsCircles)
+            {
+                circle.ColorIndex = 150;
+                pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(circle);
+            }
         }
         catch
         {

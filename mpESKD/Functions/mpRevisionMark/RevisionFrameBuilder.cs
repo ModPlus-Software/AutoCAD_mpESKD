@@ -27,8 +27,13 @@ public static class RevisionFrameBuilder
         RevisionFrameType frameType, 
         List<Polyline> revisionFramesAsPolylines,
         List<Circle> revisionFramesAsCircles,
-        double scale)
+        double scale
+        )
     {
+        /*
+        List<Polyline> polylinesResult = new ();
+        List<Circle> circlesResult = new ();*/
+
         if (frameType == RevisionFrameType.Round)
         {
             revisionMark.CornerRadiusVisibilityDependency = false;
@@ -43,7 +48,7 @@ public static class RevisionFrameBuilder
                     new Circle
                     {
                         Center = insertPoint,
-                        Radius = radius
+                        Radius = radius,
                     });
             }
             else

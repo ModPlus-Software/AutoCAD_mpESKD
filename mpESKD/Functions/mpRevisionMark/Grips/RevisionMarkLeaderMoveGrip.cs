@@ -83,7 +83,16 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
 
             using (RevisionMark)
             {
+                var prevLeaderPoint = RevisionMark.LeaderPoints[GripIndex];
+                var prevStretchPoint = RevisionMark.RevisionFrameStretchPoints[GripIndex];
+
+                var moveVector = NewPoint - prevLeaderPoint;
+
                 RevisionMark.LeaderPoints[GripIndex] = NewPoint;
+
+                RevisionMark.RevisionFrameStretchPoints[GripIndex]=
+                    prevStretchPoint + moveVector;
+
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();
 
