@@ -58,15 +58,16 @@ public static class RevisionFrameBuilder
                 var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
 
                 var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
-                    centerPoint,
+                   //centerPoint,
+                   insertPoint,
                     radius,
                     revisionMark.RevisionCloudArcLength * scale);
 
-                cloudArcPoints.Add(centerPoint.ToPoint2d() + (Vector2d.XAxis * radius));
+                cloudArcPoints.Add(insertPoint.ToPoint2d() + (Vector2d.XAxis * radius));
 
                 var frameCloudPolyline = new Polyline(cloudArcPoints.Count);
 
-                for (int i = 0; i < cloudArcPoints.Count; i++)
+                for (int i = 0; i < cloudArcPoints.Count ; i++)
                 {
                     frameCloudPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
                 }

@@ -1,4 +1,5 @@
-﻿namespace mpESKD.Functions.mpRevisionMark;
+﻿#nullable enable
+namespace mpESKD.Functions.mpRevisionMark;
 
 using System;
 using System.Collections.Generic;
@@ -481,44 +482,44 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                     this._revisionFramesAsCircles,
                     this._scale);
             }
-
-            /*
-            if (FrameType == FrameType.Round)
-            {
-                _frameCircle.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, c);
-            }
-            else
-            {
-                _framePolyline.IntersectWith(leaderLine, Intersect.OnBothOperands, pts, IntPtr.Zero, IntPtr.Zero);
-            }*/
         }
 
         for (int i = 0; i < _leaderLines.Count; i++)
         {
-            var intersectionPoints = new Point3dCollection();
+            Point3d? intersection = null;
 
             if (RevisionFrameTypes[i] == 1)
             {
-                _revisionFramesAsCircles[i].IntersectWith(_leaderLines[i], Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
-
-                //if (intersectionPoints.Count > 0)
-                //{
-                //    _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersectionPoints[0]);
-                //}
+                if (IsRevisionCloud)
+                {
+                    intersection = IntSect(_revisionFramesAsPolylines[i], _leaderLines[i]);
+                }
+                else
+                {
+                    intersection = IntSect(_revisionFramesAsCircles[i], _leaderLines[i]);
+                }
             }
             else if (RevisionFrameTypes[i] == 2)
             {
-                //var pts = new Point3dCollection();
-                _revisionFramesAsPolylines[i].IntersectWith(_leaderLines[i], Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
-
+                intersection = IntSect(_revisionFramesAsPolylines[i], _leaderLines[i]);
             }
 
-            if (intersectionPoints.Count > 0)
+           if (intersection != null)
             {
-                _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersectionPoints[0]);
+                _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersection.Value);
             }
         }
 
+        
+    }
+
+    private Point3d? IntSect(Entity entity, Entity sectionEntity)
+    {
+        var intersectionPoints = new Point3dCollection();
+
+        entity.IntersectWith(sectionEntity, Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
+
+        return intersectionPoints.Count == 1 ? intersectionPoints[0] : null;
     }
 
     private Line CreateLeaders(Point3d point, IEnumerable<Point2d> points)
