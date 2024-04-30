@@ -1,6 +1,6 @@
-﻿#nullable enable
-namespace mpESKD.Functions.mpRevisionMark;
+﻿namespace mpESKD.Functions.mpRevisionMark;
 
+using ModPlusAPI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,6 @@ using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 
 /// <summary>
 /// Маркер изменения
@@ -24,22 +23,12 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     private string _cachedRevisionNumber;
 
     private readonly List<Line> _leaderLines = new ();
-    private readonly List<Polyline> _revisionFramesAsPolylines= new ();
+    private readonly List<Polyline> _revisionFramesAsPolylines = new ();
     private readonly List<Circle> _revisionFramesAsCircles = new ();
     private double _scale;
 
     #region Entities
-
-    /// <summary>
-    /// Рамка ревизии при типе "Прямоугольная"
-    /// </summary>
-    private Polyline _frameRevisionPolyline;
-
-    /// <summary>
-    /// Рамка узла при типе "Круглая"
-    /// </summary>
-    private Circle _frameRevisionCircle;
-
+    
     /// <summary>
     /// Линия полки примечания
     /// </summary>
@@ -217,6 +206,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     [SaveToXData]
     public MarkPosition MarkPosition { get; set; } = MarkPosition.Right;
 
+    /// <summary>
+    /// Точки полки примечаний
+    /// </summary>
     [SaveToXData]
     public List<Point3d> NoteShelfLinePoints { get; set; }
 
@@ -276,20 +268,17 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// Точки рамки текста номера ревизии, относительно точки вставки блока
     /// </summary>
     [SaveToXData] 
-    public List<Point3d> FrameRevisionTextPoints { get; set; } = new () ; //Array.Empty<Point2d>();
+    public List<Point3d> FrameRevisionTextPoints { get; set; } = new ();
 
     /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: InitiGetPointsForOsnapalize");
         yield return InsertionPoint;
     }
 
     /// <inheritdoc/>
     public override void UpdateEntities()
     {
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities");
-
         try
         {
             _scale = GetScale();
@@ -297,17 +286,12 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         }
         catch (Exception exception)
         {
-            // todo
-           //  ExceptionBox.Show(exception);
+           ExceptionBox.Show(exception);
         }
-
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: UpdateEntities => END");
     }
 
     private void CreateEntities(Point3d insertionPoint)
     {
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: CreateEntities");
-
         _leaderLines.Clear();
         _revisionFramesAsCircles.Clear();
         _revisionFramesAsPolylines.Clear();
@@ -396,7 +380,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         var frameRevisionTextPolyline = new Polyline();
 
-        var toLeftBottomPoint = -(Vector2d.XAxis * ( (fullRevisionTextLength / 2) + diffXaxis) ) - (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
+        var toLeftBottomPoint = -(Vector2d.XAxis * ((fullRevisionTextLength / 2) + diffXaxis)) - (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
         var toRightBottomPoint = (Vector2d.XAxis * (fullRevisionTextLength / 2)) - (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
         var toRightTopPoint = (Vector2d.XAxis * ((fullRevisionTextLength / 2) + diffXaxis)) + (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
         var toLeftTopPoint = -(Vector2d.XAxis * (fullRevisionTextLength / 2)) + (Vector2d.YAxis * ((revisionTextHeight / 2) + textVerticalOffset));
@@ -426,8 +410,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             }
             else
             {
-                _noteShelfLine = new Line(leftBottomPoint.ToPoint3d(),
-                    leftBottomPoint.ToPoint3d() - (Vector3d.XAxis * (fullNoteTextLength)));
+                _noteShelfLine = new Line(
+                    leftBottomPoint.ToPoint3d(),
+                    leftBottomPoint.ToPoint3d() - (Vector3d.XAxis * fullNoteTextLength));
             }
 
             NoteShelfLinePoints = new List<Point3d> { _noteShelfLine.StartPoint, _noteShelfLine.EndPoint };
@@ -461,16 +446,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
                 .GetValue(RevisionFrameTypes[i]);
 
-            AcadUtils.WriteMessageInDebug("RevisionMark: CreateEntities: " +
-                                          $"LeaderPoints[i]: " +
-                                          $"{LeaderPoints[i].X}," +
-                                          $"{LeaderPoints[i].Y}");
-
-            AcadUtils.WriteMessageInDebug("RevisionMark: CreateEntities: " +
-                                          $"RevisionFrameStretchPoints[i]: " +
-                                          $"{RevisionFrameStretchPoints[i].X}," +
-                                          $"{RevisionFrameStretchPoints[i].Y}");
-
             if (frameType != RevisionFrameType.None)
             {
                 this.CreateRevisionFrame(
@@ -490,33 +465,25 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             if (RevisionFrameTypes[i] == 1)
             {
-                if (IsRevisionCloud)
-                {
-                    intersection = IntSect(_revisionFramesAsPolylines[i], _leaderLines[i]);
-                }
-                else
-                {
-                    intersection = IntSect(_revisionFramesAsCircles[i], _leaderLines[i]);
-                }
+                intersection = IsRevisionCloud 
+                    ? LeaderIntersection(_revisionFramesAsPolylines[i], _leaderLines[i]) 
+                    : LeaderIntersection(_revisionFramesAsCircles[i], _leaderLines[i]);
             }
             else if (RevisionFrameTypes[i] == 2)
             {
-                intersection = IntSect(_revisionFramesAsPolylines[i], _leaderLines[i]);
+                intersection = LeaderIntersection(_revisionFramesAsPolylines[i], _leaderLines[i]);
             }
 
-           if (intersection != null)
+            if (intersection != null)
             {
                 _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersection.Value);
             }
         }
-
-        
     }
 
-    private Point3d? IntSect(Entity entity, Entity sectionEntity)
+    private Point3d? LeaderIntersection(Entity entity, Entity sectionEntity)
     {
         var intersectionPoints = new Point3dCollection();
-
         entity.IntersectWith(sectionEntity, Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
 
         return intersectionPoints.Count == 1 ? intersectionPoints[0] : null;
@@ -532,12 +499,9 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
     private void SetRevisionNumberOnCreation()
     {
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: SetRevisionNumberOnCreation");
-
         if (!IsValueCreated)
             return;
 
         RevisionNumber = EntityUtils.GetNodeNumberByLastNodeNumber(_lastRevisionNumber, ref _cachedRevisionNumber);
-        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMark; metod: SetRevisionNumberOnCreation => END");
     }
 }

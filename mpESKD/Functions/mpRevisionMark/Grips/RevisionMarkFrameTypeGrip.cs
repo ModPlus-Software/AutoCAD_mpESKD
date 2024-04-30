@@ -1,18 +1,18 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark.Grips;
 
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Base.Enums;
+using Base.Overrules;
+using Base.Overrules.Grips;
+using Base.Utils;
+using ModPlusAPI;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using Autodesk.AutoCAD.DatabaseServices;
-using Base;
-using ModPlusAPI;
-using Base.Enums;
-using Base.Overrules;
-using mpESKD.Base.Overrules.Grips;
-using Base.Utils;
 
 /// <summary>
-/// Ручка выбора типа рамки, меняющая тип рамки
+/// Ручка выбора типа рамки
 /// </summary>
 public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 {
@@ -21,22 +21,28 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
     /// <summary>
     /// Initializes a new instance of the <see cref="RevisionMarkFrameTypeGrip"/> class.
     /// </summary>
-    /// <param name="revisionMark">Экземпляр <see cref="mpRevisionMark.RevisionMark"/></param>
-    public RevisionMarkFrameTypeGrip(RevisionMark revisionMark)
+    /// <param name="revisionMark">Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/></param>
+    /// <param name="gripIndex">Индекс ручки</param>
+    public RevisionMarkFrameTypeGrip(RevisionMark revisionMark, int gripIndex)
     {
         RevisionMark = revisionMark;
+        GripIndex = gripIndex;
         GripType = GripType.List;
     }
 
     /// <summary>
-    /// Экземпляр <see cref="mpRevisionMark.RevisionMark"/>
+    /// Экземпляр класса <see cref="mpRevisionMark.RevisionMark"/>
     /// </summary>
     public RevisionMark RevisionMark { get; }
+
+    /// <summary>
+    /// Индекс ручки
+    /// </summary>
+    public int GripIndex { get; }
 
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Тип рамки
         return Language.GetItem("p82");
     }
 
@@ -53,42 +59,50 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
             {
                 cm = (ContextMenu)_win.FindResource("Cm");
 
-                var menuItem = new MenuItem
-                {
-                    Name = RevisionFrameType.Rectangular.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft2"), // Прямоугольная 
-                    IsChecked = RevisionMark.RevisionFrameType == RevisionFrameType.Rectangular
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                var frameIndex = RevisionMark.RevisionFrameTypes[GripIndex];
+                
+                { 
+                    var menuItem = new MenuItem
+                    {
+                        Name = "None",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft4"), // Нет 
+                        IsChecked = frameIndex == (int)RevisionFrameType.None,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
 
-                /*
-                menuItem = new MenuItem
                 {
-                    Name = RevisionFrameType.Line.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft3"), // Линия
-                    IsChecked = RevisionMark.RevisionFrameType == RevisionFrameType.Line
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
+                    var menuItem = new MenuItem
+                    {
+                        Name = "Round",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft1"), // Круглая 
+                        IsChecked = frameIndex == (int)RevisionFrameType.Round,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
 
-                menuItem = new MenuItem
                 {
-                    Name = RevisionFrameType.None.ToString(),
-                    IsCheckable = true,
-                    Header = Language.GetItem("ft4"), // Без рамки
-                    IsChecked = RevisionMark.RevisionFrameType == RevisionFrameType.None
-                };
-                menuItem.Click += MenuItemOnClick;
-                cm.Items.Add(menuItem);
-                */
+                    var menuItem = new MenuItem
+                    {
+                        Name = "Rectangular",
+                        IsCheckable = true,
+                        Header = Language.GetItem("ft2"), // Прямоугольная 
+                        IsChecked = frameIndex == (int)RevisionFrameType.Rectangular,
+                    };
+                    menuItem.Click += MenuItemOnClick;
+                    cm.Items.Add(menuItem);
+                }
 
                 cm.MouseMove += (_, _) => _win.Close();
                 cm.Closed += (_, _) => Autodesk.AutoCAD.Internal.Utils.SetFocusToDwgView();
+
                 cm.IsOpen = true;
             };
+
             _win.Show();
         }
 
@@ -101,7 +115,21 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 
         var menuItem = (MenuItem)sender;
 
-        RevisionMark.RevisionFrameType = (RevisionFrameType)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
+        // RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
+
+        var selectedItemNumber = (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
+
+        RevisionMark.RevisionFrameTypes[GripIndex] = selectedItemNumber;
+
+        if (selectedItemNumber != 0)
+        {
+            if (RevisionMark.RevisionFrameStretchPoints[GripIndex]
+                .Equals(RevisionMark.LeaderPoints[GripIndex]))
+            {
+                RevisionMark.RevisionFrameStretchPoints[GripIndex] =
+                    RevisionMark.LeaderPoints[GripIndex] + ((Vector3d.XAxis + Vector3d.YAxis) * 5 * RevisionMark.GetFullScale());
+            }
+        }
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();

@@ -154,8 +154,6 @@ public class DefaultEntityJig : EntityJig
     /// <inheritdoc/>
     protected override bool Update()
     {
-        AcadUtils.WriteMessageInDebug("REVISIONMARK: class: DefaultEntityJig; metod: Update");
-
         try
         {
             using (AcadUtils.Document.LockDocument(DocumentLockMode.ProtectedAutoWrite, null, null, true))

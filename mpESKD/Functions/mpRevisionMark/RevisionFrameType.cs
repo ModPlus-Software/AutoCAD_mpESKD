@@ -24,6 +24,4 @@ public enum RevisionFrameType
     /// </summary>
     [EnumPropertyDisplayValueKey("ft2")]
     Rectangular = 2,
-
-
 }

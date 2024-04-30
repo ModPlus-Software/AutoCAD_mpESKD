@@ -10,7 +10,7 @@ using ModPlusAPI;
 using ModPlusAPI.Windows;
 
 /// <summary>
-/// Ручка вершин
+/// Ручка перемещения номера и примечания
 /// </summary>
 public class RevisionMarkVertexGrip : SmartEntityGripData
 {

@@ -1,6 +1,4 @@
-﻿using mpESKD.Base.Utils;
-
-namespace mpESKD.Functions.mpRevisionMark;
+﻿namespace mpESKD.Functions.mpRevisionMark;
 
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark;
 
-using mpESKD.Base.Utils;
+using Base.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,15 +10,16 @@ using Autodesk.AutoCAD.Geometry;
 public static class RevisionFrameBuilder
 {
     /// <summary>
-    /// Построение области ревизии
+    /// Построение рамки области изменения
     /// </summary>
-    /// <param name="revisionMark"></param>
-    /// <param name="centerPoint"></param>
-    /// <param name="boundPoint"></param>
-    /// <param name="frameType"></param>
-    /// <param name="revisionFramesAsPolylines"></param>
-    /// <param name="revisionFramesAsCircles"></param>
-    /// <param name="scale"></param>
+    /// <param name="revisionMark">Экземпляр класса <see cref="RevisionMark"/></param>
+    /// <param name="insertPoint">Точка вставки</param>
+    /// <param name="centerPoint">Центр рамки</param>
+    /// <param name="boundPoint">Точка на рамке</param>
+    /// <param name="frameType">Тип рамки</param>
+    /// <param name="revisionFramesAsPolylines">Части рамки - полилинии</param>
+    /// <param name="revisionFramesAsCircles">Части рамки - окружности</param>
+    /// <param name="scale">Масштаб</param>
     public static void CreateRevisionFrame(
         this RevisionMark revisionMark, 
         Point3d insertPoint,
@@ -27,13 +28,8 @@ public static class RevisionFrameBuilder
         RevisionFrameType frameType, 
         List<Polyline> revisionFramesAsPolylines,
         List<Circle> revisionFramesAsCircles,
-        double scale
-        )
+        double scale)
     {
-        /*
-        List<Polyline> polylinesResult = new ();
-        List<Circle> circlesResult = new ();*/
-
         if (frameType == RevisionFrameType.Round)
         {
             revisionMark.CornerRadiusVisibilityDependency = false;
@@ -58,8 +54,7 @@ public static class RevisionFrameBuilder
                 var bevelBulge = Math.Tan((90 / 4).DegreeToRadian());
 
                 var cloudArcPoints = RevisionCloud.GetArcPointsOfSegment(
-                   //centerPoint,
-                   insertPoint,
+                    insertPoint,
                     radius,
                     revisionMark.RevisionCloudArcLength * scale);
 
@@ -67,7 +62,7 @@ public static class RevisionFrameBuilder
 
                 var frameCloudPolyline = new Polyline(cloudArcPoints.Count);
 
-                for (int i = 0; i < cloudArcPoints.Count ; i++)
+                for (int i = 0; i < cloudArcPoints.Count; i++)
                 {
                     frameCloudPolyline.AddVertexAt(i, cloudArcPoints[i], bevelBulge, 0, 0);
                 }

@@ -10,11 +10,11 @@ using ModPlusAPI;
 using System.Linq;
 
 /// <summary>
-/// Ручка выбора типа рамки, меняющая тип рамки
+/// Ручка добавления выноски
 /// </summary>
 public class RevisionMarkAddLeaderGrip : SmartEntityGripData
 {
-    private Point2d[] _points;
+    private readonly Point2d[] _points;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RevisionMarkAddLeaderGrip"/> class.
@@ -51,14 +51,13 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
     public RevisionMark RevisionMark { get; }
 
     /// <summary>
-    /// Новое значение точки вершины
+    /// Новое значение точки ручки
     /// </summary>
     public Point3d NewPoint { get; set; }
 
     /// <inheritdoc />
     public override string GetTooltip()
     {
-        // Добавить выноску
         return Language.GetItem("gp5");
     }
 

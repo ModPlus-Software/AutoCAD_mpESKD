@@ -44,9 +44,7 @@ public class RevisionMarkLeaderRemoveGrip : SmartEntityGripData
         using (RevisionMark)
         {
             RevisionMark.LeaderPoints.RemoveAt(GripIndex);
-          
             RevisionMark.RevisionFrameTypes.RemoveAt(GripIndex);
-
             RevisionMark.RevisionFrameStretchPoints.RemoveAt(GripIndex);
 
             RevisionMark.UpdateEntities();

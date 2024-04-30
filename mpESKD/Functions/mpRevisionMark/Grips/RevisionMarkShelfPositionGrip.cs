@@ -7,7 +7,7 @@ using Base.Utils;
 using ModPlusAPI;
 
 /// <summary>
-/// Ручка марки ревизии, меняющая положение полки
+/// Ручка марки изменения, меняющая положение полки
 /// </summary>
 public class RevisionMarkShelfPositionGrip : SmartEntityGripData
 {

@@ -1,7 +1,4 @@
-﻿using Autodesk.AutoCAD.GraphicsInterface;
-using DocumentFormat.OpenXml.Drawing;
-
-namespace mpESKD.Functions.mpRevisionMark.Grips;
+﻿namespace mpESKD.Functions.mpRevisionMark.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -12,15 +9,12 @@ using Base.Utils;
 using ModPlusAPI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
-/// Ручка вершин
+/// Ручка растяжения рамки
 /// </summary>
 public class RevisionMarkFrameStretchGrip : SmartEntityGripData
 {
-    private readonly Point2d[] _points;
-
     /// <summary>
     /// Initializes a new instance of the <see cref="RevisionMarkFrameStretchGrip"/> class.
     /// </summary>
@@ -32,24 +26,6 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
         GripIndex = gripIndex;
         GripType = GripType.Point;
         RubberBandLineDisabled = true;
-
-        /*
-        var insertionPoint = RevisionMark.InsertionPoint.ToPoint2d();
-        _points = new[]
-        {
-            new Point2d(
-                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[0].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[0].Y),
-            new Point2d(
-                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[1].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[1].Y),
-            new Point2d(
-                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[2].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[2].Y),
-            new Point2d(
-                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[3].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[3].Y),
-        };*/
     }
 
     /// <summary>
@@ -58,7 +34,7 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
     public RevisionMark RevisionMark { get; }
 
     /// <summary>
-    /// Новое значение точки вершины
+    /// Новое значение точки ручки
     /// </summary>
     public Point3d NewPoint { get; set; }
 
@@ -122,8 +98,8 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
     {
         try
         {
-            List<Polyline> revisionFramesAsPolylines = new();
-            List<Circle> revisionFramesAsCircles = new();
+            List<Polyline> revisionFramesAsPolylines = new ();
+            List<Circle> revisionFramesAsCircles = new ();
 
             var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
                 .GetValue(RevisionMark.RevisionFrameTypes[GripIndex]);
@@ -135,8 +111,7 @@ public class RevisionMarkFrameStretchGrip : SmartEntityGripData
                 frameType,
                 revisionFramesAsPolylines,
                 revisionFramesAsCircles,
-                RevisionMark.GetFullScale()
-            );
+                RevisionMark.GetFullScale());
 
             if (revisionFramesAsPolylines[0] != null)
             {

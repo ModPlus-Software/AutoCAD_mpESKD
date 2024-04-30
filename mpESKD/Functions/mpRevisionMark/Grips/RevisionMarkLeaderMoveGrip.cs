@@ -12,7 +12,7 @@ using System;
 using System.Linq;
 
 /// <summary>
-/// Ручка вершин
+/// Ручка перетаскивания выносок
 /// </summary>
 public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
 {
@@ -54,7 +54,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
     public RevisionMark RevisionMark { get; }
 
     /// <summary>
-    /// Новое значение точки вершины
+    /// Новое значение точки ручки
     /// </summary>
     public Point3d NewPoint { get; set; }
 
@@ -91,9 +91,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
                 var moveVector = NewPoint - prevLeaderPoint;
 
                 RevisionMark.LeaderPoints[GripIndex] = NewPoint;
-
-                RevisionMark.RevisionFrameStretchPoints[GripIndex]=
-                    prevStretchPoint + moveVector;
+                RevisionMark.RevisionFrameStretchPoints[GripIndex] = prevStretchPoint + moveVector;
 
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();
@@ -158,8 +156,8 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
 
             var stretchPoint = prevStretchPoint + moveVector;
 
-            List<Polyline> revisionFramesAsPolylines = new();
-            List<Circle> revisionFramesAsCircles = new();
+            List<Polyline> revisionFramesAsPolylines = new ();
+            List<Circle> revisionFramesAsCircles = new ();
 
             var frameType = (RevisionFrameType)Enum.GetValues(typeof(RevisionFrameType))
                 .GetValue(RevisionMark.RevisionFrameTypes[GripIndex]);
@@ -171,8 +169,7 @@ public class RevisionMarkLeaderMoveGrip : SmartEntityGripData
                 frameType,
                 revisionFramesAsPolylines,
                 revisionFramesAsCircles,
-                RevisionMark.GetFullScale()
-            );
+                RevisionMark.GetFullScale());
 
             if (revisionFramesAsPolylines[0] != null)
             {

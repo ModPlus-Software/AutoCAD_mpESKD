@@ -23,9 +23,6 @@ internal static class RevisionCloud
         Point2d segmentEndPoint,
         double cloudArcLength)
     {
-
-      
-
         var angleCloudArc = Math.PI / 4;
         var segmentArcPoints = new List<Point2d> { segmentStartPoint };
 
@@ -70,21 +67,10 @@ internal static class RevisionCloud
         double revisionRoundRadius,
         double cloudArcLength)
     {
-
-        AcadUtils.WriteMessageInDebug(
-            $"insertionPoint: {insertionPoint.X},{insertionPoint.Y}");
-
-        AcadUtils.WriteMessageInDebug(
-            $"revisionRoundRadius: {revisionRoundRadius}");
-
-
         var angleCloudArc = Math.PI / 4;
 
         // Длина хорды дуги облака
         var cloudArcChordLength = (2 * cloudArcLength * Math.Sin(angleCloudArc)) / angleCloudArc;
-
-        AcadUtils.WriteMessageInDebug(
-            $"Длина хорды дуги облака cloudArcChordLength: {cloudArcChordLength}");
 
         // Угол, образующий хорду
         var revisionRoundChordAngle = 2 * Math.Asin(cloudArcChordLength / (2 * revisionRoundRadius));
@@ -94,9 +80,6 @@ internal static class RevisionCloud
 
         var revisionRoundCircleLength = 2 * Math.PI * revisionRoundRadius;
         var cloudArcCount = (int)(revisionRoundCircleLength / revisionRoundArcLength);
-
-        AcadUtils.WriteMessageInDebug(
-            $"Количество дуг cloudArcCount: {cloudArcCount}");
 
         if (cloudArcCount < 2)
             return GetArcPointsOfSegment(
@@ -114,7 +97,6 @@ internal static class RevisionCloud
                 revisionRoundRadius * Math.Cos(angle),
                 revisionRoundRadius * Math.Sin(angle));
 
-            // var normalVector = (normalVectorPoint - insertionPoint.ToPoint2d()).GetNormal();
             var normalVector = (normalVectorPoint - new Point2d(0,0)).GetNormal();
 
             var cloudArcPoint = insertionPoint.ToPoint2d() + (normalVector * revisionRoundRadius);

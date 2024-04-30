@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace mpESKD.Functions.mpRevisionMark;
+﻿namespace mpESKD.Functions.mpRevisionMark;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -9,7 +7,7 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Utils;
+using Base.Utils;
 
 /// <inheritdoc />
 public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<RevisionMark>
@@ -140,7 +138,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
-
         try
         {
             if (IsApplicable(entity))
@@ -149,8 +146,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                 {
                     if (gripData is RevisionMarkVertexGrip vertexGrip)
                     {
-                        // AcadUtils.WriteMessageInDebug("REVISIONMARK: class: RevisionMarkGripPointOverrule; metod: MoveGripPointsAt");
-
                         var revisionMark = vertexGrip.RevisionMark;
 
                         if (vertexGrip.GripIndex == 0)
@@ -159,7 +154,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             revisionMark.InsertionPoint = vertexGrip.GripPoint + offset;
                         }
 
-                        // Вот тут происходит перерисовка примитивов внутри блока
                         revisionMark.UpdateEntities();
                         revisionMark.BlockRecord.UpdateAnonymousBlocks();
                     }
