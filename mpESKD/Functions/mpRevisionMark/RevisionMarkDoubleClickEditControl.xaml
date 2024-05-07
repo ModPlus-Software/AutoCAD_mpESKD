@@ -39,7 +39,7 @@
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p132}" />
+                       Text="{Binding Source={StaticResource Lang}, XPath=p68}" />
 
             <TextBox Name="TbNote"
                      Grid.Row="1"

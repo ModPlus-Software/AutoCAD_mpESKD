@@ -257,7 +257,7 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// <summary>
     /// Текст примечания
     /// </summary>
-    [EntityProperty(PropertiesCategory.Content, 7, "p132", "", propertyScope: PropertyScope.Palette)]
+    [EntityProperty(PropertiesCategory.Content, 7, "p68", "", propertyScope: PropertyScope.Palette)]
     [SaveToXData]
     [ValueToSearchBy]
     public string Note { get; set; } = string.Empty;
