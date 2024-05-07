@@ -50,7 +50,12 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     // insertion (start) grip
                     var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
-                        GripPoint = revisionMark.InsertionPoint
+                        //GripPoint = !string.IsNullOrEmpty(revisionMark.Note)
+                        //    ? revisionMark.NoteShelfLinePoints[1]
+                        //    : revisionMark.InsertionPoint
+
+                         GripPoint = revisionMark.InsertionPoint
+
                     };
                     grips.Add(vertexGrip);
 
@@ -86,12 +91,24 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                             revisionMark.InsertionPoint.Z
                         );
 
+                        //var shelfPointGripPosition = new Point3d(
+                        //    revisionMark.InsertionPoint.X,
+                        //    revisionMark.InsertionPoint.Y - 20 * revisionMark.GetFullScale(),
+                        //    revisionMark.InsertionPoint.Z
+                        //);
+
                         // Добавляем ручку для зеркалирования полки примечания
                         grips.Add(new RevisionMarkShelfPositionGrip(revisionMark)
                         {
                             GripPoint = shelfPointGripPosition
                         });
                     }
+                    /*
+                    else
+                    {
+                        var frameCenter = GeometryUtils.GetMiddlePoint3d(revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[2]);
+                        revisionMark.InsertionPoint = frameCenter;
+                    }*/
 
                     for (var i = 0; i < revisionMark.LeaderPoints.Count; i++)
                     {
