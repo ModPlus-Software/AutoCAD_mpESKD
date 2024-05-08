@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpRevisionMark;
 
-using ModPlusAPI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -103,6 +102,18 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     /// </summary>
     [SaveToXData]
     public List<Point3d> RevisionFrameStretchPoints { get; set; } = new ();
+
+    /// <summary>
+    /// Точки полки примечаний
+    /// </summary>
+    [SaveToXData]
+    public List<Point3d> NoteShelfLinePoints { get; set; } = new ();
+
+    /// <summary>
+    /// Точки рамки текста номера ревизии, относительно точки вставки блока
+    /// </summary>
+    [SaveToXData] 
+    public List<Point3d> FrameRevisionTextPoints { get; set; } = new ();
 
     // ReSharper disable once InconsistentNaming
     private List<Point3d> LeaderPointsOCS => LeaderPoints.Select(p => p.TransformBy(BlockTransform.Inverse())).ToList();
@@ -258,19 +269,6 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
     #endregion
 
-
-    /// <summary>
-    /// Точки полки примечаний
-    /// </summary>
-    [SaveToXData]
-    public List<Point3d> NoteShelfLinePoints { get; set; } = new();
-
-    /// <summary>
-    /// Точки рамки текста номера ревизии, относительно точки вставки блока
-    /// </summary>
-    [SaveToXData] 
-    public List<Point3d> FrameRevisionTextPoints { get; set; } = new ();
-
     /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
@@ -344,54 +342,86 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         var diffXaxis = fullHeight / Math.Tan(60.DegreeToRadian());
 
         // Отрисовка текста - позиционирование текста
-        var noteTextPosition = default(Point3d);
+        Point3d revisionTextPosition = default;
+        Point3d noteTextPosition = default;
         if (_revisionDbText != null)
         {
-            _revisionDbText.Position = insertionPoint;
-            _revisionDbText.AlignmentPoint = insertionPoint;
-
+            // Если есть примечание
             if (_noteDbText != null)
             {
                 if (isRight)
                 {
+                    revisionTextPosition = new Point3d(
+                        // insertionPoint.X + (fullRevisionTextLength / 2) + diffXaxis + fullNoteTextLength,
+                        insertionPoint.X + fullNoteTextLength,
+                        insertionPoint.Y,
+                        0);
+
                     noteTextPosition = new Point3d(
-                        insertionPoint.X + (fullRevisionTextLength / 2) + diffXaxis + (fullNoteTextLength / 2),
+                        insertionPoint.X + (fullNoteTextLength / 2) - (fullRevisionTextLength / 2) - diffXaxis,
                         insertionPoint.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
                         0);
                 }
                 else
                 {
+                    revisionTextPosition = new Point3d(
+                        insertionPoint.X - fullRevisionTextLength  - (2 * diffXaxis) - fullNoteTextLength,
+                        insertionPoint.Y,
+                        0);
+
                     noteTextPosition = new Point3d(
-                        insertionPoint.X - (fullRevisionTextLength / 2) - diffXaxis - (fullNoteTextLength / 2),
+                        insertionPoint.X - (fullNoteTextLength / 2) - (fullRevisionTextLength / 2) - diffXaxis,
                         insertionPoint.Y - (revisionTextHeight / 2) + (noteTextHeight / 2),
                         0);
                 }
 
                 _noteDbText.Position = noteTextPosition;
                 _noteDbText.AlignmentPoint = noteTextPosition;
+
             }
+            // Если нет примечания
+            else
+            {
+                revisionTextPosition = insertionPoint;
+            }
+
+            InsertionPoint = new Point3d(
+                InsertionPoint.X + revisionTextPosition.X,
+                InsertionPoint.Y + revisionTextPosition.Y,
+                InsertionPoint.Z
+            ); 
+
+            _revisionDbText.Position = revisionTextPosition;
+            _revisionDbText.AlignmentPoint = revisionTextPosition;
         }
 
         // Отрисовка рамки номера изменения
-        var frameRevisionTextPolyline = CreateRevisionTextFrame(insertionPoint, fullRevisionTextLength, diffXaxis);
+        //Polyline frameRevisionTextPolyline = new ();
+        //if (_revisionDbText != null)
+        //{
+          var  frameRevisionTextPolyline = CreateRevisionTextFrame(revisionTextPosition, fullRevisionTextLength, diffXaxis);
+        //}
 
-        // Отрисовка полки примечания
+        // Отрисовка полки примечания и сохранения ее точек в свойстве
         if (_noteDbText != null)
         {
+            Point3d startPointLine;
+            Point3d endPointLine;
+
             if (isRight)
             {
-                _noteShelfLine = new Line(
-                    frameRevisionTextPolyline.GetPoint2dAt(1).ToPoint3d(), // точка рамки справа внизу
-                    frameRevisionTextPolyline.GetPoint2dAt(1).ToPoint3d() + (Vector3d.XAxis * (fullNoteTextLength + diffXaxis)));
+                startPointLine = frameRevisionTextPolyline.GetPoint2dAt(0).ToPoint3d();
+                endPointLine = startPointLine - (Vector3d.XAxis * fullNoteTextLength);
             }
             else
             {
-                _noteShelfLine = new Line(
-                    frameRevisionTextPolyline.GetPoint2dAt(0).ToPoint3d(), // точка рамки слева внизу
-                    frameRevisionTextPolyline.GetPoint2dAt(0).ToPoint3d() - (Vector3d.XAxis * fullNoteTextLength));
+                startPointLine = frameRevisionTextPolyline.GetPoint2dAt(1).ToPoint3d();
+                endPointLine = startPointLine + (Vector3d.XAxis * (fullNoteTextLength + diffXaxis));
             }
 
-            NoteShelfLinePoints = new List<Point3d> { _noteShelfLine.StartPoint, _noteShelfLine.EndPoint };
+            _noteShelfLine = new Line(startPointLine, endPointLine);
+
+            NoteShelfLinePoints = new List<Point3d> { startPointLine, endPointLine };
         }
 
         // Отрисовка выносок и их рамок
@@ -459,12 +489,12 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
         if (HideTextBackground)
         {
             var offset = TextMaskOffset * _scale;
-            _revisionTextMask = _revisionDbText.GetBackgroundMask(offset, insertionPoint);
+            _revisionTextMask = _revisionDbText.GetBackgroundMask(offset, revisionTextPosition);
             _noteTextMask = _noteDbText.GetBackgroundMask(offset, noteTextPosition);
         }
     }
 
-    private Polyline CreateRevisionTextFrame(Point3d insertionPoint, double fullRevisionTextLength, double diffXaxis)
+    private Polyline CreateRevisionTextFrame(Point3d centerPoint, double fullRevisionTextLength, double diffXaxis)
     {
         AcadUtils.WriteMessageInDebug($"CreateRevisionTextFrame: 1");
         var revisionTextHeight = RevisionTextHeight * _scale;
@@ -489,10 +519,10 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
         AcadUtils.WriteMessageInDebug($"CreateRevisionTextFrame: 3");
 
-        var leftBottomPoint = insertionPoint.ToPoint2d() + toLeftBottomPoint;
-        var rightBottomPoint = insertionPoint.ToPoint2d() + toRightBottomPoint;
-        var rightTopPoint = insertionPoint.ToPoint2d() + toRightTopPoint;
-        var leftTopPoint = insertionPoint.ToPoint2d() + toLeftTopPoint;
+        var leftBottomPoint = centerPoint.ToPoint2d() + toLeftBottomPoint;
+        var rightBottomPoint = centerPoint.ToPoint2d() + toRightBottomPoint;
+        var rightTopPoint = centerPoint.ToPoint2d() + toRightTopPoint;
+        var leftTopPoint = centerPoint.ToPoint2d() + toLeftTopPoint;
 
         AcadUtils.WriteMessageInDebug($"CreateRevisionTextFrame: 4");
 

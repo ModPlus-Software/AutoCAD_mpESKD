@@ -47,18 +47,45 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                 var revisionMark = EntityReaderService.Instance.GetFromEntity<RevisionMark>(entity);
                 if (revisionMark != null)
                 {
-                    // insertion (start) grip
+                    // Ручка перемещения марки изменения (номера с рамкой, примечанием и полкой примечания)
+                    Point3d RevisionMarkVertexGripPoint;
+                    if (!string.IsNullOrEmpty(revisionMark.Note))
+                    {
+                        var centerRevisionTextFrame = GeometryUtils.GetMiddlePoint3d(
+                            revisionMark.FrameRevisionTextPoints[0],
+                            revisionMark.FrameRevisionTextPoints[2]);
+
+
+                        var verctorNormal = (centerRevisionTextFrame - new Point3d(0,0,0)).GetNormal();
+
+
+                        var distanceToCenterFrame = new Point3d(0, 0, 0).DistanceTo(centerRevisionTextFrame);
+                        
+
+                      //  var centerRevisionTextFrame = revisionMark.NoteShelfLinePoints[0] + (verctorNormal * distanceToCenterFrame);
+
+                        /*
+                        RevisionMarkVertexGripPoint = new Point3d(
+                            revisionMark.InsertionPoint.X + (new Point3d(0,0,0)).DistanceTo(revisionMark.NoteShelfLinePoints[0]),
+                            revisionMark.InsertionPoint.Y,
+                            revisionMark.InsertionPoint.Z);*/
+
+                        RevisionMarkVertexGripPoint = revisionMark.InsertionPoint + (verctorNormal * distanceToCenterFrame) + Vector3d.XAxis * revisionMark.NoteShelfLinePoints[0].DistanceTo(revisionMark.NoteShelfLinePoints[1]);
+                    }
+                    else
+                    {
+                        RevisionMarkVertexGripPoint = revisionMark.InsertionPoint;
+                    }
+
                     var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
-                        //GripPoint = !string.IsNullOrEmpty(revisionMark.Note)
-                        //    ? revisionMark.NoteShelfLinePoints[1]
-                        //    : revisionMark.InsertionPoint
-
-                         GripPoint = revisionMark.InsertionPoint
-
+                        // GripPoint = RevisionMarkVertexGripPoint
+                        GripPoint = revisionMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
 
+
+                    // Ручка создания выноски
                     Point3d addLeaderGripPosition;
                     if (!string.IsNullOrEmpty(revisionMark.Note))
                     {
