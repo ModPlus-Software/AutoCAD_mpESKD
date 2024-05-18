@@ -133,6 +133,7 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
 
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();
+
         using (AcadUtils.Document.LockDocument())
         {
             using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())

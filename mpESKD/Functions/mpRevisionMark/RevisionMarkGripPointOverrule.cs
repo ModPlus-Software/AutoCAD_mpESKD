@@ -48,94 +48,46 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                 if (revisionMark != null)
                 {
                     // Ручка перемещения марки изменения (номера с рамкой, примечанием и полкой примечания)
-                    Point3d RevisionMarkVertexGripPoint;
-                    if (!string.IsNullOrEmpty(revisionMark.Note))
-                    {
-                        var centerRevisionTextFrame = GeometryUtils.GetMiddlePoint3d(
-                            revisionMark.FrameRevisionTextPoints[0],
-                            revisionMark.FrameRevisionTextPoints[2]);
-
-
-                        var verctorNormal = (centerRevisionTextFrame - new Point3d(0,0,0)).GetNormal();
-
-
-                        var distanceToCenterFrame = new Point3d(0, 0, 0).DistanceTo(centerRevisionTextFrame);
-                        
-
-                      //  var centerRevisionTextFrame = revisionMark.NoteShelfLinePoints[0] + (verctorNormal * distanceToCenterFrame);
-
-                        /*
-                        RevisionMarkVertexGripPoint = new Point3d(
-                            revisionMark.InsertionPoint.X + (new Point3d(0,0,0)).DistanceTo(revisionMark.NoteShelfLinePoints[0]),
-                            revisionMark.InsertionPoint.Y,
-                            revisionMark.InsertionPoint.Z);*/
-
-                        RevisionMarkVertexGripPoint = revisionMark.InsertionPoint + (verctorNormal * distanceToCenterFrame) + Vector3d.XAxis * revisionMark.NoteShelfLinePoints[0].DistanceTo(revisionMark.NoteShelfLinePoints[1]);
-                    }
-                    else
-                    {
-                        RevisionMarkVertexGripPoint = revisionMark.InsertionPoint;
-                    }
-
                     var vertexGrip = new RevisionMarkVertexGrip(revisionMark, 0)
                     {
-                        // GripPoint = RevisionMarkVertexGripPoint
                         GripPoint = revisionMark.InsertionPoint
                     };
                     grips.Add(vertexGrip);
 
+                    // Ручка для создания выноски
+                    Point3d revisionMarkAddLeaderGripPoint;
 
-                    // Ручка создания выноски
-                    Point3d addLeaderGripPosition;
                     if (!string.IsNullOrEmpty(revisionMark.Note))
                     {
-                        addLeaderGripPosition = new Point3d(
-                            revisionMark.InsertionPoint.X + revisionMark.NoteShelfLinePoints[1].X,
-                            revisionMark.InsertionPoint.Y + revisionMark.NoteShelfLinePoints[1].Y,
+                        revisionMarkAddLeaderGripPoint = new Point3d(
+                            revisionMark.InsertionPoint.X,
+                            revisionMark.InsertionPoint.Y - (3 * revisionMark.GetFullScale()),
                             revisionMark.InsertionPoint.Z);
                     }
                     else
                     {
-                        addLeaderGripPosition = new Point3d(
-                            revisionMark.InsertionPoint.X + revisionMark.FrameRevisionTextPoints[0].X,
-                            revisionMark.InsertionPoint.Y + revisionMark.FrameRevisionTextPoints[0].Y,
+                        revisionMarkAddLeaderGripPoint = new Point3d(
+                            revisionMark.InsertionPoint.X + revisionMark.FrameRevisionTextPoints[3].X,
+                            revisionMark.InsertionPoint.Y + revisionMark.FrameRevisionTextPoints[3].Y,
                             revisionMark.InsertionPoint.Z);
                     }
 
-                    // Добавляем ручку для создания выноски
                     grips.Add(new RevisionMarkAddLeaderGrip(revisionMark)
                     {
-                        GripPoint = addLeaderGripPosition
+                        GripPoint = revisionMarkAddLeaderGripPoint
                     });
 
+                    // Ручка для зеркалирования полки примечания
                     if (!string.IsNullOrEmpty(revisionMark.Note))
                     {
-                        var bottomLineFrameCenter = GeometryUtils.GetMiddlePoint3d(revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[1]);
-
-                        var shelfPointGripPosition = new Point3d(
-                            revisionMark.InsertionPoint.X + bottomLineFrameCenter.X,
-                            revisionMark.InsertionPoint.Y + bottomLineFrameCenter.Y,
-                            revisionMark.InsertionPoint.Z
-                        );
-
-                        //var shelfPointGripPosition = new Point3d(
-                        //    revisionMark.InsertionPoint.X,
-                        //    revisionMark.InsertionPoint.Y - 20 * revisionMark.GetFullScale(),
-                        //    revisionMark.InsertionPoint.Z
-                        //);
-
-                        // Добавляем ручку для зеркалирования полки примечания
                         grips.Add(new RevisionMarkShelfPositionGrip(revisionMark)
                         {
-                            GripPoint = shelfPointGripPosition
+                            GripPoint = new Point3d(
+                                revisionMark.InsertionPoint.X,
+                                revisionMark.InsertionPoint.Y + revisionMark.FrameRevisionTextPoints[3].Y,
+                                revisionMark.InsertionPoint.Z)
                         });
                     }
-                    /*
-                    else
-                    {
-                        var frameCenter = GeometryUtils.GetMiddlePoint3d(revisionMark.FrameRevisionTextPoints[0], revisionMark.FrameRevisionTextPoints[2]);
-                        revisionMark.InsertionPoint = frameCenter;
-                    }*/
 
                     for (var i = 0; i < revisionMark.LeaderPoints.Count; i++)
                     {
@@ -213,6 +165,13 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     {
                         frameStretchGrip.NewPoint = frameStretchGrip.GripPoint + offset;
                     }
+                    //else if (gripData is RevisionMarkFrameTypeGrip frameTypeGrip)
+                    //{
+                    //    var revisionMark = frameTypeGrip.RevisionMark;
+
+                    //    revisionMark.UpdateEntities();
+                    //    revisionMark.BlockRecord.UpdateAnonymousBlocks();
+                    //}
                     else
                     {
                         base.MoveGripPointsAt(entity, grips, offset, bitFlags);

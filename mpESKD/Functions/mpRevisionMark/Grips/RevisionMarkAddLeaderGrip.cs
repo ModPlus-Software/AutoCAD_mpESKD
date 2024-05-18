@@ -31,8 +31,8 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
         _points = new[]
         {
             new Point2d(
-                insertionPoint.X + RevisionMark.FrameRevisionTextPoints[0].X,
-                insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[0].Y),
+                insertionPoint.X,
+                insertionPoint.Y),
             new Point2d(
                 insertionPoint.X + RevisionMark.FrameRevisionTextPoints[1].X,
                 insertionPoint.Y + RevisionMark.FrameRevisionTextPoints[1].Y),
@@ -122,12 +122,12 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
             }
             else
             {
-                var startPoint = new Point3d(
-                    RevisionMark.InsertionPoint.X + RevisionMark.NoteShelfLinePoints[1].X,
-                    RevisionMark.InsertionPoint.Y + RevisionMark.NoteShelfLinePoints[1].Y,
-                    RevisionMark.InsertionPoint.Z);
+                //var startPoint = new Point3d(
+                //    RevisionMark.InsertionPoint.X + RevisionMark.NoteShelfLinePoints[1].X,
+                //    RevisionMark.InsertionPoint.Y + RevisionMark.NoteShelfLinePoints[1].Y,
+                //    RevisionMark.InsertionPoint.Z);
 
-                line = new Line(startPoint, pointMonitorEventArgs.Context.ComputedPoint)
+                line = new Line(RevisionMark.InsertionPoint, pointMonitorEventArgs.Context.ComputedPoint)
                 {
                     ColorIndex = 150
                 };
