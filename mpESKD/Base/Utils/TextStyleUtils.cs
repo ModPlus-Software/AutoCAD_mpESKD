@@ -40,7 +40,7 @@ public static class TextStyleUtils
                 foreach (var objectId in textStyleTable)
                 {
                     var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
-                    if (txtStl.Name.Equals(textStyleName))
+                    if (txtStl.Name.Equals(textStyleName, StringComparison.OrdinalIgnoreCase))
                     {
                         return txtStl;
                     }
@@ -126,7 +126,8 @@ public static class TextStyleUtils
                 foreach (var objectId in textStyleTable)
                 {
                     var textStyleTableRecord = tr.GetObject(objectId, OpenMode.ForRead) as TextStyleTableRecord;
-                    if (textStyleTableRecord != null && textStyleTableRecord.Name.Equals(textStyleName))
+                    if (textStyleTableRecord != null &&
+                        textStyleTableRecord.Name.Equals(textStyleName, StringComparison.OrdinalIgnoreCase))
                     {
                         return textStyleTableRecord;
                     }
