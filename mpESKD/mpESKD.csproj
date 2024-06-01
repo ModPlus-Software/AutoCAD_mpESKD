@@ -37,14 +37,20 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <ExternalVersion>2024</ExternalVersion>
+    <ExternalVersion>2022</ExternalVersion>
     <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
-    <!--<OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>-->
+    <OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
     <AssemblyName>$(RootNamespace)_$(ExternalVersion)</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Functions\mpRevisionMark\Grips\GripName.cs" />
+    <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkGrip.cs" />
+    <Compile Remove="Functions\mpRevisionMark\RevisionMarkJigState.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="12.0.0" ExcludeAssets="runtime" />
