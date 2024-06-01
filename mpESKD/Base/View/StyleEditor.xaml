@@ -318,110 +318,110 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
                     <Grid.Resources>
                         <apiConverters:EnumToIntConverter x:Key="EnumToIntConverter" />
                         <Style TargetType="{x:Type TextBlock}">
                             <Setter Property="TextWrapping" Value="Wrap" />
                             <Setter Property="Margin" Value="{DynamicResource ModPlusDefaultMargin}" />
+                            <Setter Property="VerticalAlignment" Value="Center"/>
                         </Style>
                     </Grid.Resources>
                     <!-- Use scale from style -->
                     <CheckBox Grid.Row="0"
+                              Grid.Column="0"
+                              Grid.ColumnSpan="2"
                               Content="{Binding Source={StaticResource Lang}, XPath=h22}"
                               IsChecked="{Binding Path=UseScaleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ToolTip="{Binding Source={StaticResource Lang}, XPath=h23}" />
                     <!-- Use Layer from style -->
                     <CheckBox Name="ChkUseLayerFromStyle"
                               Grid.Row="1"
+                              Grid.Column="0"
+                              Grid.ColumnSpan="2"
                               Content="{Binding Source={StaticResource Lang}, XPath=h24}"
                               IsChecked="{Binding Path=UseLayerFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ToolTip="{Binding Source={StaticResource Lang}, XPath=h25}" />
-                    <Grid Grid.Row="2"
-                          Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Source={StaticResource Lang}, XPath=h26}" />
-                        <ComboBox Grid.Column="1"
-                                  SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h27}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h28}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h29}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h30}" />
-                        </ComboBox>
-                    </Grid>
+                    <TextBlock Grid.Row="2"
+                               Grid.Column="0"
+                               Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h26}" />
+                    <ComboBox Grid.Row="2"
+                              Grid.Column="1"
+                              Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseLayerFromStyle}"
+                              SelectedIndex="{Binding Path=IfNoLayer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h27}"
+                                      ToolTip="{Binding Source={StaticResource Lang}, XPath=h28}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h29}"
+                                      ToolTip="{Binding Source={StaticResource Lang}, XPath=h30}" />
+                    </ComboBox>
+
                     <!-- Text style -->
                     <CheckBox Name="ChkUseTextStyleFromStyle"
                               Grid.Row="3"
+                              Grid.Column="0"
+                              Grid.ColumnSpan="2"
                               Content="{Binding Source={StaticResource Lang}, XPath=h31}"
                               IsChecked="{Binding Path=UseTextStyleFromStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ToolTip="{Binding Source={StaticResource Lang}, XPath=h32}" />
-                    <Grid Grid.Row="4"
-                          Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Source={StaticResource Lang}, XPath=h33}" />
-                        <ComboBox Grid.Column="1"
-                                  SelectedIndex="{Binding Path=IfNoTextStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h34}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h36}"
-                                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h37}" />
-                        </ComboBox>
-                    </Grid>
+                    <TextBlock Grid.Row="4"
+                               Grid.Column="0"
+                               Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h33}" />
+                    <ComboBox Grid.Row="4"
+                              Grid.Column="1"
+                              Visibility="{Binding IsChecked, Converter={StaticResource BooleanToVisibilityConverter}, ElementName=ChkUseTextStyleFromStyle}"
+                              SelectedIndex="{Binding Path=IfNoTextStyle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h34}"
+                                      ToolTip="{Binding Source={StaticResource Lang}, XPath=h35}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=h36}"
+                                      ToolTip="{Binding Source={StaticResource Lang}, XPath=h37}" />
+                    </ComboBox>
+                    
                     <!-- LayerActionOnCreateAnalog -->
-                    <Grid Grid.Row="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Source={StaticResource Lang}, XPath=h98}" />
-                        <ComboBox Grid.Column="1"
-                                  SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:LayerActionOnCreateAnalog}}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la1}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la2}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}" />
-                        </ComboBox>
-                    </Grid>
+                    <TextBlock Grid.Row="5"
+                               Grid.Column="0"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h98}" />
+                    <ComboBox Grid.Row="5"
+                              Grid.Column="1"
+                              SelectedIndex="{Binding Path=LayerActionOnCreateAnalog, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:LayerActionOnCreateAnalog}}">
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la1}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la2}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=la3}" />
+                    </ComboBox>
+                    
                     <!-- Global integer separator -->
-                    <Grid Grid.Row="6">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Source={StaticResource Lang}, XPath=h119}" />
-                        <ComboBox Grid.Column="1"
-                                  SelectedIndex="{Binding Path=GlobalNumberSeparator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:GlobalNumberSeparator}}">
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator1}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator2}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator3}" />
-                            <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator4}" />
-                        </ComboBox>
-                    </Grid>
+                    <TextBlock Grid.Row="6"
+                               Grid.Column="0"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h119}" />
+                    <ComboBox Grid.Row="6"
+                              Grid.Column="1"
+                              SelectedIndex="{Binding Path=GlobalNumberSeparator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToIntConverter}, ConverterParameter={x:Type enums:GlobalNumberSeparator}}">
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator1}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator2}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator3}" />
+                        <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=separator4}" />
+                    </ComboBox>
+                    
                     <!-- Maximum of selected objects -->
-                    <Grid Grid.Row="7"
-                          ToolTip="{Binding Source={StaticResource Lang}, XPath=h38}"
-                          ToolTipService.InitialShowDelay="0"
-                          ToolTipService.ShowDuration="30000">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding Source={StaticResource Lang}, XPath=h39}" />
-                        <mps:NumericBox Grid.Column="1"
-                                        Interval="50"
-                                        Minimum="0"
-                                        NumericInputMode="Numbers"
-                                        Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </Grid>
+                    <TextBlock Grid.Row="7"
+                               Grid.Column="0"
+                               Text="{Binding Source={StaticResource Lang}, XPath=h39}"
+                               ToolTip="{Binding Source={StaticResource Lang}, XPath=h38}"
+                               ToolTipService.InitialShowDelay="0"
+                               ToolTipService.ShowDuration="30000"/>
+                    <mps:NumericBox Grid.Row="7"
+                                    Grid.Column="1"
+                                    Interval="50"
+                                    Minimum="0"
+                                    NumericInputMode="Numbers"
+                                    Value="{Binding Path=MaxSelectedObjects, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    ToolTip="{Binding Source={StaticResource Lang}, XPath=h38}"
+                                    ToolTipService.InitialShowDelay="0"
+                                    ToolTipService.ShowDuration="30000"/>
                 </Grid>
 
                 <TextBlock Grid.Row="2"

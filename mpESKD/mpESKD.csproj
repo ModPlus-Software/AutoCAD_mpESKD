@@ -37,9 +37,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <ExternalVersion>2022</ExternalVersion>
+    <ExternalVersion>2024</ExternalVersion>
     <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
-    <OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+    <OutputPath>D:\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -47,17 +47,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Functions\mpRevisionMark\Grips\GripName.cs" />
-    <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkGrip.cs" />
-    <Compile Remove="Functions\mpRevisionMark\RevisionMarkJigState.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="12.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="13.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+		<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
