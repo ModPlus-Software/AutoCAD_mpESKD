@@ -38,6 +38,12 @@ public class RibbonBuilder
 {
     private static bool _wasActive;
     private static int _colorTheme = 1;
+    private static readonly string TabName;
+
+    static RibbonBuilder()
+    {
+        TabName = Language.GetPluginLocalName(ModPlusConnector.Instance);
+    }
 
     /// <summary>
     /// Построить вкладку ЕСКД на ленте
@@ -63,9 +69,8 @@ public class RibbonBuilder
             if (IsLoaded())
             {
                 var ribbonControl = ComponentManager.Ribbon;
-                var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
                 var tab = ribbonControl.Tabs.FirstOrDefault(tab =>
-                    !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
+                    !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(TabName));
                 if (tab != null)
                 {
                     ribbonControl.Tabs.Remove(tab);
@@ -82,17 +87,17 @@ public class RibbonBuilder
     private static bool IsLoaded()
     {
         var ribbonControl = ComponentManager.Ribbon;
-        var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-        return ribbonControl.Tabs.Any(tab => !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
+        return ribbonControl.Tabs.Any(tab => !string.IsNullOrEmpty(tab.Id) && 
+                                             tab.Id.Equals("ModPlus_ESKD") && 
+                                             tab.Title.Equals(TabName));
     }
 
     private static bool IsActive()
     {
         var ribbonControl = ComponentManager.Ribbon;
-        var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
         foreach (var tab in ribbonControl.Tabs)
         {
-            if (!string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
+            if (!string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(TabName))
             {
                 return tab.IsActive;
             }
