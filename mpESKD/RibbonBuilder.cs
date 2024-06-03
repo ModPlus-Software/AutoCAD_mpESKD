@@ -142,8 +142,7 @@ public class RibbonBuilder
             var ribbonControl = ComponentManager.Ribbon;
 
             // add the tab
-            var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-            var ribbonTab = new RibbonTab { Title = tabName, Id = "ModPlus_ESKD" };
+            var ribbonTab = new RibbonTab { Title = TabName, Id = "ModPlus_ESKD" };
             ribbonControl.Tabs.Add(ribbonTab);
 
             // add content
