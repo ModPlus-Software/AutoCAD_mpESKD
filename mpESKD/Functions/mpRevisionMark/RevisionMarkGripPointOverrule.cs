@@ -7,7 +7,6 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using Base.Utils;
 
 /// <inheritdoc />
 public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<RevisionMark>
@@ -165,13 +164,6 @@ public class RevisionMarkGripPointOverrule : BaseSmartEntityGripOverrule<Revisio
                     {
                         frameStretchGrip.NewPoint = frameStretchGrip.GripPoint + offset;
                     }
-                    //else if (gripData is RevisionMarkFrameTypeGrip frameTypeGrip)
-                    //{
-                    //    var revisionMark = frameTypeGrip.RevisionMark;
-
-                    //    revisionMark.UpdateEntities();
-                    //    revisionMark.BlockRecord.UpdateAnonymousBlocks();
-                    //}
                     else
                     {
                         base.MoveGripPointsAt(entity, grips, offset, bitFlags);

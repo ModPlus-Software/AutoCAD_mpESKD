@@ -203,10 +203,5 @@ public static class RevisionFrameBuilder
                 revisionFramesAsCircles.Add(null);
             }
         }
-        //else
-        //{
-        //    revisionFramesAsPolylines.Add(null);
-        //    revisionFramesAsCircles.Add(null);
-        //}
     }
 }

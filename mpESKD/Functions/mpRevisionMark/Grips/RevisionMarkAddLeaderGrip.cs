@@ -79,7 +79,6 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 RevisionMark.LeaderPoints.Add(NewPoint);
                 RevisionMark.RevisionFrameStretchPoints.Add(NewPoint);
                 RevisionMark.RevisionFrameTypes.Add(0);
-                //RevisionMark.AddNoneFrameEntities();
 
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();
@@ -123,11 +122,6 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
             }
             else
             {
-                //var startPoint = new Point3d(
-                //    RevisionMark.InsertionPoint.X + RevisionMark.NoteShelfLinePoints[1].X,
-                //    RevisionMark.InsertionPoint.Y + RevisionMark.NoteShelfLinePoints[1].Y,
-                //    RevisionMark.InsertionPoint.Z);
-
                 line = new Line(RevisionMark.InsertionPoint, pointMonitorEventArgs.Context.ComputedPoint)
                 {
                     ColorIndex = 150

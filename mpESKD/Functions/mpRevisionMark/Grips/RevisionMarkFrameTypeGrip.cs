@@ -114,9 +114,6 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
         _win?.Close();
 
         var menuItem = (MenuItem)sender;
-
-        // RevisionMark.LeaderTypes[GripIndex] = (int)Enum.Parse(typeof(LeaderEndType), menuItem.Name);
-
         var selectedItemNumber = (int)Enum.Parse(typeof(RevisionFrameType), menuItem.Name);
 
         RevisionMark.RevisionFrameTypes[GripIndex] = selectedItemNumber;
@@ -130,9 +127,7 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
                     RevisionMark.LeaderPoints[GripIndex] + ((Vector3d.XAxis + Vector3d.YAxis) * 5 * RevisionMark.GetFullScale());
             }
         }
-
-      //  AcadUtils.WriteMessageInDebug($"Grip: {GripIndex}; Number selected: {selectedItemNumber}");
-
+        
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();
 
