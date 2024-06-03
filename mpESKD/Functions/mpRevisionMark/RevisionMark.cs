@@ -22,8 +22,8 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
     private string _cachedRevisionNumber;
 
     private readonly List<Line> _leaderLines = new ();
-    private readonly List<Polyline> _revisionFramesAsPolylines = new ();
-    private readonly List<Circle> _revisionFramesAsCircles = new ();
+    private  List<Polyline> _revisionFramesAsPolylines = new ();
+    private  List<Circle> _revisionFramesAsCircles = new ();
     private double _scale;
 
     #region Entities
@@ -149,6 +149,18 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
             return entities;
         }
+    }
+
+    public void AddNoneFrameEntities()
+    {
+        _revisionFramesAsCircles.Add(null);    
+        _revisionFramesAsPolylines.Add(null);
+    }
+
+    public void RemoveFrameEntities(int number)
+    {
+        _revisionFramesAsCircles.RemoveAt(number);
+        _revisionFramesAsPolylines.RemoveAt(number);
     }
 
     /// <inheritdoc/>
@@ -521,6 +533,11 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
                     this._revisionFramesAsCircles,
                     this._scale);
             }
+            else
+            {
+                _revisionFramesAsPolylines.Add(null);
+                _revisionFramesAsCircles.Add(null);
+            }
         }
 
         CornerRadiusVisibilityDependency = frameRectangularExist;
@@ -544,31 +561,52 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
             }
         }
 
-        AcadUtils.WriteMessageInDebug($"_leaderLines.Count: {_leaderLines.Count}, RevisionFrameTypes.Count: {RevisionFrameTypes.Count}");
+        AcadUtils.WriteMessageInDebug($"_leaderLines.Count: {_leaderLines.Count}, " +
+                                      $"RevisionFrameTypes.Count: {RevisionFrameTypes.Count}, " +
+                                      $"_revisionFramesAsPolylines.Count: {_revisionFramesAsPolylines.Count}" +
+                                      $"_revisionFramesAsCircles.Count: {_revisionFramesAsCircles.Count}");
+        //AcadUtils.WriteMessageInDebug($"_leaderLines.Coun: {_leaderLines.Count}, RevisionFrameTypes.Count: {RevisionFrameTypes.Count}");
+
+        for (int i = 0; i < _leaderLines.Count; i++)
+        {
+            var linet = (_leaderLines[i] != null) ? "Line" : "Null";
+            var polyt = _revisionFramesAsPolylines[i] != null ? "PolylineFrame" : "PolylineNULL";
+            var circlet = _revisionFramesAsCircles[i] != null ? "CircleFrame" : "CircleNULL";
+
+            AcadUtils.WriteMessageInDebug($"Leader {i} = {linet}; RevisionFrameType [{RevisionFrameTypes[i]}] => Polyline = {polyt}, Circle = {circlet}");
+
+
+        }
 
         // Обрезка выносок по краю рамок
         for (int i = 0; i < _leaderLines.Count; i++)
         {
+           // AcadUtils.WriteMessageInDebug($"_leader {i} => frameType: {RevisionFrameTypes[i]}");
+
+            /*
             if (RevisionFrameTypes[i] == 0)
                 continue;
 
 
-                AcadUtils.WriteMessageInDebug($"_leader {i} => frameType: {RevisionFrameTypes[i]}");
 
+
+            */
             Point3d? intersection = null;
 
             if (RevisionFrameTypes[i] == 1)
             {
+
                 intersection = IsRevisionCloud
                     ? LeaderIntersection(_revisionFramesAsPolylines[i], _leaderLines[i])
                     : LeaderIntersection(_revisionFramesAsCircles[i], _leaderLines[i]);
+
             }
             else if (RevisionFrameTypes[i] == 2)
             {
+
                 intersection = LeaderIntersection(_revisionFramesAsPolylines[i], _leaderLines[i]);
             }
 
-            AcadUtils.WriteMessageInDebug($"568");
             if (intersection != null)
             {
                 _leaderLines[i] = new Line(_leaderLines[i].StartPoint, intersection.Value);
@@ -588,9 +626,11 @@ public class RevisionMark : SmartEntity, ITextValueEntity, IWithDoubleClickEdito
 
     private Point3d? LeaderIntersection(Entity entity, Entity sectionEntity)
     {
+        AcadUtils.WriteMessageInDebug($"LeaderIntersection: start");
         var intersectionPoints = new Point3dCollection();
         entity.IntersectWith(sectionEntity, Intersect.OnBothOperands, intersectionPoints, IntPtr.Zero, IntPtr.Zero);
 
+        AcadUtils.WriteMessageInDebug($"LeaderIntersection: end");
         return intersectionPoints.Count == 1 ? intersectionPoints[0] : null;
     }
 

@@ -131,6 +131,8 @@ public class RevisionMarkFrameTypeGrip : SmartEntityGripData
             }
         }
 
+      //  AcadUtils.WriteMessageInDebug($"Grip: {GripIndex}; Number selected: {selectedItemNumber}");
+
         RevisionMark.UpdateEntities();
         RevisionMark.BlockRecord.UpdateAnonymousBlocks();
 

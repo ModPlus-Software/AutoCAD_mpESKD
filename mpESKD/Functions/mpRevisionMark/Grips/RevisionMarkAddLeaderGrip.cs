@@ -79,6 +79,7 @@ public class RevisionMarkAddLeaderGrip : SmartEntityGripData
                 RevisionMark.LeaderPoints.Add(NewPoint);
                 RevisionMark.RevisionFrameStretchPoints.Add(NewPoint);
                 RevisionMark.RevisionFrameTypes.Add(0);
+                //RevisionMark.AddNoneFrameEntities();
 
                 RevisionMark.UpdateEntities();
                 RevisionMark.BlockRecord.UpdateAnonymousBlocks();
