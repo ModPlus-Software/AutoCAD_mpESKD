@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.26.16.0</Version>
+		<Version>1.28.22.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 	</PropertyGroup>
 
@@ -39,7 +39,7 @@
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <ExternalVersion>2022</ExternalVersion>
     <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
-    <OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+    <OutputPath>C:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -47,17 +47,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Functions\mpRevisionMark\Grips\GripName.cs" />
-    <Compile Remove="Functions\mpRevisionMark\Grips\RevisionMarkGrip.cs" />
-    <Compile Remove="Functions\mpRevisionMark\RevisionMarkJigState.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="12.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="13.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+		<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -69,6 +63,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16.png" />
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16_dark.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
@@ -115,6 +111,10 @@
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_16x16_dark.png" />
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32.png" />
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32_dark.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16_dark.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32_dark.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
@@ -172,36 +172,6 @@
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="Functions\mpChainLeader\ChainLeaderDoubleClickEditControl.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpChainLeader\ChainLeader.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpLevelPlanMark\LevelPlanMark.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpViewLabel\ViewLabel.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Functions\mpWeldJoint\WeldJoint.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Functions\mpAxis\Axis.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
 	</ItemGroup>
 
 </Project>

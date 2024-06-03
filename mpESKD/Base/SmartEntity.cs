@@ -30,6 +30,7 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
 {
     private BlockTableRecord _blockRecord;
     private AnnotationScale _scale;
+    private int _doubleRoundDigits = 6;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SmartEntity"/> class.
@@ -428,7 +429,9 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                             propertiesDataDictionary.Add(propertyInfo.Name, string.Join("#", integers));
                             break;
                         case List<double> doubles:
-                            propertiesDataDictionary.Add(propertyInfo.Name, string.Join("#", doubles.Select(d => Math.Round(d, 6))));
+                            propertiesDataDictionary.Add(
+                                propertyInfo.Name,
+                                string.Join("#", doubles.Select(d => Math.Round(d, _doubleRoundDigits))));
                             break;
                         case Enum _:
                             propertiesDataDictionary.Add(propertyInfo.Name, value.ToString());
@@ -599,7 +602,12 @@ public abstract class SmartEntity : ISmartEntity, IDisposable
                 }
                 else if (propertyInfo.PropertyType == typeof(List<double>))
                 {
-                    propertyInfo.SetValue(this, valueForProperty.Split('#').Select(s => double.Parse(s, CultureInfo.InvariantCulture)).ToList());
+                    propertyInfo.SetValue(
+                        this, 
+                        valueForProperty
+                            .Split('#')
+                            .Select(s => Math.Round(double.Parse(s, CultureInfo.InvariantCulture), _doubleRoundDigits))
+                            .ToList());
                 }
                 else if (propertyInfo.PropertyType == typeof(int))
                 {

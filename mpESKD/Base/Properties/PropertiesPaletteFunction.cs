@@ -30,9 +30,9 @@ public static class PropertiesPaletteFunction
                 else
                 {
                     PaletteSet = new PaletteSet(
-                        Language.GetItem("h11"), // Свойства ЕСКД
+                        Language.GetItem("h11"), // Свойства Smart
                         "mpPropertiesPalette",
-                        new Guid("1c0dc0f7-0d06-49df-a2d3-bcea4241e036"));
+                        new Guid("9a1a888f-8ad1-4bb5-bd51-f52529530e91"));
                     PaletteSet.Load += PaletteSet_Load;
                     PaletteSet.Save += PaletteSet_Save;
                     _propertiesPalette = new PropertiesPalette();
@@ -43,7 +43,7 @@ public static class PropertiesPaletteFunction
                         Child = _propertiesPalette
                     };
                     PaletteSet.Add(
-                        Language.GetItem("h11"), // Свойства ЕСКД
+                        Language.GetItem("h11"), // Свойства Smart
                         elementHost);
                     PaletteSet.Style = PaletteSetStyles.ShowCloseButton | 
                                        PaletteSetStyles.ShowPropertiesMenu |
