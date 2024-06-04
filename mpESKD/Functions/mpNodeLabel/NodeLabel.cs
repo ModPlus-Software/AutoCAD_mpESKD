@@ -16,7 +16,7 @@ using ModPlusAPI.Windows;
 /// </summary>
 [SmartEntityDisplayNameKey("h197")]
 [SystemStyleDescriptionKey("h200")]
-public class NodeLabel : SmartEntity, ITextValueEntity
+public class NodeLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _sheetNumber = string.Empty;
