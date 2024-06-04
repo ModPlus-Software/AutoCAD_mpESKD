@@ -54,7 +54,7 @@ public class NodeLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
     private Wipeout _topTextMask;
 
     /// <summary>
-    /// Маскировка ниженего текста с номером листа
+    /// Маскировка нижнего текста с номером листа
     /// </summary>
     private Wipeout _bottomTextMask;
 
