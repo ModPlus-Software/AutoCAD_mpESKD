@@ -20,6 +20,7 @@ using Functions.mpLevelMark;
 using Functions.mpLevelPlanMark;
 using Functions.mpNodalLeader;
 using Functions.mpNodeLabel;
+using Functions.mpRevisionMark;
 using Functions.mpSecantNodalLeader;
 using Functions.mpViewLabel;
 using Functions.mpWaterProofing;
@@ -37,6 +38,12 @@ public class RibbonBuilder
 {
     private static bool _wasActive;
     private static int _colorTheme = 1;
+    private static readonly string TabName;
+
+    static RibbonBuilder()
+    {
+        TabName = Language.GetPluginLocalName(ModPlusConnector.Instance);
+    }
 
     /// <summary>
     /// Построить вкладку ЕСКД на ленте
@@ -62,9 +69,8 @@ public class RibbonBuilder
             if (IsLoaded())
             {
                 var ribbonControl = ComponentManager.Ribbon;
-                var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
                 var tab = ribbonControl.Tabs.FirstOrDefault(tab =>
-                    !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
+                    !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(TabName));
                 if (tab != null)
                 {
                     ribbonControl.Tabs.Remove(tab);
@@ -81,17 +87,17 @@ public class RibbonBuilder
     private static bool IsLoaded()
     {
         var ribbonControl = ComponentManager.Ribbon;
-        var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-        return ribbonControl.Tabs.Any(tab => !string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName));
+        return ribbonControl.Tabs.Any(tab => !string.IsNullOrEmpty(tab.Id) && 
+                                             tab.Id.Equals("ModPlus_ESKD") && 
+                                             tab.Title.Equals(TabName));
     }
 
     private static bool IsActive()
     {
         var ribbonControl = ComponentManager.Ribbon;
-        var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
         foreach (var tab in ribbonControl.Tabs)
         {
-            if (!string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(tabName))
+            if (!string.IsNullOrEmpty(tab.Id) && tab.Id.Equals("ModPlus_ESKD") && tab.Title.Equals(TabName))
             {
                 return tab.IsActive;
             }
@@ -136,8 +142,7 @@ public class RibbonBuilder
             var ribbonControl = ComponentManager.Ribbon;
 
             // add the tab
-            var tabName = Language.TryGetCuiLocalGroupName("ModPlus ЕСКД");
-            var ribbonTab = new RibbonTab { Title = tabName, Id = "ModPlus_ESKD" };
+            var ribbonTab = new RibbonTab { Title = TabName, Id = "ModPlus_ESKD" };
             ribbonControl.Tabs.Add(ribbonTab);
 
             // add content
@@ -310,13 +315,18 @@ public class RibbonBuilder
         var ribPanel = new RibbonPanel { Source = ribSourcePanel };
         ribbonTab.Panels.Add(ribPanel);
         var ribRowPanel = new RibbonRowPanel();
-
+        
         // mpNodeLabel
         ribRowPanel.Items.Add(GetBigButton(GetDescriptor<NodeLabel>()));
 
         ribSourcePanel.Items.Add(ribRowPanel);
 
         ribRowPanel = new RibbonRowPanel();
+
+        // mpRevisionMark
+        ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<RevisionMark>()));
+
+        ribRowPanel.Items.Add(new RibbonRowBreak());
 
         // mpFragmentMarker
         ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<FragmentMarker>()));
@@ -325,6 +335,7 @@ public class RibbonBuilder
 
         // mpThickArrow
         ribRowPanel.Items.Add(GetSmallButton(GetDescriptor<ThickArrow>()));
+
 
         ribSourcePanel.Items.Add(ribRowPanel);
     }

@@ -294,7 +294,7 @@ public class MainSettings : ObservableObject
             OnPropertyChanged();
         }
     }
-
+    
     #endregion
 
     #region NodeLabel
@@ -320,6 +320,23 @@ public class MainSettings : ObservableObject
     /// Продолжать нумерацию узла при создании новой узловой выноски
     /// </summary>
     public bool SecantNodalLeaderContinueNodeNumber
+    {
+        get => _userConfigFileUtils.GetValue(true);
+        set
+        {
+            _userConfigFileUtils.SetValue(value);
+            OnPropertyChanged();
+        }
+    }
+
+    #endregion
+
+    #region RevisionMark
+
+    /// <summary>
+    /// Продолжать нумерацию изменения при создании нового маркера изменения
+    /// </summary>
+    public bool RevisionMarkContinueRevisionNumber
     {
         get => _userConfigFileUtils.GetValue(true);
         set
