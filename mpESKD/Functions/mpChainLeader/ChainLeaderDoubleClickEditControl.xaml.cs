@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для ChainLeaderDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class ChainLeaderDoubleClickEditControl : IDoubleClickEditControl
     public ChainLeaderDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>

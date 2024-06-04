@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.26.16.0</Version>
+		<Version>1.28.22.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
-		<Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023;A2024</Configurations>
-		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -25,145 +23,35 @@
 		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'A2013'">
-		<TargetFramework>net45</TargetFramework>
-		<ExternalVersion>2013</ExternalVersion>
-	</PropertyGroup>
+  <PropertyGroup>
+    <Configurations>Debug;A2013;A2014;A2015;A2016;A2017;A2018;A2019;A2020;A2021;A2022;A2023;A2024;A2025</Configurations>
+    <Platforms>x64</Platforms>
+    <TargetFramework>net48</TargetFramework>
+    <ExternalVersion>$(Configuration.Substring(1))</ExternalVersion>
+    <DefineConstants>A$(ExternalVersion)</DefineConstants>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'A2014'">
-		<TargetFramework>net45</TargetFramework>
-		<ExternalVersion>2014</ExternalVersion>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'A2025'">
+    <TargetFramework>net8-windows</TargetFramework>
+    <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'A2015'">
-		<TargetFramework>net45</TargetFramework>
-		<ExternalVersion>2015</ExternalVersion>
-	</PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <ExternalVersion>2022</ExternalVersion>
+    <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
+    <OutputPath>C:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'A2016'">
-		<TargetFramework>net45</TargetFramework>
-		<ExternalVersion>2016</ExternalVersion>
-	</PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>$(RootNamespace)_$(ExternalVersion)</AssemblyName>
+  </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'A2017'">
-		<TargetFramework>net45</TargetFramework>
-		<ExternalVersion>2017</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2018'">
-		<TargetFramework>net46</TargetFramework>
-		<ExternalVersion>2018</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2019'">
-		<TargetFramework>net47</TargetFramework>
-		<ExternalVersion>2019</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2020'">
-		<TargetFramework>net47</TargetFramework>
-		<ExternalVersion>2020</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2021'">
-		<TargetFramework>net47</TargetFramework>
-		<ExternalVersion>2021</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2022'">
-		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2022</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2023'">
-		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2023</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'A2024'">
-		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2024</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
-		<TargetFramework>net48</TargetFramework>
-		<ExternalVersion>2022</ExternalVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' != 'Debug'">
-		<DefineConstants>A$(ExternalVersion)</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<AssemblyName>mpESKD_$(ExternalVersion)</AssemblyName>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		<!--<OutputPath>D:\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>-->
-    <OutputPath>c:\Users\kir\AppData\Roaming\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
-	</PropertyGroup>
-
-	<ItemGroup Condition="'$(Configuration)'=='A2013'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2013" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2014'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2014" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2015'">
-		<PackageReference Include="ModPlus.AutoCAD.API.2015" Version="1.0.0" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlus.AutoCAD.Module.2015" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2016'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2016" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2017'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2017" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2018'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2018" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2019'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2019" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2020'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2020" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2021'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2021" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2022'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2023'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2023" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='A2024'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2024" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(Configuration)'=='Debug'">
-		<PackageReference Include="ModPlus.AutoCAD.Module.2022" Version="10.0.0" ExcludeAssets="runtime" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_16x16_dark.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJointFromPolyline_32x32_dark.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_16x16_dark.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32.png" />
-	  <None Remove="Functions\mpConcreteJoint\Icons\mpConcreteJoint_32x32_dark.png" />
-	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16.png" />
-	  <None Remove="Functions\mpThickArrow\Icons\mpView_16x16_dark.png" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="13.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2022.3.1" ExcludeAssets="runtime" />
-		<PackageReference Include="ModPlusAPI" Version="12.7.0" ExcludeAssets="runtime" />
-		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+		<PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -175,6 +63,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16.png" />
+		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16_dark.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
@@ -217,6 +107,14 @@
 		<Resource Include="Functions\mpLevelPlanMark\Icons\mpLevelPlanMark_32x32_dark.png" />
 		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32.png" />
 		<Resource Include="Functions\mpNodalLeader\Icons\mpNodalLeader_32x32_dark.png" />
+		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_16x16.png" />
+		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_16x16_dark.png" />
+		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32.png" />
+		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32_dark.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16_dark.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32.png" />
+		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32_dark.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
@@ -274,36 +172,6 @@
 			<Generator>SettingsSingleFileGenerator</Generator>
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Page Update="Functions\mpChainLeader\ChainLeaderDoubleClickEditControl.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpChainLeader\ChainLeader.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpLevelPlanMark\LevelPlanMarkDoubleClickEditControl.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpLevelPlanMark\LevelPlanMark.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpViewLabel\ViewLabel.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Functions\mpWeldJoint\WeldJoint.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Functions\mpAxis\Axis.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Functions\mpSecantNodalLeader\SecantNodalLeaderDoubleClickEditControl.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
 	</ItemGroup>
 
 </Project>

@@ -1,87 +1,108 @@
 ﻿<mps:ModPlusWindow x:Class="mpESKD.Functions.SearchEntities.SearchEntitiesSettings"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:mps="https://modplus.org/winfx/xaml/controls"
-             mc:Ignorable="d" SizeToContent="Manual"
-             Height="300" Width="400" ResizeMode="NoResize"
-             Loaded="SearchEntitiesSettings_OnLoaded"
-             Closed="SearchEntitiesSettings_OnClosed">
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:mps="https://modplus.org/winfx/xaml/controls"
+                   Width="400"
+                   Height="300"
+                   Closed="SearchEntitiesSettings_OnClosed"
+                   Loaded="SearchEntitiesSettings_OnLoaded"
+                   ResizeMode="NoResize"
+                   SizeToContent="Manual"
+                   mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD"/>
-            <XmlDataProvider x:Key="LangCommon" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/Common"/>
+            <XmlDataProvider x:Key="Lang" XPath="ModPlus/mpESKD" />
+            <XmlDataProvider x:Key="LangCommon" XPath="ModPlus/Common" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <GroupBox Grid.Column="0" Grid.Row="0"
+        <GroupBox Grid.Row="0"
+                  Grid.Column="0"
                   Header="{Binding Source={StaticResource Lang}, XPath=h100}">
-            <ListBox Margin="0" BorderThickness="0" Name="LbEntities"></ListBox>
+            <ListBox Name="LbEntities"
+                     Margin="0"
+                     BorderThickness="0" />
         </GroupBox>
-        <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Vertical">
-            <Button Style="{DynamicResource ModPlusFlatButton}" MinWidth="0"
-                    Padding="2" Margin="0 4 4 4" Name="BtCheckAll"
+        <StackPanel Grid.Row="0"
+                    Grid.Column="1"
+                    Orientation="Vertical">
+            <Button Name="BtCheckAll"
+                    MinWidth="0"
+                    Margin="0 4 4 4"
+                    Padding="2"
                     Click="BtCheckAll_OnClick"
+                    Style="{DynamicResource ModPlusFlatButton}"
                     ToolTip="{Binding Source={StaticResource Lang}, XPath=h101}">
-                <Viewbox Width="24" Height="24">
-                    <Canvas Width="24" Height="24">
+                <Viewbox Width="24"
+                         Height="24">
+                    <Canvas Width="24"
+                            Height="24">
                         <Path Data="M14,2A8,8 0 0,0 6,10A8,8 0 0,0 14,18A8,8 0 0,0 22,10H20C20,13.32 17.32,16 14,16A6,6 0 0,1 8,10A6,6 0 0,1 14,4C14.43,4 14.86,4.05 15.27,4.14L16.88,2.54C15.96,2.18 15,2 14,2M20.59,3.58L14,10.17L11.62,7.79L10.21,9.21L14,13L22,5M4.93,5.82C3.08,7.34 2,9.61 2,12A8,8 0 0,0 10,20C10.64,20 11.27,19.92 11.88,19.77C10.12,19.38 8.5,18.5 7.17,17.29C5.22,16.25 4,14.21 4,12C4,11.7 4.03,11.41 4.07,11.11C4.03,10.74 4,10.37 4,10C4,8.56 4.32,7.13 4.93,5.82Z"
                               Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                     </Canvas>
                 </Viewbox>
             </Button>
-            <Button Style="{DynamicResource ModPlusFlatButton}" MinWidth="0"
-                    Padding="2" Margin="0 4 4 4" Name="BtUncheckAll"
+            <Button Name="BtUncheckAll"
+                    MinWidth="0"
+                    Margin="0 4 4 4"
+                    Padding="2"
                     Click="BtUncheckAll_OnClick"
+                    Style="{DynamicResource ModPlusFlatButton}"
                     ToolTip="{Binding Source={StaticResource Lang}, XPath=h102}">
-                <Viewbox Width="24" Height="24">
-                    <Canvas Width="24" Height="24">
-                        <Path Data="M14,2A8,8 0 0,0 6,10A8,8 0 0,0 14,18A8,8 0 0,0 22,10A8,8 0 0,0 14,2M14,4C17.32,4 20,6.69 20,10C20,13.32 17.32,16 14,16A6,6 0 0,1 8,10A6,6 0 0,1 14,4M4.93,5.82C3.08,7.34 2,9.61 2,12A8,8 0 0,0 10,20C10.64,20 11.27,19.92 11.88,19.77C10.12,19.38 8.5,18.5 7.17,17.29C5.22,16.25 4,14.21 4,12C4,11.7 4.03,11.41 4.07,11.11C4.03,10.74 4,10.37 4,10C4,8.56 4.32,7.13 4.93,5.82Z" 
+                <Viewbox Width="24"
+                         Height="24">
+                    <Canvas Width="24"
+                            Height="24">
+                        <Path Data="M14,2A8,8 0 0,0 6,10A8,8 0 0,0 14,18A8,8 0 0,0 22,10A8,8 0 0,0 14,2M14,4C17.32,4 20,6.69 20,10C20,13.32 17.32,16 14,16A6,6 0 0,1 8,10A6,6 0 0,1 14,4M4.93,5.82C3.08,7.34 2,9.61 2,12A8,8 0 0,0 10,20C10.64,20 11.27,19.92 11.88,19.77C10.12,19.38 8.5,18.5 7.17,17.29C5.22,16.25 4,14.21 4,12C4,11.7 4.03,11.41 4.07,11.11C4.03,10.74 4,10.37 4,10C4,8.56 4.32,7.13 4.93,5.82Z"
                               Fill="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}" />
                     </Canvas>
                 </Viewbox>
             </Button>
         </StackPanel>
-        <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="1">
+        <Grid Grid.Row="1"
+              Grid.Column="0"
+              Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <ComboBox Grid.Column="0" Name="CbSearchProceedOption">
+            <ComboBox Name="CbSearchProceedOption"
+                      Grid.Column="0">
                 <!-- update graphics -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so0}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot0}"/>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot0}" />
                 <!-- select -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so1}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot1}"/>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot1}" />
                 <!-- remove xdata -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so2}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot2}"/>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot2}" />
                 <!-- explode -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so3}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot3}"/>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot3}" />
                 <!-- delete -->
                 <ComboBoxItem Content="{Binding Source={StaticResource Lang}, XPath=so4}"
-                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot4}"/>
+                              ToolTip="{Binding Source={StaticResource Lang}, XPath=sot4}" />
             </ComboBox>
-            
-            <Button Grid.Column="1"
-                    Name="BtAccept"
-                    Content="{Binding Source={StaticResource LangCommon}, XPath=accept}"
-                    Click="BtAccept_OnClick"/>
+
+            <Button Name="BtAccept"
+                    Grid.Column="1"
+                    Click="BtAccept_OnClick"
+                    Content="{Binding Source={StaticResource LangCommon}, XPath=accept}" />
         </Grid>
     </Grid>
 </mps:ModPlusWindow>

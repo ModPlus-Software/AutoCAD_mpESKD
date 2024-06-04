@@ -50,16 +50,6 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     #endregion
 
     #region Properties
-        
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
-    }
 
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 2.0;
@@ -250,12 +240,12 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X + (30 * _scale), InsertionPointOCS.Y,
                     InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint);
+                CreateEntities(tmpEndPoint);
             }
             else
             {
                 // Задание любой другой точки
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS);
+                CreateEntities(null);
                 AcadUtils.WriteMessageInDebug("try else ");
             }
         }
@@ -265,12 +255,13 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
         }
     }
 
-    private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
+    private void CreateEntities(Point3d? endPoint)
     {
         _texts.Clear();
         _mTextMasks.Clear();
         _lines.Clear();
-        var points = Get3dPoints(insertionPoint, middlePoints, endPoint);
+        var points = GetOcsAll3dPointsForDraw(endPoint).ToList();
+
         SetNodeNumberOnCreation();
 
         CreateMainPolyline(points);
@@ -293,7 +284,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
         }
     }
 
-    private void CreateMainPolyline(Point3dCollection points)
+    private void CreateMainPolyline(List<Point3d> points)
     {
         _mainPolyline = new Polyline(points.Count);
         SetImmutablePropertiesToNestedEntity(_mainPolyline);
@@ -306,10 +297,10 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     #region Line Creation Methods
 
     /// <summary>
-    /// создание линий по всем вводимым точкам
+    /// Создание линий по всем вводимым точкам
     /// </summary>
     /// <param name="points">Points</param>
-    private void CreateLinesByInsertionPoints(Point3dCollection points)
+    private void CreateLinesByInsertionPoints(List<Point3d> points)
     {
         var mTextWidthWithOffset = (_texts[0].ActualWidth / 2) + (TextMaskOffset * _scale);
 
@@ -644,19 +635,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
     {
         return value % 2 != 0;
     }
-
-    private static Point3dCollection Get3dPoints(Point3d insertionPoint, List<Point3d> middlePoints,
-        Point3d endPoint)
-    {
-        var points = new Point3dCollection();
-
-        points.Add(insertionPoint);
-        middlePoints.ForEach(p => points.Add(p));
-        points.Add(endPoint);
-
-        return points;
-    }
-
+    
     #endregion
 
     #region Mtext creation methods
@@ -700,7 +679,7 @@ public class LetterLine : SmartLinearEntity, ITextValueEntity, IWithDoubleClickE
         }
     }
 
-    private IEnumerable<MText> CreateMTextsByInsertionPoints(Point3dCollection points)
+    private IEnumerable<MText> CreateMTextsByInsertionPoints(List<Point3d> points)
     {
         var mTexts = new List<MText>();
         for (var i = 1; i < points.Count; i++)

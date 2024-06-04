@@ -156,7 +156,7 @@ public class SecantNodalLeader : SmartEntity, ITextValueEntity, IWithDoubleClick
     /// <summary>
     /// Отступ текста
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 25.0, nameSymbol: "o")]
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p61", 1.0, 0.0, 500.0, nameSymbol: "o")]
     [SaveToXData]
     public double TextIndent { get; set; } = 1.0;
 

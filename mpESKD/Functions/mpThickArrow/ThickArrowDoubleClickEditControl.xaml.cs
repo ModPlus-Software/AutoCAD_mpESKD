@@ -1,6 +1,7 @@
 ﻿namespace mpESKD.Functions.mpThickArrow;
 
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 using System;
 
 /// <summary>
@@ -16,7 +17,7 @@ public partial class ThickArrowDoubleClickEditControl : IDoubleClickEditControl
     public ThickArrowDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>

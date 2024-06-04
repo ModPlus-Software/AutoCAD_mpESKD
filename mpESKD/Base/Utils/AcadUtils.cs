@@ -461,32 +461,6 @@ public static class AcadUtils
 
         return loaded;
     }
-    
-    /// <summary>
-    /// Возвращает идентификатор текстового стиля по имени
-    /// </summary>
-    /// <param name="textStyleName">Имя текстового стиля</param>
-    /// <returns><see cref="ObjectId"/></returns>
-    public static TextStyleTableRecord GetTextStyleByName(string textStyleName)
-    {
-        using (Document.LockDocument())
-        {
-            using (var tr = Database.TransactionManager.StartOpenCloseTransaction())
-            {
-                var textStyleTable = (TextStyleTable)tr.GetObject(Database.TextStyleTableId, OpenMode.ForRead);
-                foreach (var objectId in textStyleTable)
-                {
-                    var txtStl = (TextStyleTableRecord)tr.GetObject(objectId, OpenMode.ForRead);
-                    if (txtStl.Name.Equals(textStyleName))
-                    {
-                        return txtStl;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// Найти все блоки в текущем пространстве (модель/лист), представляющие интеллектуальный примитив указанного типа

@@ -8,6 +8,7 @@
 
     <Style x:Key="EntityExpander" TargetType="{x:Type Expander}" BasedOn="{StaticResource ModPlusExpander}">
         <Setter Property="mps:ExpanderAssist.UpDownHeaderPadding" Value="5"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="HeaderTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
@@ -15,6 +16,7 @@
         <Setter Property="Margin" Value="5 5 5 0"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="PropertyNameTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
@@ -23,6 +25,7 @@
         <Setter Property="Margin" Value="5 0 0 0"/>
         <Setter Property="BorderThickness" Value="1 0 0 1"/>
         <Setter Property="Height" Value="24"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="PropertyValueTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
@@ -31,6 +34,7 @@
         <Setter Property="Height" Value="24"/>
         <Setter Property="mps:TextFieldAssist.SelectAllOnFocus" Value="True"/>
         <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="True"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="PropertyValueReadOnlyTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource PropertyValueTextBox}">
@@ -51,12 +55,14 @@
         <Setter Property="IsEditable" Value="True"/>
         <Setter Property="BorderThickness" Value="0 0 1 1"/>
         <Setter Property="Height" Value="24"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="PropertyValueNumericTextBox" TargetType="{x:Type mps:NumericBox}">
         <Setter Property="Margin" Value="0 0 5 0"/>
         <Setter Property="BorderThickness" Value="0 0 1 1"/>
         <Setter Property="Height" Value="24"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="BorderForValueCheckBox" TargetType="{x:Type Border}">
@@ -64,6 +70,7 @@
         <Setter Property="BorderBrush" Value="{DynamicResource BoxesBorderBrush}"/>
         <Setter Property="BorderThickness" Value="0 0 1 1"/>
         <Setter Property="Background" Value="{DynamicResource WhiteBrush}"/>
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
     </Style>
 
     <Style x:Key="PropertyValueCheckBox" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource ModPlusCheckBox}">

@@ -5,7 +5,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    <XmlDataProvider x:Key="Lang" Source="E:/ModPlus/Languages/en-US.xml" XPath="ModPlus/mpESKD" />
+    <XmlDataProvider x:Key="Lang" XPath="ModPlus/mpESKD" />
     
     <Style TargetType="{x:Type TextBlock}">
         <Setter Property="Margin" Value="{DynamicResource ModPlusDefaultMargin}"/>

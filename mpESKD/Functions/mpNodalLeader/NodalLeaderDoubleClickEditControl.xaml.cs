@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для NodalLeaderDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class NodalLeaderDoubleClickEditControl : IDoubleClickEditControl
     public NodalLeaderDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>

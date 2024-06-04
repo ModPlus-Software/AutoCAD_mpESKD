@@ -8,6 +8,7 @@ using Autodesk.AutoCAD.Geometry;
 using Enums;
 using System;
 using View;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 /// <summary>
 /// Утилиты для объектов
@@ -44,7 +45,7 @@ public static class EntityUtils
         dbText.Linetype = "ByBlock";
         dbText.LineWeight = LineWeight.ByBlock;
 
-        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        var textStyle = TextStyleUtils.GetTextStyleByName(textStyleName);
 
         if (textStyle != null)
         {
@@ -68,7 +69,7 @@ public static class EntityUtils
         mText.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
         mText.Linetype = "ByBlock";
         mText.LineWeight = LineWeight.ByBlock;
-        var textStyle = AcadUtils.GetTextStyleByName(textStyleName);
+        var textStyle = TextStyleUtils.GetTextStyleByName(textStyleName);
         if (textStyle != null)
         {
             mText.TextStyleId = textStyle.Id;
@@ -151,7 +152,7 @@ public static class EntityUtils
                 TypeFactory.Instance.GetDescriptor(entityType).LName,
                 control);
 
-            if (sectionValueEditor.ShowDialog() == true)
+            if (AcApp.ShowModalWindow(sectionValueEditor) == true)
             {
                 saveBack = true;
             }

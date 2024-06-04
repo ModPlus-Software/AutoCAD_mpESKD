@@ -11,6 +11,7 @@ using Base.Enums;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using AcApp = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 /// <summary>
 /// Поиск интеллектуальных объектов в чертеже
@@ -42,7 +43,7 @@ public static class SearchEntitiesCommand
                 settings.LbEntities.Items.Add(listBoxItem);
             }
 
-            if (settings.ShowDialog() == false)
+            if (AcApp.ShowModalWindow(settings) == false)
             {
                 return;
             }

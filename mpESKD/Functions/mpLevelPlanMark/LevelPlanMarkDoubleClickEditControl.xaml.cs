@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для LevelPlanMarkDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class LevelPlanMarkDoubleClickEditControl : IDoubleClickEditContr
     public LevelPlanMarkDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>

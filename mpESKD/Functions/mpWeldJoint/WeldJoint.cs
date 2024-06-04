@@ -3,7 +3,7 @@ namespace mpESKD.Functions.mpWeldJoint;
 
 using System;
 using System.Collections.Generic;
-using Autodesk.AutoCAD.Colors;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -55,16 +55,6 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
     public WeldJoint(ObjectId objectId)
         : base(objectId)
     {
-    }
-        
-    private List<Point3d> MiddlePointsOCS
-    {
-        get
-        {
-            var points = new List<Point3d>();
-            MiddlePoints.ForEach(p => points.Add(p.TransformBy(BlockTransform.Inverse())));
-            return points;
-        }
     }
 
     /// <inheritdoc/>
@@ -345,12 +335,12 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
                 // Задание точки вставки. Второй точки еще нет - отрисовка типового элемента
                 var tmpEndPoint = new Point3d(
                     InsertionPointOCS.X + (10 * scale), InsertionPointOCS.Y, InsertionPointOCS.Z);
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, tmpEndPoint, scale);
+                CreateEntities(tmpEndPoint, scale);
             }
             else
             {
                 // Задание любой другой точки
-                CreateEntities(InsertionPointOCS, MiddlePointsOCS, EndPointOCS, scale);
+                CreateEntities(null, scale);
             }
         }
         catch (Exception exception)
@@ -359,13 +349,13 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         }
     }
     
-    private void CreateEntities(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint, double scale)
+    private void CreateEntities(Point3d? endPoint, double scale)
     {
         _intermittentStrokes = new List<Line>();
         _tickMarksOrCrosses = new List<Line>();
         _solidPolyline = null;
 
-        var points = GetPointsForMainPolyline(insertionPoint, middlePoints, endPoint);
+        var points = GetOcsAll3dPointsForDraw(endPoint).Select(p => p.ToPoint2d()).ToList();
 
         if (IsVisible())
         {
@@ -445,7 +435,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         }
     }
 
-    private void CreateButtFactorySolidVisible(Point2dCollection points, double scale)
+    private void CreateButtFactorySolidVisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var tickMarkHalfHeight = TickMarkHalfHeight * scale;
@@ -469,7 +459,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtMountingSolidVisible(Point2dCollection points, double scale)
+    private void CreateButtMountingSolidVisible(List<Point2d> points, double scale)
     {
         var largeCrossStep = LargeCrossStep * scale;
         var largeCrossHalfHeight = LargeCrossHalfHeight * scale;
@@ -493,7 +483,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtFactorySolidInvisible(Point2dCollection points, double scale)
+    private void CreateButtFactorySolidInvisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var tickMarkHalfHeight = TickMarkHalfHeight * scale;
@@ -548,7 +538,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtMountingSolidInvisible(Point2dCollection points, double scale)
+    private void CreateButtMountingSolidInvisible(List<Point2d> points, double scale)
     {
         var seriesLength = SeriesLength * scale;
         var space = SpaceLength * scale;
@@ -603,7 +593,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtFactoryIntermittentVisible(Point2dCollection points, double scale)
+    private void CreateButtFactoryIntermittentVisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var tickMarkHalfHeight = TickMarkHalfHeight * scale;
@@ -633,7 +623,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtMountingIntermittentVisible(Point2dCollection points, double scale)
+    private void CreateButtMountingIntermittentVisible(List<Point2d> points, double scale)
     {
         var largeCrossStep = LargeCrossStep * scale;
         var largeCrossHalfHeight = LargeCrossHalfHeight * scale;
@@ -665,7 +655,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CrateButtFactoryIntermittentInvisible(Point2dCollection points, double scale)
+    private void CrateButtFactoryIntermittentInvisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var tickMarkHalfHeight = TickMarkHalfHeight * scale;
@@ -725,7 +715,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateButtMountingIntermittentInvisible(Point2dCollection points, double scale)
+    private void CreateButtMountingIntermittentInvisible(List<Point2d> points, double scale)
     {
         var largeCrossStep = LargeCrossStep * scale;
         var largeCrossHalfHeight = LargeCrossHalfHeight * scale;
@@ -785,7 +775,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerFactorySolidVisible(Point2dCollection points, double scale)
+    private void CreateCornerFactorySolidVisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var smallTickMarkHeight = SmallTickMarkHeight * scale;
@@ -809,7 +799,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerMountingSolidVisible(Point2dCollection points, double scale)
+    private void CreateCornerMountingSolidVisible(List<Point2d> points, double scale)
     {
         var smallCrossHeight = SmallCrossHeight * scale;
         var smallCrossStep = SmallCrossStep * scale;
@@ -833,7 +823,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerFactorySolidInvisible(Point2dCollection points, double scale)
+    private void CreateCornerFactorySolidInvisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var smallTickMarkHeight = SmallTickMarkHeight * scale;
@@ -888,7 +878,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerMountingSolidInvisible(Point2dCollection points, double scale)
+    private void CreateCornerMountingSolidInvisible(List<Point2d> points, double scale)
     {
         var smallCrossHeight = SmallCrossHeight * scale;
         var smallCrossStep = SmallCrossStep * scale;
@@ -943,7 +933,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerFactoryIntermittentVisible(Point2dCollection points, double scale)
+    private void CreateCornerFactoryIntermittentVisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var smallTickMarkHeight = SmallTickMarkHeight * scale;
@@ -973,7 +963,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerMountingIntermittentVisible(Point2dCollection points, double scale)
+    private void CreateCornerMountingIntermittentVisible(List<Point2d> points, double scale)
     {
         var smallCrossHeight = SmallCrossHeight * scale;
         var smallCrossStep = SmallCrossStep * scale;
@@ -1005,7 +995,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerFactoryIntermittentInvisible(Point2dCollection points, double scale)
+    private void CreateCornerFactoryIntermittentInvisible(List<Point2d> points, double scale)
     {
         var tickMarkStep = TickMarkStep * scale;
         var smallTickMarkHeight = SmallTickMarkHeight * scale;
@@ -1065,7 +1055,7 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         });
     }
 
-    private void CreateCornerMountingIntermittentInvisible(Point2dCollection points, double scale)
+    private void CreateCornerMountingIntermittentInvisible(List<Point2d> points, double scale)
     {
         var smallCrossHeight = SmallCrossHeight * scale;
         var smallCrossStep = SmallCrossStep * scale;
@@ -1186,24 +1176,12 @@ public class WeldJoint : SmartLinearEntity, IWithDoubleClickEditor
         _tickMarksOrCrosses.Add(lineTwo);
     }
 
-    private static Point2dCollection GetPointsForMainPolyline(Point3d insertionPoint, List<Point3d> middlePoints, Point3d endPoint)
-    {
-        // ReSharper disable once UseObjectOrCollectionInitializer
-        var points = new Point2dCollection();
-
-        points.Add(insertionPoint.ToPoint2d());
-        middlePoints.ForEach(p => points.Add(p.ToPoint2d()));
-        points.Add(endPoint.ToPoint2d());
-
-        return points;
-    }
-
     private bool IsVisible()
     {
         return WeldJointType.ToString().Contains("Visible");
     }
 
-    private void SegmentsIteration(Point2dCollection points, Action<Segment> action)
+    private void SegmentsIteration(List<Point2d> points, Action<Segment> action)
     {
         for (var i = 1; i < points.Count; i++)
         {

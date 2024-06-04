@@ -2,6 +2,7 @@
 
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для ViewDoubleClickEditControl.xaml
@@ -16,7 +17,7 @@ public partial class ViewLabelDoubleClickEditControl : IDoubleClickEditControl
     public ViewLabelDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>
@@ -25,7 +26,7 @@ public partial class ViewLabelDoubleClickEditControl : IDoubleClickEditControl
     /// <inheritdoc/>
     public void Initialize(IWithDoubleClickEditor smartEntity)
     {
-        if (!(smartEntity is ViewLabel viewLabel))
+        if (smartEntity is not ViewLabel viewLabel)
             throw new ArgumentException("Wrong type of entity");
 
         _viewLabel = viewLabel;

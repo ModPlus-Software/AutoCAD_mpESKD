@@ -3,6 +3,7 @@
 using Autodesk.AutoCAD.Geometry;
 using System;
 using Base.Abstractions;
+using mpESKD.Base.Utils;
 
 /// <summary>
 /// Логика взаимодействия для LevelMarkDoubleClickEditControl.xaml
@@ -17,7 +18,7 @@ public partial class LevelMarkDoubleClickEditControl : IDoubleClickEditControl
     public LevelMarkDoubleClickEditControl()
     {
         InitializeComponent();
-        ModPlusAPI.Language.SetLanguageProviderForResourceDictionary(Resources);
+        Resources.SetModPlusResources();
     }
 
     /// <inheritdoc/>
