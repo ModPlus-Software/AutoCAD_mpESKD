@@ -16,7 +16,7 @@ using ModPlusAPI.Windows;
 /// </summary>
 [SmartEntityDisplayNameKey("h197")]
 [SystemStyleDescriptionKey("h200")]
-public class NodeLabel : SmartEntity, ITextValueEntity
+public class NodeLabel : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     private readonly string _lastNodeNumber;
     private string _sheetNumber = string.Empty;
@@ -54,7 +54,7 @@ public class NodeLabel : SmartEntity, ITextValueEntity
     private Wipeout _topTextMask;
 
     /// <summary>
-    /// Маскировка ниженего текста с номером листа
+    /// Маскировка нижнего текста с номером листа
     /// </summary>
     private Wipeout _bottomTextMask;
 
