@@ -22,7 +22,7 @@ public class ModPlusConnector : IModPlusPlugin
     public string Name => nameof(mpESKD);
 
     /// <inheritdoc/>
-    public string AvailProductExternalVersion => ModPlus.VersionData.CurrentCadVersion;
+    public string AvailProductExternalVersion => "2022";  //  ModPlus.VersionData.CurrentCadVersion; // todo
 
     /// <inheritdoc/>
     public string FullClassName => string.Empty;

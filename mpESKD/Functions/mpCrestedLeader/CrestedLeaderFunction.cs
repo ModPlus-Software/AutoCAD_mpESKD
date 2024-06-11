@@ -84,7 +84,10 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
             var blockReference = MainFunction.CreateBlock(crestedLeader);
             crestedLeader.ApplyStyle(style, true);
-            InsertCrestedLeaderWithJig(crestedLeader, blockReference);
+
+            // todo Тестировние Jig
+            TestFunctions.TestJig.InsertTestWithJig(crestedLeader, blockReference);
+            // InsertCrestedLeaderWithJig(crestedLeader, blockReference); 
         }
         catch (System.Exception exception)
         {
@@ -106,7 +109,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
         AcadUtils.Editor.TurnForcedPickOn();
         AcadUtils.Editor.PointMonitor += crestedLeader.CrestedSimplyLeaderMonitor;
-
+        
         do
         {
             var status = AcadUtils.Editor.Drag(entityJig).Status;
@@ -128,7 +131,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
                     crestedLeader.LeaderPointsOcs.Add(Point3d.Origin + toEndPointVector);
                     crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
-
                 }
                 else
                 {
@@ -172,7 +174,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         {
             AcadUtils.Editor.TurnForcedPickOff();
             AcadUtils.Editor.PointMonitor -= crestedLeader.CrestedSimplyLeaderMonitor;
-
+            
         }
     }
 }
