@@ -43,7 +43,7 @@ internal class CrestedLeaderEntityJig : EntityJig
 
     /// <summary>
     /// Если значение не null, то PreviousPoint устанавливается как базовая точка
-    /// при запросе второй точки. При этом JigState должен быть PromptNextPoint
+    /// при запросе второй точки. При этом JigState должен быть PromptNextLeaderPoint
     /// </summary>
     public Point3d? PreviousPoint { get; set; }
 
@@ -83,7 +83,7 @@ internal class CrestedLeaderEntityJig : EntityJig
                         _smartEntity.InsertionPoint = value;
                     });
 
-                case CrestedLeaderJigState.PromptNextPoint:
+                case CrestedLeaderJigState.PromptNextLeaderPoint:
                     {
                         var basePoint = _insertionPoint.Value;
                         if (PreviousPoint.HasValue)
@@ -106,7 +106,7 @@ internal class CrestedLeaderEntityJig : EntityJig
                         });
                     }
 
-                case CrestedLeaderJigState.CustomPoint:
+                case CrestedLeaderJigState.PromptShelfStartPoint:
                     {
                         if (_customPointAction != null)
                         {

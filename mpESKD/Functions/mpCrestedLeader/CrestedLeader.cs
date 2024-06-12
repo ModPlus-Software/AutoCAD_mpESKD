@@ -1,4 +1,5 @@
-﻿
+﻿using TestFunctions;
+
 namespace mpESKD.Functions.mpCrestedLeader;
 
 using System;
@@ -20,7 +21,7 @@ using ModPlusAPI.Windows;
 /// </summary>
 [SmartEntityDisplayNameKey("h207")]
 [SystemStyleDescriptionKey("h208")]
-public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
+public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor, IJigProps
 {
     #region Примитивы
 
@@ -49,6 +50,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// Маскировка нижнего текста
     /// </summary>
     private Wipeout _bottomTextMask;
+
+    private Circle _testCircle;
 
     #endregion
 
@@ -91,7 +94,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// Состояние указания точек выносок
     /// </summary>
     [SaveToXData]
-    public int CurrentJigState { get; set; } = (int)CrestedLeaderJigState.PromptInsertPoint;
+    public int CurrentJigState { get; set; } =  (int)CrestedLeaderJigState.PromptInsertPoint;
 
     #endregion
 
@@ -206,8 +209,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             if (_bottomText != null)    
                 entities.Add(_bottomText);  
 
+            entities.Add(_testCircle);
+
             foreach (var e in entities)
                 SetImmutablePropertiesToNestedEntity(e);
+
 
             return entities;
         }
@@ -238,19 +244,44 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _leaderPoints.Add(InsertionPointOCS + vector);
             }
 
-            if (CurrentJigState == (int)CrestedLeaderJigState.CustomPoint)
+            if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
             {
-                CreateEntities(scale);
+                TestCreateEntities(scale, InsertionPoint);
+            }
+            else if (CurrentJigState == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
+            {
+                TestCreateEntities(scale, EndPoint);
+            }
+            else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfStartPoint)
+            {
+                // CreateEntities(scale);
+                TestCreateEntities(scale, EndPoint);
+            }
+            else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfIndentPoint)
+            {
+                TestCreateEntities(scale, EndPoint);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.None)
             {
-                CreateEntities(scale);
+                // CreateEntities(scale);
+                TestCreateEntities(scale, EndPoint);
             }
         }
         catch (Exception exception)
         {
             ExceptionBox.Show(exception);
         }
+    }
+
+
+    private void TestCreateEntities(double scale, Point3d center)
+    {
+        _testCircle = new Circle()
+        {
+            Radius= 30,
+            Center = center
+
+        };
     }
 
     private void CreateEntities(double scale)
@@ -262,6 +293,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         if (CurrentJigState == (int)CrestedLeaderJigState.None)
             CreateLeaderArrow(scale);
+        
     }
     
     private void CreateLeaderLines()

@@ -119,7 +119,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
                     entityJig.JigState = JigState.PromptNextPoint;
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextPoint;
+                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint;
 
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     crestedLeader.CreateSimplyLeader(crestedLeader.InsertionPoint);
@@ -146,7 +146,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptNextPoint)
                 {
                     entityJig.JigState = JigState.CustomPoint;
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.CustomPoint;
+                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptShelfStartPoint;
 
                     AcadUtils.Editor.TurnForcedPickOff();
                     AcadUtils.Editor.PointMonitor -= crestedLeader.CrestedSimplyLeaderMonitor;

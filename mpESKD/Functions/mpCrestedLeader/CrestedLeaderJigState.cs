@@ -3,22 +3,27 @@
 public enum CrestedLeaderJigState
 {
     /// <summary>
-    /// Не в режиме запроса точек
+    /// Не в режиме указания точек
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// Запрос точки вставки и первой выноски
+    /// Происходит указание точки вставки и первой выноски
     /// </summary>
     PromptInsertPoint = 1,
 
     /// <summary>
-    /// Запрос точки следующей выноски
+    /// Происходит указание точки следующей выноски
     /// </summary>
-    PromptNextPoint = 2,
+    PromptNextLeaderPoint = 2,
 
     /// <summary>
-    /// Запрос точки полки
+    /// Происходит указание первой точки полки
     /// </summary>
-    CustomPoint = 3
+    PromptShelfStartPoint = 3,
+
+    /// <summary>
+    /// Происходит указание точки отступа полки
+    /// </summary>
+    PromptShelfIndentPoint = 4
 }
