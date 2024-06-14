@@ -316,7 +316,7 @@ public static class EntityUtils
         }
         else if (textObject is MText mText)
         {
-            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.TextStyleName, mText.ActualHeight);
+            textSize = TextStyleArx.GetTrueTextSize(mText.Text, mText.GetTextStyleName(), mText.ActualHeight);
         }
 
         var textWidth = textSize.Item1;
@@ -332,10 +332,7 @@ public static class EntityUtils
             var topRightPoint = new Point2d(center.X + halfWidth, center.Y + halfHeight);
             var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
 
-            return new Point2dCollection
-            {
-                bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint
-            };
+            return [bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint];
         }
 
         return null;
@@ -378,5 +375,10 @@ public static class EntityUtils
         }
 
         return number;
+    }
+
+    private static string GetTextStyleName(this MText mText)
+    {
+        return mText.TextStyleId == ObjectId.Null ? "Standard" : mText.TextStyleName;
     }
 }
