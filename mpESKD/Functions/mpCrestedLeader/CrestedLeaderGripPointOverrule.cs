@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using System.Linq;
+
+namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -157,11 +159,12 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                         if (moveGrip.GripIndex == 0)
                         {
-                            var vec = crestedLeader.ShelfStartPointOcs - crestedLeader.InsertionPoint;
                             var pos = moveGrip.GripPoint + offset; // + vec;
 
                             ((BlockReference)entity).Position = pos;
                             crestedLeader.InsertionPoint = pos;
+
+                            //var vec = 
                         }
 
                         crestedLeader.UpdateEntities();

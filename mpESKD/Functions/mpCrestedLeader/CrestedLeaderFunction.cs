@@ -28,6 +28,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     /// <inheritdoc />
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
+        Loggerq.WriteRecord($"CrestedLeaderFunction; CreateAnalog; currentJigState == 4)");
+
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
         try
@@ -44,7 +46,9 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             var blockReference = MainFunction.CreateBlock(crestedLeader);
             crestedLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-            InsertCrestedLeaderWithJig(crestedLeader, blockReference);
+            // todo Тест
+            TestFunctions.TestJig.InsertTestWithJig2(crestedLeader, blockReference);
+            // InsertCrestedLeaderWithJig(crestedLeader, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -99,6 +103,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         }
     }
 
+    /*
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
         var entityJig = new DefaultEntityJig(
@@ -177,4 +182,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             
         }
     }
+
+    */
 }
