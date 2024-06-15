@@ -86,7 +86,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             crestedLeader.ApplyStyle(style, true);
 
             // todo Тестировние Jig
-            TestFunctions.TestJig.InsertTestWithJig(crestedLeader, blockReference);
+            TestFunctions.TestJig.InsertTestWithJig2(crestedLeader, blockReference);
             // InsertCrestedLeaderWithJig(crestedLeader, blockReference); 
         }
         catch (System.Exception exception)
@@ -128,8 +128,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 else if (entityJig.JigState == JigState.PromptNextPoint)
                 {
                     var toEndPointVector = crestedLeader.EndPoint - crestedLeader.InsertionPoint;
-
                     crestedLeader.LeaderPointsOcs.Add(Point3d.Origin + toEndPointVector);
+
                     crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
                 }
                 else

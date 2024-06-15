@@ -55,10 +55,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     grips.Add(MoveGrip);
 
 
-                    grips.Add(new CrestedLeaderShelfMoveGrip(crestedLeader, 1)
-                    {
-                        GripPoint = crestedLeader.EndPoint
-                    });
+                    //grips.Add(new CrestedLeaderShelfMoveGrip(crestedLeader, 1)
+                    //{
+                    //    GripPoint = crestedLeader.EndPoint
+                    //});
 
                     /*
                     Point3d addLeaderGripPosition;
@@ -157,8 +157,11 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                         if (moveGrip.GripIndex == 0)
                         {
-                            ((BlockReference)entity).Position = moveGrip.GripPoint + offset;
-                            crestedLeader.InsertionPoint = moveGrip.GripPoint + offset;
+                            var vec = crestedLeader.ShelfStartPointOcs - crestedLeader.InsertionPoint;
+                            var pos = moveGrip.GripPoint + offset; // + vec;
+
+                            ((BlockReference)entity).Position = pos;
+                            crestedLeader.InsertionPoint = pos;
                         }
 
                         crestedLeader.UpdateEntities();
@@ -167,7 +170,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     }
                     else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
                     {
-                        shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
+                        // shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
                     }
                    else
                     {

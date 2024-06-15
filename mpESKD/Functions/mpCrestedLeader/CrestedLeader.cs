@@ -15,6 +15,7 @@ using Base.Abstractions;
 using Autodesk.AutoCAD.EditorInput;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using System.Windows;
 
 /// <summary>
 /// Имя
@@ -52,10 +53,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private Wipeout _bottomTextMask;
 
     private Circle _testCircle;
+    private List<Circle> _testCirclesAsLeaderPoints = new ();
 
     #endregion
 
-    private readonly List<Point3d> _leaderPoints = new ();
+    private readonly List<Point3d> _leaderPoints = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeader"/> class.
@@ -95,6 +97,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     [SaveToXData]
     public int CurrentJigState { get; set; } =  (int)CrestedLeaderJigState.PromptInsertPoint;
+
+    [SaveToXData]
+    public Point3d ShelfStartPointOcs { get; set; }
+
+    [SaveToXData]
+    public Point3d ShelfIdentPointOcs { get; set; }
+
+    [SaveToXData]
+    public bool IsFirstCreate { get; set; } = false;
 
     #endregion
 
@@ -209,7 +220,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             if (_bottomText != null)    
                 entities.Add(_bottomText);  
 
+            if (_testCircle != null)
             entities.Add(_testCircle);
+
+            if (_testCirclesAsLeaderPoints != null)
+                entities.AddRange(_testCirclesAsLeaderPoints);
 
             foreach (var e in entities)
                 SetImmutablePropertiesToNestedEntity(e);
@@ -235,22 +250,31 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             var scale = GetScale();
 
-            _leaderPoints.Clear();
-            _leaderPoints.Add(InsertionPointOCS);
+            //_leaderPoints.Clear();
+            //_leaderPoints.Add(InsertionPointOCS);
 
-            foreach (var leaderPointOcs in LeaderPointsOcs)
-            {
-                var vector = leaderPointOcs - Point3d.Origin;
-                _leaderPoints.Add(InsertionPointOCS + vector);
-            }
+            //foreach (var leaderPointOcs in LeaderPointsOcs)
+            //{
+            //    var vector = leaderPointOcs - Point3d.Origin;
+            //    _leaderPoints.Add(InsertionPoint + vector);
+            //}
+
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; CurrentJigState: {CurrentJigState}");
+
+
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPoint: {InsertionPoint.ToString()}");
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPointOCS: {InsertionPointOCS}");
+
 
             if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
             {
-                TestCreateEntities(scale, InsertionPoint);
+               // TestCreateEntities(scale, InsertionPoint);
+              // CreateSimplyLeader(InsertionPoint);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
             {
-                TestCreateEntities(scale, EndPoint);
+                // TestCreateEntities(scale, EndPoint);
+               // CreateSimplyLeader(InsertionPoint);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfStartPoint)
             {
@@ -263,9 +287,89 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.None)
             {
+                Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPoint: {InsertionPoint}");
+
                 // CreateEntities(scale);
-                TestCreateEntities(scale, EndPoint);
+                // TestCreateEntities(scale, EndPoint);
+
+                if (IsFirstCreate)
+               {
+                   _testCircle = null;
+                    _leaders.Clear();
+                   _leaderArrows.Clear();
+                   _testCirclesAsLeaderPoints.Clear();
+                   _leaderPoints.Clear();
+
+                    // Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; CurrentJigState: None");
+                    Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: {IsFirstCreate}");
+
+                    //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; leaderPointsOcs:");
+                    //var i = 1;
+                    //foreach (var leaderPointOcs in LeaderPointsOcs)
+                    //{
+                    //    Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; leaderPointOcs[{i}]: {leaderPointOcs.ToString()}");
+                    //    i++;
+                    //}
+
+
+                    //List<Point3d> leaderPoints = new ();
+                    foreach (var leaderPointOcs in LeaderPointsOcs)
+                    {
+                        var vector = leaderPointOcs - Point3d.Origin;
+                        _leaderPoints.Add(InsertionPoint + vector);
+                    }
+
+                    _leaderPoints.Add(InsertionPoint  + (ShelfStartPointOcs - Point3d.Origin));
+                    _leaderPoints.Add(InsertionPoint + (ShelfIdentPointOcs - Point3d.Origin));
+
+                    foreach (var leaderPoint in _leaderPoints)
+                    {
+                       var  testCircle = new Circle()
+                        {
+                            Radius = 30,
+                            Center = leaderPoint
+
+                        };
+
+                       _testCirclesAsLeaderPoints.Add(testCircle);
+                    }
+
+                   // IsFirstCreate = false;
+               }
+               else
+                {
+                    _testCircle = null;
+                   _leaders.Clear();
+                   _leaderArrows.Clear();
+                   _testCirclesAsLeaderPoints.Clear();
+                   _leaderPoints.Clear();
+
+                    Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: {IsFirstCreate}");
+
+                   foreach (var leaderPointOcs in LeaderPointsOcs)
+                   {
+                       var vector = leaderPointOcs - Point3d.Origin;
+                       _leaderPoints.Add(InsertionPointOCS + vector);
+                   }
+
+                   _leaderPoints.Add(InsertionPointOCS + (ShelfStartPointOcs - Point3d.Origin));
+                   _leaderPoints.Add(InsertionPointOCS + (ShelfIdentPointOcs - Point3d.Origin));
+
+                    foreach (var leaderPoint in _leaderPoints)
+                   {
+                       var testCircle = new Circle()
+                       {
+                           Radius = 10,
+                           Center = leaderPoint
+
+                       };
+
+                       _testCirclesAsLeaderPoints.Add(testCircle);
+                   }
+                }
             }
+
+
         }
         catch (Exception exception)
         {
@@ -273,12 +377,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
     }
 
-
     private void TestCreateEntities(double scale, Point3d center)
     {
         _testCircle = new Circle()
         {
-            Radius= 30,
+            Radius = 30,
             Center = center
 
         };
@@ -293,7 +396,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         if (CurrentJigState == (int)CrestedLeaderJigState.None)
             CreateLeaderArrow(scale);
-        
     }
     
     private void CreateLeaderLines()
@@ -421,7 +523,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// Отрисовка выноски в режиме указания точек
     /// </summary>
     /// <param name="leaderEndPoint">Точка конца выноски</param>
-    internal void CreateSimplyLeader(Point3d leaderEndPoint)
+    public void CreateSimplyLeader(Point3d leaderEndPoint)
     {
         _leaders.Add(GetLeaderSimplyLine(leaderEndPoint));
         _leaderArrows.Add(GetLeaderSimpleArrow());
@@ -439,7 +541,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         return new Line(leaderStartPoint, leaderEndPoint)
         {
-            ColorIndex = 150
+            // ColorIndex = 150
         }; 
     }
 
@@ -453,7 +555,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     /// <param name="sender">sender</param>
     /// <param name="pointMonitorEventArgs">pointMonitorEventArgs</param>
-    internal void CrestedSimplyLeaderMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
+    public void CrestedSimplyLeaderMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
     {
         var cursorPoint = pointMonitorEventArgs.Context.ComputedPoint;
 
