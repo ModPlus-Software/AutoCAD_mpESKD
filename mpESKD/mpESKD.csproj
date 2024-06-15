@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.26.16.0</Version>
+		<Version>1.28.23.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 	</PropertyGroup>
 
@@ -38,7 +38,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug_Pekshev'">
-    <ExternalVersion>2024</ExternalVersion>
+    <ExternalVersion>2023</ExternalVersion>
     <DefineConstants>Debug;A$(ExternalVersion)</DefineConstants>
     <OutputPath>D:\ModPlus\Functions\AutoCAD\mpESKD</OutputPath>
   </PropertyGroup>
