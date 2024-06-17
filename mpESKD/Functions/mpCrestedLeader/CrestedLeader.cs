@@ -89,8 +89,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
 
 
-    [SaveToXData]
-    public bool IsFirstCreate { get; set; } = false;
+    //[SaveToXData]
+    //public bool IsFirstCreate { get; set; } = false;
 
     /// <summary>
     /// Состояние указания точек выносок
@@ -266,10 +266,16 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             var scale = GetScale();
 
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPoints.Count: {LeaderPoints.Count}");
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsOCS.Count: {LeaderPointsOCS.Count}");
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsMove.Count: {LeaderPointsMove.Count}");
+            Loggerq.WriteRecord($"--------------------------------------------------------------");
+
             //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; CurrentJigState: {CurrentJigState}");
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: {IsFirstCreate}");
-            //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPoint: {InsertionPoint}");
-            //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPointOCS: {InsertionPointOCS}");
+            //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: {IsFirstCreate}");
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPoint: {InsertionPoint}");
+            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPointOCS: {InsertionPointOCS}");
+            Loggerq.WriteRecord($"--------------------------------------------------------------");
 
             Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsMove: =>");
             var ii = 1;
@@ -307,40 +313,51 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _testCirclesAsLeaderPoints.Clear();
                 _leaderPoints.Clear();
 
+                //List<Point3d> testCirclesPoints = new ();
+
                 double testCircleRadius;
-                if (IsFirstCreate)
-                {
-                    testCircleRadius = 30;
-                    //foreach (var leaderPointOcs in LeaderPointsOCS)
-                    //{
-                    //    var vec = leaderPointOcs - InsertionPoint;
-                    //    _leaderPoints.Add(InsertionPoint + vec);
-                    //}
+                //if (IsFirstCreate)
+                //{
+                //    Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: TRUE");
+                //    LeaderPointsMove.Clear();
 
-                    _leaderPoints.AddRange(LeaderPointsOCS);
-                    _leaderPoints.Add(ShelfStartPointOCS);
-                    _leaderPoints.Add(ShelfIdentPointOCS);
+                //    testCircleRadius = 30;
+                //    //foreach (var leaderPointOcs in LeaderPointsOCS)
+                //    //{
+                //    //    var vec = leaderPointOcs - InsertionPoint;
+                //    //    _leaderPoints.Add(InsertionPoint + vec);
+                //    //}
 
-                    foreach (var leaderPoint in LeaderPoints)
-                    {
-                        var vec = leaderPoint - InsertionPoint;
-                        LeaderPointsMove.Add(Point3d.Origin + vec); 
-                    }   
-                }
-                else
-                {
+                //    _leaderPoints.AddRange(LeaderPointsOCS);
+                //    _leaderPoints.Add(ShelfStartPointOCS);
+                //    _leaderPoints.Add(ShelfIdentPointOCS);
+
+                //    foreach (var leaderPoint in LeaderPoints)
+                //    {
+                //        var vec = leaderPoint - InsertionPointOCS;
+                //        LeaderPointsMove.Add(Point3d.Origin + vec); 
+                //    }   
+                //}
+                //else
+                //{
+                    //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: FALSE");
+
+                        /*
                     foreach (var leaderPointMove in LeaderPointsMove)
                     {
-                        var vectorMove = leaderPointMove - Point3d.Origin  ;
-                        _leaderPoints.Add(InsertionPointOCS + vectorMove );
+                        var vectorMove = leaderPointMove - Point3d.Origin;
+                        _leaderPoints.Add(InsertionPointOCS + vectorMove);
+
                         
                     }
+                        */
 
+                        _leaderPoints.AddRange(LeaderPointsOCS);
 
                     _leaderPoints.Add(ShelfStartPointOCS);
                     _leaderPoints.Add(ShelfIdentPointOCS);
                     testCircleRadius = 10;
-                }
+                //}
 
 
 

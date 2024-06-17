@@ -28,7 +28,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     /// <inheritdoc />
     public void CreateAnalog(SmartEntity sourceEntity, bool copyLayer)
     {
-        Loggerq.WriteRecord($"CrestedLeaderFunction; CreateAnalog; currentJigState == 4)");
+        Loggerq.WriteRecord($"CrestedLeaderFunction; CreateAnalog; START)");
 
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
@@ -66,6 +66,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     [CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
     public void CreateCrestedLeaderCommand()
     {
+        Loggerq.DeleteFile();
+        Loggerq.WriteRecord($" * "); Loggerq.WriteRecord($" * "); Loggerq.WriteRecord($" * ");
+        Loggerq.WriteRecord($" *-*-*-*-*-*-*- M  O  D   P  L  U  S -*-*-*-*-*-*-*-*-*");
+        Loggerq.WriteRecord($" * ");
+
         CreateCrestedLeader();
     }
 
