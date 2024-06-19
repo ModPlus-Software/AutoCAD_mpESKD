@@ -32,6 +32,11 @@ public class CrestedLeaderGrip : SmartEntityGripData
     }
 
     /// <summary>
+    /// Новое значение точки ручки
+    /// </summary>
+    public Point3d NewPoint { get; set; }
+
+    /// <summary>
     /// Экземпляр класса <see cref="mpCrestedLeader.CrestedLeader"/>
     /// </summary>
     public CrestedLeader CrestedLeader { get; }
@@ -63,6 +68,15 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
+                // Loggerq.WriteRecord($"GripMoveBlock: OnGripStatusChanged:  (newStatus == Status.GripEnd");
+                // Loggerq.WriteRecord($"GripMoveBlock: OnGripStatusChanged:  GripPoint: {GripPoint}");
+
+                var offset = NewPoint - _gripTmp;
+                CrestedLeader.ShelfIndentPointTempForGripMove +=   offset;
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);

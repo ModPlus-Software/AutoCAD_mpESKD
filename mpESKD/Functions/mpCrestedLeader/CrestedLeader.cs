@@ -102,7 +102,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     public List<Point3d> LeaderPointsOCS  => LeaderPoints.Select(x => x.TransformBy(BlockTransform.Inverse())).ToList();
 
-    public Point3d ShelfIdentPointOCS => ShelfIdentPoint.TransformBy(BlockTransform.Inverse());
+    public Point3d ShelfIndentPointOCS => ShelfIndentPoint.TransformBy(BlockTransform.Inverse());
 
     public Point3d ShelfStartPointOCS => ShelfStartPoint.TransformBy(BlockTransform.Inverse());
 
@@ -118,7 +118,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d ShelfStartPoint { get; set; }
 
     [SaveToXData]
-    public Point3d ShelfIdentPoint { get; set; }
+    public Point3d ShelfIndentPoint { get; set; }
+
+    [SaveToXData]
+    public Point3d ShelfIndentPointTempForGripMove { get; set; }
+
+
 
     [SaveToXData] 
     public List<Point3d> LeaderPointsMove { get; set; } = new ();
@@ -330,7 +335,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 //    _leaderPoints.AddRange(LeaderPointsOCS);
                 //    _leaderPoints.Add(ShelfStartPointOCS);
-                //    _leaderPoints.Add(ShelfIdentPointOCS);
+                //    _leaderPoints.Add(ShelfIndentPointOCS);
 
                 //    foreach (var leaderPoint in LeaderPoints)
                 //    {
@@ -352,10 +357,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     }
                         */
 
+                        ShelfStartPoint = InsertionPoint;
+
                         _leaderPoints.AddRange(LeaderPointsOCS);
 
                     _leaderPoints.Add(ShelfStartPointOCS);
-                    _leaderPoints.Add(ShelfIdentPointOCS);
+                    _leaderPoints.Add(ShelfIndentPointOCS);
                     testCircleRadius = 10;
                 //}
 
