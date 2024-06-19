@@ -72,7 +72,16 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 // Loggerq.WriteRecord($"GripMoveBlock: OnGripStatusChanged:  GripPoint: {GripPoint}");
 
                 var offset = NewPoint - _gripTmp;
-                CrestedLeader.ShelfIndentPointTempForGripMove +=   offset;
+                CrestedLeader.ShelfIndentPointPreviousForGripMove += offset;
+
+                //foreach (var pt in CrestedLeader.LeaderPointsPreviousForGripMove)
+                //{
+                //    pt += offset;
+                //}
+
+                CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
+                    .Select(x => x + offset)
+                    .ToList();
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

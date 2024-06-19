@@ -86,27 +86,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc/>
     public override double MinDistanceBetweenPoints => 5.0;
 
-
-
-
-    //[SaveToXData]
-    //public bool IsFirstCreate { get; set; } = false;
-
     /// <summary>
     /// Состояние указания точек выносок
     /// </summary>
     [SaveToXData]
     public int CurrentJigState { get; set; } = (int)CrestedLeaderJigState.PromptInsertPoint;
 
-
-
     public List<Point3d> LeaderPointsOCS  => LeaderPoints.Select(x => x.TransformBy(BlockTransform.Inverse())).ToList();
 
     public Point3d ShelfIndentPointOCS => ShelfIndentPoint.TransformBy(BlockTransform.Inverse());
 
     public Point3d ShelfStartPointOCS => ShelfStartPoint.TransformBy(BlockTransform.Inverse());
-
-
 
     /// <summary>
     /// Точки концов выносок
@@ -121,12 +111,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d ShelfIndentPoint { get; set; }
 
     [SaveToXData]
-    public Point3d ShelfIndentPointTempForGripMove { get; set; }
-
-
+    public Point3d ShelfIndentPointPreviousForGripMove { get; set; }
 
     [SaveToXData] 
-    public List<Point3d> LeaderPointsMove { get; set; } = new ();
+    public List<Point3d> LeaderPointsPreviousForGripMove { get; set; } = new ();
 
     #endregion
 
@@ -273,7 +261,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPoints.Count: {LeaderPoints.Count}");
             Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsOCS.Count: {LeaderPointsOCS.Count}");
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsMove.Count: {LeaderPointsMove.Count}");
             Loggerq.WriteRecord($"--------------------------------------------------------------");
 
             //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; CurrentJigState: {CurrentJigState}");
@@ -282,24 +269,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPointOCS: {InsertionPointOCS}");
             Loggerq.WriteRecord($"--------------------------------------------------------------");
 
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsMove: =>");
-            var ii = 1;
-            foreach (var pt in LeaderPointsMove)
-            {
-                Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsMove[{ii}] : {pt.ToString()}");
-                ii++;
-            }
-
-
             if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
             {
-               // TestCreateEntities(scale, InsertionPoint);
-              // CreateSimplyLeader(InsertionPoint);
+                // TestCreateEntities(scale, InsertionPoint);
+                // CreateSimplyLeader(InsertionPoint);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
             {
                 // TestCreateEntities(scale, EndPoint);
-               // CreateSimplyLeader(InsertionPoint);
+                // CreateSimplyLeader(InsertionPoint);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfStartPoint)
             {
@@ -318,55 +296,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _testCirclesAsLeaderPoints.Clear();
                 _leaderPoints.Clear();
 
-                //List<Point3d> testCirclesPoints = new ();
-
                 double testCircleRadius;
-                //if (IsFirstCreate)
-                //{
-                //    Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: TRUE");
-                //    LeaderPointsMove.Clear();
 
-                //    testCircleRadius = 30;
-                //    //foreach (var leaderPointOcs in LeaderPointsOCS)
-                //    //{
-                //    //    var vec = leaderPointOcs - InsertionPoint;
-                //    //    _leaderPoints.Add(InsertionPoint + vec);
-                //    //}
+                ShelfStartPoint = InsertionPoint;
 
-                //    _leaderPoints.AddRange(LeaderPointsOCS);
-                //    _leaderPoints.Add(ShelfStartPointOCS);
-                //    _leaderPoints.Add(ShelfIndentPointOCS);
+                _leaderPoints.AddRange(LeaderPointsOCS);
 
-                //    foreach (var leaderPoint in LeaderPoints)
-                //    {
-                //        var vec = leaderPoint - InsertionPointOCS;
-                //        LeaderPointsMove.Add(Point3d.Origin + vec); 
-                //    }   
-                //}
-                //else
-                //{
-                    //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: FALSE");
+                _leaderPoints.Add(ShelfStartPointOCS);
 
-                        /*
-                    foreach (var leaderPointMove in LeaderPointsMove)
-                    {
-                        var vectorMove = leaderPointMove - Point3d.Origin;
-                        _leaderPoints.Add(InsertionPointOCS + vectorMove);
+                _leaderPoints.Add(ShelfIndentPointOCS);
 
-                        
-                    }
-                        */
-
-                        ShelfStartPoint = InsertionPoint;
-
-                        _leaderPoints.AddRange(LeaderPointsOCS);
-
-                    _leaderPoints.Add(ShelfStartPointOCS);
-                    _leaderPoints.Add(ShelfIndentPointOCS);
-                    testCircleRadius = 10;
-                //}
-
-
+                testCircleRadius = 10;
 
                 foreach (var leaderPoint in _leaderPoints)
                 {

@@ -162,11 +162,14 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         {
                             moveGrip.NewPoint = moveGrip.GripPoint + offset;
 
+                            crestedLeader.ShelfIndentPoint = crestedLeader.ShelfIndentPointPreviousForGripMove + offset;
+
+                            crestedLeader.LeaderPoints = crestedLeader
+                                .LeaderPointsPreviousForGripMove.Select(x => x + offset)
+                                .ToList();
+
                             var pos = moveGrip.GripPoint + offset;
-
-                            crestedLeader.ShelfIndentPoint = crestedLeader.ShelfIndentPointTempForGripMove + offset;
-
-                          ((BlockReference)entity).Position = pos;
+                            ((BlockReference)entity).Position = pos;
                             crestedLeader.InsertionPoint = pos;
                         }
 
@@ -177,7 +180,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     {
                         // shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
                     }
-                   else
+                    else
                     {
                         base.MoveGripPointsAt(entity, grips, offset, bitFlags);
                     }
