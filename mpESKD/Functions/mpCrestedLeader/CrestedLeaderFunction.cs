@@ -11,6 +11,8 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI.Windows;
 using Base.Enums;
+using CSharpFunctionalExtensions;
+using System.Collections.Generic;
 
 /// <inheritdoc />
 public class CrestedLeaderFunction : ISmartEntityFunction
@@ -46,9 +48,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             var blockReference = MainFunction.CreateBlock(crestedLeader);
             crestedLeader.SetPropertiesFromSmartEntity(sourceEntity, copyLayer);
 
-            // todo Тест
-            TestFunctions.TestJig.InsertTestWithJig2(crestedLeader, blockReference);
-            // InsertCrestedLeaderWithJig(crestedLeader, blockReference);
+            InsertCrestedLeaderWithJig(crestedLeader, blockReference);
         }
         catch (System.Exception exception)
         {
@@ -66,11 +66,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     [CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
     public void CreateCrestedLeaderCommand()
     {
-        Loggerq.DeleteFile();
-        Loggerq.WriteRecord($" * "); Loggerq.WriteRecord($" * "); Loggerq.WriteRecord($" * ");
-        Loggerq.WriteRecord($" *-*-*-*-*-*-*- M  O  D   P  L  U  S -*-*-*-*-*-*-*-*-*");
-        Loggerq.WriteRecord($" * ");
-
         CreateCrestedLeader();
     }
 
@@ -94,9 +89,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             var blockReference = MainFunction.CreateBlock(crestedLeader);
             crestedLeader.ApplyStyle(style, true);
 
-            // todo Тестировние Jig
-            TestFunctions.TestJig.InsertTestWithJig2(crestedLeader, blockReference);
-            // InsertCrestedLeaderWithJig(crestedLeader, blockReference); 
+            InsertCrestedLeaderWithJig(crestedLeader, blockReference); 
         }
         catch (System.Exception exception)
         {
@@ -108,62 +101,89 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         }
     }
 
-    /*
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
+        List<Point3d> leaderPoints = new ();
+        Point3d shelfIndentPoint = new ();
+
         var entityJig = new DefaultEntityJig(
             crestedLeader,
             blockReference,
-            new Point3d(20, 0, 0),
-            (point) => crestedLeader.EndPoint = point);
+            new Point3d(20, 0, 0));
 
-        AcadUtils.Editor.TurnForcedPickOn();
-        AcadUtils.Editor.PointMonitor += crestedLeader.CrestedSimplyLeaderMonitor;
-        
         do
         {
             var status = AcadUtils.Editor.Drag(entityJig).Status;
+
+            // Это именно режим указания точек для смарт-объекта - не путать с режимом самого JIG
+            var currentJigState = crestedLeader.CurrentJigState;
 
             if (status == PromptStatus.OK)
             {
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
-                    entityJig.JigState = JigState.PromptNextPoint;
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint;
-
-                    entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     crestedLeader.CreateSimplyLeader(crestedLeader.InsertionPoint);
+
+                    // Задан текущий режим JIG как режим NextPoint
+                    entityJig.JigState = JigState.PromptNextPoint;
+
+                    //jig1LeaderPoints.Add(crestedLeader.InsertionPoint);
+
+                    // Включение режима указания точек для смарт-объекта - указание точек выносок
+                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint; 
                 }
-                // Если текущий режим - указание точек выносок  и выполнен клик мышкой
+                // Если режим JIG - это NextPoint
                 else if (entityJig.JigState == JigState.PromptNextPoint)
                 {
-                    var toEndPointVector = crestedLeader.EndPoint - crestedLeader.InsertionPoint;
-                    crestedLeader.LeaderPointsOcs.Add(Point3d.Origin + toEndPointVector);
+                    // Если текущий режим указания точек для смарт-объекта - указание точек выносок
+                    if (currentJigState == 2)
+                    {
+                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
-                    crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
-                }
-                else
-                {
-                    // Выполняется Action (где задается EndPoint) и выход
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.None;
-                    break;
+                        // сохранение точки выноски
+                        leaderPoints.Add(crestedLeader.EndPoint);
+
+                    }
+                    // Если текущий режим указания точек для смарт-объекта - указание первой точки полки
+                    else if (currentJigState == 3)
+                    {
+                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+
+                        // Сохранение точки начала полки
+                        crestedLeader.ShelfStartPoint = crestedLeader.EndPoint;
+
+                        // Включение режима указания точки отступа полки как текущего
+                        crestedLeader.CurrentJigState = 4; // 4
+
+                    }
+                    // Если текущий режим указания точек для смарт-объекта - указание точки отступа полки
+                    else if (currentJigState == 4) // currentJigState == 4
+                    {
+                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+
+                        // Сохранение точки отступа полки
+                        shelfIndentPoint = crestedLeader.EndPoint;
+
+                        // Отключение режима указания точек 
+                        crestedLeader.CurrentJigState = 0;
+                        crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
+
+                        crestedLeader.UpdateEntities();
+                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                        break;
+                    }
                 }
             }
-            // Нажат Enter
             else if (status == PromptStatus.Other)
             {
-                // Проверяем, что мы в режиме указания точек выносок
                 if (entityJig.JigState == JigState.PromptNextPoint)
                 {
-                    entityJig.JigState = JigState.CustomPoint;
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptShelfStartPoint;
-
-                    AcadUtils.Editor.TurnForcedPickOff();
-                    AcadUtils.Editor.PointMonitor -= crestedLeader.CrestedSimplyLeaderMonitor;
+                    // Включение режима указания первой точки полки как текущего
+                    crestedLeader.CurrentJigState = 3;
                 }
             }
-            // Нажат Cancel или что-то  другое (но не Enter)
-            else 
+            else
             {
                 EntityUtils.Erase(blockReference.Id);
                 break;
@@ -176,17 +196,29 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             {
                 var ent = tr.GetObject(crestedLeader.BlockId, OpenMode.ForWrite, true, true);
 
+                // перемещение точки вставки в точку первой точки полки
+                ((BlockReference)ent).Position = crestedLeader.InsertionPoint;
+
+                ent.XData = crestedLeader.GetDataForXData();
+                tr.Commit();
+            }
+
+            crestedLeader.LeaderPoints.AddRange(leaderPoints);
+            crestedLeader.ShelfIndentPoint = shelfIndentPoint;
+
+            //crestedLeader.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
+            crestedLeader.ShelfIndentPointPreviousForGripMove = shelfIndentPoint;
+
+            crestedLeader.UpdateEntities();
+            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+            using (var tr = AcadUtils.Database.TransactionManager.StartTransaction())
+            {
+                var ent = tr.GetObject(crestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
                 ent.XData = crestedLeader.GetDataForXData();
                 tr.Commit();
             }
         }
-        else
-        {
-            AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.Editor.PointMonitor -= crestedLeader.CrestedSimplyLeaderMonitor;
-            
-        }
     }
-
-    */
 }

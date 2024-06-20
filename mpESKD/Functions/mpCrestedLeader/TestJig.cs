@@ -292,6 +292,55 @@ namespace TestFunctions
                     entity.ShelfIndentPoint = jig1ShelfIndentPoint;
 
                     // Точки выносок для их прорисовки при смещения при перетаскивании за базовую точку 
+                    // в GripPointOverrule MoveGripPointsAt :
+                    /*
+                      if (moveGrip.GripIndex == 0)
+                        {
+                            moveGrip.NewPoint = moveGrip.GripPoint + offset;
+
+                            crestedLeader.ShelfIndentPoint = crestedLeader.ShelfIndentPointPreviousForGripMove + offset;
+
+                            crestedLeader.LeaderPoints = crestedLeader
+                                .LeaderPointsPreviousForGripMove.Select(x => x + offset)
+                                .ToList();
+
+                            var pos = moveGrip.GripPoint + offset;
+                            ((BlockReference)entity).Position = pos;
+                            crestedLeader.InsertionPoint = pos;
+                        }
+
+                        crestedLeader.UpdateEntities();
+                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+                    */
+                    // в Grip добавить  свойство 'public Point3d NewPoint { get; set; }'
+                    // в Grip в OnGripStatusChanged добавить
+                    /*
+                        if (newStatus == Status.GripEnd)
+                            {
+                                var offset = NewPoint - _gripTmp;
+                                CrestedLeader.ShelfIndentPointPreviousForGripMove += offset;
+
+                                CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
+                                    .Select(x => x + offset)
+                                    .ToList();
+
+                                CrestedLeader.UpdateEntities();
+                                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                                {
+                                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                                    using (var resBuf = CrestedLeader.GetDataForXData())
+                                    {
+                                        blkRef.XData = resBuf;
+                                    }
+
+                                    tr.Commit();
+                                }
+
+                                CrestedLeader.Dispose();
+                            }
+                    */
                     entity.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
                     // Точка отступа полки для ее прорисовки при смещения при перетаскивании за базовую точку 
                     entity.ShelfIndentPointPreviousForGripMove = jig1ShelfIndentPoint;

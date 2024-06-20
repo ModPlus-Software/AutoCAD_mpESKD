@@ -164,9 +164,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                             crestedLeader.ShelfIndentPoint = crestedLeader.ShelfIndentPointPreviousForGripMove + offset;
 
-                            crestedLeader.LeaderPoints = crestedLeader
-                                .LeaderPointsPreviousForGripMove.Select(x => x + offset)
-                                .ToList();
+                            //crestedLeader.LeaderPoints = crestedLeader
+                            //    .LeaderPointsPreviousForGripMove.Select(x => x + offset)
+                            //    .ToList();
 
                             var pos = moveGrip.GripPoint + offset;
                             ((BlockReference)entity).Position = pos;

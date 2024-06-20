@@ -22,7 +22,7 @@ using System.Windows;
 /// </summary>
 [SmartEntityDisplayNameKey("h207")]
 [SystemStyleDescriptionKey("h208")]
-public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor, IJigProps
+public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEditor
 {
     #region Примитивы
 
@@ -113,8 +113,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public Point3d ShelfIndentPointPreviousForGripMove { get; set; }
 
-    [SaveToXData] 
-    public List<Point3d> LeaderPointsPreviousForGripMove { get; set; } = new ();
+    //[SaveToXData] 
+    //public List<Point3d> LeaderPointsPreviousForGripMove { get; set; } = new ();
 
     #endregion
 
@@ -258,16 +258,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         try
         {
             var scale = GetScale();
-
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPoints.Count: {LeaderPoints.Count}");
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; LeaderPointsOCS.Count: {LeaderPointsOCS.Count}");
-            Loggerq.WriteRecord($"--------------------------------------------------------------");
-
-            //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; CurrentJigState: {CurrentJigState}");
-            //Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; IsFirstCreate: {IsFirstCreate}");
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPoint: {InsertionPoint}");
-            Loggerq.WriteRecord($"CrectedLeader; UpdateEntities; InsertionPointOCS: {InsertionPointOCS}");
-            Loggerq.WriteRecord($"--------------------------------------------------------------");
 
             if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
             {

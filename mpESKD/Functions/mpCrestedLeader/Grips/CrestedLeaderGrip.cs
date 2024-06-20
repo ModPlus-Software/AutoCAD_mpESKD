@@ -68,20 +68,13 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                // Loggerq.WriteRecord($"GripMoveBlock: OnGripStatusChanged:  (newStatus == Status.GripEnd");
-                // Loggerq.WriteRecord($"GripMoveBlock: OnGripStatusChanged:  GripPoint: {GripPoint}");
-
                 var offset = NewPoint - _gripTmp;
+
                 CrestedLeader.ShelfIndentPointPreviousForGripMove += offset;
 
-                //foreach (var pt in CrestedLeader.LeaderPointsPreviousForGripMove)
-                //{
-                //    pt += offset;
-                //}
-
-                CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
-                    .Select(x => x + offset)
-                    .ToList();
+                //CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
+                //    .Select(x => x + offset)
+                //    .ToList();
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
