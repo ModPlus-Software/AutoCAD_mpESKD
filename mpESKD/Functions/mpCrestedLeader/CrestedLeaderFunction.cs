@@ -124,10 +124,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 {
                     crestedLeader.CreateSimplyLeader(crestedLeader.InsertionPoint);
 
+                    entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     // Задан текущий режим JIG как режим NextPoint
                     entityJig.JigState = JigState.PromptNextPoint;
 
-                    //jig1LeaderPoints.Add(crestedLeader.InsertionPoint);
+                    leaderPoints.Add(crestedLeader.InsertionPoint);
 
                     // Включение режима указания точек для смарт-объекта - указание точек выносок
                     crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint; 
@@ -135,6 +136,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 // Если режим JIG - это NextPoint
                 else if (entityJig.JigState == JigState.PromptNextPoint)
                 {
+
+
                     // Если текущий режим указания точек для смарт-объекта - указание точек выносок
                     if (currentJigState == 2)
                     {
@@ -179,6 +182,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             {
                 if (entityJig.JigState == JigState.PromptNextPoint)
                 {
+                    entityJig.PreviousPoint = crestedLeader.EndPoint;
                     // Включение режима указания первой точки полки как текущего
                     crestedLeader.CurrentJigState = 3;
                 }
