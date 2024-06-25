@@ -298,7 +298,7 @@ namespace TestFunctions
                         {
                             moveGrip.NewPoint = moveGrip.GripPoint + offset;
 
-                            crestedLeader.ShelfIndentPoint = crestedLeader.ShelfIndentPointPreviousForGripMove + offset;
+                            crestedLeader.ShelfLedgePoint = crestedLeader.ShelfLedgePointPreviousForGripMove + offset;
 
                             crestedLeader.LeaderPoints = crestedLeader
                                 .LeaderPointsPreviousForGripMove.Select(x => x + offset)
@@ -318,7 +318,7 @@ namespace TestFunctions
                         if (newStatus == Status.GripEnd)
                             {
                                 var offset = NewPoint - _gripTmp;
-                                CrestedLeader.ShelfIndentPointPreviousForGripMove += offset;
+                                CrestedLeader.ShelfLedgePointPreviousForGripMove += offset;
 
                                 CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
                                     .Select(x => x + offset)

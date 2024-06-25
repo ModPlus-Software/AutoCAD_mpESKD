@@ -4,32 +4,35 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                    xmlns:mps="https://modplus.org/winfx/xaml/controls"
-                   mc:Ignorable="d"
-                   Width="400" Height="300" MinWidth="200" MinHeight="200"
+                   Width="400"
+                   Height="300"
+                   MinWidth="200"
+                   MinHeight="200"
                    ResizeMode="CanResizeWithGrip"
-                   Topmost="True">
+                   Topmost="True"
+                   mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <XmlDataProvider x:Key="LangCommon" XPath="ModPlus/Common" />
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0"
-                        x:Name="ContentControl"/>
+        <ContentControl x:Name="ContentControl"
+                        Grid.Row="0" />
 
-        <Button Grid.Row="1"
+        <Button Name="BtAccept"
+                Grid.Row="1"
                 HorizontalAlignment="Center"
-                IsDefault="True"
+                Click="BtAccept_OnClick"
                 Content="{Binding Source={StaticResource LangCommon}, XPath=accept}"
-                Name="BtAccept"
-                Click="BtAccept_OnClick"></Button>
+                IsDefault="True" />
     </Grid>
 </mps:ModPlusWindow>

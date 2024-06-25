@@ -70,7 +70,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
             {
                 var offset = NewPoint - _gripTmp;
 
-                CrestedLeader.ShelfIndentPointPreviousForGripMove += offset;
+                CrestedLeader.ShelfLedgePointPreviousForGripMove += offset;
 
                 //CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
                 //    .Select(x => x + offset)

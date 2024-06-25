@@ -1,157 +1,286 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    >
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Canvas x:Key="ImageAxis" Width="190" Height="150">
+    <Canvas x:Key="ImageAxis"
+            Width="190"
+            Height="150">
         <Canvas.RenderTransform>
-            <MatrixTransform Matrix="0 -0.02 -0.02 0 580 455"/>
+            <MatrixTransform Matrix="0 -0.02 -0.02 0 580 455" />
         </Canvas.RenderTransform>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="M 22155.741 26836.861 H 21160.32"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 20892.622 26836.861 h -267.697"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 20357.227 26836.861 h -995.236" ></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 18505.432 26836.861 -1129.455 576.422" StrokeStartLineCap="Round"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 19361.991 26836.861 h -856.559"></Path>
-        <Path StrokeThickness="150" Stroke="{DynamicResource BlackBrush}" Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5">
+        <Path Data="M 22155.741 26836.861 H 21160.32"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 20892.622 26836.861 h -267.697"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 20357.227 26836.861 h -995.236"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 18505.432 26836.861 -1129.455 576.422"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeStartLineCap="Round"
+              StrokeThickness="50" />
+        <Path Data="m 19361.991 26836.861 h -856.559"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="150">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 16899.151 27656.756"/>
+                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 16899.151 27656.756" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="M 22155.741 24671.515 H 21160.32"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 20892.622 24671.515 h -267.697"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 20357.227 24671.515 h -995.236 l -1129.269 576.422"></Path>
-        <Path StrokeThickness="150" Stroke="{DynamicResource BlackBrush}" Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5">
+        <Path Data="M 22155.741 24671.515 H 21160.32"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 20892.622 24671.515 h -267.697"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 20357.227 24671.515 h -995.236 l -1129.269 576.422"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="150">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17755.897 25491.409"/>
+                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17755.897 25491.409" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="M 22155.741 22858.52 H 20783.464"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="m 20515.766 22858.52 h -267.698"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="M 19980.371 22858.52 H 18608.093 17537.301"></Path>
-        <Path StrokeThickness="150" Stroke="{DynamicResource BlackBrush}" Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5">
+        <Path Data="M 22155.741 22858.52 H 20783.464"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="m 20515.766 22858.52 h -267.698"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="M 19980.371 22858.52 H 18608.093 17537.301"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="M 2884.5 0 C 2884.5 1593.0654 1593.0654 2884.5 0 2884.5 -1593.0654 2884.5 -2884.5 1593.0654 -2884.5 0 c 0 -1593.0654 1291.4346 -2884.5 2884.5 -2884.5 1593.0654 0 2884.5 1291.4346 2884.5 2884.5"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="150">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17001.998 22858.613"/>
+                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17001.998 22858.613" />
             </Path.RenderTransform>
         </Path>
-        <Path Fill="{DynamicResource BlackBrush}" StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" Data="M 8919 8174 8631 6444 8342 8174 Z">
+        <Path Data="M 8919 8174 8631 6444 8342 8174 Z"
+              Fill="{DynamicResource BlackBrush}"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045"/>
+                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource BlackBrush}" Data="m 17001.998 20181.539 c 295.743 0 535.49 239.747 535.49 535.49 0 295.741 -239.747 535.487 -535.49 535.487 -295.742 0 -535.488 -239.746 -535.488 -535.487 0 -295.743 239.746 -535.49 535.488 -535.49"></Path>
-        <Path  StrokeThickness="150" Stroke="{DynamicResource BlackBrush}" Data="M 2307.5 0 C 2307.5 1274.3971 1274.3971 2307.5 0 2307.5 -1274.3971 2307.5 -2307.5 1274.3971 -2307.5 0 c 0 -1274.3971 1033.1029 -2307.5 2307.5 -2307.5 1274.3971 0 2307.5 1033.1029 2307.5 2307.5">
+        <Path Data="m 17001.998 20181.539 c 295.743 0 535.49 239.747 535.49 535.49 0 295.741 -239.747 535.487 -535.49 535.487 -295.742 0 -535.488 -239.746 -535.488 -535.487 0 -295.743 239.746 -535.49 535.488 -535.49"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 2307.5 0 C 2307.5 1274.3971 1274.3971 2307.5 0 2307.5 -1274.3971 2307.5 -2307.5 1274.3971 -2307.5 0 c 0 -1274.3971 1033.1029 -2307.5 2307.5 -2307.5 1274.3971 0 2307.5 1033.1029 2307.5 2307.5"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="150">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17001.998 20717.029"/>
+                <MatrixTransform Matrix="0 -0.18564355 0.18564355 0 17001.998 20717.029" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource BlackBrush}" Data="M 17001.905 22323.123 V 21252.332"></Path>
+        <Path Data="M 17001.905 22323.123 V 21252.332"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="30" />
 
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18505.432 27104.744 v 1621.227"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17434.454 27924.361 v 801.61"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="M 18773.13 28458.272 H 17166.756"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18398.316 28351.156 214.048 214.232"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17541.571 28565.388 -214.046 -214.232"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 19361.991 27104.744 v 1621.227"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18237.734 28458.272 h 1391.955"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 19254.876 28351.156 214.232 214.232"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16711.744 27313.408 v -1011.2"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17087.487 27313.408 v -1011.2"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16444.046 26569.906 h 911.139"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16818.861 26677.022 -214.233 -214.234"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16980.371 26462.788 214.232 214.234"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17269.603 21252.332 h 1137.439"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17269.603 21573.495 h 1137.439"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18139.343 20984.634 v 856.743"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18032.228 21359.448 214.231 -214.234"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 18246.459 21466.564 -214.231 214.047"></Path>
-        <Path Fill="{DynamicResource AccentColorBrush}" StrokeThickness="50" Stroke="{DynamicResource AccentColorBrush}" Data="M 5351 19119 6591 17136 4775 18609 Z">
+        <Path Data="m 18505.432 27104.744 v 1621.227"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17434.454 27924.361 v 801.61"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 18773.13 28458.272 H 17166.756"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 18398.316 28351.156 214.048 214.232"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17541.571 28565.388 -214.046 -214.232"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 19361.991 27104.744 v 1621.227"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 18237.734 28458.272 h 1391.955"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 19254.876 28351.156 214.232 214.232"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 16711.744 27313.408 v -1011.2"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17087.487 27313.408 v -1011.2"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 16444.046 26569.906 h 911.139"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 16818.861 26677.022 -214.233 -214.234"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 16980.371 26462.788 214.232 214.234"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17269.603 21252.332 h 1137.439"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17269.603 21573.495 h 1137.439"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 18139.343 20984.634 v 856.743"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 18032.228 21359.448 214.231 -214.234"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 18246.459 21466.564 -214.231 214.047"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 5351 19119 6591 17136 4775 18609 Z"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045"/>
+                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16339.529 23558.025 -675 762.994 v 1386.2"></Path>
-        <Path Fill="{DynamicResource AccentColorBrush}" StrokeThickness="50" Stroke="{DynamicResource AccentColorBrush}" Data="M 5351 7582 6591 5599 4775 7073 Z">
+        <Path Data="m 16339.529 23558.025 -675 762.994 v 1386.2"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 5351 7582 6591 5599 4775 7073 Z"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045"/>
+                <MatrixTransform Matrix="0.18564355 0 0 0.18564355 15399.616 20056.045" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 16339.529 21416.254 -675 763.181 v 1454.703"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="M 17755.804 23533.333 V 24955.92"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="M 17755.804 26026.713 V 24955.92"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17648.688 26133.829 214.231 -214.233"></Path>
-        <Path StrokeThickness="30" Stroke="{DynamicResource AccentColorBrush}" Data="m 17862.919 24848.804 -214.231 214.233"></Path>
+        <Path Data="m 16339.529 21416.254 -675 763.181 v 1454.703"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 17755.804 23533.333 V 24955.92"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="M 17755.804 26026.713 V 24955.92"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17648.688 26133.829 214.231 -214.233"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
+        <Path Data="m 17862.919 24848.804 -214.231 214.233"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="30" />
         <!-- Text -->
-        <TextBlock Text="1" FontSize="520" FontFamily="Arial" Canvas.Top="27810" Canvas.Left="17185"
-                   Foreground="{DynamicResource BlackBrush}">
+        <TextBlock Canvas.Left="17185"
+                   Canvas.Top="27810"
+                   FontFamily="Arial"
+                   FontSize="520"
+                   Foreground="{DynamicResource BlackBrush}"
+                   Text="1">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="2" FontSize="520" FontFamily="Arial" Canvas.Top="20850" Canvas.Left="17270"
-                   Foreground="{DynamicResource BlackBrush}">
+        <TextBlock Canvas.Left="17270"
+                   Canvas.Top="20850"
+                   FontFamily="Arial"
+                   FontSize="520"
+                   Foreground="{DynamicResource BlackBrush}"
+                   Text="2">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="a" FontSize="800" FontFamily="ISOCPEUR" Canvas.Top="29350" Canvas.Left="18770"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="18770"
+                   Canvas.Top="29350"
+                   FontFamily="ISOCPEUR"
+                   FontSize="800"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="a">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="b" FontSize="800" FontFamily="ISOCPEUR" Canvas.Top="29350" Canvas.Left="17770"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="17770"
+                   Canvas.Top="29350"
+                   FontFamily="ISOCPEUR"
+                   FontSize="800"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="b">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="h" FontSize="800" FontFamily="ISOCPEUR" Canvas.Top="27450" Canvas.Left="16250"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="16250"
+                   Canvas.Top="27450"
+                   FontFamily="ISOCPEUR"
+                   FontSize="800"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="h">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="d" FontSize="800" FontFamily="ISOCPEUR" Canvas.Top="24200" Canvas.Left="18650"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="18650"
+                   Canvas.Top="24200"
+                   FontFamily="ISOCPEUR"
+                   FontSize="800"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="d">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="c" FontSize="800" FontFamily="ISOCPEUR" Canvas.Top="22000" Canvas.Left="19050"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="19050"
+                   Canvas.Top="22000"
+                   FontFamily="ISOCPEUR"
+                   FontSize="800"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="c">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="Type 1" FontSize="500" FontFamily="ISOCPEUR" Canvas.Top="25700" Canvas.Left="16300"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="16300"
+                   Canvas.Top="25700"
+                   FontFamily="ISOCPEUR"
+                   FontSize="500"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="Type 1">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock Text="Type 2" FontSize="500" FontFamily="ISOCPEUR" Canvas.Top="23600" Canvas.Left="16300"
-                   Foreground="{DynamicResource AccentColorBrush}">
+        <TextBlock Canvas.Left="16300"
+                   Canvas.Top="23600"
+                   FontFamily="ISOCPEUR"
+                   FontSize="500"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="Type 2">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleY="-1"></ScaleTransform>
-                    <RotateTransform Angle="-90"></RotateTransform>
+                    <ScaleTransform ScaleY="-1" />
+                    <RotateTransform Angle="-90" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>

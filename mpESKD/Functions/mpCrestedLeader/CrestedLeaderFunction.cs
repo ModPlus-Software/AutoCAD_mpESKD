@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using System.Linq;
+
+namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -104,7 +106,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
         List<Point3d> leaderPoints = new ();
-        Point3d shelfIndentPoint = new ();
+        Point3d shelfLedgePoint = new ();
 
         var entityJig = new DefaultEntityJig(
             crestedLeader,
@@ -116,41 +118,57 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             var status = AcadUtils.Editor.Drag(entityJig).Status;
 
             // Это именно режим указания точек для смарт-объекта - не путать с режимом самого JIG
-            var currentJigState = crestedLeader.CurrentJigState;
+            var currentJigStateOfCrestedLeader = crestedLeader.CurrentJigState;
+
+            Loggerq.WriteRecord($"currentJigState :{currentJigStateOfCrestedLeader}");
+
+            /*
+            if (currentJigStateOfCrestedLeader == (int)CrestedLeaderJigState.PromptInsertPoint ||
+                currentJigStateOfCrestedLeader == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
+            {
+                crestedLeader.CreateSimplyLeader(crestedLeader.InsertionPoint);
+            }
+            else
+            {
+                crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+            }*/
 
             if (status == PromptStatus.OK)
             {
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
-                    crestedLeader.CreateSimplyLeader(crestedLeader.InsertionPoint);
 
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     // Задан текущий режим JIG как режим NextPoint
                     entityJig.JigState = JigState.PromptNextPoint;
 
                     leaderPoints.Add(crestedLeader.InsertionPoint);
+                    crestedLeader.LeaderPoints.Add(crestedLeader.InsertionPoint);
 
                     // Включение режима указания точек для смарт-объекта - указание точек выносок
-                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint; 
+                    crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint;
+
+                    // Отрисовка выноски при клике в режиме PromptNextLeaderPoint // todo
+                    //crestedLeader.CreateTempLeaders();
                 }
                 // Если режим JIG - это NextPoint
                 else if (entityJig.JigState == JigState.PromptNextPoint)
                 {
-
-
                     // Если текущий режим указания точек для смарт-объекта - указание точек выносок
-                    if (currentJigState == 2)
+                    if (currentJigStateOfCrestedLeader == 2)
                     {
-                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+                        // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
                         // сохранение точки выноски
                         leaderPoints.Add(crestedLeader.EndPoint);
+                        crestedLeader.LeaderPoints.Add(crestedLeader.EndPoint);
+
 
                     }
                     // Если текущий режим указания точек для смарт-объекта - указание первой точки полки
-                    else if (currentJigState == 3)
+                    else if (currentJigStateOfCrestedLeader == 3)
                     {
-                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+                        // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
                         // Сохранение точки начала полки
                         crestedLeader.ShelfStartPoint = crestedLeader.EndPoint;
@@ -160,16 +178,20 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
                     }
                     // Если текущий режим указания точек для смарт-объекта - указание точки отступа полки
-                    else if (currentJigState == 4) // currentJigState == 4
+                    else if (currentJigStateOfCrestedLeader == 4) // currentJigState == 4
                     {
-                        crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
+                        // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
                         // Сохранение точки отступа полки
-                        shelfIndentPoint = crestedLeader.EndPoint;
+                        shelfLedgePoint = crestedLeader.EndPoint;
+                        //crestedLeader.ShelfLedgePoint = shelfLedgePoint;
 
                         // Отключение режима указания точек 
                         crestedLeader.CurrentJigState = 0;
-                        crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
+
+                        // Новая точка вставки (точка начала крайней справа выноски)
+                        crestedLeader.InsertionPoint = crestedLeader.
+                            LeaderStartPoints.OrderBy(p => p.X).Last();
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -207,11 +229,12 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 tr.Commit();
             }
 
+            crestedLeader.LeaderPoints.Clear();
             crestedLeader.LeaderPoints.AddRange(leaderPoints);
-            crestedLeader.ShelfIndentPoint = shelfIndentPoint;
+            crestedLeader.ShelfLedgePoint = shelfLedgePoint;
 
             //crestedLeader.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
-            crestedLeader.ShelfIndentPointPreviousForGripMove = shelfIndentPoint;
+            crestedLeader.ShelfLedgePointPreviousForGripMove = shelfLedgePoint;
 
             crestedLeader.UpdateEntities();
             crestedLeader.BlockRecord.UpdateAnonymousBlocks();
