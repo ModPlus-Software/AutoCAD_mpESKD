@@ -23,6 +23,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         Vector3d curViewDir,
         GetGripPointsFlags bitFlags)
     {
+        Loggerq.WriteRecord($"GetGripPoints start");
         try
         {
             if (IsApplicable(entity))
@@ -49,14 +50,27 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 var crestedLeader = EntityReaderService.Instance.GetFromEntity<CrestedLeader>(entity);
                 if (crestedLeader != null)
                 {
+                    if (crestedLeader.LeaderStartPoints != null)
+                    {
+
+                    Loggerq.WriteRecord($"GetGripPoints crestedLeader.LeaderStartPoints.Count:{crestedLeader.LeaderStartPoints.Count}");
+                    }
+                    else
+                    {
+
+                        Loggerq.WriteRecord($"GetGripPoints crestedLeader.LeaderStartPoints IS NULL");
+                    }
+
                     // insertion (start) grip
                     var MoveGrip = new CrestedLeaderGrip(crestedLeader, 0)
                     {
-                        
-                        GripPoint = crestedLeader.InsertionPoint
+                        // GripPoint = crestedLeader.InsertionPoint
+                        GripPoint = crestedLeader.LeaderStartPoints != null 
+                            ? crestedLeader.LeaderStartPoints.Last()
+                            : crestedLeader.InsertionPoint
                     };
-                    grips.Add(MoveGrip);
 
+                    grips.Add(MoveGrip);
 
                     //grips.Add(new CrestedLeaderShelfMoveGrip(crestedLeader, 1)
                     //{
@@ -103,23 +117,23 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         });
                     }
 
-                    for (var i = 0; i < crestedLeader.LeaderPoints.Count; i++)
+                    for (var i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
                     {
                         // ручки переноса выносок
                         grips.Add(new CrestedLeaderShelfMoveGrip(crestedLeader, i)
                         {
-                            GripPoint = crestedLeader.LeaderPoints[i]
+                            GripPoint = crestedLeader.LeaderEndPoints[i]
                         });
 
                         // ручки удаления выносок
-                        var deleteGripPoint = crestedLeader.LeaderPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
+                        var deleteGripPoint = crestedLeader.LeaderEndPoints[i] + (Vector3d.XAxis * 20 * curViewUnitSize);
                         grips.Add(new CrestedLeaderLeaderRemoveGrip(crestedLeader, i)
                         {
                             GripPoint = deleteGripPoint
                         });
 
                         // ручки типа рамки у выноски
-                        var leaderEndTypeGripPoint = crestedLeader.LeaderPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+                        var leaderEndTypeGripPoint = crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
                         grips.Add(new CrestedLeaderFrameTypeGrip(crestedLeader, i)
                         {
                             GripPoint = leaderEndTypeGripPoint
@@ -142,12 +156,14 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
             if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
                 ExceptionBox.Show(exception);
         }
+        Loggerq.WriteRecord($"GetGripPoints end");
     }
 
     /// <inheritdoc />
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
+        Loggerq.WriteRecord($"MoveGripPointsAt start");
         try
         {
             if (IsApplicable(entity))
@@ -164,7 +180,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                             crestedLeader.ShelfLedgePoint = crestedLeader.ShelfLedgePointPreviousForGripMove + offset;
 
-                            //crestedLeader.LeaderPoints = crestedLeader
+                            //crestedLeader.LeaderEndPoints = crestedLeader
                             //    .LeaderPointsPreviousForGripMove.Select(x => x + offset)
                             //    .ToList();
 
@@ -196,5 +212,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
             if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
                 ExceptionBox.Show(exception);
         }
+        Loggerq.WriteRecord($"MoveGripPointsAt end");
     }
 }

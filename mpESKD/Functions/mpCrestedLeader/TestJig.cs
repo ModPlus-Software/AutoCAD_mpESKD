@@ -300,7 +300,7 @@ namespace TestFunctions
 
                             crestedLeader.ShelfLedgePoint = crestedLeader.ShelfLedgePointPreviousForGripMove + offset;
 
-                            crestedLeader.LeaderPoints = crestedLeader
+                            crestedLeader.LeaderEndPoints = crestedLeader
                                 .LeaderPointsPreviousForGripMove.Select(x => x + offset)
                                 .ToList();
 
@@ -340,8 +340,8 @@ namespace TestFunctions
 
                                 CrestedLeader.Dispose();
                             }
-                    */
                     entity.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
+                    */
                     // Точка отступа полки для ее прорисовки при смещения при перетаскивании за базовую точку 
                     entity.ShelfIndentPointPreviousForGripMove = jig1ShelfIndentPoint;
 
