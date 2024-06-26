@@ -195,6 +195,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                             crestedLeader.InsertionPoint = crestedLeader.LeaderStartPoints.Last();
                         }
 
+                        crestedLeader.ShelfLedge = (crestedLeader.EndPoint - crestedLeader.ShelfStartPoint).Length;
+
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
 

@@ -92,7 +92,14 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
 
                     // перемещение точки вставки в точку первой точки полки
-                   // ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+                    // ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                    Loggerq.WriteRecord($"OnGripStatusChanged: ((BlockReference)blkRef).Position: {((BlockReference)blkRef).Position.ToString()}");
+                    Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.InsertionPoint: {CrestedLeader.InsertionPoint.ToString()}");
+                    Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.LeaderStartPoints.Last(): {CrestedLeader.LeaderStartPoints.Last().ToString()}");
+
+                    //CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPoints.Last();
+                    //((BlockReference)blkRef).Position = CrestedLeader.LeaderStartPoints.Last();
 
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
