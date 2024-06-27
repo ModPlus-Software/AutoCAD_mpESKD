@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -105,8 +106,10 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
-        List<Point3d> leaderPoints = new ();
+        List<Point3d> leaderEndPoints = new ();
+        Point3d shelfStartPoint = new ();
         Point3d shelfLedgePoint = new ();
+        List<Point3d> leaderStartPoints = new();
 
         var entityJig = new DefaultEntityJig(
             crestedLeader,
@@ -120,8 +123,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             // Это именно режим указания точек для смарт-объекта - не путать с режимом самого JIG
             var currentJigStateOfCrestedLeader = crestedLeader.CurrentJigState;
 
+            Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: currentJigState: {currentJigStateOfCrestedLeader}");
             /*
-            Loggerq.WriteRecord($"currentJigState :{currentJigStateOfCrestedLeader}");
 
             if (currentJigStateOfCrestedLeader == (int)CrestedLeaderJigState.PromptInsertPoint ||
                 currentJigStateOfCrestedLeader == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
@@ -142,7 +145,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     // Задан текущий режим JIG как режим NextPoint
                     entityJig.JigState = JigState.PromptNextPoint;
 
-                    leaderPoints.Add(crestedLeader.InsertionPoint);
+                    leaderEndPoints.Add(crestedLeader.InsertionPoint);
                     crestedLeader.LeaderEndPoints.Add(crestedLeader.InsertionPoint);
 
                     // Включение режима указания точек для смарт-объекта - указание точек выносок
@@ -160,7 +163,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
                         // сохранение точки выноски
-                        leaderPoints.Add(crestedLeader.EndPoint);
+                        leaderEndPoints.Add(crestedLeader.EndPoint);
                         crestedLeader.LeaderEndPoints.Add(crestedLeader.EndPoint);
 
 
@@ -171,7 +174,29 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
                         // Сохранение точки начала полки
-                        crestedLeader.ShelfStartPoint = crestedLeader.EndPoint;
+
+                        //var leaderStartPoints = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                        //var leaderStartPointsMiddle = GeometryUtils.GetMiddlePoint3d(
+                        //    leaderStartPoints.First(),
+                        //    leaderStartPoints.Last());
+
+                        //if (crestedLeader.EndPoint.X > leaderStartPoints.Last().X)
+                        //{
+                        //    shelfStartPoint = crestedLeader.ShelfStartPoint = crestedLeader.EndPoint;
+                        //}
+                        //else if (crestedLeader.EndPoint.X < leaderStartPoints.First().X)
+                        //{
+                        //}
+                        //else if (crestedLeader.EndPoint.X < leaderStartPointsMiddle.X)
+                        //{
+                        //    shelfStartPoint = crestedLeader.ShelfStartPoint = leaderStartPoints.First();
+                        //}
+                        //else
+                        //{
+                        //    shelfStartPoint = crestedLeader.ShelfStartPoint = leaderStartPoints.Last();
+                        //}
+                        leaderStartPoints.Clear();
+                        leaderEndPoints.AddRange(crestedLeader.LeaderStartPoints);
 
                         // Включение режима указания точки отступа полки как текущего
                         crestedLeader.CurrentJigState = 4; // 4
@@ -182,20 +207,59 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     {
                         // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
 
-                        // Сохранение точки отступа полки
-                        shelfLedgePoint = crestedLeader.EndPoint;
                         //crestedLeader.ShelfLedgePoint = shelfLedgePoint;
 
                         // Отключение режима указания точек 
                         crestedLeader.CurrentJigState = 0;
 
                         // Новая точка вставки (точка начала крайней справа выноски)
-                        if (crestedLeader.LeaderStartPoints != null)
+                        //if (crestedLeader.LeaderStartPoints != null)
+                        //{
+                        //    var leaderStartPoints = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                        //    crestedLeader.InsertionPoint = leaderStartPoints.Last();
+                        //}
+
+                        crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
+
+                        //var xLeaderStartPoints =
+                        //    crestedLeader.LeaderStartPoints.OrderBy(p => p.X).Select(p => p.X).ToList();
+
+
+                        /*
+                        Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: crestedLeader.EndPoint:{crestedLeader.EndPoint}");
+
+                        Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: crestedLeader.ShelfStartPoint:{crestedLeader.ShelfStartPoint}");
+
+                        Loggerq.WriteRecord($"*");
+                        Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: LeaderStartPoints SORT =>");
+                        foreach (var leaderStartPoint in crestedLeader.LeaderStartPoints.OrderBy(p => p.X))
                         {
-                            crestedLeader.InsertionPoint = crestedLeader.LeaderStartPoints.Last();
+                            Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: leaderStartPoint: {leaderStartPoint.ToString()}");
+                        }*/
+                        
+
+                        //if (xLeaderStartPoints.Max() - xLeaderStartPoints.Min() )
+
+                        var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                        //var leaderStartPointsMiddle = GeometryUtils.GetMiddlePoint3d(
+                        //    leaderStartPoints.First(),
+                        //    leaderStartPoints.Last());
+
+                        if (crestedLeader.EndPoint.X > leaderStartPointsSort.Last().X ||
+                            crestedLeader.EndPoint.X < leaderStartPointsSort.First().X)
+                        {
+                            crestedLeader.ShelfLedge = (crestedLeader.EndPoint - crestedLeader.ShelfStartPoint).Length;
+                            // Сохранение точки отступа полки
+                            shelfLedgePoint = crestedLeader.EndPoint;
+                        }
+                        else
+                        {
+                            shelfLedgePoint = crestedLeader.ShelfStartPoint;
                         }
 
-                        crestedLeader.ShelfLedge = (crestedLeader.EndPoint - crestedLeader.ShelfStartPoint).Length;
+                        Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: ShelfStartPoint: {crestedLeader.ShelfStartPoint}");
+
+                        Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: ShelfLedgePoint: {crestedLeader.ShelfLedgePoint}");
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -234,9 +298,13 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             }
 
             crestedLeader.LeaderEndPoints.Clear();
-            crestedLeader.LeaderEndPoints.AddRange(leaderPoints);
+            crestedLeader.LeaderEndPoints.AddRange(leaderEndPoints);
+
+            crestedLeader.LeaderStartPoints.Clear();
+            crestedLeader.LeaderStartPoints.AddRange(leaderStartPoints);
+
             crestedLeader.ShelfLedgePoint = shelfLedgePoint;
-            crestedLeader.ShelfStartPoint = crestedLeader.InsertionPoint;
+            crestedLeader.ShelfStartPoint = shelfStartPoint;
 
             //crestedLeader.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
             crestedLeader.ShelfLedgePointPreviousForGripMove = shelfLedgePoint;
