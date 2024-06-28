@@ -69,10 +69,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             {
                 CrestedLeader.EndPoint = NewPoint;
 
-                //var posShgelf = NewPoint - _gripTmp;
-
-                //CrestedLeader.ShelfLedgePoint += posShgelf;
-
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
