@@ -73,17 +73,28 @@ public class CrestedLeaderGrip : SmartEntityGripData
             {
                 var offset = NewPoint - _gripTmp;
               //  var tempLeaderEndPoints = CrestedLeader.LeaderEndPoints;
-               // var tempShelfStartPoint = CrestedLeader.ShelfStartPoint;
-              //  var tempShelfLedgePoint = CrestedLeader.ShelfLedgePoint;
+                var tempShelfStartPoint = CrestedLeader.ShelfStartPoint;
+                var tempShelfLedgePoint = CrestedLeader.ShelfLedgePoint;
+                var tempShelfEndPoint = CrestedLeader.ShelfEndPoint;
 
-                CrestedLeader.ShelfLedgePointPreviousForGripMove += offset;
-                CrestedLeader.ShelfEndPointPreviousForGripMove += offset;
+               // CrestedLeader.ShelfLedgePointPreviousForGripMove += offset;
+              //  CrestedLeader.ShelfEndPointPreviousForGripMove += offset;
 
                 //CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
                 //    .Select(x => x + offset)
                 //    .ToList();
 
                 //CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPoints.Last();
+
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                {
+                    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                }
+                else
+                {
+                    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+                }
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -93,16 +104,13 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
 
                     // перемещение точки вставки в точку первой точки полки
-                    // ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+                     ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
                     /*
                     Loggerq.WriteRecord($"OnGripStatusChanged: ((BlockReference)blkRef).Position: {((BlockReference)blkRef).Position.ToString()}");
                     Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.InsertionPoint: {CrestedLeader.InsertionPoint.ToString()}");
                     Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.LeaderStartPoints.Last(): {CrestedLeader.LeaderStartPoints.Last().ToString()}");
                     */
-
-                    //CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPoints.Last();
-                    //((BlockReference)blkRef).Position = CrestedLeader.LeaderStartPoints.Last();
 
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
@@ -111,6 +119,22 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
                     tr.Commit();
                 }
+
+                CrestedLeader.ShelfStartPoint =  tempShelfStartPoint;
+                CrestedLeader.ShelfLedgePoint = tempShelfLedgePoint;
+                CrestedLeader.ShelfEndPoint = tempShelfEndPoint;
+
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+
                 /*
                 CrestedLeader.LeaderEndPoints = tempLeaderEndPoints;
                 CrestedLeader.ShelfStartPoint = tempShelfStartPoint;

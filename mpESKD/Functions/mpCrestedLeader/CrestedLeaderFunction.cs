@@ -317,8 +317,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             crestedLeader.ShelfEndPoint = shelfEndPoint;
 
             //crestedLeader.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
-            crestedLeader.ShelfLedgePointPreviousForGripMove = shelfLedgePoint;
-            crestedLeader.ShelfEndPointPreviousForGripMove = shelfEndPoint;
+            //crestedLeader.ShelfLedgePointPreviousForGripMove = shelfLedgePoint;
+            //crestedLeader.ShelfEndPointPreviousForGripMove = shelfEndPoint;
 
             crestedLeader.UpdateEntities();
             crestedLeader.BlockRecord.UpdateAnonymousBlocks();

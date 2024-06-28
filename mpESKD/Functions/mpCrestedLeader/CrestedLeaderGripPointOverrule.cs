@@ -169,9 +169,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         {
                             moveGrip.NewPoint = moveGrip.GripPoint + offset;
 
-                            crestedLeader.ShelfLedgePoint = crestedLeader.ShelfLedgePointPreviousForGripMove + offset;
+                          //  crestedLeader.ShelfLedgePoint = crestedLeader.ShelfLedgePointPreviousForGripMove + offset;
 
-                            crestedLeader.ShelfEndPoint = crestedLeader.ShelfEndPointPreviousForGripMove + offset;
+                          //  crestedLeader.ShelfEndPoint = crestedLeader.ShelfEndPointPreviousForGripMove + offset;
 
                             //crestedLeader.LeaderEndPoints = crestedLeader
                             //    .LeaderPointsPreviousForGripMove.Select(x => x + offset)

@@ -115,11 +115,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d ShelfEndPointOCS => ShelfEndPoint.TransformBy(BlockTransform.Inverse());
 
 
-    [SaveToXData]
-    public Point3d ShelfLedgePointPreviousForGripMove { get; set; }
+    //[SaveToXData]
+    //public Point3d ShelfLedgePointPreviousForGripMove { get; set; }
 
-    [SaveToXData]
-    public Point3d ShelfEndPointPreviousForGripMove { get; set; }
+    //[SaveToXData]
+    //public Point3d ShelfEndPointPreviousForGripMove { get; set; }
 
 
     [SaveToXData]
@@ -372,6 +372,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             ? ShelfStartPoint + vectorToShelfLedge
             : ShelfStartPoint - vectorToShelfLedge;
 
+       // ShelfLedgePointPreviousForGripMove = ShelfLedgePoint;
+
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
         var vectorToShelfEndpoint = Vector3d.XAxis * ((TextIndent * scale) + textWidth);
@@ -379,6 +381,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         ShelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? ShelfLedgePoint + vectorToShelfEndpoint
             : ShelfLedgePoint - vectorToShelfEndpoint;
+
+       // ShelfEndPointPreviousForGripMove = ShelfEndPoint;
 
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
 
