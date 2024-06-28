@@ -1,114 +1,225 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    >
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Canvas x:Key="ImageBreakLine" Width="190" Height="150">
+    <Canvas x:Key="ImageBreakLine"
+            Width="190"
+            Height="150">
         <Canvas.RenderTransform>
-            <MatrixTransform Matrix="0 -0.02 -0.02 0 190 150"/>
+            <MatrixTransform Matrix="0 -0.02 -0.02 0 190 150" />
         </Canvas.RenderTransform>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 7717 v 944"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 7717 v 944"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 4535 v 944"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 4535 v 944"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 6220 1352 v 945"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource BlackBrush}" Data="m 1338 1352 v 945"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6598 7465 V 5995"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6220 7465 V 5995"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6850 6247 H 5968"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 6409 6058 378 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6409 6436 6031 6058"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 960 7465 V 5995"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1338 7465 V 5995"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 708 6247 h 882"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1149 6436 771 6058"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1149 6058 378 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3307 7465 V 5388"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 4251 7465 V 5388"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3055 5640 H 4503"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3496 5829 3118 5451"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 4062 5451 378 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3291 8661 H 1705"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 3763 6772 H 1705"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1956 8913 V 6520"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 2145 8472 -377 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1768 6961 377 -378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6611 4087 V 2813"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6220 4283 V 2813"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6863 3065 H 5968"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 6422 2876 378 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 6409 3254 6031 2876"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1338 4283 V 2813"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 947 4478 V 2813"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1590 3065 H 695"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="m 1149 2876 378 378"></Path>
-        <Path StrokeThickness="25" Stroke="{DynamicResource AccentColorBrush}" Data="M 1136 3254 758 2876"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" 
-              StrokeLineJoin="Miter" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
-              Data="m 960 7717 h 378 1969 l 236 944 472 -1889 236 945 h 1969 378"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
-              Data="m 947 4730 75 -45 76 -43 79 -39 79 -36 82 -32 105 -42 108 -38 108 -35 110 -30 111 -26 112 -23 112 -18 113 -14 114 -10 113 -7 114 -2 114 2 114 7 113 10 113 14 113 18 111 23 111 26 110 30 109 35 107 38 106 42 106 41 107 39 109 34 110 30 111 26 111 23 113 18 113 14 113 10 114 7 114 2 114 -2 113 -7 114 -10 113 -14 112 -18 112 -23 111 -26 110 -30 108 -34 108 -39 105 -41 391 -196"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}" StrokeLineJoin="Miter" StrokeStartLineCap="Triangle" StrokeEndLineCap="Triangle"
-              Data="m 18.77691 -507.15253 c 265.54346 9.83155 478.54407 222.83216 488.37562 488.37562">
+        <Path Data="m 6220 7717 v 944"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1338 7717 v 944"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1338 4535 v 944"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 6220 4535 v 944"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 6220 1352 v 945"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1338 1352 v 945"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6598 7465 V 5995"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6220 7465 V 5995"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6850 6247 H 5968"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 6409 6058 378 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6409 6436 6031 6058"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 960 7465 V 5995"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1338 7465 V 5995"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 708 6247 h 882"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1149 6436 771 6058"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1149 6058 378 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 3307 7465 V 5388"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 4251 7465 V 5388"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 3055 5640 H 4503"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 3496 5829 3118 5451"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 4062 5451 378 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 3291 8661 H 1705"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 3763 6772 H 1705"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1956 8913 V 6520"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 2145 8472 -377 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1768 6961 377 -378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6611 4087 V 2813"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6220 4283 V 2813"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6863 3065 H 5968"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 6422 2876 378 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 6409 3254 6031 2876"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1338 4283 V 2813"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 947 4478 V 2813"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1590 3065 H 695"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 1149 2876 378 378"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="M 1136 3254 758 2876"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeThickness="25" />
+        <Path Data="m 960 7717 h 378 1969 l 236 944 472 -1889 236 945 h 1969 378"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeEndLineCap="Triangle"
+              StrokeLineJoin="Miter"
+              StrokeStartLineCap="Triangle"
+              StrokeThickness="50" />
+        <Path Data="m 947 4730 75 -45 76 -43 79 -39 79 -36 82 -32 105 -42 108 -38 108 -35 110 -30 111 -26 112 -23 112 -18 113 -14 114 -10 113 -7 114 -2 114 2 114 7 113 10 113 14 113 18 111 23 111 26 110 30 109 35 107 38 106 42 106 41 107 39 109 34 110 30 111 26 111 23 113 18 113 14 113 10 114 7 114 2 114 -2 113 -7 114 -10 113 -14 112 -18 112 -23 111 -26 110 -30 108 -34 108 -39 105 -41 391 -196"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeEndLineCap="Triangle"
+              StrokeStartLineCap="Triangle"
+              StrokeThickness="50" />
+        <Path Data="m 18.77691 -507.15253 c 265.54346 9.83155 478.54407 222.83216 488.37562 488.37562"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeEndLineCap="Triangle"
+              StrokeLineJoin="Miter"
+              StrokeStartLineCap="Triangle"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <RotateTransform Angle="-90" CenterX="1608.5" CenterY="-237"/>
+                <RotateTransform Angle="-90" CenterX="1608.5" CenterY="-237" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
-              Data="m 5732 1841 -120 4 h -120 l -120 -4 -120 -9 -120 -12 -119 -17 -118 -21 -118 -25 -116 -29 -116 -33 -114 -37 -113 -42 -111 -45 -110 -49 -108 -53 -106 -56 -104 -61 -104 -60 -106 -56 -108 -53 -110 -49 -111 -45 -113 -42 -114 -37 -116 -33 -116 -29 -118 -25 -118 -21 -119 -17 -120 -12 -120 -9 -120 -4 h -120 l -120 4"></Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
-              Data="M -18.77691 507.15253 C -284.32037 497.32098 -497.32098 284.32037 -507.15253 18.77691">
+        <Path Data="m 5732 1841 -120 4 h -120 l -120 -4 -120 -9 -120 -12 -119 -17 -118 -21 -118 -25 -116 -29 -116 -33 -114 -37 -113 -42 -111 -45 -110 -49 -108 -53 -106 -56 -104 -61 -104 -60 -106 -56 -108 -53 -110 -49 -111 -45 -113 -42 -114 -37 -116 -33 -116 -29 -118 -25 -118 -21 -119 -17 -120 -12 -120 -9 -120 -4 h -120 l -120 4"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <Path Data="M -18.77691 507.15253 C -284.32037 497.32098 -497.32098 284.32037 -507.15253 18.77691"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <RotateTransform Angle="-90" CenterX="3524" CenterY="-2189.5"/>
+                <RotateTransform Angle="-90" CenterX="3524" CenterY="-2189.5" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
-              Data="M 507.15253 18.77691 C 497.32098 284.32037 284.32037 497.32098 18.77691 507.15253">
+        <Path Data="M 507.15253 18.77691 C 497.32098 284.32037 284.32037 497.32098 18.77691 507.15253"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50">
             <Path.RenderTransform>
-                <RotateTransform Angle="-90" CenterX="3542.5" CenterY="-2171"/>
+                <RotateTransform Angle="-90" CenterX="3542.5" CenterY="-2171" />
             </Path.RenderTransform>
         </Path>
-        <Path StrokeThickness="50" Stroke="{DynamicResource BlackBrush}"
-              Data="m 5732 864 -120 -4 h -120 l -120 4 -120 9 -120 12 -119 17 -118 21 -118 25 -116 29 -116 33 -114 37 -113 42 -111 45 -110 49 -108 53 -106 56 -104 60"></Path>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}" 
-                   Text="a" Canvas.Top="7250" Canvas.Left="5750">
+        <Path Data="m 5732 864 -120 -4 h -120 l -120 4 -120 9 -120 12 -119 17 -118 21 -118 25 -116 29 -116 33 -114 37 -113 42 -111 45 -110 49 -108 53 -106 56 -104 60"
+              Stroke="{DynamicResource BlackBrush}"
+              StrokeThickness="50" />
+        <TextBlock Canvas.Left="5750"
+                   Canvas.Top="7250"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="a">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
-                   Text="a" Canvas.Top="4050" Canvas.Left="5750">
+        <TextBlock Canvas.Left="5750"
+                   Canvas.Top="4050"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="a">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
-                   Text="w" Canvas.Top="6600" Canvas.Left="3500">
+        <TextBlock Canvas.Left="3500"
+                   Canvas.Top="6600"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="w">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
-                </TextBlock>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
-                   Text="h" Canvas.Left="2950" Canvas.Top="8350">
+        </TextBlock>
+        <TextBlock Canvas.Left="2950"
+                   Canvas.Top="8350"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="h">
             <TextBlock.RenderTransform>
                 <TransformGroup>
-                    <ScaleTransform ScaleX="-1"></ScaleTransform>
-                    <RotateTransform CenterX="0.5" CenterY="0.5" Angle="90"></RotateTransform>
+                    <ScaleTransform ScaleX="-1" />
+                    <RotateTransform Angle="90" CenterX="0.5" CenterY="0.5" />
                 </TransformGroup>
             </TextBlock.RenderTransform>
-                </TextBlock>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}"
-                   Text="a" Canvas.Top="7250" Canvas.Left="500">
+        </TextBlock>
+        <TextBlock Canvas.Left="500"
+                   Canvas.Top="7250"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="a">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
-        <TextBlock FontSize="900" FontFamily="ISOCPEUR" Foreground="{DynamicResource AccentColorBrush}" Text="a"
-                   Canvas.Top="4050" Canvas.Left="500">
+        <TextBlock Canvas.Left="500"
+                   Canvas.Top="4050"
+                   FontFamily="ISOCPEUR"
+                   FontSize="900"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   Text="a">
             <TextBlock.RenderTransform>
-                <ScaleTransform ScaleY="-1"></ScaleTransform>
+                <ScaleTransform ScaleY="-1" />
             </TextBlock.RenderTransform>
         </TextBlock>
     </Canvas>

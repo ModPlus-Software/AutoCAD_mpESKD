@@ -8,9 +8,9 @@
                    Width="400"
                    MaxHeight="450"
                    d:DataContext="{d:DesignInstance local:SearchEntitiesByValuesViewModel, IsDesignTimeCreatable=False}"
+                   ResizeMode="NoResize"
                    SizeToContent="Height"
-                   mc:Ignorable="d"
-                   ResizeMode="NoResize">
+                   mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

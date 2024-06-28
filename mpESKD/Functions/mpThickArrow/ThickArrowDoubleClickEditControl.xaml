@@ -42,9 +42,9 @@
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
                        Text="{Binding Source={StaticResource Lang}, XPath=p115}" />
-            <ComboBox Grid.Row="0"
+            <ComboBox x:Name="CbArrowCount"
+                      Grid.Row="0"
                       Grid.Column="1"
-                      x:Name="CbArrowCount"
                       ItemsSource="{Binding Source={StaticResource DataFromThickArrowCountEnum}}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>

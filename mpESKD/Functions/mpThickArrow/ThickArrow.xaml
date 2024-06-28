@@ -1,32 +1,123 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    >
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Canvas x:Key="ImageThickArrow"  Width="190.000" Height="150.000">
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 95.302,124.435 L 103.265,116.472"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 146.196,124.435 L 154.160,116.472"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 155.057,59.885 L 163.020,67.848"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 99.284,85.072 L 99.284,126.109"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 153.501,120.454 L 95.599,120.454"/>
-        <TextBlock Foreground="{DynamicResource AccentColorBrush}" Canvas.Left="119.147" Canvas.Top="93.959" FontSize="24.64" FontFamily="ISOCPEUR">e</TextBlock>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 151.055,81.502 L 164.751,81.540"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 159.039,85.167 L 159.039,35.130"/>
-        <TextBlock Foreground="{DynamicResource AccentColorBrush}" RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000" Canvas.Left="132.333" Canvas.Top="55.918" FontSize="24.64" FontFamily="ISOCPEUR">t2</TextBlock>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 150.145,85.072 L 150.145,126.109"/>
-        <Path Fill="{DynamicResource BlackBrush}" Data="F1 M 48.001,76.598 L 48.001,68.457 L 99.110,68.457 L 99.110,63.598 L 150.001,72.457 L 150.001,72.598 L 99.110,81.457 L 99.110,76.598 L 48.001,76.598 Z"/>
-        <Path Fill="{DynamicResource BlackBrush}" Data="F1 M 99.110,81.457"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 155.057,77.542 L 163.020,85.505"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 164.751,59.000"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 151.104,63.847 L 164.800,63.885"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 31.754,64.716 L 39.718,72.679"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 29.436,76.338 L 43.947,76.378"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 35.736,80.000 L 35.736,34.962"/>
-        <TextBlock Foreground="{DynamicResource AccentColorBrush}" RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000" Canvas.Left="9.030" Canvas.Top="55.749" FontSize="24.64" FontFamily="ISOCPEUR">t1</TextBlock>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 31.754,72.373 L 39.718,80.336"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 41.448,58.831"/>
-        <Path StrokeThickness="0.5" Stroke="{DynamicResource AccentColorBrush}" StrokeMiterLimit="1.0" Fill="{DynamicResource AccentColorBrush}" Data="F1 M 29.436,68.683 L 43.914,68.723"/>
+    <Canvas x:Key="ImageThickArrow"
+            Width="190.000"
+            Height="150.000">
+        <Path Data="F1 M 95.302,124.435 L 103.265,116.472"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 146.196,124.435 L 154.160,116.472"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 155.057,59.885 L 163.020,67.848"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 99.284,85.072 L 99.284,126.109"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 153.501,120.454 L 95.599,120.454"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <TextBlock Canvas.Left="119.147"
+                   Canvas.Top="93.959"
+                   FontFamily="ISOCPEUR"
+                   FontSize="24.64"
+                   Foreground="{DynamicResource AccentColorBrush}">
+            e
+        </TextBlock>
+        <Path Data="F1 M 151.055,81.502 L 164.751,81.540"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 159.039,85.167 L 159.039,35.130"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <TextBlock Canvas.Left="132.333"
+                   Canvas.Top="55.918"
+                   FontFamily="ISOCPEUR"
+                   FontSize="24.64"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000">
+            t2
+        </TextBlock>
+        <Path Data="F1 M 150.145,85.072 L 150.145,126.109"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 48.001,76.598 L 48.001,68.457 L 99.110,68.457 L 99.110,63.598 L 150.001,72.457 L 150.001,72.598 L 99.110,81.457 L 99.110,76.598 L 48.001,76.598 Z"
+              Fill="{DynamicResource BlackBrush}" />
+        <Path Data="F1 M 99.110,81.457"
+              Fill="{DynamicResource BlackBrush}" />
+        <Path Data="F1 M 155.057,77.542 L 163.020,85.505"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 164.751,59.000"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 151.104,63.847 L 164.800,63.885"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 31.754,64.716 L 39.718,72.679"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 29.436,76.338 L 43.947,76.378"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 35.736,80.000 L 35.736,34.962"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <TextBlock Canvas.Left="9.030"
+                   Canvas.Top="55.749"
+                   FontFamily="ISOCPEUR"
+                   FontSize="24.64"
+                   Foreground="{DynamicResource AccentColorBrush}"
+                   RenderTransform="0.000,-1.000,1.000,0.000,0.000,0.000">
+            t1
+        </TextBlock>
+        <Path Data="F1 M 31.754,72.373 L 39.718,80.336"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 41.448,58.831"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
+        <Path Data="F1 M 29.436,68.683 L 43.914,68.723"
+              Fill="{DynamicResource AccentColorBrush}"
+              Stroke="{DynamicResource AccentColorBrush}"
+              StrokeMiterLimit="1.0"
+              StrokeThickness="0.5" />
     </Canvas>
 </ResourceDictionary>

@@ -3,64 +3,75 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mps="https://modplus.org/winfx/xaml/controls">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
-    
-    <Style x:Key="HeaderTextBoxForStyleEditor" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="Margin" Value="4,2,4,0"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="Padding" Value="0"/>
-        <Setter Property="IsManipulationEnabled" Value="False"/>
-        <Setter Property="IsHitTestVisible" Value="False"/>
-        <Setter Property="IsTabStop" Value="False"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+
+    <Style x:Key="HeaderTextBoxForStyleEditor"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="Margin" Value="4 2 4 0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="IsManipulationEnabled" Value="False" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
-    <Style x:Key="PropertyValueTextBoxForStyleEditor" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="Margin" Value="0 0 4 0"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueTextBoxForStyleEditor"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="Margin" Value="0 0 4 0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
-    <Style x:Key="PropertyValueComboBoxForStyleEditor" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ModPlusComboBox}">
-        <Setter Property="Margin" Value="0 0 4 0"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueComboBoxForStyleEditor"
+           BasedOn="{StaticResource ModPlusComboBox}"
+           TargetType="{x:Type ComboBox}">
+        <Setter Property="Margin" Value="0 0 4 0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
-    <Style x:Key="PropertyValueDoubleTextBoxForStyleEditor" TargetType="{x:Type mps:NumericBox}">
-        <Setter Property="Margin" Value="0 0 4 0"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="HideUpDownButtons" Value="True"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueDoubleTextBoxForStyleEditor"
+           TargetType="{x:Type mps:NumericBox}">
+        <Setter Property="Margin" Value="0 0 4 0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="HideUpDownButtons" Value="True" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
-    <Style x:Key="PropertyValueIntTextBoxForStyleEditor" TargetType="{x:Type mps:NumericBox}">
-        <Setter Property="Margin" Value="0 0 4 0"/>
-        <Setter Property="VerticalAlignment" Value="Stretch"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueIntTextBoxForStyleEditor"
+           TargetType="{x:Type mps:NumericBox}">
+        <Setter Property="Margin" Value="0 0 4 0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
-    <Style x:Key="PropertyBorderForCheckBoxForStyleEditor" TargetType="{x:Type Border}">
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BoxesBorderBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource WhiteBrush}"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="Margin" Value="0 0 4 0"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyBorderForCheckBoxForStyleEditor"
+           TargetType="{x:Type Border}">
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BoxesBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource WhiteBrush}" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="Margin" Value="0 0 4 0" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
     <!-- Заголовок с названием свойства в StyleEditor -->
-    <Style x:Key="PropertyHeaderInStyleEditor" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="Margin" Value="15 0 0 0"/>
-        <Setter Property="BorderThickness" Value="1 0 0 1"/>
-        <Setter Property="Height" Value="26"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyHeaderInStyleEditor"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="Margin" Value="15 0 0 0" />
+        <Setter Property="BorderThickness" Value="1 0 0 1" />
+        <Setter Property="Height" Value="26" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 </ResourceDictionary>

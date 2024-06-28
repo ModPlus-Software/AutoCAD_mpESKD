@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="mpESKD.Functions.mpLetterLine.LetterLineDoubleClickEditControl"
+﻿<UserControl x:Class="mpESKD.Functions.mpCrestedLeader.CrestedLeaderDoubleClickEditControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -19,8 +19,6 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -29,23 +27,21 @@
 
             <TextBlock Grid.Row="0"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p101}" />
-            <TextBox Name="TbDesignation"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p132}" />
+            <TextBox Name="TbTopText"
                      Grid.Row="0"
                      Grid.Column="1"
                      mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"
-                     MaxLength="20" />
+                     mps:TextFieldAssist.SelectAllOnFocus="True" />
 
             <TextBlock Grid.Row="1"
                        Grid.Column="0"
-                       Text="{Binding Source={StaticResource Lang}, XPath=p102}" />
-            <TextBox Name="TbDesignationPrefix"
+                       Text="{Binding Source={StaticResource Lang}, XPath=p133}" />
+            <TextBox Name="TbBottomText"
                      Grid.Row="1"
                      Grid.Column="1"
                      mps:TextFieldAssist.ClearTextButton="True"
-                     mps:TextFieldAssist.SelectAllOnFocus="True"
-                     MaxLength="3" />
+                     mps:TextFieldAssist.SelectAllOnFocus="True" />
         </Grid>
     </mps:Card>
 </UserControl>
