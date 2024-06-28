@@ -319,8 +319,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                // Loggerq.WriteRecord($"UpdateEntities: CrestedLeaderJigState.None 1");
                CreateEntities(scale);
 
-               // CreateLeaderLines();
-               //  CreateShelf(CreateText(scale), scale);
                // Loggerq.WriteRecord($"UpdateEntities: CrestedLeaderJigState.None 2");
             }
         }
@@ -357,6 +355,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         if (_leaders.Count < 1)
             return;
+
+        //LeaderStartPoints.Clear();
+        //LeaderStartPoints.AddRange(_lead);
 
         var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X);
         _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
@@ -427,19 +428,24 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             return ;
 
         var leaderEndPointsOcsSort = LeaderEndPointsOCS.OrderBy(p => p.X).ToList();
-        var newLeaderVector = InsertionPointOCS.ToPoint2d() - leaderEndPointsOcsSort.Last().ToPoint2d();
 
-        for (int i = 0; i < leaderEndPointsOcsSort.Count; i++)
+        var leaderEndPointNearestToInsPt = ShelfPosition == ShelfPosition.Right
+            ? leaderEndPointsOcsSort.Last().ToPoint2d()
+            : leaderEndPointsOcsSort.First().ToPoint2d();
+
+        var newLeaderVector = InsertionPointOCS.ToPoint2d() - leaderEndPointNearestToInsPt;
+
+        for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
         {
             var intersectPointOcs = GetIntersectBetweenVectors(
                 InsertionPointOCS.ToPoint2d(),
                 Vector2d.XAxis,
-                leaderEndPointsOcsSort[i].ToPoint2d(),
+                LeaderEndPointsOCS[i].ToPoint2d(),
                 newLeaderVector);
 
             var intersectPointOcs3d = intersectPointOcs.ToPoint3d();
 
-            _leaders.Add(new Line(intersectPointOcs3d, leaderEndPointsOcsSort[i]));
+            _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
             LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
         }
     }
@@ -557,9 +563,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             if (leaderStartPoints != null && leaderStartPoints.Count > 0)
             {
                 var leaderStartPointsSort = leaderStartPoints.OrderBy(p => p.X).ToList();
-                LeaderStartPoints = leaderStartPoints;
-
                 _shelfLine = new Line(leaderStartPointsSort.First(), leaderStartPointsSort.Last());
+                
+                LeaderStartPoints = leaderStartPoints;
             }
         }
     }

@@ -197,6 +197,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         //{
                         //    shelfStartPoint = crestedLeader.ShelfStartPoint = leaderStartPoints.Last();
                         //}
+
+
                         leaderStartPoints.Clear();
                         leaderStartPoints.AddRange(crestedLeader.LeaderStartPoints);
 
