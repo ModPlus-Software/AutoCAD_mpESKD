@@ -124,7 +124,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             // Это именно режим указания точек для смарт-объекта - не путать с режимом самого JIG
             var currentJigStateOfCrestedLeader = crestedLeader.CurrentJigState;
 
-            Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: currentJigState: {currentJigStateOfCrestedLeader}");
+           // Loggerq.WriteRecord($"InsertCrestedLeaderWithJig: currentJigState: {currentJigStateOfCrestedLeader}");
+
             /*
 
             if (currentJigStateOfCrestedLeader == (int)CrestedLeaderJigState.PromptInsertPoint ||
@@ -223,8 +224,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         //    crestedLeader.InsertionPoint = leaderStartPoints.Last();
                         //}
 
-                        crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
-                        shelfStartPoint = crestedLeader.ShelfStartPoint;
+                        shelfStartPoint = crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
                         shelfLedgePoint = crestedLeader.ShelfLedgePoint;
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
 
@@ -319,6 +319,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             //crestedLeader.LeaderPointsPreviousForGripMove.AddRange(jig1LeaderPoints);
             //crestedLeader.ShelfLedgePointPreviousForGripMove = shelfLedgePoint;
             //crestedLeader.ShelfEndPointPreviousForGripMove = shelfEndPoint;
+
+            crestedLeader.IsFirst = true;   
 
             crestedLeader.UpdateEntities();
             crestedLeader.BlockRecord.UpdateAnonymousBlocks();

@@ -51,8 +51,16 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 if (crestedLeader != null)
                 {
 
+                    Loggerq.WriteRecord($"GetGripPoints: *");
+                    Loggerq.WriteRecord($"GetGripPoints: LeaderStartPoints: {crestedLeader.LeaderStartPoints.Count} =>");
 
-                   // insertion (start) grip
+                    for (int i = 0; i < crestedLeader.LeaderStartPoints.Count; i++)
+                    {
+                        Loggerq.WriteRecord($"GetGripPoints: pt[{i}]: {crestedLeader.LeaderStartPoints[i].ToString()}");
+                        
+                    }
+
+                    // insertion (start) grip
                     var MoveGrip = new CrestedLeaderGrip(crestedLeader, 0)
                     {
                         GripPoint = crestedLeader.InsertionPoint

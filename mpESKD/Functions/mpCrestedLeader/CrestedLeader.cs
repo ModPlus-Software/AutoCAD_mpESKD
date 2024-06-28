@@ -114,6 +114,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     
     public Point3d ShelfEndPointOCS => ShelfEndPoint.TransformBy(BlockTransform.Inverse());
 
+    [SaveToXData]
+    public bool IsFirst = true;
+
 
     //[SaveToXData]
     //public Point3d ShelfLedgePointPreviousForGripMove { get; set; }
@@ -284,7 +287,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc/>
     public override void UpdateEntities()
     {
-        //Loggerq.WriteRecord($"UpdateEntities start; CurrentJigState: {CurrentJigState.ToString()}");
+        //Loggerq.WriteRecord($"UpdateEntities start");
+       Loggerq.WriteRecord($"UpdateEntities start; " +
+                           $"CurrentJigState: {CurrentJigState.ToString()};" +
+                           $"IsFirst: {IsFirst.ToString()}");
 
         try
         {
@@ -317,7 +323,44 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 
                // Loggerq.WriteRecord($"UpdateEntities: CrestedLeaderJigState.None 1");
-               CreateEntities(scale);
+
+               if (IsFirst)
+                {
+                    _unionLine = null;
+                    _shelfLine = null;
+                    _shelf = null;
+                    _tempLeader = null;
+                    _leaders.Clear();
+
+                    for (var i = 0; i < LeaderEndPointsOCS.Count; i++)
+                    {
+                        _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+                    }
+
+                    var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
+                    _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
+
+                    _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
+                    _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
+
+                    _ = CreateText(scale);
+                    var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(ShelfLedgePointOCS, ShelfEndPointOCS);
+
+                    if (_topText != null)
+                    {
+                        var yVectorToCenterTopText = Vector3d.YAxis * ((TextVerticalOffset * scale) + (_topText.ActualHeight / 2));
+                        _topText.Location = textRegionCenterPoint + yVectorToCenterTopText;
+                    }
+
+                    _bottomText = null;
+
+                    IsFirst = false;
+                }
+               else
+               {
+                    CreateEntities(scale);
+
+               }
 
                // Loggerq.WriteRecord($"UpdateEntities: CrestedLeaderJigState.None 2");
             }
@@ -328,7 +371,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             Loggerq.WriteRecord($"ERROR! {exception.Message}");
         }
 
-        //Loggerq.WriteRecord($"UpdateEntities end");
+        Loggerq.WriteRecord($"UpdateEntities end");
     }
 
     #region Графика при отрисовке
