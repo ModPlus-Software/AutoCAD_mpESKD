@@ -77,6 +77,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
               //  var tempShelfLedgePoint = CrestedLeader.ShelfLedgePoint;
 
                 CrestedLeader.ShelfLedgePointPreviousForGripMove += offset;
+                CrestedLeader.ShelfEndPointPreviousForGripMove += offset;
 
                 //CrestedLeader.LeaderPointsPreviousForGripMove = CrestedLeader.LeaderPointsPreviousForGripMove
                 //    .Select(x => x + offset)
@@ -94,9 +95,11 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     // перемещение точки вставки в точку первой точки полки
                     // ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
+                    /*
                     Loggerq.WriteRecord($"OnGripStatusChanged: ((BlockReference)blkRef).Position: {((BlockReference)blkRef).Position.ToString()}");
                     Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.InsertionPoint: {CrestedLeader.InsertionPoint.ToString()}");
                     Loggerq.WriteRecord($"OnGripStatusChanged: CrestedLeader.LeaderStartPoints.Last(): {CrestedLeader.LeaderStartPoints.Last().ToString()}");
+                    */
 
                     //CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPoints.Last();
                     //((BlockReference)blkRef).Position = CrestedLeader.LeaderStartPoints.Last();
