@@ -9,6 +9,9 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
+using mpESKD.Base.Enums;
+using mpESKD.Base.Utils;
+using System.Collections.Generic;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -50,7 +53,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 var crestedLeader = EntityReaderService.Instance.GetFromEntity<CrestedLeader>(entity);
                 if (crestedLeader != null)
                 {
-
+                    /*
                     Loggerq.WriteRecord($"GetGripPoints: *");
                     Loggerq.WriteRecord($"GetGripPoints: LeaderStartPoints: {crestedLeader.LeaderStartPoints.Count} =>");
 
@@ -58,7 +61,68 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     {
                         Loggerq.WriteRecord($"GetGripPoints: pt[{i}]: {crestedLeader.LeaderStartPoints[i].ToString()}");
                         
+                    }*/
+
+                    /*
+                    List<Point3d> leaderStartPointsTmp = new();
+                    leaderStartPointsTmp.AddRange(crestedLeader.LeaderStartPoints);
+
+                    var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+                    if (crestedLeader.ShelfPosition == ShelfPosition.Right)
+                        crestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                    else
+                        crestedLeader.InsertionPoint = leaderStartPointsSort.First();
+
+                    crestedLeader.UpdateEntities();
+                    crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var blkRef1 = tr.GetObject(crestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                        // перемещение точки вставки в точку первой точки полки
+                        ((BlockReference)blkRef1).Position = crestedLeader.InsertionPoint;
+
+                        using (var resBuf = crestedLeader.GetDataForXData())
+                        {
+                            blkRef1.XData = resBuf;
+                        }
+
+                        tr.Commit();
                     }
+
+                    crestedLeader.LeaderStartPoints.Clear();
+                    crestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                    crestedLeader.IsBasePointMoved = true;
+
+                    crestedLeader.UpdateEntities();
+                    crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var blkRef2 = tr.GetObject(crestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = crestedLeader.GetDataForXData())
+                        {
+                            blkRef2.XData = resBuf;
+                        }
+
+                        tr.Commit();
+                    }
+
+
+
+
+
+
+
+
+
+
+
+
+                    */
+
 
                     // insertion (start) grip
                     var MoveGrip = new CrestedLeaderGrip(crestedLeader, 0)

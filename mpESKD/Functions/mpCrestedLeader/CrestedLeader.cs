@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using mpESKD.Functions.mpCrestedLeader.Grips;
 using TestFunctions;
 
 namespace mpESKD.Functions.mpCrestedLeader;
@@ -115,8 +116,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d ShelfEndPointOCS => ShelfEndPoint.TransformBy(BlockTransform.Inverse());
 
     [SaveToXData]
-    public bool IsFirst = true;
+    public bool IsFirst { get; set; } = false;
 
+    [SaveToXData]
+    public bool IsBasePointMoved { get; set; } = false;
+
+    [SaveToXData]
+    public ShelfPosition PrevShelfPosition { get; set; }
 
     //[SaveToXData]
     //public Point3d ShelfLedgePointPreviousForGripMove { get; set; }
@@ -324,6 +330,31 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 
                // Loggerq.WriteRecord($"UpdateEntities: CrestedLeaderJigState.None 1");
 
+               if (PrevShelfPosition != null && !PrevShelfPosition.Equals(ShelfPosition))
+               {
+                   var pl = LeaderStartPoints.OrderBy(p => p.X);
+
+                   var vectorToShelfLedgePoint = ShelfLedgePoint - ShelfStartPoint;
+                   var vectorToShelfEndPoint =ShelfEndPoint - ShelfLedgePoint;
+
+                    if (ShelfPosition == ShelfPosition.Right)
+                   {
+                       ShelfStartPoint = pl.Last();
+                       ShelfLedgePoint = ShelfStartPoint + vectorToShelfLedgePoint;
+                       ShelfEndPoint = ShelfLedgePoint + vectorToShelfEndPoint;
+                   }
+                   else
+                   {
+                       ShelfStartPoint = pl.First();
+                       ShelfLedgePoint = ShelfStartPoint - vectorToShelfLedgePoint;
+                       ShelfEndPoint = ShelfLedgePoint - vectorToShelfEndPoint;
+                    }
+
+                    PrevShelfPosition = ShelfPosition;
+
+                    IsFirst = true;
+               }
+
                if (IsFirst)
                 {
                     _unionLine = null;
@@ -332,7 +363,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     _tempLeader = null;
                     _leaders.Clear();
 
-                    for (var i = 0; i < LeaderEndPointsOCS.Count; i++)
+                    for (var i = 0; i < LeaderEndPoints.Count; i++)
                     {
                         _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
                     }
@@ -356,6 +387,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     IsFirst = false;
                 }
+
+               //if (PrevShelfPosition != null && !PrevShelfPosition.Equals(ShelfPosition))
+               //{
+                   
+               //}
+
                else
                {
                     CreateEntities(scale);
@@ -388,13 +425,30 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private void CreateEntities(double scale)
     {
+        _tempLeader = null;
         _unionLine = null;
         _shelfLine = null;
         _shelf = null;
 
         ShelfStartPoint = InsertionPoint;
 
-        CreateLeaderLines();
+
+
+        if (IsBasePointMoved)
+        {
+            _leaders.Clear();
+
+            for (var i = 0; i < LeaderEndPoints.Count; i++)
+            {
+                _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+            }
+
+            IsBasePointMoved = false;
+        }
+        else
+        {
+            CreateLeaderLines();
+        }
 
         if (_leaders.Count < 1)
             return;
@@ -467,7 +521,19 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <returns>Список точек начала выносок</returns>
     private void CreateLeaderLines()
     {
-        //_tempLeader = null;
+        
+            Loggerq.WriteRecord($"CreateLeaderLines: *");
+            Loggerq.WriteRecord($"CreateLeaderLines: LeaderStartPoints: {this.LeaderEndPoints.Count} =>");
+
+            for (int i = 0; i < this.LeaderEndPoints.Count; i++)
+            {
+                Loggerq.WriteRecord(
+                    $"CreateLeaderLines: LeaderStartPoint[{i}]: {this.LeaderEndPoints[i].ToString()}");
+            }
+
+
+
+            //_tempLeader = null;
         _leaders.Clear();
         LeaderStartPoints.Clear();
 
@@ -703,6 +769,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
 
         }
+
+        PrevShelfPosition = ShelfPosition;
 
         if (!ShelfStartPoint.Equals(ShelfLedgePoint))
         {

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
@@ -71,20 +72,18 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                /*
-                var offset = NewPoint - _gripTmp;
-              
-                var leaderEndPointsTmp = CrestedLeader.LeaderEndPoints;
+
+                //var offset = NewPoint - _gripTmp;
+
+                List<Point3d> leaderStartPointsTmp = new ();
+                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
                 var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
                 if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                {
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-                }
                 else
-                {
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-                }
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -92,7 +91,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-
                     // перемещение точки вставки в точку первой точки полки
                     ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
@@ -104,8 +102,10 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     tr.Commit();
                 }
 
-                CrestedLeader.LeaderEndPoints = leaderEndPointsTmp;
-                */
+                CrestedLeader.LeaderStartPoints.Clear();
+                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                CrestedLeader.IsBasePointMoved = true;
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
