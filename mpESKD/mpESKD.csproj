@@ -59,7 +59,6 @@
 
   <ItemGroup>
     <Compile Remove="Functions\mpCrestedLeader\CrestedLeaderEntityJig.cs" />
-    <Compile Remove="Functions\mpCrestedLeader\Loggerq.cs" />
     <Compile Remove="Functions\mpCrestedLeader\TestJig.cs" />
   </ItemGroup>
 

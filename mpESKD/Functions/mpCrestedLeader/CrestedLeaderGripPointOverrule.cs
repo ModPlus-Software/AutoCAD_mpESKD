@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -26,6 +27,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         Vector3d curViewDir,
         GetGripPointsFlags bitFlags)
     {
+        Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: GetGripPoints()");
+
         try
         {
             if (IsApplicable(entity))
@@ -52,52 +55,127 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 var crestedLeader = EntityReaderService.Instance.GetFromEntity<CrestedLeader>(entity);
                 if (crestedLeader != null)
                 {
+                    var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+                    #region insertGripPoint
+
                     // insertion (start) grip
-                    var MoveGrip = new CrestedLeaderGrip(crestedLeader, 0)
+                    //Point3d insertGripPoint;
+
+                    // Перемещение ручки по положению полки
+                    //if (crestedLeader.IsChangeShelfPosition)
+                    //{
+                    //    insertGripPoint = crestedLeader.ShelfStartPoint;
+                    //}
+                    //else
+                    //{
+                    //    insertGripPoint = crestedLeader.InsertionPoint;
+                    //}
+
+                    // insertGripPoint = crestedLeader.ShelfStartPoint;
+
+                    var insertGrip = new CrestedLeaderGrip(crestedLeader, 0)
                     {
-                        GripPoint = crestedLeader.InsertionPoint
+                        GripPoint = crestedLeader.ShelfStartPoint
                     };
 
-                    grips.Add(MoveGrip);
+                    grips.Add(insertGrip);
+
+                    #endregion
+
+
+                    #region shelfMoveGripPoint
+
+                    //Point3d shelfMoveGripPoint;
+
+                    //shelfMoveGripPoint = crestedLeader.ShelfLedgePoint;
+
+                    var shelfMoveGrip = new CrestedLeaderShelfMoveGrip(crestedLeader, 0)
+                    {
+                        GripPoint = crestedLeader.ShelfLedgePoint
+                    };
+
+                    grips.Add(shelfMoveGrip);
+                    #endregion
+
+
+
                 }
             }
         }
         catch (Exception exception)
         {
-            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-                ExceptionBox.Show(exception);
+            // todo
+            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+            //    ExceptionBox.Show(exception);
+
+            Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: GetGripPoints() => ERROR");
         }
     }
+
 
     /// <inheritdoc />
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
+        Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: MoveGripPointsAt() => START");
+
         try
         {
             if (IsApplicable(entity))
             {
                 foreach (var gripData in grips)
                 {
-                    if (gripData is CrestedLeaderGrip moveGrip)
+                    if (gripData is CrestedLeaderGrip insertGrip)
                     {
-                        var crestedLeader = moveGrip.CrestedLeader;
+                        var crestedLeader = insertGrip.CrestedLeader;
 
-                        if (moveGrip.GripIndex == 0)
+                        if (insertGrip.GripIndex == 0)
                         {
-                            moveGrip.NewPoint = moveGrip.GripPoint + offset;
+                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
+                            var newPoint = insertGrip.NewPoint;
+                            
+                            ((BlockReference)entity).Position = newPoint;
+                            crestedLeader.InsertionPoint = newPoint;
 
-                            var pos = moveGrip.GripPoint + offset;
-                            ((BlockReference)entity).Position = pos;
-                            crestedLeader.InsertionPoint = pos;
+                       // crestedLeader.IsBasePointMovedByGrip = true;
+                       //crestedLeader.TempNewPoint = newPoint; 
+                       crestedLeader.IsBasePointMovedByOverrule =true;
+
+
+                        crestedLeader.UpdateEntities();
+                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+                        }
+                    }
+                    else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
+                    {
+                        var crestedLeader = shelfMoveGrip.CrestedLeader;
+
+                        shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
+                        var newPoint = shelfMoveGrip.NewPoint;
+
+                        // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
+                        var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X);
+                        var leftStartPoint = leaderStartPointsSort.First();
+                        var rightStartPoint = leaderStartPointsSort.Last();
+
+                        var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
+
+                        if ((crestedLeader.ShelfPosition == ShelfPosition.Right && newPoint.X >= midUnionLinePoint.X) ||
+                            (crestedLeader.ShelfPosition == ShelfPosition.Left && newPoint.X < midUnionLinePoint.X))
+                        {
+                            if (newPoint.X >= leftStartPoint.X && newPoint.X <= rightStartPoint.X)
+                            {
+                                crestedLeader.ShelfLedge = 0;
+                            }
+                            else
+                            {
+                                crestedLeader.ShelfLedge = Math.Abs(newPoint.X - crestedLeader.ShelfStartPoint.X);
+                            }
                         }
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
-                    }
-                    else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
-                    {
-                        // shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
                     }
                     else
                     {

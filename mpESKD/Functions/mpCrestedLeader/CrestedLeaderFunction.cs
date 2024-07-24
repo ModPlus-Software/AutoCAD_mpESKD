@@ -24,10 +24,15 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     public void Initialize()
     {
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new CrestedLeaderGripPointOverrule(), true);
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(),
-            true);
-        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(),
-            true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(), true);
+        Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(), true);
+
+        Loggerq.DeleteFile();
+        Loggerq.WriteRecord("*");
+        Loggerq.WriteRecord("**");
+        Loggerq.WriteRecord($"CrestedLeaderFunction: Initialize()");
+
+
     }
 
     /// <inheritdoc />
@@ -72,6 +77,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void CreateCrestedLeader()
     {
+        //Loggerq.WriteRecord($"CrestedLeaderFunction: ");
+
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
         try
@@ -108,12 +115,14 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         List<Point3d> leaderEndPoints = new ();
         Point3d shelfStartPoint = new ();
         Point3d shelfLedgePoint = new ();
-        Point3d shelfEndPoint = new();
+        Point3d shelfEndPoint = new ();
+        Point3d boundLeaderEndPoint = new ();
 
         var entityJig = new DefaultEntityJig(
             crestedLeader,
             blockReference,
             new Point3d(20, 0, 0));
+
 
         do
         {
@@ -169,6 +178,9 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         shelfStartPoint = crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
                         shelfLedgePoint = crestedLeader.ShelfLedgePoint;
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
+
+                        // запомнить точку конца выноски, исходящей из InsertionPoint
+                        //boundLeaderEndPoint = crestedLeader.
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();

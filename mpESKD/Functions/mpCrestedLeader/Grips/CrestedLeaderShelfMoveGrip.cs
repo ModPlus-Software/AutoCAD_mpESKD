@@ -8,6 +8,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using System.Linq;
 
 /// <summary>
 /// Ручка перетаскивания полки
@@ -27,7 +28,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
-        RubberBandLineDisabled = true;
+        //RubberBandLineDisabled = true;
     }
 
     /// <summary>
@@ -54,6 +55,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
+        Loggerq.WriteRecord("CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => START");
         try
         {
             // При начале перемещения запоминаем первоначальное положение ручки
@@ -67,7 +69,21 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                CrestedLeader.EndPoint = NewPoint;
+                // CrestedLeader.EndPoint = NewPoint;
+
+                // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X);
+                var leftStartPoint = leaderStartPointsSort.First();
+                var rightStartPoint = leaderStartPointsSort.Last();
+
+                if (CrestedLeader.ShelfPosition == ShelfPosition.Right && NewPoint.X > rightStartPoint.X)
+                {
+                    CrestedLeader.ShelfLedge = NewPoint.X - CrestedLeader.ShelfStartPoint.X;
+                }
+                else
+                {
+
+                }
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+
+using System.Collections.Generic;
 using System.Linq;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
-
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.Windows.Data;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
@@ -13,11 +13,16 @@ using CSharpFunctionalExtensions;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
 
+
+//public delegate void OnGripStatusChangedDelegate(ObjectId entityId, GripData.Status newStatus);
+
 /// <summary>
 /// Ручка переноса выносок
 /// </summary>
 public class CrestedLeaderGrip : SmartEntityGripData
 {
+    //public event OnGripStatusChangedDelegate OnGripStatusChangedEvent;
+
     // Временное значение ручки
     private Point3d _gripTmp;
 
@@ -31,7 +36,23 @@ public class CrestedLeaderGrip : SmartEntityGripData
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
+
+        Loggerq.WriteRecord($"CrestedLeaderGrip: CrestedLeaderGrip() => crestedLeader.IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition.ToString()}");
+
+        if (crestedLeader.IsChangeShelfPosition)
+        {
+            //crestedLeader.ShelfPosChangeEvent += this.OnGripStatusChanged;
+            //this.OnGripStatusChanged(crestedLeader.BlockId, Status.Move);
+        }
+        
     }
+
+    public void OnGripStatusChangedInvoke()
+    {
+        //OnGripStatusChangedEvent?.Invoke(CrestedLeader.BlockId, Status.GripEnd);
+    }
+
+
 
     /// <summary>
     /// Новое значение точки ручки
@@ -57,12 +78,23 @@ public class CrestedLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
+        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => *\n**");
+        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => START");
+        Loggerq.WriteRecord($"CrestedLeaderGrip: OnGripStatusChanged() =>        Status grip: {newStatus.ToString()}");
+
         try
         {
+            //if (newStatus == Status.Move)
+            //{
+            //    Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => Status.Move");
+                
+            //}
+
             // При начале перемещения запоминаем первоначальное положение ручки
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
+
                 _gripTmp = GripPoint;
             }
 
@@ -100,7 +132,12 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 CrestedLeader.LeaderStartPoints.Clear();
                 CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
 
-                CrestedLeader.IsBasePointMoved = true;
+
+
+                //CrestedLeader.BoundStartPoint = 
+                CrestedLeader.IsBasePointMovedByGrip = true;
+
+
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -135,8 +172,81 @@ public class CrestedLeaderGrip : SmartEntityGripData
         }
         catch (Exception exception)
         {
-            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-                ExceptionBox.Show(exception);
+            // todo
+            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+            //    ExceptionBox.Show(exception);
+            Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => ERROR");
         }
     }
+
+    public  void OnGripStatusChangedMy()
+    {
+        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => START");
+
+        try
+        {
+           
+                List<Point3d> leaderStartPointsTmp = new();
+                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+                if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                else
+                    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                    // перемещение точки вставки в точку первой точки полки
+                    ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+
+                CrestedLeader.LeaderStartPoints.Clear();
+                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                CrestedLeader.IsBasePointMovedByGrip = true;
+
+                //CrestedLeader.CrestedLeaderGrip = this;
+                //CrestedLeader.ObjectIdForGrip = entityId;
+                //CrestedLeader.GripDataStatus = newStatus;
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
+
+                CrestedLeader.Dispose();
+            
+
+        }
+        catch (Exception exception)
+        {
+            // todo
+            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+            //    ExceptionBox.Show(exception);
+            Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => ERROR");
+        }
+    }
+
 }
