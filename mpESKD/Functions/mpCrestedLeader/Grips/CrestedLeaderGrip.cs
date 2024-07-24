@@ -102,6 +102,20 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
+                if (CrestedLeader.LeaderStartPoints.Count == 0)
+                {
+                    if (_gripTmp != null)
+                    {
+                        if (GripIndex == 0)
+                        {
+                            CrestedLeader.InsertionPoint = _gripTmp;
+                        }
+                    }
+
+                    base.OnGripStatusChanged(entityId, newStatus);
+                    return;
+                }
+
                 List<Point3d> leaderStartPointsTmp = new ();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
@@ -111,6 +125,8 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
                 else
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+
+
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -137,7 +153,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 //CrestedLeader.BoundStartPoint = 
                 CrestedLeader.IsBasePointMovedByGrip = true;
 
-
+                CrestedLeader.PrevInsertionPoint = CrestedLeader.InsertionPoint;
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

@@ -162,6 +162,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
+    [SaveToXData]
+    public Point3d PrevInsertionPoint { get; set; }
+
     #endregion
 
     #region Свойства - геометрия
@@ -505,6 +508,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     //BoundStartPoint = leaderBound.StartPoint;
                     BoundEndPoint = leaderBound.EndPoint;
 
+                    PrevInsertionPoint = InsertionPoint;
+
                     Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>         IsFirst = true");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: InsertionPoint:{InsertionPoint.ToString()}");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: InsertionPointOCS:{InsertionPointOCS.ToString()}");
@@ -550,7 +555,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Перетаскивание
         if (!IsBasePointMovedByGrip && IsBasePointMovedByOverrule)
         {
-
            if (!CreateLeaderLines(true))
             {
                 return;
@@ -567,8 +571,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Перетаскивание выполнено
         else if (IsBasePointMovedByGrip && !IsBasePointMovedByOverrule)
         {
+
+
+            if ( _leaders.Count == 0)
+            {
+                return; 
+            }
+
             Loggerq.WriteRecord("CrestedLeader: CreateEntities() =>          Move done: start");
             _leaders.Clear();
+
+
 
             for (var i = 0; i < LeaderEndPoints.Count; i++)
             {
@@ -688,10 +701,23 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _leaders.Clear();
         LeaderStartPoints.Clear();
 
-        if (LeaderEndPoints.Any(x => x.Equals(InsertionPoint)) || 
-            BoundEndPoint.Equals(InsertionPoint))
-            return false;
+        //if (LeaderEndPoints.Any(x => x.Equals(InsertionPoint)) ||
+        //    BoundEndPoint.Equals(InsertionPoint))
+        if (LeaderEndPoints.Any(x => x.Equals(InsertionPoint))) 
+        {
+            Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      FATAL ERROR!");
+            //return false;
 
+            //for (var i = 0; i < LeaderEndPoints.Count; i++)
+            //{
+            //    var leaderEndPoint = LeaderEndPoints[i];
+
+            //    if (leaderEndPoint.Equals(InsertionPoint))
+            //    {
+            //        LeaderEndPoints.RemoveAt(i);
+            //    }
+            //}
+        }
         /*
         var leaderEndPointsOcsSort = LeaderEndPointsOCS.OrderBy(p => p.X).ToList();
 
@@ -723,24 +749,36 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         }*/
 
-        if (BoundEndPointOCS.X.Equals(InsertionPointOCS.X))
+        if (BoundEndPointOCS.X.Equals(InsertionPointOCS.X) && !BoundEndPointOCS.Equals(InsertionPointOCS))
         {
             for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
             {
                 var intersectPointOcs = new Point2d(LeaderEndPointsOCS[i].X, InsertionPointOCS.Y);
                 var intersectPointOcs3d = intersectPointOcs.ToPoint3d();
 
-                _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
 
                 LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
+
+                //if (intersectPointOcs3d.Equals(LeaderEndPointsOCS[i]))
+                //{
+                //    continue;
+                //}
+
+                _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
             }
         }
-        else
+        else 
         {
             var newLeaderVector = InsertionPointOCS.ToPoint2d() - BoundEndPointOCS.ToPoint2d();
 
             for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
             {
+                if (InsertionPointOCS.Equals(LeaderEndPointsOCS[i]))
+                {
+                    LeaderStartPoints.Add(InsertionPoint);
+                    continue;
+                }
+
                 var intersectPointOcs = GetIntersectBetweenVectors(
                     InsertionPointOCS.ToPoint2d(),
                     Vector2d.XAxis,
@@ -753,9 +791,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 var intersectPointOcs3d = intersectPointOcs.Value.ToPoint3d();
 
+                LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
+
+                if (intersectPointOcs3d.Equals(LeaderEndPointsOCS[i]))
+                {
+                    continue;
+                }
+
                 _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
 
-                LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
             }
         }
 
@@ -829,40 +873,82 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _tempLeader = null;
         _leaders.Clear();
 
-        bool isCorrectDistance = LeaderEndPoints.Any(x => (x - EndPoint).Length > MinDistanceBetweenPoints);
+        var minDist = MinDistanceBetweenPoints;
 
-        if (isCorrectDistance)
+        Vector2d newLeaderVector;
+        if (LeaderEndPoints.Any(p => EndPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
         {
-            var newLeaderVector = EndPointOCS.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
+            var searchLeaderEndPoint = LeaderEndPoints
+                .Select(leaderEndPoint => new
+                {
+                    Point = leaderEndPoint,
+                    Distance = leaderEndPoint.ToPoint2d().GetDistanceTo(EndPoint.ToPoint2d())
+                })
+                .OrderBy(p => p.Distance)
+                .First();
 
-            if (newLeaderVector.Angle.RadianToDegree() == 0 || LeaderEndPoints.Any(x => x.Equals(EndPoint)))
-                return;
+            Point3d searchPoint = searchLeaderEndPoint.Point;
 
-            for (int i = 0; i < LeaderEndPoints.Count; i++)
+            // Найдем точку пересечения окружности с радиусом minDist и отрезка
+            // от прежней точки InsertionPoint к newPoint
+            //var prevInsertionPoint = PrevInsertionPoint;
+            //var line = new Line(prevInsertionPoint, EndPoint);
+            var lineStartPoint = searchPoint + ((EndPoint - searchPoint) * minDist * 2);
+
+            var line = new Line(lineStartPoint, searchPoint);
+            var circle = new Circle()
             {
-                var intersectPoint = GetIntersectBetweenVectors(
-                    EndPointOCS.ToPoint2d(),
-                    Vector2d.XAxis,
-                    LeaderEndPoints[i].ToPoint2d(),
-                    newLeaderVector);
+                Center = searchPoint,
+                Radius = minDist,
+            };
 
-                if (intersectPoint == null)
-                    continue;
-
-                _leaders.Add(new Line(intersectPoint.Value.ToPoint3d(), LeaderEndPoints[i]));
-            }
-
-            var leaderStartPoints = _leaders?.Select(l => l.StartPoint).ToList();
-
-            if (leaderStartPoints != null && leaderStartPoints.Count > 0)
+            var intersectPoint = CircleLineIntersection.GetIntersection(line, circle);
+            if (intersectPoint != null)
             {
-                var leaderStartPointsSort = leaderStartPoints.OrderBy(p => p.X).ToList();
-                _shelfLine = new Line(leaderStartPointsSort.First(), leaderStartPointsSort.Last());
-                
-                LeaderStartPoints = leaderStartPoints;
+                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: intersectPoint!");
+                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: distance:" +
+                                    $"{intersectPoint.Value.ToPoint2d().GetDistanceTo(searchPoint.ToPoint2d())}");
 
-               
+                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: EndPoint:{EndPoint.ToString()}");
+                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: EndPointOCS:{EndPointOCS.ToString()}");
+
+               // newLeaderVector = intersectPoint.Value.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
+               EndPoint = intersectPoint.Value;
             }
+            else
+            {
+                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: intersectPoint = NULL!");
+                //newLeaderVector = EndPointOCS.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
+            }
+        }
+
+        newLeaderVector = EndPointOCS.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
+
+        if (newLeaderVector.Angle.RadianToDegree() == 0 || LeaderEndPoints.Any(x => x.Equals(EndPoint)))
+            return;
+
+        for (int i = 0; i < LeaderEndPoints.Count; i++)
+        {
+            var intersectPoint = GetIntersectBetweenVectors(
+                EndPointOCS.ToPoint2d(),
+                Vector2d.XAxis,
+                LeaderEndPoints[i].ToPoint2d(),
+                newLeaderVector);
+
+            if (intersectPoint == null)
+                continue;
+
+            _leaders.Add(new Line(intersectPoint.Value.ToPoint3d(), LeaderEndPoints[i]));
+        }
+
+        var leaderStartPoints = _leaders?.Select(l => l.StartPoint).ToList();
+
+        if (leaderStartPoints != null && leaderStartPoints.Count > 0)
+        {
+            var leaderStartPointsSort = leaderStartPoints.OrderBy(p => p.X).ToList();
+            _shelfLine = new Line(leaderStartPointsSort.First(), leaderStartPointsSort.Last());
+
+            LeaderStartPoints = leaderStartPoints;
         }
     }
 
