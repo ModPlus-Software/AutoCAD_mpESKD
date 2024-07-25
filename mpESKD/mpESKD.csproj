@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
 	<PropertyGroup>
-		<Version>1.28.23.0</Version>
+		<Version>1.28.24.0</Version>
 		<RootNamespace>mpESKD</RootNamespace>
 	</PropertyGroup>
 
@@ -55,6 +55,14 @@
     <AssemblyName>$(RootNamespace)_$(ExternalVersion)</AssemblyName>
   </PropertyGroup>
 
+  
+
+  <ItemGroup>
+    <Compile Remove="Functions\mpCrestedLeader\CrestedLeaderEntityJig.cs" />
+    <Compile Remove="Functions\mpCrestedLeader\Loggerq.cs" />
+    <Compile Remove="Functions\mpCrestedLeader\TestJig.cs" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="ModPlus.AutoCAD.Module.$(ExternalVersion)" Version="13.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
@@ -72,8 +80,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16.png" />
-		<Resource Include="Functions\mpAxis\Icons\mpAxis_16x16_dark.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32.png" />
 		<Resource Include="Functions\mpAxis\Icons\mpAxis_32x32_dark.png" />
 		<Resource Include="Functions\mpBreakLine\Icons\mpBreakLineCurve_32x32.png" />
@@ -120,10 +126,6 @@
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_16x16_dark.png" />
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32.png" />
 		<Resource Include="Functions\mpNodeLabel\Icons\mpNodeLabel_32x32_dark.png" />
-		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16.png" />
-		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_16x16_dark.png" />
-		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32.png" />
-		<Resource Include="Functions\mpRevisionMark\Icons\mpRevisionMark_32x32_dark.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16.png" />
 		<Resource Include="Functions\mpSecantNodalLeader\Icons\mpSecantNodalLeader_16x16_dark.png" />
 		<Resource Include="Functions\mpSection\Icons\mpSectionBroken_32x32.png" />
