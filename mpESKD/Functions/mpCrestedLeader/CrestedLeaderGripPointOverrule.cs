@@ -132,12 +132,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                         if (insertGrip.GripIndex == 0)
                         {
-
                             insertGrip.NewPoint = insertGrip.GripPoint + offset;
                             var newPoint = insertGrip.NewPoint;
-                            
 
-                            // если новая точка приближается слишком близко к одной из точек EndPoint выносок,
+                            // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
                             // то не дать этого сделать
 
                             var minDist = crestedLeader.MinDistanceBetweenPoints;
@@ -145,23 +143,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             if (crestedLeader.LeaderEndPoints.Any(p =>
                                     newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
                             {
-
                                 // найдем LeaderEndPoint, к которому приближается newpoint и
                                 // не соблюдается требование к минимальному расстоянию 
-
-                                /*
-                                var minDistCheck = minDist;
-                                Point3d searchPoint;
-                                foreach (var leaderEndPoint in crestedLeader.LeaderEndPoints)
-                                {
-                                   var minDistCheckX = leaderEndPoint.ToPoint2d().GetDistanceTo(newPoint.ToPoint2d());
-                                    if (minDistCheckX < minDistCheck)
-                                    {
-                                        minDistCheck = minDistCheckX;
-                                        searchPoint = leaderEndPoint;
-                                    }
-
-                                }*/
 
                                 var searchLeaderEndPoint = crestedLeader.LeaderEndPoints
                                     .Select(leaderEndPoint => new
@@ -174,10 +157,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                                 Point3d searchPoint = searchLeaderEndPoint.Point;
 
-                                // Найдем точку пересечения окружности с радиусом minDist и отрезка
-                                // от прежней точки InsertionPoint к newPoint
-                                //var prevInsertionPoint = crestedLeader.PrevInsertionPoint;
-                                //var line = new Line(prevInsertionPoint, newPoint);
+                                // Найдем точку пересечения окружности с радиусом minDist и отрезка к searchPoint
 
                                 var lineStartPoint = searchPoint + ((newPoint - searchPoint) * minDist * 2);
                                 var line = new Line(lineStartPoint, searchPoint);
@@ -190,20 +170,17 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                                 var intersectPoint = CircleLineIntersection.GetIntersection(line, circle);
 
-                                // перенесем newpPoint на пересечение окружности с радиусом minDist и отрезка
-                                // от прежней точки InsertionPoint к newPoint
+                                // перенесем newpPoint на пересечение окружности с радиусом minDist и отрезка к searchPoint
                                 newPoint = intersectPoint ?? newPoint;
                             }
 
                             ((BlockReference)entity).Position = newPoint;
                             crestedLeader.InsertionPoint = newPoint;
 
+                            crestedLeader.IsBasePointMovedByOverrule = true;
 
-                            crestedLeader.IsBasePointMovedByOverrule =true;
-
-
-                        crestedLeader.UpdateEntities();
-                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+                            crestedLeader.UpdateEntities();
+                            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                         }
                     }
                     else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
@@ -225,13 +202,90 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         {
                             if (newPoint.X >= leftStartPoint.X && newPoint.X <= rightStartPoint.X)
                             {
-                                crestedLeader.ShelfLedge = 0;
+                                /*
+                                if (crestedLeader.IsChangeShelfPosition)
+                                {
+                                    if ((crestedLeader.ShelfPosition == ShelfPosition.Left && crestedLeader.InsertionPoint.Equals(rightStartPoint)) ||
+                                         (crestedLeader.ShelfPosition == ShelfPosition.Right && crestedLeader.InsertionPoint.Equals(leftStartPoint)))
+                                    {
+                                        crestedLeader.ShelfLedge = rightStartPoint.ToPoint2d().GetDistanceTo(leftStartPoint.ToPoint2d());
+                                    }
+                                    else
+                                    {
+                                        crestedLeader.ShelfLedge = 0;
+                                    }
+
+                                    crestedLeader.IsChangeShelfPosition = false;
+                                }
+                                else
+                                {
+                                    crestedLeader.ShelfLedge = 0;
+                                }*/
+
+
+                                if (crestedLeader.InsertionPoint.Equals(rightStartPoint) &&
+                                    crestedLeader.ShelfPosition == ShelfPosition.Left)
+                                {
+                                    crestedLeader.ShelfLedge = rightStartPoint.ToPoint2d().GetDistanceTo(leftStartPoint.ToPoint2d());
+                                }
+                                else if (crestedLeader.InsertionPoint.Equals(leftStartPoint) &&
+                                         crestedLeader.ShelfPosition == ShelfPosition.Right)
+                                {
+                                    crestedLeader.ShelfLedge = rightStartPoint.ToPoint2d().GetDistanceTo(leftStartPoint.ToPoint2d());
+                                }
+                                else
+                                {
+                                    crestedLeader.ShelfLedge = 0;
+                                }
                             }
                             else
                             {
                                 crestedLeader.ShelfLedge = Math.Abs(newPoint.X - crestedLeader.ShelfStartPoint.X);
                             }
+
                         }
+                        // Если полка вправо, а курсор налево
+                        else if (crestedLeader.ShelfPosition == ShelfPosition.Right && newPoint.X < midUnionLinePoint.X)
+                        {
+                            if (newPoint.X >= leftStartPoint.X)
+                            {
+                              //  crestedLeader.ShelfLedge = rightStartPoint.ToPoint2d().GetDistanceTo(leftStartPoint.ToPoint2d());
+                            }
+                            else
+                            {
+                              //  crestedLeader.ShelfLedge = Math.Abs(newPoint.X - leftStartPoint.X);
+                            }
+
+                            crestedLeader.ShelfPosition = ShelfPosition.Left;
+
+                            Loggerq.WriteRecord($"CrestedLeaderGripPointOverrule: MoveGripPointsAt() => " +
+                                                $"ShelfPosition set is LEFT");
+                            crestedLeader.PrevShelfPosition = ShelfPosition.Right;
+                            crestedLeader.IsChangeShelfPosition = true;
+                        }
+
+                        // Если полка влево, а курсор направо
+                        else if (crestedLeader.ShelfPosition == ShelfPosition.Left && newPoint.X >= midUnionLinePoint.X)
+                        {
+                            if (newPoint.X <= rightStartPoint.X)
+                            {
+                               // crestedLeader.ShelfLedge = rightStartPoint.ToPoint2d().GetDistanceTo(leftStartPoint.ToPoint2d());
+                            }
+                            else
+                            {
+                               // crestedLeader.ShelfLedge = Math.Abs(newPoint.X - rightStartPoint.X);
+                            }
+
+                            crestedLeader.PrevShelfPosition = ShelfPosition.Left;
+                            crestedLeader.ShelfPosition = ShelfPosition.Right;
+
+                            crestedLeader.IsChangeShelfPosition = true;
+                        }
+                        Loggerq.WriteRecord($"CrestedLeaderGripPointOverrule: MoveGripPointsAt() => " +
+                                            $"ShelfPosition: {crestedLeader.ShelfPosition.ToString()}");
+
+                        Loggerq.WriteRecord($"CrestedLeaderGripPointOverrule: MoveGripPointsAt() => " +
+                                        $"IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition}");
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();

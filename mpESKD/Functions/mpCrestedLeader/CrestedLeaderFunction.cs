@@ -123,7 +123,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             blockReference,
             new Point3d(20, 0, 0));
 
-
         do
         {
             var status = AcadUtils.Editor.Drag(entityJig).Status;
@@ -153,8 +152,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     // Если текущий режим указания точек для смарт-объекта - указание точек выносок
                     if (currentJigStateOfCrestedLeader == 2)
                     {
-                        // crestedLeader.CreateSimplyLeader(crestedLeader.EndPoint);
-
                         // сохранение точки выноски
                         leaderEndPoints.Add(crestedLeader.EndPoint);
                         crestedLeader.LeaderEndPoints.Add(crestedLeader.EndPoint);
@@ -180,7 +177,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
 
                         // запомнить точку конца выноски, исходящей из InsertionPoint
-                        //boundLeaderEndPoint = crestedLeader.
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();

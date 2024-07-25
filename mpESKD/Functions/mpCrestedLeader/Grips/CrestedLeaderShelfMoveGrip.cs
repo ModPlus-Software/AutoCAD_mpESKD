@@ -72,18 +72,30 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                 // CrestedLeader.EndPoint = NewPoint;
 
                 // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
+
+                /*
                 var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X);
                 var leftStartPoint = leaderStartPointsSort.First();
                 var rightStartPoint = leaderStartPointsSort.Last();
+                var middleStartPoint = GeometryUtils
+                    .GetMiddlePoint3d(leaderStartPointsSort.First(), leaderStartPointsSort.Last());
 
+                // Полка справа, курсор вправо
                 if (CrestedLeader.ShelfPosition == ShelfPosition.Right && NewPoint.X > rightStartPoint.X)
                 {
                     CrestedLeader.ShelfLedge = NewPoint.X - CrestedLeader.ShelfStartPoint.X;
                 }
+                // Полка справа курсор влево
                 else
                 {
-
                 }
+
+                */
+
+                // Если меняется положение полки - ShelfPoeition - переносится точка вставки
+
+                Loggerq.WriteRecord($"CrestedLeaderGripPointOverrule: MoveGripPointsAt() => " +
+                                    $"IsChangeShelfPosition: {CrestedLeader.IsChangeShelfPosition}");
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

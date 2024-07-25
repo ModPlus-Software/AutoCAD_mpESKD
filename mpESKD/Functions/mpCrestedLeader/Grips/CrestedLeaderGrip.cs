@@ -39,11 +39,11 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
         Loggerq.WriteRecord($"CrestedLeaderGrip: CrestedLeaderGrip() => crestedLeader.IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition.ToString()}");
 
-        if (crestedLeader.IsChangeShelfPosition)
-        {
-            //crestedLeader.ShelfPosChangeEvent += this.OnGripStatusChanged;
-            //this.OnGripStatusChanged(crestedLeader.BlockId, Status.Move);
-        }
+        //if (crestedLeader.IsChangeShelfPosition)
+        //{
+        //    //crestedLeader.ShelfPosChangeEvent += this.OnGripStatusChanged;
+        //    //this.OnGripStatusChanged(crestedLeader.BlockId, Status.Move);
+        //}
         
     }
 
@@ -102,6 +102,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
+                /*
                 if (CrestedLeader.LeaderStartPoints.Count == 0)
                 {
                     if (_gripTmp != null)
@@ -114,7 +115,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
                     base.OnGripStatusChanged(entityId, newStatus);
                     return;
-                }
+                }*/
 
                 List<Point3d> leaderStartPointsTmp = new ();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
@@ -125,8 +126,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
                 else
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-
-
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -148,12 +147,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 CrestedLeader.LeaderStartPoints.Clear();
                 CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
 
-
-
-                //CrestedLeader.BoundStartPoint = 
                 CrestedLeader.IsBasePointMovedByGrip = true;
-
-                CrestedLeader.PrevInsertionPoint = CrestedLeader.InsertionPoint;
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

@@ -162,8 +162,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
-    [SaveToXData]
-    public Point3d PrevInsertionPoint { get; set; }
+   
 
     #endregion
 
@@ -359,15 +358,19 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.None)
             {
-                if (!PrevShelfPosition.Equals(ShelfPosition))
+                //if (!PrevShelfPosition.Equals(ShelfPosition))
+                //if (IsChangeShelfPosition)
+                if(false)
                 {
-                   // Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>      (!PrevShelfPosition.Equals(ShelfPosition))");
+                    Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>      CHANGE ShelfPosition:");
+                    Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>      CHANGE ShelfPosition: ShelfPosition:{ShelfPosition.ToString()}");
 
                     var leaderStartPointsSort = LeaderStartPoints.OrderBy(p => p.X);
-
+                    //Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>      CHANGE ShelfPosition: 1");
                     var vectorToShelfLedgePoint = Vector3d.XAxis * ShelfLedge;
-
+                    //Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>      CHANGE ShelfPosition: 2");
                     var widthText = CreateText(scale);
+                    //Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>      CHANGE ShelfPosition: 3");
                     var vectorToShelfEndPoint = Vector3d.XAxis * (widthText + (TextIndent * scale));
 
                     if (ShelfPosition == ShelfPosition.Right)
@@ -381,15 +384,18 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     }
                     else
                     {
-                       // Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>         ShelfPosition == ShelfPosition.Left");
+                        Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>         #!ShelfPosition == ShelfPosition.Left");
+                        Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>        #!ShelfLedge: {ShelfLedge.ToString()}");
 
                         ShelfStartPoint = leaderStartPointsSort.First();
-
+                        Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>        #!ShelfStartPoint: {ShelfStartPoint.ToString()}");
                         ShelfLedgePoint = ShelfStartPoint - vectorToShelfLedgePoint;
+                        Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>        #!ShelfLedgePoint: {ShelfLedgePoint.ToString()}");
                         ShelfEndPoint = ShelfLedgePoint - vectorToShelfEndPoint;
+                        Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>        #!ShelfEndPoint: {ShelfEndPoint.ToString()}");
                     }
 
-                    PrevShelfPosition = ShelfPosition;
+                    //PrevShelfPosition = ShelfPosition;
 
                     _unionLine = null;
                     _shelfLine = null;
@@ -480,13 +486,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                         _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
                     }
 
-                    //var leadersSort = _leaders.OrderBy(l => l.StartPoint.X);
-                    //var leaderBound = ShelfPosition == ShelfPosition.Right ? 
-
-                    //var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
-                    //BoundStartPoint = leaderBound.StartPoint;
-                    //BoundEndPoint = leaderBound.EndPoint;
-
                     var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
                     _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
 
@@ -505,16 +504,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     _bottomText = null;
                     var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
-                    //BoundStartPoint = leaderBound.StartPoint;
                     BoundEndPoint = leaderBound.EndPoint;
-
-                    PrevInsertionPoint = InsertionPoint;
 
                     Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>         IsFirst = true");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: InsertionPoint:{InsertionPoint.ToString()}");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: InsertionPointOCS:{InsertionPointOCS.ToString()}");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: leaderBound.StartPoint:{leaderBound.StartPoint.ToString()}");
                     Loggerq.WriteRecord($"CrestedLeader: UpdateEntities() =>         IsFirst = true: leaderBound.EndPoint:{leaderBound.EndPoint.ToString()}");
+
+                    PrevShelfPosition = ShelfPosition;
 
                     IsFirst = false;
                 }
@@ -555,7 +553,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Перетаскивание
         if (!IsBasePointMovedByGrip && IsBasePointMovedByOverrule)
         {
-           if (!CreateLeaderLines(true))
+           if (!CreateLeaderLines())
             {
                 return;
             }
@@ -678,7 +676,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
        // Loggerq.WriteRecord("CrestedLeader: CreateEntities() => END");
     }
 
-    private bool CreateLeaderLines(bool IsOverruleMoving = false)
+    private bool CreateLeaderLines()
     {
         Loggerq.WriteRecord("CrestedLeader: CreateLeaderLines() => START");
         //Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      IsOverruleMoving: {IsOverruleMoving}");
@@ -686,68 +684,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      InsertionPointOCS: {InsertionPointOCS.ToString()}");
         Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      BoundEndPoint: {BoundEndPoint.ToString()}");
         Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      BoundEndPointOCS: {BoundEndPointOCS.ToString()}");
-
-        /*
-        // отсортировать _leaders по StartPoint.Х  
-        var leadersSort = _leaders.OrderBy(l => l.StartPoint.X);
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      leadersSort!");
-
-        // Получить крайнюю линию
-        var boundLine = ShelfPosition == ShelfPosition.Right ? leadersSort.Last() : leadersSort.First();
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      boundLine!");
-        */
-
-
+        
         _leaders.Clear();
         LeaderStartPoints.Clear();
-
-        //if (LeaderEndPoints.Any(x => x.Equals(InsertionPoint)) ||
-        //    BoundEndPoint.Equals(InsertionPoint))
-        if (LeaderEndPoints.Any(x => x.Equals(InsertionPoint))) 
-        {
-            Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      FATAL ERROR!");
-            //return false;
-
-            //for (var i = 0; i < LeaderEndPoints.Count; i++)
-            //{
-            //    var leaderEndPoint = LeaderEndPoints[i];
-
-            //    if (leaderEndPoint.Equals(InsertionPoint))
-            //    {
-            //        LeaderEndPoints.RemoveAt(i);
-            //    }
-            //}
-        }
-        /*
-        var leaderEndPointsOcsSort = LeaderEndPointsOCS.OrderBy(p => p.X).ToList();
-
-        var leaderEndPointNearestToInsPt = ShelfPosition == ShelfPosition.Right
-            ? leaderEndPointsOcsSort.Last().ToPoint2d()
-            : leaderEndPointsOcsSort.First().ToPoint2d();
-
-        var newLeaderVector = IsOverruleMoving
-        ? TempNewPointOCS.ToPoint2d() - leaderEndPointNearestToInsPt
-        : InsertionPointOCS.ToPoint2d() - leaderEndPointNearestToInsPt;
-        */
-
-        //var newLeaderVector = InsertionPointOCS.ToPoint2d() - boundLine.EndPoint.ToPoint2d();
-        // var newLeaderVector = InsertionPointOCS.ToPoint2d() - BoundEndPoint.ToPoint2d();
-
-
-        /*
-        if (IsOverruleMoving)
-        {
-            if (GetBoundEndPoint(InsertionPoint, LeaderEndPoints, ShelfPosition) is { } boundEndPoint)
-            {
-                BoundEndPoint = boundEndPoint;
-
-            }
-            else
-            {
-                return false;
-            }
-
-        }*/
 
         if (BoundEndPointOCS.X.Equals(InsertionPointOCS.X) && !BoundEndPointOCS.Equals(InsertionPointOCS))
         {
@@ -756,13 +695,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 var intersectPointOcs = new Point2d(LeaderEndPointsOCS[i].X, InsertionPointOCS.Y);
                 var intersectPointOcs3d = intersectPointOcs.ToPoint3d();
 
-
                 LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
-
-                //if (intersectPointOcs3d.Equals(LeaderEndPointsOCS[i]))
-                //{
-                //    continue;
-                //}
 
                 _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
             }
@@ -785,7 +718,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     LeaderEndPointsOCS[i].ToPoint2d(),
                     newLeaderVector);
 
-
                 if (intersectPointOcs == null)
                     continue;
 
@@ -799,27 +731,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
 
                 _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
-
             }
         }
-
-        /*
-               _firstLeader = new Line(InsertionPointOCS, leaderEndPointNearestToInsPt.ToPoint3d())
-               {
-                   ColorIndex = 150,
-                   Thickness = 20,
-                   LineWeight = (LineWeight)20,
-               };*/
-
-        //_firstLeader = new Xline()
-        //{
-        //    BasePoint =     EndPointOCS,
-        //    SecondPoint = leaderEndPointNearestToInsPt.ToPoint3d()
-        //};
-
-        //var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
-        //BoundStartPoint = leaderBound.StartPoint;
-        //BoundEndPoint = leaderBound.EndPoint;
 
         return true;
     }
@@ -889,10 +802,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             Point3d searchPoint = searchLeaderEndPoint.Point;
 
-            // Найдем точку пересечения окружности с радиусом minDist и отрезка
-            // от прежней точки InsertionPoint к newPoint
-            //var prevInsertionPoint = PrevInsertionPoint;
-            //var line = new Line(prevInsertionPoint, EndPoint);
+            // Найдем точку пересечения окружности с радиусом minDist и отрезка к searchPoint
             var lineStartPoint = searchPoint + ((EndPoint - searchPoint) * minDist * 2);
 
             var line = new Line(lineStartPoint, searchPoint);
@@ -912,13 +822,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 Loggerq.WriteRecord($"CreateTempLeaderLineMoved: EndPoint:{EndPoint.ToString()}");
                 Loggerq.WriteRecord($"CreateTempLeaderLineMoved: EndPointOCS:{EndPointOCS.ToString()}");
 
-               // newLeaderVector = intersectPoint.Value.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
                EndPoint = intersectPoint.Value;
-            }
-            else
-            {
-                Loggerq.WriteRecord($"CreateTempLeaderLineMoved: intersectPoint = NULL!");
-                //newLeaderVector = EndPointOCS.ToPoint2d() - LeaderEndPoints.Last().ToPoint2d();
             }
         }
 
@@ -1032,7 +936,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         }
 
-        PrevShelfPosition = ShelfPosition;
+        //PrevShelfPosition = ShelfPosition;
 
         if (!ShelfStartPoint.Equals(ShelfLedgePoint))
         {
