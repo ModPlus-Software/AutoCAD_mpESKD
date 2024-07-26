@@ -16,6 +16,8 @@ internal static class ShelfActions
         var rightStartPoint = leaderStartPointsSort.Last();
         var unionLineLenght = Math.Abs(leftStartPoint.X - rightStartPoint.X);
 
+        //var startShelfPosition = crestedLeader.ShelfPosition;
+
         var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
 
         // Точка вставки справа
@@ -133,6 +135,16 @@ internal static class ShelfActions
                     crestedLeader.ShelfLedge = Math.Abs(newPoint.X - leftStartPoint.X);
                 }
             }
+        }
+        
+        if (newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPoint.Equals(leftStartPoint) ||
+            newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPoint.Equals(rightStartPoint))
+        {
+            crestedLeader.IsChangeShelfPosition = true;
+        }
+        else
+        {
+            crestedLeader.IsChangeShelfPosition = false;
         }
     }
 }

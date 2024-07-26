@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿using System;
+
+namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -8,6 +10,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
+using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
@@ -94,8 +97,69 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
 
                 // Если меняется положение полки - ShelfPoeition - переносится точка вставки
 
-                Loggerq.WriteRecord($"CrestedLeaderGripPointOverrule: MoveGripPointsAt() => " +
+                Loggerq.WriteRecord($"CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => " +
                                     $"IsChangeShelfPosition: {CrestedLeader.IsChangeShelfPosition}");
+
+                    //var leaderEndPointsSort = CrestedLeader.LeaderEndPoints.OrderBy(p => p.X).ToList();
+
+                //if (this.GripPoint.X <= leaderStartPointsSort.First().X && CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) ||
+                //this.GripPoint.X >= leaderStartPointsSort.Last().X && CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()))
+                if (CrestedLeader.IsChangeShelfPosition)
+                {
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+                    List<Point3d> leaderStartPointsTmp = new();
+                    leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+
+                    List<Point3d> leaderEndPointsTmp = new();
+                    leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
+
+
+
+                    if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                    {
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                        //CrestedLeader.ShelfLedge = GripPoint.X - leaderStartPointsSort.Last().X;
+                    }
+                    else
+                    {
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+                        //CrestedLeader.ShelfLedge = Math.Abs(GripPoint.X - leaderStartPointsSort.First().X);
+                    }
+
+                    CrestedLeader.ShelfLedgePoint =new Point3d( NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);  
+                 
+                    CrestedLeader.IsShelfPointMovedByGrip = true;
+                    CrestedLeader.IsChangeShelfPosition  = true;
+
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                        // перемещение точки вставки в точку первой точки полки
+                        ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                        using (var resBuf = CrestedLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
+                    }
+
+                    CrestedLeader.LeaderStartPoints.Clear();
+                    CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                    CrestedLeader.LeaderEndPoints.Clear();
+                    CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
+
+                    CrestedLeader.ShelfLedgePoint = new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);
+
+                    CrestedLeader.IsShelfPointMovedByGrip = true;
+                    CrestedLeader.IsChangeShelfPosition = true;
+                }
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
