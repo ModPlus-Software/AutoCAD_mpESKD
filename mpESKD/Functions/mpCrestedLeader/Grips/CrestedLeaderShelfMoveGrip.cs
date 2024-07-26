@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
@@ -31,7 +29,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
-        //RubberBandLineDisabled = true;
     }
 
     /// <summary>
@@ -72,38 +69,10 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                // CrestedLeader.EndPoint = NewPoint;
-
-                // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
-
                 /*
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X);
-                var leftStartPoint = leaderStartPointsSort.First();
-                var rightStartPoint = leaderStartPointsSort.Last();
-                var middleStartPoint = GeometryUtils
-                    .GetMiddlePoint3d(leaderStartPointsSort.First(), leaderStartPointsSort.Last());
-
-                // Полка справа, курсор вправо
-                if (CrestedLeader.ShelfPosition == ShelfPosition.Right && NewPoint.X > rightStartPoint.X)
-                {
-                    CrestedLeader.ShelfLedge = NewPoint.X - CrestedLeader.ShelfStartPoint.X;
-                }
-                // Полка справа курсор влево
-                else
-                {
-                }
-
-                */
-
-                // Если меняется положение полки - ShelfPoeition - переносится точка вставки
-
                 Loggerq.WriteRecord($"CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => " +
-                                    $"IsChangeShelfPosition: {CrestedLeader.IsChangeShelfPosition}");
+                                    $"IsChangeShelfPosition: {CrestedLeader.IsChangeShelfPosition}");*/
 
-                    //var leaderEndPointsSort = CrestedLeader.LeaderEndPoints.OrderBy(p => p.X).ToList();
-
-                //if (this.GripPoint.X <= leaderStartPointsSort.First().X && CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) ||
-                //this.GripPoint.X >= leaderStartPointsSort.Last().X && CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()))
                 if (CrestedLeader.IsChangeShelfPosition)
                 {
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
@@ -114,23 +83,20 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     List<Point3d> leaderEndPointsTmp = new();
                     leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-
-
                     if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
                     {
                         CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-                        //CrestedLeader.ShelfLedge = GripPoint.X - leaderStartPointsSort.Last().X;
                     }
                     else
                     {
                         CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-                        //CrestedLeader.ShelfLedge = Math.Abs(GripPoint.X - leaderStartPointsSort.First().X);
                     }
 
-                    CrestedLeader.ShelfLedgePoint =new Point3d( NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);  
-                 
+                    CrestedLeader.ShelfLedgePoint = new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y,
+                        CrestedLeader.InsertionPoint.Z);
+
                     CrestedLeader.IsShelfPointMovedByGrip = true;
-                    CrestedLeader.IsChangeShelfPosition  = true;
+                    CrestedLeader.IsChangeShelfPosition = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -138,6 +104,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
                         // перемещение точки вставки в точку первой точки полки
                         ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
@@ -155,7 +122,8 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     CrestedLeader.LeaderEndPoints.Clear();
                     CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
 
-                    CrestedLeader.ShelfLedgePoint = new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);
+                    CrestedLeader.ShelfLedgePoint = 
+                        new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);
 
                     CrestedLeader.IsShelfPointMovedByGrip = true;
                     CrestedLeader.IsChangeShelfPosition = true;

@@ -5,24 +5,16 @@ using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Windows.Data;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
-using CSharpFunctionalExtensions;
 using ModPlusAPI;
-using ModPlusAPI.Windows;
-
-
-//public delegate void OnGripStatusChangedDelegate(ObjectId entityId, GripData.Status newStatus);
 
 /// <summary>
 /// Ручка переноса выносок
 /// </summary>
 public class CrestedLeaderGrip : SmartEntityGripData
 {
-    //public event OnGripStatusChangedDelegate OnGripStatusChangedEvent;
-
     // Временное значение ручки
     private Point3d _gripTmp;
 
@@ -37,22 +29,8 @@ public class CrestedLeaderGrip : SmartEntityGripData
         GripIndex = gripIndex;
         GripType = GripType.Point;
 
-        Loggerq.WriteRecord($"CrestedLeaderGrip: CrestedLeaderGrip() => crestedLeader.IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition.ToString()}");
-
-        //if (crestedLeader.IsChangeShelfPosition)
-        //{
-        //    //crestedLeader.ShelfPosChangeEvent += this.OnGripStatusChanged;
-        //    //this.OnGripStatusChanged(crestedLeader.BlockId, Status.Move);
-        //}
-        
+      //  Loggerq.WriteRecord($"CrestedLeaderGrip: CrestedLeaderGrip() => crestedLeader.IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition.ToString()}");
     }
-
-    public void OnGripStatusChangedInvoke()
-    {
-        //OnGripStatusChangedEvent?.Invoke(CrestedLeader.BlockId, Status.GripEnd);
-    }
-
-
 
     /// <summary>
     /// Новое значение точки ручки
@@ -78,23 +56,18 @@ public class CrestedLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
+        /*
         Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => *\n**");
         Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => START");
         Loggerq.WriteRecord($"CrestedLeaderGrip: OnGripStatusChanged() =>        Status grip: {newStatus.ToString()}");
+        */
 
         try
         {
-            //if (newStatus == Status.Move)
-            //{
-            //    Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => Status.Move");
-                
-            //}
-
             // При начале перемещения запоминаем первоначальное положение ручки
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-
                 _gripTmp = GripPoint;
             }
 
@@ -102,21 +75,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                /*
-                if (CrestedLeader.LeaderStartPoints.Count == 0)
-                {
-                    if (_gripTmp != null)
-                    {
-                        if (GripIndex == 0)
-                        {
-                            CrestedLeader.InsertionPoint = _gripTmp;
-                        }
-                    }
-
-                    base.OnGripStatusChanged(entityId, newStatus);
-                    return;
-                }*/
-
                 List<Point3d> leaderStartPointsTmp = new ();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
@@ -191,11 +149,10 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
     public  void OnGripStatusChangedMy()
     {
-        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => START");
+       // Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => START");
 
         try
         {
-           
                 List<Point3d> leaderStartPointsTmp = new();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
@@ -228,10 +185,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
                 CrestedLeader.IsBasePointMovedByGrip = true;
 
-                //CrestedLeader.CrestedLeaderGrip = this;
-                //CrestedLeader.ObjectIdForGrip = entityId;
-                //CrestedLeader.GripDataStatus = newStatus;
-
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -247,8 +200,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 }
 
                 CrestedLeader.Dispose();
-            
-
         }
         catch (Exception exception)
         {
