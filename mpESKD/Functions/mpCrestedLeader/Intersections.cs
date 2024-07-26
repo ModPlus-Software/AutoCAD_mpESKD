@@ -5,14 +5,61 @@ using System.Text;
 using System.Threading.Tasks;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
 using System;
 
-public class CircleLineIntersection
+internal class Intersections
 {
-    public static Point3d? GetIntersection(Line line, Circle circle)
+    /// <summary>
+    /// Возвращает точку пересечения 2х 2D векторов
+    /// </summary>
+    internal static Point2d? GetIntersectionBetweenVectors(Point2d point1, Vector2d vector1, Point2d point2, Vector2d vector2)
+    {
+        if (point1.Equals(point2))
+            return null;
+
+        var v1 = point1 + vector1;
+        var v2 = point2 + vector2;
+
+        // далее по уравнению прямой по двум точкам
+
+        var x11 = point1.X;
+        var y11 = point1.Y;
+        var x21 = v1.X;
+        var y21 = v1.Y;
+
+        var x12 = point2.X;
+        var y12 = point2.Y;
+        var x22 = v2.X;
+        var y22 = v2.Y;
+
+        var a1 = (y21 - y11) / (x21 - x11);
+        var a2 = (y22 - y12) / (x22 - x12);
+
+        var b1 = ((y11 * (x21 - x11)) + (x11 * (y11 - y21))) / (x21 - x11);
+        var b2 = ((y12 * (x22 - x12)) + (x12 * (y12 - y22))) / (x22 - x12);
+
+        var x = (b1 - b2) / (a2 - a1);
+        var y = (a2 * x) + b2;
+
+        return !double.IsNaN(x) || !double.IsNaN(y) ? new Point2d(x, y) : default;
+    }
+
+    internal static Point3d? GetIntersectionBetweenVectors(Point3d point1, Vector2d vector1, Point3d point2,
+        Vector2d vector2)
+    {
+
+        var point2d = GetIntersectionBetweenVectors(point1.ToPoint2d(), vector1, point2.ToPoint2d(), vector2);
+
+        if (point2d == null) return null;
+
+        return new Point3d(point2d.Value.X, point2d.Value.Y, point1.Z);
+    }
+
+    internal static Point3d? GetIntersectionBetweenCircleLine(Line line, Circle circle)
     {
         /*
         double x1 = 1, y1 = 1; // Координаты первого конца отрезка (внутри окружности)

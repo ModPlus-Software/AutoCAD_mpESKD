@@ -613,14 +613,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private bool CreateLeaderLines()
     {
-        /*
-        Loggerq.WriteRecord("CrestedLeader: CreateLeaderLines() => START");
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      InsertionPoint: {InsertionPoint.ToString()}");
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      InsertionPointOCS: {InsertionPointOCS.ToString()}");
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      BoundEndPoint: {BoundEndPoint.ToString()}");
-        Loggerq.WriteRecord($"CrestedLeader: CreateLeaderLines() =>      BoundEndPointOCS: {BoundEndPointOCS.ToString()}");
-        */
-       
         _leaders.Clear();
         LeaderStartPoints.Clear();
 
@@ -648,7 +640,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     continue;
                 }
 
-                var intersectPointOcs = GetIntersectBetweenVectors(
+                var intersectPointOcs = Intersections.GetIntersectionBetweenVectors(
                     InsertionPointOCS.ToPoint2d(),
                     Vector2d.XAxis,
                     LeaderEndPointsOCS[i].ToPoint2d(),
@@ -748,7 +740,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 Radius = minDist,
             };
 
-            var intersectPoint = CircleLineIntersection.GetIntersection(line, circle);
+            var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
             if (intersectPoint != null)
             {
                 /*
@@ -771,7 +763,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         for (int i = 0; i < LeaderEndPoints.Count; i++)
         {
-            var intersectPoint = GetIntersectBetweenVectors(
+            var intersectPoint = Intersections.GetIntersectionBetweenVectors(
                 EndPointOCS.ToPoint2d(),
                 Vector2d.XAxis,
                 LeaderEndPoints[i].ToPoint2d(),
@@ -966,38 +958,5 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     #endregion
 
-    /// <summary>
-    /// Возвращает точку пересечения 2х 2D векторов
-    /// </summary>
-    private Point2d? GetIntersectBetweenVectors(Point2d point1, Vector2d vector1, Point2d point2, Vector2d vector2)
-    {
-        if (point1.Equals(point2))
-            return null;
 
-        var v1 = point1 + vector1;
-        var v2 = point2 + vector2;
-
-        // далее по уравнению прямой по двум точкам
-
-        var x11 = point1.X;
-        var y11 = point1.Y;
-        var x21 = v1.X;
-        var y21 = v1.Y;
-
-        var x12 = point2.X;
-        var y12 = point2.Y;
-        var x22 = v2.X;
-        var y22 = v2.Y;
-
-        var a1 = (y21 - y11) / (x21 - x11);
-        var a2 = (y22 - y12) / (x22 - x12);
-
-        var b1 = ((y11 * (x21 - x11)) + (x11 * (y11 - y21))) / (x21 - x11);
-        var b2 = ((y12 * (x22 - x12)) + (x12 * (y12 - y22))) / (x22 - x12);
-
-        var x = (b1 - b2) / (a2 - a1);
-        var y = (a2 * x) + b2;
-
-        return !double.IsNaN(x) || !double.IsNaN(y) ? new Point2d(x, y) : default;
-    }
 }

@@ -55,7 +55,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-        Loggerq.WriteRecord("CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => START");
+        // Loggerq.WriteRecord("CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => START");
         try
         {
             // При начале перемещения запоминаем первоначальное положение ручки

@@ -58,7 +58,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                     grips.Add(insertGrip);
 
-
                     var shelfMoveGrip = new CrestedLeaderShelfMoveGrip(crestedLeader, 0)
                     {
                         GripPoint = crestedLeader.ShelfLedgePoint
@@ -143,7 +142,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                     Radius = minDist,
                                 };
 
-                                var intersectPoint = CircleLineIntersection.GetIntersection(line, circle);
+                                var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
 
                                 // перенесем newpPoint на пересечение окружности с радиусом minDist и отрезка к searchPoint
                                 newPoint = intersectPoint ?? newPoint;
