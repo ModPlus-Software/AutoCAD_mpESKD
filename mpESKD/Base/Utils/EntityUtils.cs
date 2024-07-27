@@ -299,7 +299,7 @@ public static class EntityUtils
     /// <param name="offset">Отступ</param>
     /// <param name="center">Средняя точка прямоугольной области контура</param>
     /// <returns>Коллекция <see cref="Point2dCollection"/> точек контура: слева внизу, слева вверху, справа вверху, справа внизу </returns>
-    private static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center)
+    public static Point2dCollection GetTextBoundsPoints<T>(this T textObject, double offset, Point3d center)
         where T : Entity
     {
         if (textObject == null || (typeof(T) != typeof(DBText) && typeof(T) != typeof(MText)))
@@ -333,6 +333,7 @@ public static class EntityUtils
             var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
 
             return [bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint];
+            
         }
 
         return null;

@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿using Autodesk.AutoCAD.GraphicsInterface;
+using Autodesk.AutoCAD.Windows.Data;
+
+namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -20,6 +23,13 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
     private readonly Point3d _endLeaderPoint;
     private readonly Point3d _insertionPoint;
 
+    /*
+    private readonly string _topText;
+    private readonly string _bottomText;
+    private readonly double _topTextHeight;
+    private readonly double _bottomTextHeight;
+    private readonly string _textStyle;*/
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderMoveLeaderGrip"/> class.
     /// </summary>
@@ -34,7 +44,11 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
 
         _startLeaderPoint = CrestedLeader.LeaderStartPoints[gripIndex];
         _endLeaderPoint = CrestedLeader.LeaderEndPoints[gripIndex];
-        _insertionPoint = CrestedLeader.InsertionPoint;
+       _insertionPoint = CrestedLeader.InsertionPoint;
+        /*
+       _topText = CrestedLeader.TopText;
+       _topTextHeight = CrestedLeader.TopTextHeight;
+       _textStyle = CrestedLeader.TextStyle;*/
     }
 
     /// <summary>
@@ -196,22 +210,77 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
 
             var vectorLeader = _endLeaderPoint.ToPoint2d() - _startLeaderPoint.ToPoint2d();
 
-            var pointStart = Intersections.GetIntersectionBetweenVectors(
+            var tempLineStartPoint = Intersections.GetIntersectionBetweenVectors(
                 cursorPoint, vectorLeader, _insertionPoint, Vector2d.XAxis);
 
-            if (pointStart == null)
+            if (tempLineStartPoint == null)
                 return;
 
-            line = new Line(pointStart.Value, cursorPoint)
+            line = new Line(tempLineStartPoint.Value, cursorPoint)
             {
                 ColorIndex = 150,
             };
 
             pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
+
+
+
+            /*
+            var widthText = _topText.ActualWidth;
+            var vectorToShelfEndPoint = Vector3d.XAxis * (widthText + (CrestedLeader.TextIndent * CrestedLeader.GetScale()));
+
+            var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(CrestedLeader.ShelfLedgePointOCS, CrestedLeader.ShelfEndPointOCS);
+
+            if (_topText != null)
+            {
+                var yVectorToCenterTopText = Vector3d.YAxis * ((CrestedLeader.TextVerticalOffset * CrestedLeader.GetScale()) + 
+                                                               (_topText.ActualHeight / 2));
+
+                _topText.Location = textRegionCenterPoint + yVectorToCenterTopText;
+            }*/
+
+            var topText = new MText()
+            {
+                Contents = CrestedLeader.TopText,
+                Attachment = AttachmentPoint.MiddleCenter,
+            };
+
+            topText.SetProperties(CrestedLeader.TextStyle, CrestedLeader.TopTextHeight * CrestedLeader.GetScale());
+
+            topText.Location = Point3d.Origin;
+
+            Loggerq.WriteRecord($"_topText.Text: {topText.Text}, Text location: {topText.Location.ToString()}");
+
+            var distanceMove  = tempLineStartPoint.Value.X - _startLeaderPoint.X;
+
+            var widthText = topText.ActualWidth + (CrestedLeader.TextIndent * CrestedLeader.GetScale());
+
+            var centerTextPoint = CrestedLeader.ShelfLedgePoint + (Vector3d.XAxis * ((widthText / 2) + distanceMove));
+
+            var centerTopTextPoint = centerTextPoint + 
+                                     (Vector3d.YAxis * ((CrestedLeader.TextVerticalOffset * CrestedLeader.GetScale()) + (topText.ActualHeight / 2)));
+
+            var framePoints = topText.GetTextBoundsPoints(0,  centerTopTextPoint);
+
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[0].ToPoint3d(), framePoints[1].ToPoint3d()));
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[1].ToPoint3d(), framePoints[2].ToPoint3d()));
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[2].ToPoint3d(), framePoints[3].ToPoint3d()));
+            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[3].ToPoint3d(), framePoints[0].ToPoint3d()));
+
+            //var framePointsList = framePoints.ToArray().ToList();
+            //framePointsList.Add(framePointsList[0]);
+            //var framePoints3d = framePointsList.Select(p => p.ToPoint3d()).ToList();
+
+            //for (int i = 0; i < framePoints3d.Count - 1; i++)
+            //{
+            //    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints3d[i], framePoints3d[i + 1]));
+            //}
         }
         catch
         {
             // ignored
         }
     }
+
+    
 }
