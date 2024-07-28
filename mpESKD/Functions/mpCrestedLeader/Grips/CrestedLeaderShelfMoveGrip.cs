@@ -55,7 +55,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-        // Loggerq.WriteRecord("CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => START");
         try
         {
             // При начале перемещения запоминаем первоначальное положение ручки
@@ -69,10 +68,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                /*
-                Loggerq.WriteRecord($"CrestedLeaderShelfMoveGrip: OnGripStatusChanged() => " +
-                                    $"IsChangeShelfPosition: {CrestedLeader.IsChangeShelfPosition}");*/
-
                 if (CrestedLeader.IsChangeShelfPosition)
                 {
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();

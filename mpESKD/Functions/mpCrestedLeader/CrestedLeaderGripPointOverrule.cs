@@ -1,7 +1,6 @@
-﻿using mpESKD.Base.Enums;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
-namespace mpESKD.Functions.mpCrestedLeader;
-
+using Base.Enums;
 using Autodesk.AutoCAD.DatabaseServices;
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
@@ -10,7 +9,7 @@ using Base;
 using Base.Overrules;
 using Grips;
 using ModPlusAPI.Windows;
-using mpESKD.Base.Utils;
+using Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
@@ -25,14 +24,11 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         Vector3d curViewDir,
         GetGripPointsFlags bitFlags)
     {
-       // Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: GetGripPoints()");
-
         try
         {
             if (IsApplicable(entity))
             {
                 // Удаляю все ручки - это удалит ручку вставки блока
-
                 var blkRef = (BlockReference)entity;
                 GripData toRemove = null;
 
@@ -82,11 +78,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         }
         catch (Exception exception)
         {
-            // todo
-            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-            //    ExceptionBox.Show(exception);
-
-            Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: GetGripPoints() => ERROR");
+            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                ExceptionBox.Show(exception);
         }
     }
 
@@ -94,8 +87,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
-       // Loggerq.WriteRecord("CrestedLeaderGripPointOverrule: MoveGripPointsAt() => START");
-
        try
        {
            if (IsApplicable(entity))
@@ -187,8 +178,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                crestedLeader.InsertionPoint,
                                Vector2d.XAxis) is { } tempLineStartPoint)
                        {
-                           var distanceMove = tempLineStartPoint.X - leaderStartPoint.X;
-
                            // todo Проверка на мин расстояние, чтобы не наложились точки начал выносок
 
                            crestedLeader.LeaderStartPoints[leaderMoveGrip.GripIndex] = tempLineStartPoint;

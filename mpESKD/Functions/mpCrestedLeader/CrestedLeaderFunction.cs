@@ -17,7 +17,6 @@ using Base.Styles;
 using Base.Utils;
 using ModPlusAPI.Windows;
 using Base.Enums;
-using CSharpFunctionalExtensions;
 using System.Collections.Generic;
 
 /// <inheritdoc />
@@ -29,13 +28,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new CrestedLeaderGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(), true);
-
-        Loggerq.DeleteFile();
-        Loggerq.WriteRecord("*");
-        Loggerq.WriteRecord("**");
-        Loggerq.WriteRecord($"CrestedLeaderFunction: Initialize()");
-
-
     }
 
     /// <inheritdoc />
@@ -80,8 +72,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void CreateCrestedLeader()
     {
-        //Loggerq.WriteRecord($"CrestedLeaderFunction: ");
-
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
         try
@@ -114,12 +104,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
-        List<Point3d> leaderStartPoints = new();
+        List<Point3d> leaderStartPoints = new ();
         List<Point3d> leaderEndPoints = new ();
         Point3d shelfStartPoint = new ();
         Point3d shelfLedgePoint = new ();
         Point3d shelfEndPoint = new ();
-        Point3d boundLeaderEndPoint = new ();
 
         var entityJig = new DefaultEntityJig(
             crestedLeader,
@@ -137,7 +126,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             {
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
-
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     // Задан текущий режим JIG как режим NextPoint
                     entityJig.JigState = JigState.PromptNextPoint;
@@ -179,8 +167,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         shelfLedgePoint = crestedLeader.ShelfLedgePoint;
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
 
-                        // запомнить точку конца выноски, исходящей из InsertionPoint
-
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -193,6 +179,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptNextPoint)
                 {
                     entityJig.PreviousPoint = crestedLeader.EndPoint;
+
                     // Включение режима указания первой точки полки как текущего
                     crestedLeader.CurrentJigState = 3;
                 }

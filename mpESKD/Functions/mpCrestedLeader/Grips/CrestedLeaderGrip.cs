@@ -1,5 +1,6 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
+using ModPlusAPI.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -28,8 +29,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
-
-      //  Loggerq.WriteRecord($"CrestedLeaderGrip: CrestedLeaderGrip() => crestedLeader.IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition.ToString()}");
     }
 
     /// <summary>
@@ -56,12 +55,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-        /*
-        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => *\n**");
-        Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => START");
-        Loggerq.WriteRecord($"CrestedLeaderGrip: OnGripStatusChanged() =>        Status grip: {newStatus.ToString()}");
-        */
-
         try
         {
             // При начале перемещения запоминаем первоначальное положение ручки
@@ -140,17 +133,13 @@ public class CrestedLeaderGrip : SmartEntityGripData
         }
         catch (Exception exception)
         {
-            // todo
-            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-            //    ExceptionBox.Show(exception);
-            Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChanged() => ERROR");
+            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                ExceptionBox.Show(exception);
         }
     }
 
     public  void OnGripStatusChangedMy()
     {
-       // Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => START");
-
         try
         {
                 List<Point3d> leaderStartPointsTmp = new();
@@ -169,6 +158,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
                     // перемещение точки вставки в точку первой точки полки
                     ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
@@ -203,10 +193,8 @@ public class CrestedLeaderGrip : SmartEntityGripData
         }
         catch (Exception exception)
         {
-            // todo
-            //if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-            //    ExceptionBox.Show(exception);
-            Loggerq.WriteRecord("CrestedLeaderGrip: OnGripStatusChangedMy() => ERROR");
+            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
+                ExceptionBox.Show(exception);
         }
     }
 
