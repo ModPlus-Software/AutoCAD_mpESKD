@@ -155,6 +155,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public bool IsShelfPointMovedByGrip { get; set; } = false;
 
+
+    [SaveToXData]
+    public bool IsLeaderPointMovedByOverrule { get; set; } = false;
+
     /*
     [SaveToXData]
     public Point3d BoundStartPoint { get; set; }
@@ -458,8 +462,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     }
 
                     _bottomText = null;
-                    var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
-                    BoundEndPoint = leaderBound.EndPoint;
+
+                    if (!IsLeaderPointMovedByOverrule)
+                    {
+                        var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
+                        BoundEndPoint = leaderBound.EndPoint;
+                    }
 
                     /*
                     Loggerq.WriteRecord("CrestedLeader: UpdateEntities() =>         IsFirst = true");
@@ -472,6 +480,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     PrevShelfPosition = ShelfPosition;
 
                     IsFirst = false;
+                    IsLeaderPointMovedByOverrule = false;
                 }
                 else
                 {

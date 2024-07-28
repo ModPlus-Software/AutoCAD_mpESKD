@@ -77,17 +77,18 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
-            AcadUtils.Editor.TurnForcedPickOn();
-            AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
+            //AcadUtils.Editor.TurnForcedPickOn();
+            //AcadUtils.Editor.PointMonitor += AddNewVertex_EdOnPointMonitor;
         }
 
         if (newStatus == Status.GripEnd)
         {
-            AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            //AcadUtils.Editor.TurnForcedPickOff();
+            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
 
             using (CrestedLeader)
             {
+                /*
                 var moveDistance = CrestedLeader.LeaderEndPoints[GripIndex].X - NewPoint.X;
                 var leaderStartPointPrev = CrestedLeader.LeaderStartPoints[GripIndex];
 
@@ -96,14 +97,14 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
                     leaderStartPointPrev.Y,
                     leaderStartPointPrev.Z);
 
-                CrestedLeader.LeaderEndPoints[GripIndex] = NewPoint;
+                CrestedLeader.LeaderEndPoints[GripIndex] = NewPoint;*/
                 
 
                 #region Переместить точку вставки
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+               /* CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();*/
 
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+               // var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
 
                 // Сохранить начала выносок
                 List<Point3d> leaderStartPointsTmp = new();
@@ -112,7 +113,8 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
                 // Сохранить концы выносок
                 List<Point3d> leaderEndPointsTmp = new();
                 leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
-                
+
+                /*
                 int searchIndex;
                 if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
                 {
@@ -133,7 +135,11 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
 
                 // Сохранить конец выноски, начало которой совпадает с точкой вставки
                 var boundEndPointTmp = CrestedLeader.LeaderEndPoints[searchIndex];
+                */
 
+                var boundEndPointTmp = CrestedLeader.BoundEndPoint;
+
+                CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -143,7 +149,7 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
                     var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
 
                     // перемещение точки вставки в точку первой точки полки
-                    ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+                    ((BlockReference)blkRef).Position =  CrestedLeader.InsertionPoint;
 
                     using (var resBuf = CrestedLeader.GetDataForXData())
                     {
@@ -165,8 +171,6 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
                 CrestedLeader.BoundEndPoint = boundEndPointTmp;
                 #endregion
 
-                
-
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -186,101 +190,10 @@ public class CrestedLeaderMoveLeaderGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
-            AcadUtils.Editor.TurnForcedPickOff();
-            AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
+            //AcadUtils.Editor.TurnForcedPickOff();
+            //AcadUtils.Editor.PointMonitor -= AddNewVertex_EdOnPointMonitor;
         }
 
         base.OnGripStatusChanged(entityId, newStatus);
     }
-
-    private void AddNewVertex_EdOnPointMonitor(object sender, PointMonitorEventArgs pointMonitorEventArgs)
-    {
-        try
-        {
-            Line line;
-
-            var cursorPoint = pointMonitorEventArgs.Context.ComputedPoint;
-            /*
-            var pointStart = new Point3d(
-                _startLeaderPoint.X + (cursorPoint.X - _endLeaderPoint.X),
-                _startLeaderPoint.Y,
-                _startLeaderPoint.Z
-            );
-            */
-
-            var vectorLeader = _endLeaderPoint.ToPoint2d() - _startLeaderPoint.ToPoint2d();
-
-            var tempLineStartPoint = Intersections.GetIntersectionBetweenVectors(
-                cursorPoint, vectorLeader, _insertionPoint, Vector2d.XAxis);
-
-            if (tempLineStartPoint == null)
-                return;
-
-            line = new Line(tempLineStartPoint.Value, cursorPoint)
-            {
-                ColorIndex = 150,
-            };
-
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(line);
-
-
-
-            /*
-            var widthText = _topText.ActualWidth;
-            var vectorToShelfEndPoint = Vector3d.XAxis * (widthText + (CrestedLeader.TextIndent * CrestedLeader.GetScale()));
-
-            var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(CrestedLeader.ShelfLedgePointOCS, CrestedLeader.ShelfEndPointOCS);
-
-            if (_topText != null)
-            {
-                var yVectorToCenterTopText = Vector3d.YAxis * ((CrestedLeader.TextVerticalOffset * CrestedLeader.GetScale()) + 
-                                                               (_topText.ActualHeight / 2));
-
-                _topText.Location = textRegionCenterPoint + yVectorToCenterTopText;
-            }*/
-
-            var topText = new MText()
-            {
-                Contents = CrestedLeader.TopText,
-                Attachment = AttachmentPoint.MiddleCenter,
-            };
-
-            topText.SetProperties(CrestedLeader.TextStyle, CrestedLeader.TopTextHeight * CrestedLeader.GetScale());
-
-            topText.Location = Point3d.Origin;
-
-            Loggerq.WriteRecord($"_topText.Text: {topText.Text}, Text location: {topText.Location.ToString()}");
-
-            var distanceMove  = tempLineStartPoint.Value.X - _startLeaderPoint.X;
-
-            var widthText = topText.ActualWidth + (CrestedLeader.TextIndent * CrestedLeader.GetScale());
-
-            var centerTextPoint = CrestedLeader.ShelfLedgePoint + (Vector3d.XAxis * ((widthText / 2) + distanceMove));
-
-            var centerTopTextPoint = centerTextPoint + 
-                                     (Vector3d.YAxis * ((CrestedLeader.TextVerticalOffset * CrestedLeader.GetScale()) + (topText.ActualHeight / 2)));
-
-            var framePoints = topText.GetTextBoundsPoints(0,  centerTopTextPoint);
-
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[0].ToPoint3d(), framePoints[1].ToPoint3d()));
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[1].ToPoint3d(), framePoints[2].ToPoint3d()));
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[2].ToPoint3d(), framePoints[3].ToPoint3d()));
-            pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints[3].ToPoint3d(), framePoints[0].ToPoint3d()));
-
-            //var framePointsList = framePoints.ToArray().ToList();
-            //framePointsList.Add(framePointsList[0]);
-            //var framePoints3d = framePointsList.Select(p => p.ToPoint3d()).ToList();
-
-            //for (int i = 0; i < framePoints3d.Count - 1; i++)
-            //{
-            //    pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(new Line(framePoints3d[i], framePoints3d[i + 1]));
-            //}
-        }
-        catch
-        {
-            // ignored
-        }
-    }
-
-    
 }
