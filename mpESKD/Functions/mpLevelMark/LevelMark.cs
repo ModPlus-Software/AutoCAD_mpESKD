@@ -22,7 +22,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     private bool _objectLine;
     private int _objectLineOffset = 5;
     private int _bottomShelfLength = 10;
-    
+
     /// <summary>
     /// Нижняя полка
     /// </summary>
@@ -78,7 +78,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     public Point3d ObjectPoint { get; set; }
 
     /// <summary>
-    /// Точка уровня в внутренней системе координат блока
+    /// Точка уровня во внутренней системе координат блока
     /// </summary>
     private Point3d ObjectPointOCS => ObjectPoint.TransformBy(BlockTransform.Inverse());
 
@@ -216,7 +216,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// <summary>
     /// Длина нижней полки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 3, "p57", 10, 1, 20, descLocalKey: "d57", nameSymbol: "l2")]
+    [EntityProperty(PropertiesCategory.Geometry, 3, "p57", 10, 0, 20, descLocalKey: "d57", nameSymbol: "l2")]
     [SaveToXData]
     public int BottomShelfLength
     {
@@ -238,7 +238,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
     /// <summary>
     /// Выступ нижней полки
     /// </summary>
-    [EntityProperty(PropertiesCategory.Geometry, 4, "p58", 2, 1, 5, descLocalKey: "d58", nameSymbol: "l3")]
+    [EntityProperty(PropertiesCategory.Geometry, 4, "p58", 2, 0, 5, descLocalKey: "d58", nameSymbol: "l3")]
     [SaveToXData]
     public int BottomShelfLedge { get; set; } = 2;
 
@@ -600,18 +600,20 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
         var textIndent = TextIndent * scale;
         var textVerticalOffset = TextVerticalOffset * scale;
 
+        _bottomShelfLine = null;
         if (ObjectLine)
         {
             _bottomShelfLine = new Line(
                 objectPoint + (horV * ObjectLineOffset * scale),
                 arrowPoint + (horV * BottomShelfLedge * scale));
         }
-        else
+        else if (BottomShelfLength > 0 || BottomShelfLedge > 0)
         {
             _bottomShelfLine = new Line(
-                bottomShelfStartPoint,
-                bottomShelfStartPoint + (horV * (BottomShelfLength + BottomShelfLedge) * scale));
+            bottomShelfStartPoint,
+            bottomShelfStartPoint + (horV * (BottomShelfLength + BottomShelfLedge) * scale));
         }
+
 
         _verticalLine = new Line(arrowPoint, shelfPoint);
         _arrowPolyline = GetArrow(objectPoint, arrowPoint, shelfPoint, scale);
@@ -631,7 +633,7 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
             _bottomDbText = new DBText { TextString = Note };
             _bottomDbText.SetProperties(TextStyle, secondTextHeight);
             _bottomDbText.SetPosition(null, TextVerticalMode.TextVerticalMid, AttachmentPoint.MiddleCenter);
-            Point3d bottomTextPosition = isTop
+            var bottomTextPosition = isTop
                 ? shelfPoint - ((textVerticalOffset + (_bottomDbText.GetHeight() / 2)) * verV) + ((textIndent + (_bottomDbText.GetLength() / 2)) * horV)
                 : shelfPoint + ((textVerticalOffset + (_bottomDbText.GetHeight() / 2)) * verV) + ((textIndent + (_bottomDbText.GetLength() / 2)) * horV);
             _bottomDbText.Position = bottomTextPosition;
@@ -687,8 +689,8 @@ public class LevelMark : SmartEntity, ITextValueEntity, INumericValueEntity, IWi
 
         _topShelfLine = new Line(shelfPoint, shelfPoint + (topShelfLength * horV));
         TopShelfLineLength = _topShelfLine.Length;
-        
-        MirrorIfNeed(new[] { _topDbText, _bottomDbText });
+
+        MirrorIfNeed([_topDbText, _bottomDbText]);
     }
 
     private Polyline GetArrow(Point3d objectPoint, Point3d endPoint, Point3d shelfPoint, double scale)
