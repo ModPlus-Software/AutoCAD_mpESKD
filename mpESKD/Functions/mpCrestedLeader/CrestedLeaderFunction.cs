@@ -28,6 +28,9 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new CrestedLeaderGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(), true);
+
+        Loggerq.DeleteFile();
+
     }
 
     /// <inheritdoc />

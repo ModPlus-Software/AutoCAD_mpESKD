@@ -140,6 +140,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
+    public int NoValidPointIndex { get; set; } =  -1;
+
     #endregion
 
     #region Свойства - геометрия
@@ -259,7 +261,16 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc/>
     public override IEnumerable<Point3d> GetPointsForOsnap()
     {
+        yield return InsertionPoint;
+        yield return ShelfLedgePoint;
+        yield return ShelfEndPoint;
+
         foreach (var leaderEndPoint in LeaderEndPoints)
+        {
+            yield return leaderEndPoint;
+        }
+
+        foreach (var leaderEndPoint in LeaderStartPoints)
         {
             yield return leaderEndPoint;
         }
@@ -322,7 +333,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     for (var i = 0; i < LeaderEndPoints.Count; i++)
                     {
-                        _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+                        
+                            _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+
                     }
 
                     var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPointOCS));
