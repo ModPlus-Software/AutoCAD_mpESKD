@@ -120,10 +120,30 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
                            var newPoint = insertGrip.NewPoint;
 
-                           // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
-                           // то не дать этого сделать
+                            /*
+                             if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
+                             {
+                                 var endPointMin  = crestedLeader.LeaderEndPoints
+                                     .Where(p => p.Y == crestedLeader.LeaderEndPoints
+                                     .Min(p => Math.Abs(newPoint.Y - p.Y))).First();
 
-                           var minDist = crestedLeader.MinDistanceBetweenPoints;
+                                 newPoint = new Point3d(
+                                     newPoint.X,
+                                     endPointMin.Y + crestedLeader.MinDistanceBetweenPoints,
+                                     newPoint.Z);
+                             }*/
+
+                            if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
+                            {
+                                newPoint = new Point3d(
+                                    newPoint.X,
+                                    newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
+                                    newPoint.Z);
+                            }
+
+                            // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
+                            // то не дать этого сделать
+                            var minDist = crestedLeader.MinDistanceBetweenPoints;
 
                            if (crestedLeader.LeaderEndPoints.Any(p =>
                                    newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
