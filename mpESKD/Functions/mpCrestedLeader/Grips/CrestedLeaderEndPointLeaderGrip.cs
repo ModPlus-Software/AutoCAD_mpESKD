@@ -7,6 +7,7 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Ручка перетаскивания выносок
@@ -58,46 +59,56 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
         {
             using (CrestedLeader)
             {
-                // Сохранить начала выносок
-                List<Point3d> leaderStartPointsTmp = new();
-                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
 
-                // Сохранить концы выносок
-                List<Point3d> leaderEndPointsTmp = new();
-                leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
-
-                var boundEndPointTmp = CrestedLeader.BoundEndPoint;
-
-                CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                // Если требуется переместить точку вставки
+                if (!(CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) &&
+                      CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                    ||
+                    (!CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()) &&
+                     CrestedLeader.ShelfPosition == ShelfPosition.Left))
                 {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                    // Сохранить начала выносок
+                    List<Point3d> leaderStartPointsTmp = new();
+                    leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
-                    // перемещение точки вставки в точку первой точки полки
-                    ((BlockReference)blkRef).Position =  CrestedLeader.InsertionPoint;
+                    // Сохранить концы выносок
+                    List<Point3d> leaderEndPointsTmp = new();
+                    leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    var boundEndPointTmp = CrestedLeader.BoundEndPoint;
+
+                    CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
+
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        blkRef.XData = resBuf;
+                        var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
+                        // перемещение точки вставки в точку первой точки полки
+                        ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                        using (var resBuf = CrestedLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
                     }
 
-                    tr.Commit();
+                    CrestedLeader.LeaderStartPoints.Clear();
+                    CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                    CrestedLeader.LeaderEndPoints.Clear();
+                    CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
+
+                    CrestedLeader.BoundEndPoint = boundEndPointTmp;
+
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
                 }
-                
-                CrestedLeader.LeaderStartPoints.Clear();
-                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
-
-                CrestedLeader.LeaderEndPoints.Clear();
-                CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
-
-                CrestedLeader.BoundEndPoint = boundEndPointTmp;
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                 {
