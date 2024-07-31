@@ -4,6 +4,7 @@ namespace mpESKD.Functions.mpCrestedLeader;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base;
@@ -594,7 +595,22 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 var intersectPointOcs3d = intersectPointOcs.Value.ToPoint3d();
 
-                LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
+                var leaderStartPoint = InsertionPoint + (intersectPointOcs3d - InsertionPointOCS);
+
+                //this.ToLogAnyString($"CreateLeaderLines():  IsRotated: {IsRotated.ToString()}");
+                if (IsRotated)
+                {
+                   // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
+                   // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
+
+                    var blockRotation = Rotation;
+                    var blockRotationMatrix = Matrix3d.Rotation(blockRotation, Vector3d.ZAxis, InsertionPointOCS);
+
+                    leaderStartPoint = InsertionPoint + (intersectPointOcs3d.TransformBy(blockRotationMatrix) - InsertionPointOCS);
+                }
+
+
+                LeaderStartPoints.Add(leaderStartPoint);
 
                 if (intersectPointOcs3d.Equals(LeaderEndPointsOCS[i]))
                 {
