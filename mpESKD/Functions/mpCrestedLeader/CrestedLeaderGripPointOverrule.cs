@@ -91,6 +91,16 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             grips.Add(leaderMoveGrip);
                         }
                     }
+
+                    var addLeaderGrip = new CrestedLeaderAddLeaderGrip(crestedLeader)
+                    {
+                        GripPoint = new Point3d(
+                            crestedLeader.ShelfLedgePoint.X,
+                            crestedLeader.ShelfLedgePoint.Y - crestedLeader.MinDistanceBetweenPoints*3*crestedLeader.GetScale(),
+                            crestedLeader.ShelfLedgePoint.Z)
+                    };
+
+                    grips.Add(addLeaderGrip);
                 }
             }
         }
@@ -120,30 +130,30 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
                            var newPoint = insertGrip.NewPoint;
 
-                            /*
-                             if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
-                             {
-                                 var endPointMin  = crestedLeader.LeaderEndPoints
-                                     .Where(p => p.Y == crestedLeader.LeaderEndPoints
-                                     .Min(p => Math.Abs(newPoint.Y - p.Y))).First();
-
-                                 newPoint = new Point3d(
-                                     newPoint.X,
-                                     endPointMin.Y + crestedLeader.MinDistanceBetweenPoints,
-                                     newPoint.Z);
-                             }*/
-
+                           /*
                             if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
                             {
+                                var endPointMin  = crestedLeader.LeaderEndPoints
+                                    .Where(p => p.Y == crestedLeader.LeaderEndPoints
+                                    .Min(p => Math.Abs(newPoint.Y - p.Y))).First();
+
                                 newPoint = new Point3d(
                                     newPoint.X,
-                                    newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
+                                    endPointMin.Y + crestedLeader.MinDistanceBetweenPoints,
                                     newPoint.Z);
-                            }
+                            }*/
 
-                            // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
-                            // то не дать этого сделать
-                            var minDist = crestedLeader.MinDistanceBetweenPoints;
+                           if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
+                           {
+                               newPoint = new Point3d(
+                                   newPoint.X,
+                                   newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
+                                   newPoint.Z);
+                           }
+
+                           // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
+                           // то не дать этого сделать
+                           var minDist = crestedLeader.MinDistanceBetweenPoints;
 
                            if (crestedLeader.LeaderEndPoints.Any(p =>
                                    newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
@@ -208,12 +218,12 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                        var leaderStartPoint = crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex];
                        var leaderEndPoint = crestedLeader.LeaderEndPoints[leaderEndGrip.GripIndex];
-                  
+
                        if (Math.Abs(leaderStartPoint.Y - newPoint.Y) < crestedLeader.MinDistanceBetweenPoints)
                        {
                            newPoint = new Point3d(
                                newPoint.X,
-                               newPoint.Y > leaderStartPoint.Y 
+                               newPoint.Y > leaderStartPoint.Y
                                    ? leaderStartPoint.Y + crestedLeader.MinDistanceBetweenPoints
                                    : leaderStartPoint.Y - crestedLeader.MinDistanceBetweenPoints,
                                newPoint.Z);
@@ -230,7 +240,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            bool isValidPoint =
                                !(newPoint.Y.Equals(leaderStartPoint.Y) ||
                                  crestedLeader.LeaderStartPoints.Any(p => p.Equals(newPoint)) ||
-                                 crestedLeader.LeaderEndPoints.Any(p => p.Equals(newPoint) && !p.Equals(leaderEndPoint)));
+                                 crestedLeader.LeaderEndPoints.Any(p =>
+                                     p.Equals(newPoint) && !p.Equals(leaderEndPoint)));
 
                            if (isValidPoint)
                            {
@@ -239,7 +250,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                                var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
 
-                               var vectorToShelfLedgePoint = crestedLeader.ShelfLedgePoint - crestedLeader.ShelfStartPoint;
+                               var vectorToShelfLedgePoint =
+                                   crestedLeader.ShelfLedgePoint - crestedLeader.ShelfStartPoint;
                                var vectorToShelfEndPoint = crestedLeader.ShelfEndPoint - crestedLeader.ShelfLedgePoint;
 
                                if (crestedLeader.ShelfPosition == ShelfPosition.Right)
@@ -362,6 +374,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            crestedLeader.UpdateEntities();
                            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                        }
+                   }
+                   else if (gripData is CrestedLeaderAddLeaderGrip addLeaderGrip)
+                   {
+                       addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
                    }
                    else
                    {
