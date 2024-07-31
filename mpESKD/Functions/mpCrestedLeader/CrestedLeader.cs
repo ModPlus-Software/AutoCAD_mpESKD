@@ -510,22 +510,44 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         // Ширина самого широкого текста (верхнего или нижнего)
         var textWidth = CreateText(scale);
-
+        
+        /*
         var vectorToShelfLedge = Vector3d.XAxis * ShelfLedge;
 
-        ShelfLedgePoint = ShelfPosition == ShelfPosition.Right
-            ? ShelfStartPoint + vectorToShelfLedge
-            : ShelfStartPoint - vectorToShelfLedge;
+        Point3d shelfLedgePointOcs;
+        if (IsRotated)
+        {
+            shelfLedgePointOcs = ShelfPosition == ShelfPosition.Right
+                ? (ShelfStartPointOCS + vectorToShelfLedge).RotateByBlock(this)
+                : (ShelfStartPointOCS - vectorToShelfLedge).RotateByBlock(this);
+        }
+        else
+        {
+            shelfLedgePointOcs = ShelfPosition == ShelfPosition.Right
+                    ? ShelfStartPointOCS + vectorToShelfLedge
+                    : ShelfStartPointOCS - vectorToShelfLedge;
+        } 
+
+        ShelfLedgePoint = InsertionPoint + (shelfLedgePointOcs - InsertionPointOCS);
+        */
+
+        ShelfLedgePoint = this.GetShelfLedgePoint();
 
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
         var vectorToShelfEndpoint = Vector3d.XAxis * ((TextIndent * scale) + textWidth);
-
+        
+        /*
         ShelfEndPoint = ShelfPosition == ShelfPosition.Right
             ? ShelfLedgePoint + vectorToShelfEndpoint
             : ShelfLedgePoint - vectorToShelfEndpoint;
+        */
+
+        ShelfEndPoint = this.GetShelfEndPoint(textWidth);
 
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
+
+
 
         var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(ShelfLedgePointOCS, ShelfEndPointOCS);
 
@@ -595,20 +617,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 var intersectPointOcs3d = intersectPointOcs.Value.ToPoint3d();
 
+                
                 var leaderStartPoint = InsertionPoint + (intersectPointOcs3d - InsertionPointOCS);
 
                 //this.ToLogAnyString($"CreateLeaderLines():  IsRotated: {IsRotated.ToString()}");
                 if (IsRotated)
                 {
-                   // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
-                   // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
+                    // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
+                    // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
 
-                    var blockRotation = Rotation;
-                    var blockRotationMatrix = Matrix3d.Rotation(blockRotation, Vector3d.ZAxis, InsertionPointOCS);
-
-                    leaderStartPoint = InsertionPoint + (intersectPointOcs3d.TransformBy(blockRotationMatrix) - InsertionPointOCS);
+                    leaderStartPoint = InsertionPoint + (intersectPointOcs3d.RotateByBlock(this) - InsertionPointOCS);
                 }
-
 
                 LeaderStartPoints.Add(leaderStartPoint);
 
@@ -905,4 +924,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     }
 
     #endregion
+
+ 
+
+    
 }
