@@ -14,6 +14,8 @@ using Grips;
 using ModPlusAPI.Windows;
 using Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
+using mpESKD.Functions.mpRevisionMark.Grips;
+using mpESKD.Functions.mpRevisionMark;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
@@ -101,6 +103,17 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     };
 
                     grips.Add(addLeaderGrip);
+
+                    for (int i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
+                    {
+                        var removeLeaderGripPoint =
+                        crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+
+                        grips.Add(new CrestedLeaderLeaderRemoveGrip(crestedLeader, i)
+                        {
+                            GripPoint = removeLeaderGripPoint
+                        });
+                    }
                 }
             }
         }
