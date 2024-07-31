@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -262,7 +263,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                        crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                    }
                    else if (gripData is CrestedLeaderStartPointLeaderGrip leaderStartGrip)
-
                    {
                        var crestedLeader = leaderStartGrip.CrestedLeader;
 
@@ -280,117 +280,59 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                              newPoint.Equals(crestedLeader.ShelfLedgePoint) ||
                                              newPoint.Equals(crestedLeader.ShelfEndPoint));
 
-
                        if (isValidPoint)
                        {
-                           LogData.ToLogAnyString(crestedLeader, "Is Valid point");
-
+                           var vectorToShelfEndPoint = crestedLeader.ShelfEndPoint - crestedLeader.ShelfLedgePoint;
+                           var vectorToShelfLedgePoint = crestedLeader.ShelfLedgePoint - crestedLeader.ShelfStartPoint;
 
                            var tempLineStartPoint = new Point3d(newPoint.X, leaderStartPoint.Y, leaderStartPoint.Z);
 
-                           /*
-                            if (crestedLeader.LeaderStartPoints.Any(p => p.X.Equals(tempLineStartPoint.X)) ||
-                                tempLineStartPoint.X.Equals(crestedLeader.InsertionPoint.Y) ||
-                                tempLineStartPoint.X.Equals(crestedLeader.ShelfLedgePoint.Y) ||
-                                tempLineStartPoint.X.Equals(crestedLeader.ShelfEndPoint.Y))
-                            {
-                                tempLineStartPoint = new Point3d(
-                                    tempLineStartPoint.X + crestedLeader.MinDistanceBetweenPoints,
-                                    tempLineStartPoint.Y,
-                                    tempLineStartPoint.Z);
-                            }*/
-
                            crestedLeader.LeaderStartPoints[leaderStartGrip.GripIndex] = tempLineStartPoint;
 
-                           crestedLeader.LeaderEndPoints[leaderStartGrip.GripIndex] =
-                               tempLineStartPoint + (leaderEndPoint - leaderStartPoint);
+                           var vectorTempLineToEndPoint = leaderEndPoint - leaderStartPoint;
+                           crestedLeader.LeaderEndPoints[leaderStartGrip.GripIndex] = tempLineStartPoint + vectorTempLineToEndPoint;
 
-                           // Далее поиск ShelfStartPoint, BoundEndPoint
+                           // Список векторов от начал к концам выносок
+                           List<Vector3d> vectorsToEndPoint = crestedLeader.LeaderStartPoints
+                               .Select((t, i) => crestedLeader.LeaderEndPoints[i] - t).ToList();
 
-                           // пользоваться нельзя, т.к. данные в LeaderStartPoints обновятся после Update
-                           // использовать tempLineStartPoint 
                            var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
 
-                           var vectorToShelfLedgePoint = crestedLeader.ShelfLedgePoint - crestedLeader.ShelfStartPoint;
-                           var vectorToShelfEndPoint = crestedLeader.ShelfEndPoint - crestedLeader.ShelfLedgePoint;
-
-                           var vectorTempLineToStartPoint = leaderStartPoint - leaderEndPoint;
-
-                           // Список концов 
-
-                           if (crestedLeader.ShelfPosition == ShelfPosition.Right)
+                           // Список концов выносок, с учетом нового положения перемещаемой выноски
+                           List<Point3d> leaderEndPointsSort = new();
+                           for (int i = 0; i < leaderStartPointsSort.Count; i++)
                            {
-                               if (tempLineStartPoint.X > crestedLeader.InsertionPoint.X)
+                               foreach (var endPoint in crestedLeader.LeaderEndPoints)
                                {
-                                   crestedLeader.ShelfStartPoint = tempLineStartPoint;
-                               }
-                               else
-                               {
-                                   crestedLeader.ShelfStartPoint = leaderStartPointsSort.Last();
-                               }
+                                   var vectorToEndPoint = endPoint - leaderStartPointsSort[i];
 
-                               foreach (var leaderEndPt in crestedLeader.LeaderEndPoints)
-                               {
-                                   if (tempLineStartPoint.Equals(leaderStartPointsSort.Last()) &&
-                                       (leaderEndPt + vectorTempLineToStartPoint).Equals(
-                                           tempLineStartPoint))
+                                   if (vectorsToEndPoint.Any(v => v.Equals(vectorToEndPoint)))
                                    {
-                                       crestedLeader.BoundEndPoint = leaderEndPt;
+                                       leaderEndPointsSort.Add(endPoint);
+                                       break;
                                    }
                                }
                            }
-                           else // ShelfPosition.Left
-                           {
-                               if (tempLineStartPoint.X < crestedLeader.InsertionPoint.X)
-                               {
-                                   crestedLeader.ShelfStartPoint = tempLineStartPoint;
-                               }
-                               else
-                               {
-                                   crestedLeader.ShelfStartPoint = leaderStartPointsSort.First();
-                               }
 
-                               foreach (var leaderEndPt in crestedLeader.LeaderEndPoints)
-                               {
-                                   if (tempLineStartPoint.Equals(leaderStartPointsSort.First()) &&
-                                       (leaderEndPt + vectorTempLineToStartPoint).Equals(
-                                           tempLineStartPoint))
-                                   {
-                                       crestedLeader.BoundEndPoint = leaderEndPt;
-                                   }
-                               }
+                           if (crestedLeader.ShelfPosition == ShelfPosition.Right)
+                           {
+                               crestedLeader.ShelfStartPoint = leaderStartPointsSort.Last();
+                               crestedLeader.BoundEndPoint = leaderEndPointsSort.Last();
+                           }
+                           else 
+                           {
+                               crestedLeader.ShelfStartPoint = leaderStartPointsSort.First();
+                               crestedLeader.BoundEndPoint = leaderEndPointsSort.First();
                            }
 
                            crestedLeader.ShelfLedgePoint = crestedLeader.ShelfStartPoint + vectorToShelfLedgePoint;
                            crestedLeader.ShelfEndPoint = crestedLeader.ShelfLedgePoint + vectorToShelfEndPoint;
-
-                           //else
-                           // {
-                           //     crestedLeader.LeaderStartPoints[leaderStartGrip.GripIndex] = leaderStartPoint;
-
-                           //     crestedLeader.LeaderEndPoints[leaderStartGrip.GripIndex] = leaderEndPoint;
-
-                           // }
 
                            crestedLeader.IsFirst = true;
                            crestedLeader.IsLeaderPointMovedByOverrule = true;
 
                            crestedLeader.UpdateEntities();
                            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                           // LogData.ToLogAnyString(crestedLeader, $"InsertionPoint: {crestedLeader.InsertionPoint.ToString()}");
-                           // LogData.ToLogAnyString(crestedLeader, $"leaderStartPointsSort.Last: {leaderStartPointsSort.Last().ToString()}");
-
-                           if (crestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()))
-                           {
-                               LogData.ToLogAnyString(crestedLeader, $"InsertionPoint =" +
-                                                                     $" leaderStartPointsSort.Last()");
-                           }
-                           else
-                           {
-                               LogData.ToLogAnyString(crestedLeader, $"InsertionPoint !=" +
-                                                                     $" leaderStartPointsSort.Last()");
-                           }
                        }
                    }
                    else

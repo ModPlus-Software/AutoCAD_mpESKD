@@ -61,55 +61,13 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
         {
             using (CrestedLeader)
             {
-                /*
-                // Сохранить начала выносок
-                List<Point3d> leaderStartPointsTmp = new();
-                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
-
-                // Сохранить концы выносок
-                List<Point3d> leaderEndPointsTmp = new();
-                leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
-
-                var boundEndPointTmp = CrestedLeader.BoundEndPoint;
-
-                CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-
-                    // перемещение точки вставки в точку первой точки полки
-                    ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
-
-                    using (var resBuf = CrestedLeader.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
-                }
-                
-                CrestedLeader.LeaderStartPoints.Clear();
-                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
-
-                CrestedLeader.LeaderEndPoints.Clear();
-                CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
-
-                CrestedLeader.BoundEndPoint = boundEndPointTmp;
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-                */
-
                 var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
 
+                // Если требуется переместить точку вставки
                 if (!(CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) &&
-                     CrestedLeader.ShelfPosition == ShelfPosition.Right) 
+                      CrestedLeader.ShelfPosition == ShelfPosition.Right)
                     ||
-                    (!CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()) && 
+                    (!CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()) &&
                      CrestedLeader.ShelfPosition == ShelfPosition.Left))
                 {
                     // Сохранить начала выносок
@@ -123,9 +81,6 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
                     var boundEndPointTmp = CrestedLeader.BoundEndPoint;
 
                     CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
-
-                    //CrestedLeader.IsFirst = true;
-                    //CrestedLeader.IsLeaderPointMovedByOverrule = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -153,13 +108,8 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
 
                     CrestedLeader.BoundEndPoint = boundEndPointTmp;
 
-                //CrestedLeader.IsFirst = true;
-                //CrestedLeader.IsLeaderPointMovedByOverrule = true;
-
-                CrestedLeader.UpdateEntities();
+                    CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                    CrestedLeader.ToLogAnyString($"CrestedLeaderStartPointLeaderGrip: OnGripStatusChanged: !!! InsPoint moved");
                 }
 
                 using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
@@ -172,8 +122,6 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
 
                     tr.Commit();
                 }
-
-
             }
         }
 
