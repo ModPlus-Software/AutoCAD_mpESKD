@@ -384,6 +384,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 if (IsFirst)
                 {
+                    this.ToLogAnyString(" is First");
+
                     _unionLine = null;
                     _shelfLine = null;
                     _shelf = null;
@@ -414,11 +416,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     _bottomText = null;
 
+                    this.ToLogAnyString(" is First 1");
+
                     if (!IsLeaderPointMovedByOverrule)
                     {
                         var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
                         BoundEndPoint = leaderBound.EndPoint;
                     }
+
+                    this.ToLogAnyString(" is First 2");
 
                     PrevShelfPosition = ShelfPosition;
 
@@ -427,13 +433,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
                 else
                 {
+                    this.ToLogAnyString("No First");
+
                     CreateEntities(scale);
                 }
             }
         }
         catch (Exception exception)
         {
-            ExceptionBox.Show(exception);
+            // todo
+            //ExceptionBox.Show(exception);
+            this.ToLogErr("", "Update", exception);
         }
     }
 

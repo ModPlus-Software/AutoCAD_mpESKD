@@ -96,24 +96,33 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                     var addLeaderGrip = new CrestedLeaderAddLeaderGrip(crestedLeader)
                     {
-                        GripPoint = new Point3d(
-                            crestedLeader.ShelfLedgePoint.X,
-                            crestedLeader.ShelfLedgePoint.Y - crestedLeader.MinDistanceBetweenPoints*3*crestedLeader.GetScale(),
-                            crestedLeader.ShelfLedgePoint.Z)
+                        
+                        GripPoint = crestedLeader.ShelfLedgePoint - (Vector3d.YAxis * 20 * curViewUnitSize)
                     };
 
                     grips.Add(addLeaderGrip);
 
-                    for (int i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
-                    {
-                        var removeLeaderGripPoint =
-                        crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
 
-                        grips.Add(new CrestedLeaderLeaderRemoveGrip(crestedLeader, i)
+                    if (crestedLeader.LeaderStartPoints.Count > 1)
+                    {
+                        for (int i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
                         {
-                            GripPoint = removeLeaderGripPoint
-                        });
+                            var removeLeaderGripPoint =
+                            crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+
+                            grips.Add(new CrestedLeaderLeaderRemoveGrip(crestedLeader, i)
+                            {
+                                GripPoint = removeLeaderGripPoint
+                            });
+                        }
                     }
+
+                    var shelfPositionGrip = new CrestedLeaderShelfPositionGrip(crestedLeader)
+                    {
+                        GripPoint = crestedLeader.ShelfLedgePoint + (Vector3d.YAxis * 20 * curViewUnitSize)
+                    };
+
+                    grips.Add(shelfPositionGrip);
                 }
             }
         }

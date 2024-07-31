@@ -1,10 +1,15 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿using Autodesk.AutoCAD.Geometry;
+
+namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// Ручка вершин
@@ -43,22 +48,113 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
     {
         using (CrestedLeader)
         {
-            CrestedLeader.LeaderStartPoints.RemoveAt(GripIndex);
-            CrestedLeader.LeaderEndPoints.RemoveAt(GripIndex);
-
-            CrestedLeader.UpdateEntities();
-            CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-            using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+            if (CrestedLeader.LeaderStartPoints.Count > 1)
             {
-                var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                var checkPoint = CrestedLeader.LeaderStartPoints[GripIndex];
 
-                using (var resBuf = CrestedLeader.GetDataForXData())
+                CrestedLeader.LeaderStartPoints.RemoveAt(GripIndex);
+                CrestedLeader.LeaderEndPoints.RemoveAt(GripIndex);
+
+                if (checkPoint.Equals(CrestedLeader.InsertionPoint))
                 {
-                    blkRef.XData = resBuf;
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+                    //if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                    //{
+                    //    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                    //}
+                    //else
+                    //{
+                    //    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+                    //}
+
+                    // Сохранить начала выносок
+                    List<Point3d> leaderStartPointsTmp = new();
+                    leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+
+                    // Сохранить концы выносок
+                    List<Point3d> leaderEndPointsTmp = new();
+                    leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
+
+                    Point3d shelfStartPoint;
+                    Point3d shelfLedgePoint;
+                    Point3d shelfEndPoint;
+
+                    var distanceStartToLedge = Math.Abs(CrestedLeader.ShelfStartPoint.X - CrestedLeader.ShelfLedgePoint.X);
+                    var distanceLedgeToEnd = Math.Abs(CrestedLeader.ShelfLedgePoint.X - CrestedLeader.ShelfEndPoint.X);
+
+                    if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                    {
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+
+                        shelfStartPoint = CrestedLeader.InsertionPoint;
+                        shelfLedgePoint = shelfStartPoint + (Vector3d.XAxis * distanceStartToLedge);
+                        shelfEndPoint = shelfLedgePoint + (Vector3d.XAxis * distanceLedgeToEnd);
+                    }
+                    else
+                    {
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+
+                        shelfStartPoint = CrestedLeader.InsertionPoint;
+                        shelfLedgePoint = shelfStartPoint - (Vector3d.XAxis * distanceStartToLedge);
+                        shelfEndPoint = shelfLedgePoint - (Vector3d.XAxis * distanceLedgeToEnd);
+                    }
+
+                    var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
+                    CrestedLeader.BoundEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+                    var boundEndPointTmp = CrestedLeader.BoundEndPoint;
+
+                    CrestedLeader.IsFirst = true;
+                    CrestedLeader.IsLeaderPointMovedByOverrule = true;
+
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                    {
+                        var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
+                        // перемещение точки вставки в точку первой точки полки
+                        ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                        using (var resBuf = CrestedLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
+                    }
+
+                    CrestedLeader.LeaderStartPoints.Clear();
+                    CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+
+                    CrestedLeader.LeaderEndPoints.Clear();
+                    CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
+
+                    CrestedLeader.ShelfStartPoint = shelfStartPoint;
+                    CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
+                    CrestedLeader.ShelfEndPoint = shelfEndPoint;
+
+                    CrestedLeader.BoundEndPoint = boundEndPointTmp;
+
+                    CrestedLeader.IsFirst = true;
+                    CrestedLeader.IsLeaderPointMovedByOverrule = true;
                 }
 
-                tr.Commit();
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
+                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    {
+                        blkRef.XData = resBuf;
+                    }
+
+                    tr.Commit();
+                }
             }
         }
 
