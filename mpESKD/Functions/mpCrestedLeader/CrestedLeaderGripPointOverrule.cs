@@ -145,7 +145,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                {
                    if (gripData is CrestedLeaderGrip insertGrip)
                    {
-                       var crestedLeader = insertGrip.CrestedLeader;
+                        var crestedLeader = insertGrip.CrestedLeader;
+                        crestedLeader.ToLogAnyString("MoveGripPointsAt: CrestedLeaderGrip");
 
                        if (insertGrip.GripIndex == 0)
                        {
@@ -223,7 +224,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                    else if (gripData is CrestedLeaderShelfMoveGrip shelfMoveGrip)
                    {
                        var crestedLeader = shelfMoveGrip.CrestedLeader;
-                       shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
+                       crestedLeader.ToLogAnyString("MoveGripPointsAt: CrestedLeaderShelfMoveGrip");
+
+                        shelfMoveGrip.NewPoint = shelfMoveGrip.GripPoint + offset;
 
                        ShelfActions.ShelfPositionMove(ref crestedLeader, shelfMoveGrip.NewPoint);
 
@@ -233,8 +236,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                    else if (gripData is CrestedLeaderEndPointLeaderGrip leaderEndGrip)
                    {
                        var crestedLeader = leaderEndGrip.CrestedLeader;
+                       crestedLeader.ToLogAnyString("MoveGripPointsAt: CrestedLeaderEndPointLeaderGrip");
 
-                       leaderEndGrip.NewPoint = leaderEndGrip.GripPoint + offset;
+                        leaderEndGrip.NewPoint = leaderEndGrip.GripPoint + offset;
                        var newPoint = leaderEndGrip.NewPoint;
 
 
@@ -327,8 +331,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                    else if (gripData is CrestedLeaderStartPointLeaderGrip leaderStartGrip)
                    {
                        var crestedLeader = leaderStartGrip.CrestedLeader;
-
-                       leaderStartGrip.NewPoint = leaderStartGrip.GripPoint + offset;
+                       crestedLeader.ToLogAnyString("MoveGripPointsAt: CrestedLeaderStartPointLeaderGrip");
+                        leaderStartGrip.NewPoint = leaderStartGrip.GripPoint + offset;
                        var newPoint = leaderStartGrip.NewPoint;
 
                        bool isValidPoint = !(crestedLeader.LeaderStartPoints.Any(p => p.Equals(newPoint)) ||
@@ -399,7 +403,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                    }
                    else if (gripData is CrestedLeaderAddLeaderGrip addLeaderGrip)
                    {
-                       addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                       addLeaderGrip.CrestedLeader.ToLogAnyString("MoveGripPointsAt: CrestedLeaderShelfMoveGrip");
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
                    }
                    else
                    {

@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Geometry;
 using ControlzEx.Standard;
 using mpESKD.Base.Abstractions;
 using mpESKD.Base.Enums;
+using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -27,6 +28,21 @@ internal static class SmartRotations
         return Matrix3d.Rotation(smartEntity.Rotation, Vector3d.ZAxis, smartEntity.InsertionPointOCS);
     }
 
+    internal static Point3d GetLeaderStartPoint(this CrestedLeader crestedLeader, Point2d? leaderStartPointOcs)
+    {
+        var intersectPointOcs3d = leaderStartPointOcs.Value.ToPoint3d();
+
+        if (crestedLeader.IsRotated)
+        {
+            // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
+            // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
+
+            return crestedLeader.InsertionPoint + 
+                (intersectPointOcs3d.RotateByBlock(crestedLeader) - crestedLeader.InsertionPointOCS);
+        }
+
+        return crestedLeader.InsertionPoint + (intersectPointOcs3d - crestedLeader.InsertionPointOCS);
+    }
 
     internal static Point3d GetShelfLedgePoint(this CrestedLeader crestedLeader)
     {
@@ -70,5 +86,4 @@ internal static class SmartRotations
 
         return crestedLeader.InsertionPoint + (shelfEndPointOcs - crestedLeader.InsertionPointOCS);
     }
-
 }

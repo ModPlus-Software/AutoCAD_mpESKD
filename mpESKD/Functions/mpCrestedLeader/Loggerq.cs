@@ -37,7 +37,8 @@ public static class LogData
 {
     public static void ToLogAnyString(this ISmartEntity smart, string str = "")
     {
-        Loggerq.WriteRecord($"smart: {smart.GetType().Name}, mess: {str}");
+        //Loggerq.WriteRecord($"smart: {smart.GetType().Name}, mess: {str}");
+        Loggerq.WriteRecord($"{str}");
     }
 
     public static void ToLogAnyStringFromPoint3dList(this ISmartEntity smart, List<Point3d> points,  string str = "")
@@ -53,6 +54,28 @@ public static class LogData
 
     public static void ToLogErr(this ISmartEntity smart, string className, string metodName, Exception exception)
     {
-        Loggerq.WriteRecord($"smart: {smart.GetType().Name}, class: {className}, metod: {metodName} ERROR = {exception.StackTrace}");
+        Loggerq.WriteRecord($"class: {className}, metod: {metodName} ERROR = {exception.StackTrace}");
+    }
+
+
+    public static void ToLogAnyStringFromPoint3d(this ISmartEntity smart, Point3d point, string pointName)
+    {
+        var spLim = 25;
+        // Console.WriteLine("{0,-20} {1,5:N1}", names[counter], hours[counter]);
+
+        var x = Math.Round(point.X, 3, MidpointRounding.AwayFromZero);
+        var y = Math.Round(point.Y, 3, MidpointRounding.AwayFromZero);
+
+        var name = pointName + ":";
+        var pt = $"{x} , {y}";
+
+        // var str = $"{name,-50} {pt,0}";
+
+        var spCount = spLim - name.Length;
+
+        var sp = new string(' ', spCount);
+
+        var str = $"{name}{sp}{pt}";
+        Loggerq.WriteRecord(str);
     }
 }

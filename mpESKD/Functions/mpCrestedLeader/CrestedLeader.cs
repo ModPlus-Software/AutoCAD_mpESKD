@@ -1,4 +1,6 @@
-﻿#pragma warning disable SA1000
+﻿using System.Runtime.CompilerServices;
+
+#pragma warning disable SA1000
 namespace mpESKD.Functions.mpCrestedLeader;
 
 using System;
@@ -141,7 +143,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
-    public int NoValidPointIndex { get; set; } =  -1;
+    public Point3d BaseSecondPoint => InsertionPoint + (BaseSecondPointOCS - InsertionPointOCS);
+
+    public Point3d BaseSecondPointOCS =>
+        (InsertionPointOCS + Vector3d.XAxis).TransformBy(Matrix3d.Rotation(Rotation, Vector3d.ZAxis, InsertionPointOCS));
 
     #endregion
 
@@ -282,6 +287,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     {
         try
         {
+            /*
+            this.ToLogAnyString("UPDATE START \n");
+
+            this.ToLogAnyString($"Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
+            this.ToLogAnyString($"Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
+            this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
+            this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
+            this.ToLogAnyStringFromPoint3d(BaseSecondPoint, "BaseSecondPoint");
+            this.ToLogAnyStringFromPoint3d(BaseSecondPointOCS, "BaseSecondPointOCS");
+            this.ToLogAnyString("\n");*/
+
             var scale = GetScale();
 
             if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
@@ -308,6 +324,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 if (IsChangeShelfPosition && IsShelfPointMovedByGrip)
                 {
+                    this.ToLogAnyString("Update Shelf moving");
+
                     var leaderStartPointsSort = LeaderStartPoints.OrderBy(p => p.X);
 
                     var widthText = CreateText(scale);
@@ -385,7 +403,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 if (IsFirst)
                 {
-                    this.ToLogAnyString(" is First");
+                    this.ToLogAnyString("Update isFirst");
 
                     _unionLine = null;
                     _shelfLine = null;
@@ -417,15 +435,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     _bottomText = null;
 
-                    this.ToLogAnyString(" is First 1");
-
                     if (!IsLeaderPointMovedByOverrule)
                     {
                         var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPoint));
                         BoundEndPoint = leaderBound.EndPoint;
                     }
-
-                    this.ToLogAnyString(" is First 2");
 
                     PrevShelfPosition = ShelfPosition;
 
@@ -434,11 +448,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
                 else
                 {
-                    this.ToLogAnyString("No First");
-
+                    this.ToLogAnyString("Update Normal");
                     CreateEntities(scale);
                 }
             }
+
+            this.ToLogAnyString("UPDATE END \n");
+            this.ToLogAnyString(".\n");
         }
         catch (Exception exception)
         {
@@ -609,15 +625,18 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 var intersectPointOcs = Intersections.GetIntersectionBetweenVectors(
                     InsertionPointOCS.ToPoint2d(),
                     Vector2d.XAxis,
+                    // todo Добавить свойство для контроля средней линии (точку)
                     LeaderEndPointsOCS[i].ToPoint2d(),
                     newLeaderVector);
 
                 if (intersectPointOcs == null)
                     continue;
 
+
+                /*
+
                 var intersectPointOcs3d = intersectPointOcs.Value.ToPoint3d();
 
-                
                 var leaderStartPoint = InsertionPoint + (intersectPointOcs3d - InsertionPointOCS);
 
                 //this.ToLogAnyString($"CreateLeaderLines():  IsRotated: {IsRotated.ToString()}");
@@ -630,13 +649,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
 
                 LeaderStartPoints.Add(leaderStartPoint);
+                */
 
-                if (intersectPointOcs3d.Equals(LeaderEndPointsOCS[i]))
+                LeaderStartPoints.Add(this.GetLeaderStartPoint(intersectPointOcs));
+
+                // Если выноска нулевой длины - не создаем ее
+                if (intersectPointOcs.Value.Equals(LeaderEndPointsOCS[i]))
                 {
                     continue;
                 }
 
-                _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
+                _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
             }
         }
 
