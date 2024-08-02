@@ -145,8 +145,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     public Point3d BaseSecondPoint => InsertionPoint + (BaseSecondPointOCS - InsertionPointOCS);
 
-    public Point3d BaseSecondPointOCS =>
-        (InsertionPointOCS + Vector3d.XAxis).TransformBy(Matrix3d.Rotation(Rotation, Vector3d.ZAxis, InsertionPointOCS));
+    //public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).TransformBy(Matrix3d.Rotation(Rotation, Vector3d.ZAxis, InsertionPointOCS));
+    public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).RotateByBlock(this);
 
     #endregion
 
@@ -287,16 +287,22 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     {
         try
         {
-            /*
-            this.ToLogAnyString("UPDATE START \n");
+            this.ToLogAnyString(" ");
+            this.ToLogAnyString("[UpdateEntities] START");
 
+            this.ToLogAnyString($"  IsFirst: {IsFirst.ToString()}");
+            this.ToLogAnyString($"  IsLeaderPointMovedByOverrule: {IsLeaderPointMovedByOverrule.ToString()}");
+            /*
             this.ToLogAnyString($"Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
             this.ToLogAnyString($"Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
             this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
             this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
             this.ToLogAnyStringFromPoint3d(BaseSecondPoint, "BaseSecondPoint");
             this.ToLogAnyStringFromPoint3d(BaseSecondPointOCS, "BaseSecondPointOCS");
-            this.ToLogAnyString("\n");*/
+            this.ToLogAnyString("\n");
+            */
+
+            //throw new ArgumentOutOfRangeException();
 
             var scale = GetScale();
 
@@ -403,8 +409,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 if (IsFirst)
                 {
-                    this.ToLogAnyString("Update isFirst");
-
                     _unionLine = null;
                     _shelfLine = null;
                     _shelf = null;
@@ -448,34 +452,40 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
                 else
                 {
-                    this.ToLogAnyString("Update Normal");
+                    this.ToLogAnyString("  Update Normal");
                     CreateEntities(scale);
                 }
             }
 
-            this.ToLogAnyString("UPDATE END \n");
-            this.ToLogAnyString(".\n");
+            this.ToLogAnyString("[UpdateEntities] END");
+            this.ToLogAnyString(".");
         }
         catch (Exception exception)
         {
             // todo
             //ExceptionBox.Show(exception);
-            this.ToLogErr("", "Update", exception);
+            this.ToLogErr("CrestedLeader", "UpdateEntities", exception);
         }
     }
 
     private void CreateEntities(double scale)
     {
+        this.ToLogAnyString(" ");
+        this.ToLogAnyString($"      [CreateEntities] START");
+        this.ToLogAnyString($"          IsBasePointMovedByGrip: {IsBasePointMovedByGrip.ToString()}");
+        this.ToLogAnyString($"          IsBasePointMovedByOverrule: {IsBasePointMovedByOverrule.ToString()}");
+
         _tempLeader = null;
         _unionLine = null;
         _shelfLine = null;
         _shelf = null;
 
-        ShelfStartPoint = InsertionPoint;
 
         // Перетаскивание
         if (!IsBasePointMovedByGrip && IsBasePointMovedByOverrule)
         {
+            this.ToLogAnyString($"          Перетаскивание!  ShelfPosition: {ShelfPosition.ToString()}");
+
             if (!CreateLeaderLines())
             {
                 return;
@@ -492,6 +502,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Перетаскивание выполнено
         else if (IsBasePointMovedByGrip && !IsBasePointMovedByOverrule)
         {
+            this.ToLogAnyString($"          Перетаскивание выполнено!  ShelfPosition: {ShelfPosition.ToString()}");
+
             if (_leaders.Count == 0)
             {
                 return;
@@ -512,6 +524,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Не перетаскивание
         else if (!IsBasePointMovedByGrip && !IsBasePointMovedByOverrule)
         {
+            ShelfStartPoint = InsertionPoint;
+            
             if (!CreateLeaderLines())
             {
                 return;
@@ -521,49 +535,26 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         if (_leaders.Count < 1)
             return;
 
+        // Текст
+        var widthWidestText = CreateText(scale);
+
+
+        // Линии
+
         var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X);
         _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
 
-        // Ширина самого широкого текста (верхнего или нижнего)
-        var textWidth = CreateText(scale);
-        
-        /*
-        var vectorToShelfLedge = Vector3d.XAxis * ShelfLedge;
-
-        Point3d shelfLedgePointOcs;
-        if (IsRotated)
-        {
-            shelfLedgePointOcs = ShelfPosition == ShelfPosition.Right
-                ? (ShelfStartPointOCS + vectorToShelfLedge).RotateByBlock(this)
-                : (ShelfStartPointOCS - vectorToShelfLedge).RotateByBlock(this);
-        }
-        else
-        {
-            shelfLedgePointOcs = ShelfPosition == ShelfPosition.Right
-                    ? ShelfStartPointOCS + vectorToShelfLedge
-                    : ShelfStartPointOCS - vectorToShelfLedge;
-        } 
-
-        ShelfLedgePoint = InsertionPoint + (shelfLedgePointOcs - InsertionPointOCS);
-        */
+        this.ToLogAnyString($"          Перетаскивание!  ShelfPosition: {ShelfPosition.ToString()} Линии");
 
         ShelfLedgePoint = this.GetShelfLedgePoint();
 
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
-        var vectorToShelfEndpoint = Vector3d.XAxis * ((TextIndent * scale) + textWidth);
-        
-        /*
-        ShelfEndPoint = ShelfPosition == ShelfPosition.Right
-            ? ShelfLedgePoint + vectorToShelfEndpoint
-            : ShelfLedgePoint - vectorToShelfEndpoint;
-        */
-
-        ShelfEndPoint = this.GetShelfEndPoint(textWidth);
+        ShelfEndPoint = this.GetShelfEndPoint(widthWidestText);
 
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
 
-
+        // Текст,  положение
 
         var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(ShelfLedgePointOCS, ShelfEndPointOCS);
 
@@ -591,6 +582,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 _bottomTextMask = _bottomText.GetBackgroundMask(TextMaskOffset * scale);
             }
         }
+
+        this.ToLogAnyString("       [CreateEntities] END");
+        this.ToLogAnyString("       .\n");
     }
 
     private bool CreateLeaderLines()
@@ -631,25 +625,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                 if (intersectPointOcs == null)
                     continue;
-
-
-                /*
-
-                var intersectPointOcs3d = intersectPointOcs.Value.ToPoint3d();
-
-                var leaderStartPoint = InsertionPoint + (intersectPointOcs3d - InsertionPointOCS);
-
-                //this.ToLogAnyString($"CreateLeaderLines():  IsRotated: {IsRotated.ToString()}");
-                if (IsRotated)
-                {
-                    // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
-                    // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
-
-                    leaderStartPoint = InsertionPoint + (intersectPointOcs3d.RotateByBlock(this) - InsertionPointOCS);
-                }
-
-                LeaderStartPoints.Add(leaderStartPoint);
-                */
 
                 LeaderStartPoints.Add(this.GetLeaderStartPoint(intersectPointOcs));
 
@@ -947,8 +922,4 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     }
 
     #endregion
-
- 
-
-    
 }

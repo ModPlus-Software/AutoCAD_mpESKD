@@ -50,7 +50,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
     public override string GetTooltip()
     {
         return Language.GetItem("gp2"); // move
-    }
+    } 
 
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)

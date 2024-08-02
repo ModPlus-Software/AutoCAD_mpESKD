@@ -1,4 +1,5 @@
-﻿// todo Добавить  'Выбрать тип стрелки'
+﻿// todo Проблема съезжает полка при перетаскивании основной ручки
+// todo Добавить  'Выбрать тип стрелки'
 // todo Добавить ручку зеркалирования полки
 // todo Добавить ручку выравнивания текста
 
@@ -27,8 +28,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(), true);
 
-        Loggerq.DeleteFile();
-
+        // Loggerq.DeleteFile();
+        Loggerq.WriteRecord("CrestedLeaderFunction: Initialize() * * * * * * * * * * * * * * * * * * * * *");
     }
 
     /// <inheritdoc />
@@ -68,6 +69,9 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     [CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
     public void CreateCrestedLeaderCommand()
     {
+        Loggerq.ClearFile();
+        Loggerq.WriteRecord("CrestedLeaderFunction: CreateCrestedLeaderCommand() * * * * * * * * * * * * *");
+
         CreateCrestedLeader();
     }
 
@@ -167,6 +171,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         shelfStartPoint = crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
                         shelfLedgePoint = crestedLeader.ShelfLedgePoint;
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
+
+                        crestedLeader.IsFirst = true;
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();

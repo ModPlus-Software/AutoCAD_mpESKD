@@ -113,7 +113,7 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                         (!CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()) &&
                          CrestedLeader.ShelfPosition == ShelfPosition.Left))
                     {
-                        CrestedLeader.ToLogAnyString("Insert point move !");
+                        CrestedLeader.ToLogAnyString("CrestedLeaderAddLeaderGrip: OnGripStatusChanged: Insert point move !");
 
                         // Сохранить начала выносок
                         List<Point3d> leaderStartPointsTmp = new();

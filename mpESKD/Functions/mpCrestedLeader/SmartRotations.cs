@@ -19,15 +19,27 @@ internal static class SmartRotations
     {
         var rotationMatrix = smartEntity.GetRotationMatrix();
 
-        return (new Point3d(point.X, point.Y, point.Z)).TransformBy(rotationMatrix);
-        // return point.TransformBy(rotationMatrix);
+        //return (new Point3d(point.X, point.Y, point.Z)).TransformBy(rotationMatrix);
+        return point.TransformBy(rotationMatrix);
     }
 
+    /// <summary>
+    /// Возвращает матрицу для поворота объектов
+    /// </summary>
+    /// <param name="smartEntity">.</param>
+    /// <returns>.</returns>
     internal static Matrix3d GetRotationMatrix(this ISmartEntity smartEntity)
     {
         return Matrix3d.Rotation(smartEntity.Rotation, Vector3d.ZAxis, smartEntity.InsertionPointOCS);
     }
 
+    /// <summary>
+    /// Точка начала полки
+    /// </summary>
+    /// <param name="crestedLeader">.</param>
+    /// <param name="leaderStartPointOcs">.</param>
+    /// <returns>.</returns>
+    /// <remarks>Совпадает с точкой вставки блока смарт объекта</remarks>
     internal static Point3d GetLeaderStartPoint(this CrestedLeader crestedLeader, Point2d? leaderStartPointOcs)
     {
         var intersectPointOcs3d = leaderStartPointOcs.Value.ToPoint3d();
@@ -44,6 +56,11 @@ internal static class SmartRotations
         return crestedLeader.InsertionPoint + (intersectPointOcs3d - crestedLeader.InsertionPointOCS);
     }
 
+    /// <summary>
+    /// Точка отступа полки
+    /// </summary>
+    /// <param name="crestedLeader">.</param>
+    /// <returns>.</returns>
     internal static Point3d GetShelfLedgePoint(this CrestedLeader crestedLeader)
     {
         var vectorToShelfLedge = Vector3d.XAxis * crestedLeader.ShelfLedge;
@@ -57,7 +74,7 @@ internal static class SmartRotations
         }
         else
         {
-            shelfLedgePointOcs = crestedLeader.ShelfPosition == ShelfPosition.Left
+            shelfLedgePointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
                 ? crestedLeader.ShelfStartPointOCS + vectorToShelfLedge
                 : crestedLeader.ShelfStartPointOCS - vectorToShelfLedge;
         }
@@ -65,6 +82,12 @@ internal static class SmartRotations
         return  crestedLeader.InsertionPoint + (shelfLedgePointOcs - crestedLeader.InsertionPointOCS);
     }
 
+    /// <summary>
+    /// Точка конца полки
+    /// </summary>
+    /// <param name="crestedLeader">.</param>
+    /// <param name="textWidth">.</param>
+    /// <returns>.</returns>
     internal static Point3d GetShelfEndPoint(this CrestedLeader crestedLeader, double textWidth)
     {
         var vectorToShelfEndpoint = Vector3d.XAxis * ((crestedLeader.TextIndent * crestedLeader.GetScale()) 
@@ -79,7 +102,7 @@ internal static class SmartRotations
         }
         else
         {
-            shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Left
+            shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
                 ? crestedLeader.ShelfLedgePointOCS + vectorToShelfEndpoint
                 : crestedLeader.ShelfLedgePointOCS - vectorToShelfEndpoint;
         }

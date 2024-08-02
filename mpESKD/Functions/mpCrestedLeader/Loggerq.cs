@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using System.Windows.Media.Media3D;
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base.Abstractions;
-
 namespace mpESKD;
 
+using System.Collections.Generic;
+using Autodesk.AutoCAD.Geometry;
+using Base.Abstractions;
 using System;
 using System.IO;
 
@@ -28,7 +26,18 @@ public static class Loggerq
     {
         if (File.Exists(PathLog))
         {
-            (new FileInfo(PathLog)).Delete();
+            new FileInfo(PathLog).Delete();
+        }
+    }
+
+    public static void ClearFile()
+    {
+        if (File.Exists(PathLog))
+        {
+            FileStream fs = File.Open(PathLog, FileMode.Open, FileAccess.ReadWrite);
+            fs.SetLength(0);
+            fs.Close();
+            fs.Dispose();
         }
     }
 }
@@ -54,7 +63,11 @@ public static class LogData
 
     public static void ToLogErr(this ISmartEntity smart, string className, string metodName, Exception exception)
     {
-        Loggerq.WriteRecord($"class: {className}, metod: {metodName} ERROR = {exception.StackTrace}");
+        Loggerq.WriteRecord($"\nERROR (!) \nclass: {className}, metod: {metodName}" +
+                            $"\nTargetSite: {exception.TargetSite}" +
+                            $"\nStackTrace: {exception.StackTrace}" +
+                            $"\nData: {exception.Data}\n"
+                            );
     }
 
 
