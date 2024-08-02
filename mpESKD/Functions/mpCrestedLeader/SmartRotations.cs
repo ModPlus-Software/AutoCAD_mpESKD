@@ -1,37 +1,36 @@
-﻿
-using Autodesk.AutoCAD.Geometry;
-using ControlzEx.Standard;
-using mpESKD.Base.Abstractions;
-using mpESKD.Base.Enums;
-using mpESKD.Base.Utils;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
-namespace mpESKD.Functions.mpCrestedLeader;
+using Autodesk.AutoCAD.Geometry;
+using Base.Abstractions;
+using Base.Enums;
+using Base.Utils;
+using mpESKD.Base;
+using System.Windows;
 
 internal static class SmartRotations
 {
     /// <summary>
     /// Возвращает точку, повернутую относительно точки вставки блока смарт объекта
     /// </summary>
-    /// <param name="point">Точка до синхронизации с вращением блока смарт объекта</param>
+    /// <param name="point3dOcs">Точка до синхронизации с вращением блока смарт объекта</param>
     /// <param name="smartEntity">Смарт объект</param>
     /// <returns>Новый экземпляр Point3d, соответствующий вращению блока смарт объекта</returns>
-    internal static Point3d RotateByBlock(this Point3d point, ISmartEntity smartEntity)
+    internal static Point3d GetRotatedPointOcsByBlock(this Point3d point3dOcs, ISmartEntity smartEntity)
     {
-        var rotationMatrix = smartEntity.GetRotationMatrix();
+        var rotationMatrix = Matrix3d.Rotation(smartEntity.Rotation, Vector3d.ZAxis, smartEntity.InsertionPointOCS);
 
-        //return (new Point3d(point.X, point.Y, point.Z)).TransformBy(rotationMatrix);
-        return point.TransformBy(rotationMatrix);
+        return point3dOcs.TransformBy(rotationMatrix);
     }
 
-    /// <summary>
-    /// Возвращает матрицу для поворота объектов
-    /// </summary>
-    /// <param name="smartEntity">.</param>
-    /// <returns>.</returns>
-    internal static Matrix3d GetRotationMatrix(this ISmartEntity smartEntity)
+    internal static Point3d GetRotatedPointByBlock(this Point3d point3d, ISmartEntity smartEntity)
     {
-        return Matrix3d.Rotation(smartEntity.Rotation, Vector3d.ZAxis, smartEntity.InsertionPointOCS);
+        var rotationMatrix = Matrix3d.Rotation(smartEntity.Rotation, Vector3d.ZAxis, smartEntity.InsertionPoint);
+
+        return point3d.TransformBy(rotationMatrix);
     }
+
+
+
 
     /// <summary>
     /// Точка начала полки
@@ -46,11 +45,8 @@ internal static class SmartRotations
 
         if (crestedLeader.IsRotated)
         {
-            // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.ToString()}");
-            // this.ToLogAnyString($"CreateLeaderLines():  Rotation: {Rotation.RadiansToDegrees().ToString()}");
-
-            return crestedLeader.InsertionPoint + 
-                (intersectPointOcs3d.RotateByBlock(crestedLeader) - crestedLeader.InsertionPointOCS);
+            return crestedLeader.InsertionPoint +
+                   (intersectPointOcs3d.GetRotatedPointOcsByBlock(crestedLeader) - crestedLeader.InsertionPointOCS);
         }
 
         return crestedLeader.InsertionPoint + (intersectPointOcs3d - crestedLeader.InsertionPointOCS);
@@ -69,8 +65,8 @@ internal static class SmartRotations
         if (crestedLeader.IsRotated)
         {
             shelfLedgePointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
-                ? (crestedLeader.ShelfStartPointOCS + vectorToShelfLedge).RotateByBlock(crestedLeader)
-                : (crestedLeader.ShelfStartPointOCS - vectorToShelfLedge).RotateByBlock(crestedLeader);
+                ? (crestedLeader.ShelfStartPointOCS + vectorToShelfLedge).GetRotatedPointOcsByBlock(crestedLeader)
+                : (crestedLeader.ShelfStartPointOCS - vectorToShelfLedge).GetRotatedPointOcsByBlock(crestedLeader);
         }
         else
         {
@@ -79,7 +75,7 @@ internal static class SmartRotations
                 : crestedLeader.ShelfStartPointOCS - vectorToShelfLedge;
         }
 
-        return  crestedLeader.InsertionPoint + (shelfLedgePointOcs - crestedLeader.InsertionPointOCS);
+        return crestedLeader.InsertionPoint + (shelfLedgePointOcs - crestedLeader.InsertionPointOCS);
     }
 
     /// <summary>
@@ -90,15 +86,15 @@ internal static class SmartRotations
     /// <returns>.</returns>
     internal static Point3d GetShelfEndPoint(this CrestedLeader crestedLeader, double textWidth)
     {
-        var vectorToShelfEndpoint = Vector3d.XAxis * ((crestedLeader.TextIndent * crestedLeader.GetScale()) 
+        var vectorToShelfEndpoint = Vector3d.XAxis * ((crestedLeader.TextIndent * crestedLeader.GetScale())
                                                       + textWidth);
 
         Point3d shelfEndPointOcs;
         if (crestedLeader.IsRotated)
         {
             shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
-                ? (crestedLeader.ShelfLedgePointOCS + vectorToShelfEndpoint).RotateByBlock(crestedLeader)
-                : (crestedLeader.ShelfLedgePointOCS - vectorToShelfEndpoint).RotateByBlock(crestedLeader);
+                ? (crestedLeader.ShelfLedgePointOCS + vectorToShelfEndpoint).GetRotatedPointOcsByBlock(crestedLeader)
+                : (crestedLeader.ShelfLedgePointOCS - vectorToShelfEndpoint).GetRotatedPointOcsByBlock(crestedLeader);
         }
         else
         {
@@ -108,5 +104,20 @@ internal static class SmartRotations
         }
 
         return crestedLeader.InsertionPoint + (shelfEndPointOcs - crestedLeader.InsertionPointOCS);
+    }
+
+
+    internal static Point3d GetRotatePointToXaxis(this Point3d point, CrestedLeader crestedLeader)
+    {
+        var rotationMatrix = Matrix3d.Rotation(-crestedLeader.Rotation, Vector3d.ZAxis, crestedLeader.InsertionPoint);
+
+        return point.TransformBy(rotationMatrix);
+    }
+
+    internal static Point3d GetRotatePointOcsToXaxis(this Point3d pointOcs, CrestedLeader crestedLeader)
+    {
+        var rotationMatrix = Matrix3d.Rotation(-crestedLeader.Rotation, Vector3d.ZAxis, crestedLeader.InsertionPointOCS);
+
+        return pointOcs.TransformBy(rotationMatrix);
     }
 }

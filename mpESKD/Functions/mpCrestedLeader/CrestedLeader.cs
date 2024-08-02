@@ -143,10 +143,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
-    public Point3d BaseSecondPoint => InsertionPoint + (BaseSecondPointOCS - InsertionPointOCS);
+    // public Point3d BaseSecondPoint => InsertionPoint + (BaseSecondPointOCS - InsertionPointOCS);
 
     //public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).TransformBy(Matrix3d.Rotation(Rotation, Vector3d.ZAxis, InsertionPointOCS));
-    public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).RotateByBlock(this);
+    // public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).GetRotatedPointOcsByBlock(this);
+
+    public Point3d BaseSecondPoint => (InsertionPoint + Vector3d.XAxis).GetRotatedPointByBlock(this);
+    public Point3d BaseSecondPointOCS  => BaseSecondPoint.TransformBy(BlockTransform.Inverse());
 
     #endregion
 
@@ -292,7 +295,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             this.ToLogAnyString($"  IsFirst: {IsFirst.ToString()}");
             this.ToLogAnyString($"  IsLeaderPointMovedByOverrule: {IsLeaderPointMovedByOverrule.ToString()}");
-            /*
+            
             this.ToLogAnyString($"Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
             this.ToLogAnyString($"Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
             this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
@@ -300,7 +303,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             this.ToLogAnyStringFromPoint3d(BaseSecondPoint, "BaseSecondPoint");
             this.ToLogAnyStringFromPoint3d(BaseSecondPointOCS, "BaseSecondPointOCS");
             this.ToLogAnyString("\n");
-            */
+            
 
             //throw new ArgumentOutOfRangeException();
 
@@ -480,7 +483,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _shelfLine = null;
         _shelf = null;
 
-
         // Перетаскивание
         if (!IsBasePointMovedByGrip && IsBasePointMovedByOverrule)
         {
@@ -538,19 +540,35 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Текст
         var widthWidestText = CreateText(scale);
 
-
         // Линии
 
         var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X);
         _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
 
-        this.ToLogAnyString($"          Перетаскивание!  ShelfPosition: {ShelfPosition.ToString()} Линии");
+        // this.ToLogAnyString($"          Перетаскивание!  ShelfPosition: {ShelfPosition.ToString()} Линии");
 
         ShelfLedgePoint = this.GetShelfLedgePoint();
 
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
         ShelfEndPoint = this.GetShelfEndPoint(widthWidestText);
+        //this.ToLogAnyString($"          ShelfEndPoint: {ShelfEndPoint.ToString()}");
+        //this.ToLogAnyString($"          ShelfEndPointOCS: {ShelfEndPointOCS.ToString()}");
+
+        //ShelfEndPoint = ShelfEndPoint.GetBackRotatedShelfEndPoint(this);
+
+        //ShelfEndPoint = SmartRotations.GetRotatePointToXaxis(ShelfEndPoint, this);
+        ShelfEndPoint = ShelfEndPoint.GetRotatePointToXaxis(this);
+
+        /*
+        this.ToLogAnyString($"          Done back rotation of ShelfEndPoint");
+        this.ToLogAnyString($"          InsertionPoint: {InsertionPoint.ToString()}");
+        this.ToLogAnyString($"          InsertionPointOCS: {InsertionPointOCS.ToString()}");
+        this.ToLogAnyString($"          ShelfEndPoint: {ShelfEndPoint.ToString()}");
+        this.ToLogAnyString($"          ShelfEndPointOCS: {ShelfEndPointOCS.ToString()}");
+        */
+
+        //TestInverseRotationOfPoint(ShelfEndPoint, this);
 
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
 
@@ -922,4 +940,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     }
 
     #endregion
+
+
+
 }
