@@ -143,11 +143,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public Point3d BoundEndPoint { get; set; }
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
-    // public Point3d BaseSecondPoint => InsertionPoint + (BaseSecondPointOCS - InsertionPointOCS);
-
-    //public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).TransformBy(Matrix3d.Rotation(Rotation, Vector3d.ZAxis, InsertionPointOCS));
-    // public Point3d BaseSecondPointOCS => (InsertionPointOCS + Vector3d.XAxis).GetRotatedPointOcsByBlock(this);
-
     public Point3d BaseSecondPoint => (InsertionPoint + Vector3d.XAxis).GetRotatedPointByBlock(this);
     public Point3d BaseSecondPointOCS  => BaseSecondPoint.TransformBy(BlockTransform.Inverse());
 
@@ -288,23 +283,23 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc/>
     public override void UpdateEntities()
     {
-        try
-        {
             this.ToLogAnyString(" ");
             this.ToLogAnyString("[UpdateEntities] START");
-
+            /*
             this.ToLogAnyString($"  IsFirst: {IsFirst.ToString()}");
             this.ToLogAnyString($"  IsLeaderPointMovedByOverrule: {IsLeaderPointMovedByOverrule.ToString()}");
             
-            this.ToLogAnyString($"Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
-            this.ToLogAnyString($"Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
+            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
+            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
             this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
             this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
             this.ToLogAnyStringFromPoint3d(BaseSecondPoint, "BaseSecondPoint");
             this.ToLogAnyStringFromPoint3d(BaseSecondPointOCS, "BaseSecondPointOCS");
             this.ToLogAnyString("\n");
-            
+            */
 
+        try
+        {
             //throw new ArgumentOutOfRangeException();
 
             var scale = GetScale();
@@ -333,9 +328,16 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 if (IsChangeShelfPosition && IsShelfPointMovedByGrip)
                 {
-                    this.ToLogAnyString("Update Shelf moving");
+                     this.ToLogAnyString("  Shelf moving");
 
-                    var leaderStartPointsSort = LeaderStartPoints.OrderBy(p => p.X);
+                    // var points3dOcs = LeaderStartPointsOCS;
+                    // var points3d = LeaderStartPoints;
+
+                    //var leaderStartPointsSort = LeaderStartPoints.OrderBy(p => p.X);
+                    var leaderStartPointsSort = LeaderStartPoints.PointsSortByBaseLine(LeaderStartPointsOCS);
+
+                    //LeaderStartPoints.ToLogAnyStringFromPoint3dList("LeaderStartPoints");
+                    //leaderStartPointsSort.ToLogAnyStringFromPoint3dList("LeaderStartPoints sorted");
 
                     var widthText = CreateText(scale);
                     var vectorToShelfEndPoint = Vector3d.XAxis * (widthText + (TextIndent * scale));
@@ -361,9 +363,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     for (var i = 0; i < LeaderEndPoints.Count; i++)
                     {
-                        
                             _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
-
                     }
 
                     var leaderBound = _leaders.First(l => l.StartPoint.Equals(InsertionPointOCS));
@@ -409,7 +409,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     return;
                 }
-
                 if (IsFirst)
                 {
                     _unionLine = null;
@@ -460,8 +459,18 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 }
             }
 
-            this.ToLogAnyString("[UpdateEntities] END");
-            this.ToLogAnyString(".");
+            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
+            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
+            /*
+            this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
+            this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
+            this.ToLogAnyStringFromPoint3d(ShelfLedgePoint, "ShelfLedgePoint");
+            this.ToLogAnyStringFromPoint3d(ShelfLedgePointOCS, "ShelfLedgePointOCS");
+            this.ToLogAnyStringFromPoint3d(ShelfEndPoint, "ShelfEndPoint");
+            this.ToLogAnyStringFromPoint3d(ShelfEndPointOCS, "ShelfEndPointOCS");
+            */
+
+
         }
         catch (Exception exception)
         {
@@ -469,14 +478,23 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             //ExceptionBox.Show(exception);
             this.ToLogErr("CrestedLeader", "UpdateEntities", exception);
         }
+
+        LeaderStartPoints.ToLogAnyStringFromPoint3dList("LeaderStartPoints");
+        var leaderStartPointsSort1 = LeaderStartPoints.PointsSortByBaseLine(LeaderStartPointsOCS);
+        leaderStartPointsSort1.ToLogAnyStringFromPoint3dList("LeaderStartPoints sorted");
+
+        this.ToLogAnyString("[UpdateEntities] END");
+        this.ToLogAnyString(".");
     }
 
     private void CreateEntities(double scale)
     {
+        /*
         this.ToLogAnyString(" ");
         this.ToLogAnyString($"      [CreateEntities] START");
         this.ToLogAnyString($"          IsBasePointMovedByGrip: {IsBasePointMovedByGrip.ToString()}");
         this.ToLogAnyString($"          IsBasePointMovedByOverrule: {IsBasePointMovedByOverrule.ToString()}");
+        */
 
         _tempLeader = null;
         _unionLine = null;
@@ -552,13 +570,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
         ShelfEndPoint = this.GetShelfEndPoint(widthWidestText);
-        //this.ToLogAnyString($"          ShelfEndPoint: {ShelfEndPoint.ToString()}");
-        //this.ToLogAnyString($"          ShelfEndPointOCS: {ShelfEndPointOCS.ToString()}");
 
-        //ShelfEndPoint = ShelfEndPoint.GetBackRotatedShelfEndPoint(this);
-
-        //ShelfEndPoint = SmartRotations.GetRotatePointToXaxis(ShelfEndPoint, this);
-        ShelfEndPoint = ShelfEndPoint.GetRotatePointToXaxis(this);
+        // ShelfEndPoint = ShelfEndPoint.GetRotatePointToXaxis(this);
 
         /*
         this.ToLogAnyString($"          Done back rotation of ShelfEndPoint");
@@ -567,8 +580,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         this.ToLogAnyString($"          ShelfEndPoint: {ShelfEndPoint.ToString()}");
         this.ToLogAnyString($"          ShelfEndPointOCS: {ShelfEndPointOCS.ToString()}");
         */
-
-        //TestInverseRotationOfPoint(ShelfEndPoint, this);
 
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
 
@@ -940,7 +951,4 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     }
 
     #endregion
-
-
-
 }

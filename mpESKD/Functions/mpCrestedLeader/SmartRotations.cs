@@ -1,4 +1,7 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.Geometry;
 using Base.Abstractions;
@@ -114,10 +117,41 @@ internal static class SmartRotations
         return point.TransformBy(rotationMatrix);
     }
 
+    // OCS точки вращать? они точно относительно, в координатах блока
     internal static Point3d GetRotatePointOcsToXaxis(this Point3d pointOcs, CrestedLeader crestedLeader)
     {
         var rotationMatrix = Matrix3d.Rotation(-crestedLeader.Rotation, Vector3d.ZAxis, crestedLeader.InsertionPointOCS);
 
         return pointOcs.TransformBy(rotationMatrix);
+    }
+
+
+    // Пересчет точки из OCS в норм
+    internal static Point3d Point3dOcsToPoint3d(this Point3d point3dOcs, ISmartEntity smartEntity)
+    {
+        return smartEntity.InsertionPoint + (point3dOcs - smartEntity.InsertionPointOCS);
+    }
+
+    /// <summary>
+    /// Сортирует список точек по возрастанию X первого параметра по отсортированному списку второго параметра
+    /// </summary>
+    /// <param name="points3d">Список точек для сортировки</param>
+    /// <param name="points3dOcs">Список точек как шаблон для сортировки </param>
+    /// <returns>Список точек</returns>
+    /// <remarks>Второй параметр содержит список точек с относительными координатами по блоку, этот список сортируется по X,
+    /// затем точки первого списка переставляются в соответствии с отсортированным списком относительных точек.
+    /// Получаем точки в координатах модели слева направо от первой выноски слева до крайней справа </remarks>
+    internal static List<Point3d> PointsSortByBaseLine(this List<Point3d> points3d, List<Point3d> points3dOcs)
+    {
+        var points3dOcsSort = points3dOcs.OrderBy(p => p.X).ToList();
+
+        List<Point3d> points3dSort = new ();
+        for (int i = 0; i < points3dOcsSort.Count; i++)
+        {
+            var indexInPoints3dOcs = points3dOcs.IndexOf(points3dOcsSort[i]);
+            points3dSort.Add(points3d.ElementAt(indexInPoints3dOcs));
+        }
+
+        return points3dSort;
     }
 }

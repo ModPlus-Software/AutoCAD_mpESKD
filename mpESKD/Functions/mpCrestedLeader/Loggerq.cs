@@ -50,13 +50,17 @@ public static class LogData
         Loggerq.WriteRecord($"{str}");
     }
 
-    public static void ToLogAnyStringFromPoint3dList(this ISmartEntity smart, List<Point3d> points,  string str = "")
+    public static void ToLogAnyStringFromPoint3dList(this  List<Point3d> points,  string listName = "")
     {
-        Loggerq.WriteRecord($"\nsmart: {smart.GetType().Name}, List of 3d points:");
+        Loggerq.WriteRecord($"\nList 3d points of {listName}:");
         Loggerq.WriteRecord("{");
         for (int i = 0; i < points.Count; i++)
         {
-            Loggerq.WriteRecord($"[{i}]: {points[i].ToString()}");
+            var x = Math.Round(points[i].X, 3, MidpointRounding.AwayFromZero);
+            var y = Math.Round(points[i].Y, 3, MidpointRounding.AwayFromZero);
+            var z = Math.Round(points[i].Z, 3, MidpointRounding.AwayFromZero);
+
+            Loggerq.WriteRecord($"  [{i}]: {x} , {y} , {z}");
         }
         Loggerq.WriteRecord("}\n");
     }
