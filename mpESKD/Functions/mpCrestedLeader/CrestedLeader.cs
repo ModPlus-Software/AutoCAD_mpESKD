@@ -651,7 +651,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 var intersectPointOcs = Intersections.GetIntersectionBetweenVectors(
                     InsertionPointOCS.ToPoint2d(),
                     Vector2d.XAxis,
-                    // todo Добавить свойство для контроля средней линии (точку)
                     LeaderEndPointsOCS[i].ToPoint2d(),
                     newLeaderVector);
 

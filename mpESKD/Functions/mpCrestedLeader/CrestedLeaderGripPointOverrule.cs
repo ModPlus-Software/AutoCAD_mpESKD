@@ -231,6 +231,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                        leaderEndGrip.NewPoint = leaderEndGrip.GripPoint + offset;
                        var newPoint = leaderEndGrip.NewPoint;
 
+                        /*
                        newPoint.ToLog("Точка курсора");
                         crestedLeader.BaseSecondPoint.ToLog("Точка BaseSecondPoint");
                         crestedLeader.ToLogAnyString("**");
@@ -238,7 +239,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         //var newPoint 
                         newPoint.GetProjectPointToBaseLine(crestedLeader)
                         .ToLog("Точка перпендикулярной проекции курсора на центральную линию");
-
+                        */
+                       
                        var leaderStartPoint = crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex];
                        var leaderEndPoint = crestedLeader.LeaderEndPoints[leaderEndGrip.GripIndex];
 
