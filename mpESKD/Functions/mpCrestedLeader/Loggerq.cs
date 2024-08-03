@@ -75,7 +75,7 @@ public static class LogData
     }
 
 
-    public static void ToLogAnyStringFromPoint3d(this ISmartEntity smart, Point3d point, string pointName)
+    public static void ToLog(this Point3d point, string pointName)
     {
         var spLim = 25;
         // Console.WriteLine("{0,-20} {1,5:N1}", names[counter], hours[counter]);
@@ -88,9 +88,13 @@ public static class LogData
 
         // var str = $"{name,-50} {pt,0}";
 
+        var sp = "";
         var spCount = spLim - name.Length;
+        if (spCount > 0)
+        {
+            sp = new string(' ', spCount);
+        }
 
-        var sp = new string(' ', spCount);
 
         var str = $"{name}{sp}{pt}";
         Loggerq.WriteRecord(str);

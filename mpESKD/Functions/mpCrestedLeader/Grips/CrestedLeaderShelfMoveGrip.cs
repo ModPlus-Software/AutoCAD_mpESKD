@@ -72,7 +72,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             {
                 if (CrestedLeader.IsChangeShelfPosition)
                 {
-                    var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                     List<Point3d> leaderStartPointsTmp = new();
                     leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);

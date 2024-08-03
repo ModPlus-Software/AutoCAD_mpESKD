@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -7,6 +8,8 @@ using Autodesk.AutoCAD.Geometry;
 using Base.Abstractions;
 using Base.Enums;
 using Base.Utils;
+using ControlzEx.Standard;
+using CSharpFunctionalExtensions;
 using mpESKD.Base;
 using System.Windows;
 
@@ -139,9 +142,9 @@ internal static class SmartRotations
     /// <param name="points3dOcs">Список точек как шаблон для сортировки </param>
     /// <returns>Список точек</returns>
     /// <remarks>Второй параметр содержит список точек с относительными координатами по блоку, этот список сортируется по X,
-    /// затем точки первого списка переставляются в соответствии с отсортированным списком относительных точек.
-    /// Получаем точки в координатах модели слева направо от первой выноски слева до крайней справа </remarks>
-    internal static List<Point3d> PointsSortByBaseLine(this List<Point3d> points3d, List<Point3d> points3dOcs)
+    /// затем точки списка первого параметра переставляются в соответствии с отсортированным списком относительных точек.
+    /// Получаем точки в координатах модели последовательно слева направо от первой выноски слева до крайней справа </remarks>
+    internal static List<Point3d> OrderByBaseLine(this List<Point3d> points3d, List<Point3d> points3dOcs)
     {
         var points3dOcsSort = points3dOcs.OrderBy(p => p.X).ToList();
 
@@ -153,5 +156,36 @@ internal static class SmartRotations
         }
 
         return points3dSort;
+    }
+
+    /// <summary>
+    ///  Функция возвращает проекцию точки на прямую, заданную
+    ///  двумя точками. Проекция по оси Y
+    /// </summary>
+    /// <param name="p">Проецирумая точка</param>
+    /// <param name="p1">первая точка прямой</param>
+    /// <param name="p2">вторая точка прямой</param>
+    /// <returns></returns>
+    /// <remarks>Модифицировано из <see href="https://adn-cis.org/forum/index.php?topic=9772.15"/></remarks>
+    internal static Point3d GetProjectPoint(this Point3d p, Point3d p1, Point3d p2)
+    {
+        using (var line = new Line3d(p1, p2)) 
+        {
+            var vector = (p2 - p1).GetPerpendicularVector();
+
+            return line.GetProjectedClosestPointTo(p, vector).Point;
+        }
+    }
+
+    /// <summary>
+    /// Перпендикулярная проекция точки на центральную линию смарт объекта 
+    /// </summary>
+    /// <param name="point">Проецируемая точка</param>
+    /// <param name="crestedLeader">смарт объект</param>
+    /// <returns>Точка проекции</returns>
+    /// <remarks>Например, точки курсора</remarks>
+    internal static Point3d GetProjectPointToBaseLine(this Point3d point, CrestedLeader crestedLeader)
+    {
+        return GetProjectPoint(point, crestedLeader.InsertionPoint, crestedLeader.BaseSecondPoint);
     }
 }

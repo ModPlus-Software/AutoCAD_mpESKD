@@ -61,7 +61,7 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
         {
             using (CrestedLeader)
             {
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                 // Если требуется переместить точку вставки
                 if (!(CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) &&

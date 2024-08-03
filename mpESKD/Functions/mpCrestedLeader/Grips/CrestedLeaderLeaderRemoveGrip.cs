@@ -57,16 +57,7 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
 
                 if (checkPoint.Equals(CrestedLeader.InsertionPoint))
                 {
-                    var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
-
-                    //if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                    //{
-                    //    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-                    //}
-                    //else
-                    //{
-                    //    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-                    //}
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                     // Сохранить начала выносок
                     List<Point3d> leaderStartPointsTmp = new();

@@ -1,8 +1,10 @@
 ﻿using mpESKD.Base.Enums;
 using System;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
 using mpESKD.Base.Utils;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.Internal;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -11,12 +13,17 @@ internal static class ShelfActions
     internal static void ShelfPositionMove(ref CrestedLeader crestedLeader, Point3d newPoint)
     {
         // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
+        /*
         var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X);
+
         var leftStartPoint = leaderStartPointsSort.First();
         var rightStartPoint = leaderStartPointsSort.Last();
-        var unionLineLenght = Math.Abs(leftStartPoint.X - rightStartPoint.X);
+        */
 
-        //var startShelfPosition = crestedLeader.ShelfPosition;
+        var leftStartPoint = crestedLeader.LeaderStartPointsSorted.First();
+        var rightStartPoint = crestedLeader.LeaderStartPointsSorted.Last();
+
+        var unionLineLenght = Math.Abs(leftStartPoint.X - rightStartPoint.X);
 
         var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
 
@@ -29,6 +36,9 @@ internal static class ShelfActions
                 // Направо от правой точки
                 if (newPoint.X >= rightStartPoint.X)
                 {
+                    // ShelfLedge = [точка проекции newPoint на BaseLine].DistanceTo(rightStartPoint)
+                    // GetProjectPointToBaseLine
+
                     crestedLeader.ShelfLedge = Math.Abs(newPoint.X - rightStartPoint.X);
                 }
                 // Между средней точкой и правой точкой

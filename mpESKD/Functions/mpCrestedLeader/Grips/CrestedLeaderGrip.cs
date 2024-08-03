@@ -71,7 +71,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 List<Point3d> leaderStartPointsTmp = new ();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                 if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
@@ -145,7 +145,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 List<Point3d> leaderStartPointsTmp = new();
                 leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                 if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
                     CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();

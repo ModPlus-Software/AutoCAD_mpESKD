@@ -71,7 +71,8 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                     List<Vector3d> vectorsToEndPoint = CrestedLeader.LeaderStartPoints
                         .Select((t, i) => CrestedLeader.LeaderEndPoints[i] - t).ToList();
 
-                    var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                    // var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                     // Список концов выносок, с учетом нового положения перемещаемой выноски
                     List<Point3d> leaderEndPointsSort = new();
@@ -200,7 +201,7 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
             {
                 var lineNewLeader = new Line(cursorPoint, startPoint);
 
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                 if (startPoint.X < leaderStartPointsSort.First().X)
                 {

@@ -42,7 +42,7 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
     {
         using (CrestedLeader)
         {
-            var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+            var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
             // Сохранить начала выносок
             List<Point3d> leaderStartPointsTmp = new();
