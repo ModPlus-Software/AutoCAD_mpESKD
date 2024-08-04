@@ -1,3 +1,5 @@
+using mpESKD.Base.Utils;
+
 namespace mpESKD;
 
 using System.Collections.Generic;
@@ -50,7 +52,7 @@ public static class LogData
         Loggerq.WriteRecord($"{str}");
     }
 
-    public static void ToLogAnyStringFromPoint3dList(this  List<Point3d> points,  string listName = "")
+    public static void ToLog(this  List<Point3d> points,  string listName = "")
     {
         Loggerq.WriteRecord($"\nList 3d points of {listName}:");
         Loggerq.WriteRecord("{");
@@ -99,4 +101,10 @@ public static class LogData
         var str = $"{name}{sp}{pt}";
         Loggerq.WriteRecord(str);
     }
+
+    public static void ToLog(this Point2d point, string pointName)
+    {
+        point.ToPoint3d().ToLog(pointName);
+    }
+
 }

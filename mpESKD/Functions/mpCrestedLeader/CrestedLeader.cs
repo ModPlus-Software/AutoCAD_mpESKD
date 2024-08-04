@@ -136,18 +136,21 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public bool IsShelfPointMovedByGrip { get; set; } = false;
 
-
     [SaveToXData]
     public bool IsLeaderPointMovedByOverrule { get; set; } = false;
 
     [SaveToXData]
     public Point3d BoundEndPoint { get; set; }
+
     public Point3d BoundEndPointOCS => BoundEndPoint.TransformBy(BlockTransform.Inverse());
 
     public Point3d BaseSecondPoint => (InsertionPoint + Vector3d.XAxis).GetRotatedPointByBlock(this);
+
     public Point3d BaseSecondPointOCS  => BaseSecondPoint.TransformBy(BlockTransform.Inverse());
 
+    public Vector3d BaseVectorNormal => BaseSecondPoint - InsertionPoint;
 
+    public Vector3d BaseVectorNormalOCS => BaseSecondPointOCS - InsertionPointOCS;
 
     #endregion
 
@@ -286,20 +289,38 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// <inheritdoc/>
     public override void UpdateEntities()
     {
-            this.ToLogAnyString(" ");
-            this.ToLogAnyString("[UpdateEntities] START");
-            /*
-            this.ToLogAnyString($"  IsFirst: {IsFirst.ToString()}");
-            this.ToLogAnyString($"  IsLeaderPointMovedByOverrule: {IsLeaderPointMovedByOverrule.ToString()}");
-            
-            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
-            this.ToLogAnyString($"  Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
-            this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
-            this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
-            this.ToLogAnyStringFromPoint3d(BaseSecondPoint, "BaseSecondPoint");
-            this.ToLogAnyStringFromPoint3d(BaseSecondPointOCS, "BaseSecondPointOCS");
-            this.ToLogAnyString("\n");
-            */
+        this.ToLogAnyString(" ");
+        this.ToLogAnyString("[UpdateEntities] START");
+        /*
+        this.ToLogAnyString($"  IsFirst: {IsFirst.ToString()}");
+        this.ToLogAnyString($"  IsLeaderPointMovedByOverrule: {IsLeaderPointMovedByOverrule.ToString()}");
+        
+        this.ToLogAnyString($"  Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
+        this.ToLogAnyString($"  Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
+        */
+
+        /*
+        this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
+        this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
+        */
+
+        BaseSecondPoint.ToLog("BaseSecondPoint");
+        BaseSecondPointOCS.ToLog("BaseSecondPointOCS");
+
+        this.ToLogAnyString("\n");
+
+        /*
+        this.ToLogAnyString("Преобразование из vector3d в vector2d");
+        var pt3dStart = new Point3d(100, 100, 0);
+        var pt3dEnd = new Point3d(200, 200, 0);
+        var vec3d = pt3dEnd - pt3dStart;
+        var vec2d = vec3d.ToVector2d();
+
+        var pt2dStart = new Point2d(pt3dStart.X, pt3dStart.Y);
+        var pt2dEnd = pt2dStart + vec2d;
+
+        this.ToLogAnyString($"Точка должна быть = (200, 200)");
+        pt2dEnd.ToLog("Конец вектора 2d:");*/
 
         try
         {
@@ -621,52 +642,55 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private bool CreateLeaderLines()
     {
+        InsertionPoint.ToLog("InsertionPoint");
+        BoundEndPoint.ToLog("BoundEndPoint");
+        LeaderEndPoints.ToLog("LeaderEndPoints");
+        this.ToLogAnyString(" ");
+        InsertionPointOCS.ToLog("InsertionPointOCS");
+        BoundEndPointOCS.ToLog("BoundEndPointOCS");
+        LeaderEndPointsOCS.ToLog("LeaderEndPointsOCS");
+
         _leaders.Clear();
         LeaderStartPoints.Clear();
 
-        if (BoundEndPointOCS.X.Equals(InsertionPointOCS.X) && !BoundEndPointOCS.Equals(InsertionPointOCS))
+        
+        if (BoundEndPointOCS.Y.Equals(InsertionPointOCS.Y))
+        //if (LeaderEndPointsOCS.Any(p => p.Y.Equals(InsertionPointOCS.Y)))
+        //if (BoundEndPoint.Equals(InsertionPoint))
         {
-            for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
-            {
-                var intersectPointOcs = new Point2d(LeaderEndPointsOCS[i].X, InsertionPointOCS.Y);
-                var intersectPointOcs3d = intersectPointOcs.ToPoint3d();
-
-                LeaderStartPoints.Add(InsertionPoint + (intersectPointOcs3d - InsertionPointOCS));
-
-                _leaders.Add(new Line(intersectPointOcs3d, LeaderEndPointsOCS[i]));
-            }
+            return false;
         }
-        else 
-        {
-            var newLeaderVector = InsertionPointOCS.ToPoint2d() - BoundEndPointOCS.ToPoint2d();
 
+        if (BoundEndPoint.GetProjectPointToBaseLine(this).Equals(InsertionPoint))
+        {
             for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
             {
-                if (InsertionPointOCS.Equals(LeaderEndPointsOCS[i]))
-                {
-                    LeaderStartPoints.Add(InsertionPoint);
-                    continue;
-                }
+                var leaderStartPointOcs = new Point3d(LeaderEndPointsOCS[i].X, InsertionPointOCS.Y, InsertionPointOCS.Z);
+                _leaders.Add(new Line(leaderStartPointOcs, LeaderEndPointsOCS[i]));
 
-                var intersectPointOcs = Intersections.GetIntersectionBetweenVectors(
-                    InsertionPointOCS.ToPoint2d(),
-                    Vector2d.XAxis,
-                    LeaderEndPointsOCS[i].ToPoint2d(),
-                    newLeaderVector);
+                LeaderStartPoints.Add(leaderStartPointOcs.Point3dOcsToPoint3d(this));
 
-                if (intersectPointOcs == null)
-                    continue;
-
-                LeaderStartPoints.Add(this.GetLeaderStartPoint(intersectPointOcs));
-
-                // Если выноска нулевой длины - не создаем ее
-                if (intersectPointOcs.Value.Equals(LeaderEndPointsOCS[i]))
-                {
-                    continue;
-                }
-
-                _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
             }
+
+            return true;
+        }
+
+        var newLeaderVector = InsertionPoint.ToPoint2d() - BoundEndPoint.ToPoint2d();
+
+        for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
+        {
+            var intersectPoint = Intersections.GetIntersectionBetweenVectors(
+                InsertionPoint.ToPoint2d(),
+                BaseVectorNormal.ToVector2d(),
+                LeaderEndPoints[i].ToPoint2d(),
+                newLeaderVector);
+
+            if (intersectPoint == null)
+                continue;
+
+            LeaderStartPoints.Add(intersectPoint.Value.ToPoint3d());
+
+            _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
         }
 
         return true;

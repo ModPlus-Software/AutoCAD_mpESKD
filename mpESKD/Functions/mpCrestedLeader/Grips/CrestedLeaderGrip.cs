@@ -68,53 +68,62 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                List<Point3d> leaderStartPointsTmp = new ();
-                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+                //if (!CrestedLeader.LeaderEndPointsOCS.Any(p => p.Y.Equals(CrestedLeader.InsertionPointOCS.Y)))
+                //{
 
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
-                if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-                else
-                    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+                    List<Point3d> leaderStartPointsTmp = new();
+                    leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-                    // перемещение точки вставки в точку первой точки полки
-                    ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+                    if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                    else
+                        CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
 
-                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        blkRef.XData = resBuf;
+                        var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                        // перемещение точки вставки в точку первой точки полки
+                        ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
+
+                        using (var resBuf = CrestedLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
                     }
 
-                    tr.Commit();
-                }
+                    CrestedLeader.LeaderStartPoints.Clear();
+                    CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
 
-                CrestedLeader.LeaderStartPoints.Clear();
-                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
+                    CrestedLeader.IsBasePointMovedByGrip = true;
 
-                CrestedLeader.IsBasePointMovedByGrip = true;
+                    CrestedLeader.UpdateEntities();
+                    CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = CrestedLeader.GetDataForXData())
+                    using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
-                        blkRef.XData = resBuf;
+                        var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+                        using (var resBuf = CrestedLeader.GetDataForXData())
+                        {
+                            blkRef.XData = resBuf;
+                        }
+
+                        tr.Commit();
                     }
 
-                    tr.Commit();
-                }
-
-                CrestedLeader.Dispose();
+                    CrestedLeader.Dispose();
+                //}
+                //else
+                //{
+                //    newStatus = Status.GripAbort;
+                //}
             }
 
             // При отмене перемещения возвращаем временные значения
@@ -130,66 +139,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
             }
 
             base.OnGripStatusChanged(entityId, newStatus);
-        }
-        catch (Exception exception)
-        {
-            if (exception.ErrorStatus != ErrorStatus.NotAllowedForThisProxy)
-                ExceptionBox.Show(exception);
-        }
-    }
-
-    public  void OnGripStatusChangedMy()
-    {
-        try
-        {
-                List<Point3d> leaderStartPointsTmp = new();
-                leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
-
-                var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
-
-                if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                    CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-                else
-                    CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-
-                    // перемещение точки вставки в точку первой точки полки
-                    ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
-
-                    using (var resBuf = CrestedLeader.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
-                }
-
-                CrestedLeader.LeaderStartPoints.Clear();
-                CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
-
-                CrestedLeader.IsBasePointMovedByGrip = true;
-
-                CrestedLeader.UpdateEntities();
-                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
-
-                using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
-                    using (var resBuf = CrestedLeader.GetDataForXData())
-                    {
-                        blkRef.XData = resBuf;
-                    }
-
-                    tr.Commit();
-                }
-
-                CrestedLeader.Dispose();
         }
         catch (Exception exception)
         {

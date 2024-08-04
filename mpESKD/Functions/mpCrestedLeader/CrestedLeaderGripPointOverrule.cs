@@ -154,17 +154,40 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
                            var newPoint = insertGrip.NewPoint;
 
+                           /*
+                           if (crestedLeader.LeaderEndPoints.Any(p => p.Equals(newPoint)))
+                           {
+                               return;
+                           }*/
+
+                           /*
                            if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
                            {
                                newPoint = new Point3d(
                                    newPoint.X,
                                    newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
                                    newPoint.Z);
-                           }
+                           }*/
 
                            // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
                            // то не дать этого сделать
                            var minDist = crestedLeader.MinDistanceBetweenPoints;
+
+                           /*
+                            var ptCheck = Point3d.Origin + (newPoint - crestedLeader.InsertionPoint);
+
+                            ptCheck.ToLog("ptCheck");
+
+
+                           if (crestedLeader.BoundEndPointOCS.Y.Equals(ptCheck.Y))
+                           //if (crestedLeader.LeaderEndPointsOCS.Any(p => p.Y.Equals(crestedLeader.InsertionPointOCS.Y)))
+                            //if (crestedLeader.BoundEndPointOCS.Y.Equals(crestedLeader.InsertionPointOCS.Y))
+                            {
+                                newPoint = new Point3d(
+                                    newPoint.X,
+                                    newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
+                                    newPoint.Z);
+                            }*/
 
                            if (crestedLeader.LeaderEndPoints.Any(p =>
                                    newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
