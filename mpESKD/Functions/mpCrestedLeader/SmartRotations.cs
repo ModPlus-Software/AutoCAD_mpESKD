@@ -43,7 +43,7 @@ internal static class SmartRotations
         return point3d.TransformBy(rotationMatrix);
     }
 
-
+    /*
 
     //internal static Point3d
 
@@ -66,7 +66,7 @@ internal static class SmartRotations
 
         // return crestedLeader.InsertionPoint + (leaderStartPointOcs3d - crestedLeader.InsertionPointOCS);
         return leaderStartPointOcs3d.Point3dOcsToPoint3d(crestedLeader);
-    }
+    }*/
 
     /// <summary>
     /// Точка отступа полки

@@ -1,10 +1,10 @@
-﻿// todo Координаты, условия переделать с учетом поворота всего смарт объекта
-// это нужно привести все .X к оси XAxis сначала ?
-// где сортировка, сортировать как точки на прямой InsPt-SecondPoint слева направо
+﻿// todo Упростить
 
 // todo Добавить  'Выбрать тип стрелки'
 // todo Добавить ручку зеркалирования полки
 // todo Добавить ручку выравнивания текста
+
+using System.Linq;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -117,6 +117,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         Point3d shelfStartPoint = new ();
         Point3d shelfLedgePoint = new ();
         Point3d shelfEndPoint = new ();
+        Point3d baseLeaderEndPoint = new();
 
         var entityJig = new DefaultEntityJig(
             crestedLeader,
@@ -137,7 +138,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
                     // Задан текущий режим JIG как режим NextPoint
                     entityJig.JigState = JigState.PromptNextPoint;
-
+                    
                     leaderEndPoints.Clear();
                     leaderEndPoints.Add(crestedLeader.InsertionPoint);
                     crestedLeader.LeaderEndPoints.Add(crestedLeader.InsertionPoint);
@@ -172,10 +173,15 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         crestedLeader.CurrentJigState = 0;
 
                         shelfStartPoint = crestedLeader.InsertionPoint = crestedLeader.ShelfStartPoint;
+
+                        var baseLeaderStartPoint = crestedLeader.LeaderStartPoints.First(p => p.Equals(crestedLeader.InsertionPoint));
+                        var baseIndex = crestedLeader.LeaderStartPoints.IndexOf(baseLeaderStartPoint);
+                        baseLeaderEndPoint = crestedLeader.BaseLeaderEndPoint = crestedLeader.LeaderEndPoints.ElementAt(baseIndex);
+
                         shelfLedgePoint = crestedLeader.ShelfLedgePoint;
                         shelfEndPoint = crestedLeader.ShelfEndPoint;
 
-                        crestedLeader.IsFirst = true;
+                        crestedLeader.IsStartPointsAssigned = true;
 
                         crestedLeader.UpdateEntities();
                         crestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -220,11 +226,12 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             crestedLeader.LeaderStartPoints.Clear();
             crestedLeader.LeaderStartPoints.AddRange(leaderStartPoints);
 
+            crestedLeader.BaseLeaderEndPoint = baseLeaderEndPoint;
             crestedLeader.ShelfLedgePoint = shelfLedgePoint;
             crestedLeader.ShelfStartPoint = shelfStartPoint;
             crestedLeader.ShelfEndPoint = shelfEndPoint;
 
-            crestedLeader.IsFirst = true;   
+            crestedLeader.IsStartPointsAssigned = true;   
 
             crestedLeader.UpdateEntities();
             crestedLeader.BlockRecord.UpdateAnonymousBlocks();

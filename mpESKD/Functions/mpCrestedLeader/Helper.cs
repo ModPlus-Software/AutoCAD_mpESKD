@@ -1,4 +1,8 @@
 ﻿using System.Linq;
+using System.Windows.Navigation;
+using Autodesk.AutoCAD.DatabaseServices;
+using ControlzEx.Standard;
+using DocumentFormat.OpenXml.Bibliography;
 using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpCrestedLeader;
@@ -74,7 +78,7 @@ internal static class Helper
     /// <returns>Список точек</returns>
     /// <remarks>Второй параметр содержит список точек с относительными координатами по блоку, этот список сортируется по X,
     /// затем точки списка первого параметра переставляются в соответствии с отсортированным списком относительных точек.
-    /// Получаем точки в координатах модели последовательно слева направо от первой выноски слева до крайней справа </remarks>
+    /// Получаем точки первого параметра в координатах модели последовательно слева направо от первой выноски слева до крайней справа </remarks>
     internal static List<Point3d> OrderByBaseLine(this List<Point3d> points3d, List<Point3d> points3dOcs)
     {
         if (points3d != null && points3d.Count > 0)
@@ -84,7 +88,7 @@ internal static class Helper
             List<Point3d> points3dSort = new();
             for (int i = 0; i < points3dOcsSort.Count; i++)
             {
-                var indexInPoints3dOcs = points3dOcs.IndexOf(points3dOcsSort[i]);
+                var indexInPoints3dOcs = points3dOcs. IndexOf(points3dOcsSort[i]);
                 points3dSort.Add(points3d.ElementAt(indexInPoints3dOcs));
             }
 
@@ -93,7 +97,18 @@ internal static class Helper
 
         return new List<Point3d>();
     }
-    
+
+
+    internal static List<Point3d> OrderLeaderStartPoints(this CrestedLeader crestedLeader)
+    {
+       return crestedLeader.LeaderStartPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
+    }
+
+    internal static List<Point3d> OrderLeaderEndPoints(this CrestedLeader crestedLeader)
+    {
+        return crestedLeader.LeaderEndPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
+    }
+
     /// <summary>
     /// Возвращает 2d вектор из 3d вектора
     /// </summary>
@@ -110,5 +125,74 @@ internal static class Helper
 
         var vec2d = ptEnd2d - ptStart2d;
         return vec2d;
+    }
+
+    // Проверка на приближение курсора к концам выносок
+    internal static Point3d GetNormalizedPointByDistToPointSet(this Point3d checkPoint, List<Point3d> pointSet, double dist)
+    {
+        //if (pointSet.Any(p => checkPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < dist))
+        //{
+
+        /*
+            var searchLeaderEndPoint = pointSet
+                .Select(leaderEndPoint => new
+                {
+                    Point = leaderEndPoint,
+                    Distance = leaderEndPoint.ToPoint2d().GetDistanceTo(checkPoint.ToPoint2d())
+                })
+                .OrderBy(p => p.Distance)
+                .First();
+
+            var searchPoint = searchLeaderEndPoint.Point;
+        */
+         var searchPoint = checkPoint.GetNearestPoint(pointSet);
+
+       // Найдем точку пересечения окружности с радиусом dist и отрезка к searchPoint
+       var lineStartPoint = searchPoint + ((checkPoint - searchPoint) * dist * 2);
+
+            var line = new Line(lineStartPoint, searchPoint);
+            var circle = new Circle()
+            {
+                Center = searchPoint,
+                Radius = dist,
+            };
+
+            var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
+            if (intersectPoint != null)
+            {
+                return intersectPoint.Value;
+            }
+        //}
+
+        return checkPoint;
+    }
+
+    internal static Point3d GetNearestPoint(this Point3d point, List<Point3d> targetPoints)
+    {
+        if (targetPoints != null && targetPoints.Count > 0)
+        {
+            if (targetPoints.Count == 1)
+            {
+                return targetPoints[0];
+            }
+
+            var minDist = point.DistanceTo(targetPoints[0]);
+            var indexSearch = 0;
+
+            for (int i = 1; i <= targetPoints.Count - 1; i++)
+            {
+                var iDist = point.DistanceTo(targetPoints[i]);
+
+                if (iDist < minDist)
+                {
+                    minDist = iDist;
+                    indexSearch = i;
+                }
+            }
+
+            return targetPoints[indexSearch];
+        }
+
+        return point; 
     }
 }

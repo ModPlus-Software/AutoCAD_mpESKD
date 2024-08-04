@@ -56,34 +56,34 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
             Point3d shelfLedgePoint;
             Point3d shelfEndPoint;
 
-            var distanceStartToLedge = Math.Abs(CrestedLeader.ShelfStartPoint.X - CrestedLeader.ShelfLedgePoint.X);
-            var distanceLedgeToEnd = Math.Abs(CrestedLeader.ShelfLedgePoint.X - CrestedLeader.ShelfEndPoint.X);
+            /*var distanceStartToLedge = Math.Abs(CrestedLeader.ShelfStartPointOCS.X - CrestedLeader.ShelfLedgePointOCS.X);
+            var distanceLedgeToEnd = Math.Abs(CrestedLeader.ShelfLedgePointOCS.X - CrestedLeader.ShelfEndPointOCS.X);*/
 
             if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
             {
                 CrestedLeader.ShelfPosition = ShelfPosition.Left;
-                CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
+                CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPointsSorted.First();
 
                 shelfStartPoint = CrestedLeader.InsertionPoint;
-                shelfLedgePoint = shelfStartPoint - (Vector3d.XAxis * distanceStartToLedge);
-                shelfEndPoint = shelfLedgePoint - (Vector3d.XAxis * distanceLedgeToEnd);
+                /*shelfLedgePoint = shelfStartPoint - (Vector3d.XAxis * distanceStartToLedge);
+                shelfEndPoint = shelfLedgePoint - (Vector3d.XAxis * distanceLedgeToEnd);*/
             }
             else
             {
                 CrestedLeader.ShelfPosition = ShelfPosition.Right;
-                CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
+                CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPointsSorted.Last();
 
                 shelfStartPoint = CrestedLeader.InsertionPoint;
-                shelfLedgePoint = shelfStartPoint + (Vector3d.XAxis * distanceStartToLedge);
-                shelfEndPoint = shelfLedgePoint + (Vector3d.XAxis * distanceLedgeToEnd);
+               /* shelfLedgePoint = shelfStartPoint + (Vector3d.XAxis * distanceStartToLedge);
+                shelfEndPoint = shelfLedgePoint + (Vector3d.XAxis * distanceLedgeToEnd);*/
             }
 
             var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
-            CrestedLeader.BoundEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
-            var boundEndPointTmp = CrestedLeader.BoundEndPoint;
+            CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+            var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
-            CrestedLeader.IsFirst = true;
-            CrestedLeader.IsLeaderPointMovedByOverrule = true;
+            CrestedLeader.IsStartPointsAssigned = true;
+            //CrestedLeader.IsMoveGripPointsAt = true;
 
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -110,13 +110,13 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
             CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
 
             CrestedLeader.ShelfStartPoint = shelfStartPoint;
-            CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
-            CrestedLeader.ShelfEndPoint = shelfEndPoint;
+           /* CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
+            CrestedLeader.ShelfEndPoint = shelfEndPoint;*/
 
-            CrestedLeader.BoundEndPoint = boundEndPointTmp;
+            CrestedLeader.BaseLeaderEndPoint = boundEndPointTmp;
 
-            CrestedLeader.IsFirst = true;
-            CrestedLeader.IsLeaderPointMovedByOverrule = true;
+            CrestedLeader.IsStartPointsAssigned = true;
+            //CrestedLeader.IsMoveGripPointsAt = true;
 
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

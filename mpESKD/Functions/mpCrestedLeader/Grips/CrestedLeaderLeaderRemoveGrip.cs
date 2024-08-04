@@ -92,11 +92,11 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
                     }
 
                     var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
-                    CrestedLeader.BoundEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
-                    var boundEndPointTmp = CrestedLeader.BoundEndPoint;
+                    CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+                    var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
-                    CrestedLeader.IsFirst = true;
-                    CrestedLeader.IsLeaderPointMovedByOverrule = true;
+                    CrestedLeader.IsStartPointsAssigned = true;
+                    CrestedLeader.IsMoveGripPointsAt = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -126,10 +126,10 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
                     CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
                     CrestedLeader.ShelfEndPoint = shelfEndPoint;
 
-                    CrestedLeader.BoundEndPoint = boundEndPointTmp;
+                    CrestedLeader.BaseLeaderEndPoint = boundEndPointTmp;
 
-                    CrestedLeader.IsFirst = true;
-                    CrestedLeader.IsLeaderPointMovedByOverrule = true;
+                    CrestedLeader.IsStartPointsAssigned = true;
+                    CrestedLeader.IsMoveGripPointsAt = true;
                 }
 
                 CrestedLeader.UpdateEntities();

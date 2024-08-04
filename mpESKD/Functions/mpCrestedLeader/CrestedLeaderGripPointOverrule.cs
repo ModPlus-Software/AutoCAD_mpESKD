@@ -16,6 +16,7 @@ using Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 using mpESKD.Functions.mpRevisionMark.Grips;
 using mpESKD.Functions.mpRevisionMark;
+using System.Reflection;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
@@ -154,34 +155,14 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
                            var newPoint = insertGrip.NewPoint;
 
-                           /*
-                           if (crestedLeader.LeaderEndPoints.Any(p => p.Equals(newPoint)))
-                           {
-                               return;
-                           }*/
+                            /*
+                            if (crestedLeader.LeaderEndPoints.Any(p => p.Equals(newPoint)))
+                            {
+                                return;
+                            }*/
 
-                           /*
-                           if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
-                           {
-                               newPoint = new Point3d(
-                                   newPoint.X,
-                                   newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
-                                   newPoint.Z);
-                           }*/
-
-                           // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
-                           // то не дать этого сделать
-                           var minDist = crestedLeader.MinDistanceBetweenPoints;
-
-                           /*
-                            var ptCheck = Point3d.Origin + (newPoint - crestedLeader.InsertionPoint);
-
-                            ptCheck.ToLog("ptCheck");
-
-
-                           if (crestedLeader.BoundEndPointOCS.Y.Equals(ptCheck.Y))
-                           //if (crestedLeader.LeaderEndPointsOCS.Any(p => p.Y.Equals(crestedLeader.InsertionPointOCS.Y)))
-                            //if (crestedLeader.BoundEndPointOCS.Y.Equals(crestedLeader.InsertionPointOCS.Y))
+                            /*
+                            if (crestedLeader.LeaderEndPoints.Any(p => p.Y.Equals(newPoint.Y)))
                             {
                                 newPoint = new Point3d(
                                     newPoint.X,
@@ -189,41 +170,72 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                     newPoint.Z);
                             }*/
 
-                           if (crestedLeader.LeaderEndPoints.Any(p =>
-                                   newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
-                           {
-                               // найдем LeaderEndPoint, к которому приближается newpoint и
-                               // не соблюдается требование к минимальному расстоянию 
+                            // если newPoint приближается слишком близко к одной из точек EndPoint выносок,
+                            // то не дать этого сделать
+                            // var minDist = crestedLeader.MinDistanceBetweenPoints;
 
-                               var searchLeaderEndPoint = crestedLeader.LeaderEndPoints
-                                   .Select(leaderEndPoint => new
-                                   {
-                                       Point = leaderEndPoint,
-                                       Distance = leaderEndPoint.ToPoint2d().GetDistanceTo(newPoint.ToPoint2d())
-                                   })
-                                   .OrderBy(p => p.Distance)
-                                   .First();
+                            /*
+                             var ptCheck = Point3d.Origin + (newPoint - crestedLeader.InsertionPoint);
 
-                               Point3d searchPoint = searchLeaderEndPoint.Point;
+                             ptCheck.ToLog("ptCheck");
 
-                               // Найдем точку пересечения окружности с радиусом minDist и отрезка к searchPoint
 
-                               var lineStartPoint = searchPoint + ((newPoint - searchPoint) * minDist * 2);
-                               var line = new Line(lineStartPoint, searchPoint);
+                            if (crestedLeader.BaseLeaderEndPointOCS.Y.Equals(ptCheck.Y))
+                            //if (crestedLeader.LeaderEndPointsOCS.Any(p => p.Y.Equals(crestedLeader.InsertionPointOCS.Y)))
+                             //if (crestedLeader.BaseLeaderEndPointOCS.Y.Equals(crestedLeader.InsertionPointOCS.Y))
+                             {
+                                 newPoint = new Point3d(
+                                     newPoint.X,
+                                     newPoint.Y + crestedLeader.MinDistanceBetweenPoints,
+                                     newPoint.Z);
+                             }*/
 
-                               var circle = new Circle()
-                               {
-                                   Center = searchPoint,
-                                   Radius = minDist,
-                               };
+                            /*
+                            if (crestedLeader.LeaderEndPoints.Any(p =>
+                                    newPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < minDist))
+                            {
+                                // найдем LeaderEndPoint, к которому приближается newpoint и
+                                // не соблюдается требование к минимальному расстоянию 
 
-                               var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
+                                var searchLeaderEndPoint = crestedLeader.LeaderEndPoints
+                                    .Select(leaderEndPoint => new
+                                    {
+                                        Point = leaderEndPoint,
+                                        Distance = leaderEndPoint.ToPoint2d().GetDistanceTo(newPoint.ToPoint2d())
+                                    })
+                                    .OrderBy(p => p.Distance)
+                                    .First();
 
-                               // перенесем newpPoint на пересечение окружности с радиусом minDist и отрезка к searchPoint
-                               newPoint = intersectPoint ?? newPoint;
-                           }
+                                Point3d searchPoint = searchLeaderEndPoint.Point;
 
-                           ((BlockReference)entity).Position = newPoint;
+                                // Найдем точку пересечения окружности с радиусом minDist и отрезка к searchPoint
+
+                                var lineStartPoint = searchPoint + ((newPoint - searchPoint) * minDist * 2);
+                                var line = new Line(lineStartPoint, searchPoint);
+
+                                var circle = new Circle()
+                                {
+                                    Center = searchPoint,
+                                    Radius = minDist,
+                                };
+
+                                var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
+
+                                // перенесем newpPoint на пересечение окружности с радиусом minDist и отрезка к searchPoint
+                                newPoint = intersectPoint ?? newPoint;
+                            }
+                            */
+
+                            // Проверка на приближение курсора к концам выносок
+                            if (crestedLeader.LeaderEndPoints
+                                .Any(p => newPoint.DistanceTo(p) < crestedLeader.MinDistanceBetweenPoints))
+                            {
+                                newPoint = newPoint.GetNormalizedPointByDistToPointSet(
+                                    crestedLeader.LeaderEndPoints, 
+                                    crestedLeader.MinDistanceBetweenPoints);
+                            }
+
+                            ((BlockReference)entity).Position = newPoint;
                            crestedLeader.InsertionPoint = newPoint;
 
                            crestedLeader.IsBasePointMovedByOverrule = true;
@@ -315,7 +327,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                                        if (intersection.Equals(leaderStartPointsSort.Last()))
                                        {
-                                           crestedLeader.BoundEndPoint = leaderEndPt;
+                                           crestedLeader.BaseLeaderEndPoint = leaderEndPt;
                                        }
                                    }
                                }
@@ -333,7 +345,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                                        if (intersection.Equals(leaderStartPointsSort.First()))
                                        {
-                                           crestedLeader.BoundEndPoint = leaderEndPt;
+                                           crestedLeader.BaseLeaderEndPoint = leaderEndPt;
                                        }
                                    }
                                }
@@ -341,8 +353,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                crestedLeader.ShelfLedgePoint = crestedLeader.ShelfStartPoint + vectorToShelfLedgePoint;
                                crestedLeader.ShelfEndPoint = crestedLeader.ShelfLedgePoint + vectorToShelfEndPoint;
 
-                               crestedLeader.IsFirst = true;
-                               crestedLeader.IsLeaderPointMovedByOverrule = true;
+                               crestedLeader.IsStartPointsAssigned = true;
+                               crestedLeader.IsMoveGripPointsAt = true;
 
                                crestedLeader.UpdateEntities();
                                crestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -406,19 +418,19 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            if (crestedLeader.ShelfPosition == ShelfPosition.Right)
                            {
                                crestedLeader.ShelfStartPoint = leaderStartPointsSort.Last();
-                               crestedLeader.BoundEndPoint = leaderEndPointsSort.Last();
+                               crestedLeader.BaseLeaderEndPoint = leaderEndPointsSort.Last();
                            }
                            else
                            {
                                crestedLeader.ShelfStartPoint = leaderStartPointsSort.First();
-                               crestedLeader.BoundEndPoint = leaderEndPointsSort.First();
+                               crestedLeader.BaseLeaderEndPoint = leaderEndPointsSort.First();
                            }
 
                            crestedLeader.ShelfLedgePoint = crestedLeader.ShelfStartPoint + vectorToShelfLedgePoint;
                            crestedLeader.ShelfEndPoint = crestedLeader.ShelfLedgePoint + vectorToShelfEndPoint;
 
-                           crestedLeader.IsFirst = true;
-                           crestedLeader.IsLeaderPointMovedByOverrule = true;
+                           crestedLeader.IsStartPointsAssigned = true;
+                           crestedLeader.IsMoveGripPointsAt = true;
 
                            crestedLeader.UpdateEntities();
                            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
