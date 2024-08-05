@@ -129,6 +129,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public bool IsBasePointMovedByGrip { get; set; } = false;
 
+    
     [SaveToXData]
     public bool IsBasePointMovedByOverrule { get; set; } = false;
 
@@ -422,6 +423,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         #region Создание выносок
         CreateLeaderLines();
+        
+        LeaderStartPoints.ToLog("LeaderStartPoints");
         #endregion
 
         #region Создание текста
@@ -434,7 +437,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
         
-        // ShelfStartPoint задается через обработку ручек
+        // ShelfStartPoint задается через обработку ручек, кроме
+        if (IsBasePointMovedByOverrule)
+        {
+            ShelfStartPoint = this.GetShelfStartPoint();
+        }
 
         ShelfLedgePoint = this.GetShelfLedgePoint();
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
@@ -475,6 +482,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         IsStartPointsAssigned = false;
         IsMoveGripPointsAt = false;
+        IsBasePointMovedByOverrule = false;
 
         /*
         if (_bottomText == null)
@@ -685,6 +693,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     private void CreateLeaderLines()
     {
+
         /*
         InsertionPoint.ToLog("InsertionPoint");
         BaseLeaderEndPoint.ToLog("BaseLeaderEndPoint");
@@ -695,7 +704,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         LeaderEndPointsOCS.ToLog("LeaderEndPointsOCS");
 
         _leaders.Clear();
-        LeaderStartPoints.Clear();
         */
 
         // todo Предотвратить улет выносок в 0 и др. неприятности
@@ -717,6 +725,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
         else
         {
+            LeaderStartPoints.Clear();
+
             // BaseLeaderEndPoint задать при обработке Jig и менять в OnGripStatusChanged:
             /*
              При выполнении OnGripStatusChanged ручки (и др.?)

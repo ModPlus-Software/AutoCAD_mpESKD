@@ -43,10 +43,9 @@ internal static class SmartRotations
         return point3d.TransformBy(rotationMatrix);
     }
 
+
+
     /*
-
-    //internal static Point3d
-
     /// <summary>
     /// Возвращает точку начала выноски в координатах модели с учетом вращения смарт объекта
     /// </summary>
@@ -67,6 +66,33 @@ internal static class SmartRotations
         // return crestedLeader.InsertionPoint + (leaderStartPointOcs3d - crestedLeader.InsertionPointOCS);
         return leaderStartPointOcs3d.Point3dOcsToPoint3d(crestedLeader);
     }*/
+
+
+    /// <summary>
+    /// Точка начала полки
+    /// </summary>
+    /// <param name="crestedLeader">.</param>
+    /// <returns>.</returns>
+    internal static Point3d GetShelfStartPoint(this CrestedLeader crestedLeader)
+    {
+        var leaderStartPointsOcsSort = crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
+
+        Point3d shelfStartPointOcs;
+        if (crestedLeader.IsRotated)
+        {
+            shelfStartPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
+                ? (leaderStartPointsOcsSort.Last()).GetRotatedPointOcsByBlock(crestedLeader)
+                : (leaderStartPointsOcsSort.First()).GetRotatedPointOcsByBlock(crestedLeader);
+        }
+        else
+        {
+            shelfStartPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
+                ? leaderStartPointsOcsSort.Last()
+                : leaderStartPointsOcsSort.First();
+        }
+
+        return shelfStartPointOcs.Point3dOcsToPoint3d(crestedLeader);
+    }
 
     /// <summary>
     /// Точка отступа полки

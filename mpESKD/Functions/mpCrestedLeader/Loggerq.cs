@@ -55,16 +55,24 @@ public static class LogData
     public static void ToLog(this  List<Point3d> points,  string listName = "")
     {
         Loggerq.WriteRecord($"\nList 3d points of {listName}:");
-        Loggerq.WriteRecord("{");
-        for (int i = 0; i < points.Count; i++)
-        {
-            var x = Math.Round(points[i].X, 3, MidpointRounding.AwayFromZero);
-            var y = Math.Round(points[i].Y, 3, MidpointRounding.AwayFromZero);
-            var z = Math.Round(points[i].Z, 3, MidpointRounding.AwayFromZero);
 
-            Loggerq.WriteRecord($"  [{i}]: {x} , {y} , {z}");
+        if (points != null && points.Count > 0)
+        {
+            Loggerq.WriteRecord("{");
+            for (int i = 0; i < points.Count; i++)
+            {
+                var x = Math.Round(points[i].X, 3, MidpointRounding.AwayFromZero);
+                var y = Math.Round(points[i].Y, 3, MidpointRounding.AwayFromZero);
+                var z = Math.Round(points[i].Z, 3, MidpointRounding.AwayFromZero);
+
+                Loggerq.WriteRecord($"  [{i}]: {x} , {y} , {z}");
+            }
+            Loggerq.WriteRecord("}\n");
         }
-        Loggerq.WriteRecord("}\n");
+        else
+        {
+            Loggerq.WriteRecord("List EMPTY");
+        }
     }
 
     public static void ToLogErr(this ISmartEntity smart, string className, string metodName, Exception exception)

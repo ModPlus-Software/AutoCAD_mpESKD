@@ -238,9 +238,11 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             ((BlockReference)entity).Position = newPoint;
                            crestedLeader.InsertionPoint = newPoint;
 
-                           crestedLeader.IsBasePointMovedByOverrule = true;
+                            crestedLeader.IsBasePointMovedByOverrule = true;
 
-                           crestedLeader.UpdateEntities();
+                           
+
+                            crestedLeader.UpdateEntities();
                            crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                        }
                    }
