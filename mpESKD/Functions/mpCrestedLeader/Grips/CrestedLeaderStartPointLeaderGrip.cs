@@ -16,6 +16,10 @@ using System.Collections.Generic;
 /// </summary>
 public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
 {
+    // Временное значение точек выноски
+    private Point3d _leaderStartPointTmp;
+    private Point3d _leaderEndPointTmp;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderMoveLeaderGrip"/> class.
     /// </summary>
@@ -55,6 +59,8 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
+            _leaderStartPointTmp = CrestedLeader.LeaderStartPoints[GripIndex];
+            _leaderEndPointTmp = CrestedLeader.LeaderEndPoints[GripIndex];
         }
 
         if (newStatus == Status.GripEnd)
@@ -78,9 +84,11 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
                     List<Point3d> leaderEndPointsTmp = new();
                     leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-                    var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
-
                     CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
+
+                    var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
+                    CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+                    var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -127,6 +135,11 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
+            if (_leaderStartPointTmp != null && _leaderEndPointTmp != null)
+            {
+                CrestedLeader.LeaderStartPoints[GripIndex] = _leaderStartPointTmp;
+                CrestedLeader.LeaderEndPoints[GripIndex] = _leaderEndPointTmp;
+            }
         }
 
         base.OnGripStatusChanged(entityId, newStatus);

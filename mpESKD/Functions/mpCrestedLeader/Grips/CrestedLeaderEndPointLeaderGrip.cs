@@ -82,9 +82,11 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
                     List<Point3d> leaderEndPointsTmp = new();
                     leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-                    var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
-
                     CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
+
+                    var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
+                    CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+                    var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
