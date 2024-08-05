@@ -50,15 +50,35 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
         {
             if (CrestedLeader.LeaderStartPoints.Count > 1)
             {
-                var checkPoint = CrestedLeader.LeaderStartPoints[GripIndex];
+                var removedPoint = CrestedLeader.LeaderStartPoints[GripIndex];
 
                 CrestedLeader.LeaderStartPoints.RemoveAt(GripIndex);
                 CrestedLeader.LeaderEndPoints.RemoveAt(GripIndex);
 
-                if (checkPoint.Equals(CrestedLeader.InsertionPoint))
+                if (removedPoint.Equals(CrestedLeader.InsertionPoint))
                 {
+                    // Найти новые InsertionPoint, BaseLeaderEndPoint, ShelfStartPoint
+                    // Сохранить точки 
+
+
+
+                    //Point3d shelfStartPoint;
+                    //Point3d shelfLedgePoint;
+                    //Point3d shelfEndPoint;
+
+                    /*
+                    var distanceStartToLedge = Math.Abs(CrestedLeader.ShelfStartPoint.X - CrestedLeader.ShelfLedgePoint.X);
+                    var distanceLedgeToEnd = Math.Abs(CrestedLeader.ShelfLedgePoint.X - CrestedLeader.ShelfEndPoint.X);*/
+
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
+                    CrestedLeader.InsertionPoint = CrestedLeader.ShelfPosition == ShelfPosition.Right 
+                        ? leaderStartPointsSort.Last() 
+                        : leaderStartPointsSort.First();
+                    
+                    // Сохранить начало полки
+                    var shelfStartPoint = CrestedLeader.ShelfStartPoint = CrestedLeader.InsertionPoint;
+                    
                     // Сохранить начала выносок
                     List<Point3d> leaderStartPointsTmp = new();
                     leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
@@ -67,36 +87,14 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
                     List<Point3d> leaderEndPointsTmp = new();
                     leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-                    Point3d shelfStartPoint;
-                    Point3d shelfLedgePoint;
-                    Point3d shelfEndPoint;
-
-                    var distanceStartToLedge = Math.Abs(CrestedLeader.ShelfStartPoint.X - CrestedLeader.ShelfLedgePoint.X);
-                    var distanceLedgeToEnd = Math.Abs(CrestedLeader.ShelfLedgePoint.X - CrestedLeader.ShelfEndPoint.X);
-
-                    if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                    {
-                        CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
-
-                        shelfStartPoint = CrestedLeader.InsertionPoint;
-                        shelfLedgePoint = shelfStartPoint + (Vector3d.XAxis * distanceStartToLedge);
-                        shelfEndPoint = shelfLedgePoint + (Vector3d.XAxis * distanceLedgeToEnd);
-                    }
-                    else
-                    {
-                        CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
-
-                        shelfStartPoint = CrestedLeader.InsertionPoint;
-                        shelfLedgePoint = shelfStartPoint - (Vector3d.XAxis * distanceStartToLedge);
-                        shelfEndPoint = shelfLedgePoint - (Vector3d.XAxis * distanceLedgeToEnd);
-                    }
-
                     var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
                     CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+
+                    // Созранить конец стартовой выноски
                     var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
                     CrestedLeader.IsStartPointsAssigned = true;
-                    CrestedLeader.IsMoveGripPointsAt = true;
+                    //CrestedLeader.IsMoveGripPointsAt = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -116,21 +114,24 @@ public class CrestedLeaderLeaderRemoveGrip : SmartEntityGripData
                         tr.Commit();
                     }
 
+                    CrestedLeader.ShelfStartPoint = shelfStartPoint;
+
                     CrestedLeader.LeaderStartPoints.Clear();
                     CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
 
                     CrestedLeader.LeaderEndPoints.Clear();
                     CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
 
-                    CrestedLeader.ShelfStartPoint = shelfStartPoint;
-                    CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
-                    CrestedLeader.ShelfEndPoint = shelfEndPoint;
+                    //CrestedLeader.ShelfLedgePoint = shelfLedgePoint;
+                    //CrestedLeader.ShelfEndPoint = shelfEndPoint;
 
                     CrestedLeader.BaseLeaderEndPoint = boundEndPointTmp;
 
-                    CrestedLeader.IsStartPointsAssigned = true;
-                    CrestedLeader.IsMoveGripPointsAt = true;
+                    //CrestedLeader.IsStartPointsAssigned = true;
+                    //CrestedLeader.IsMoveGripPointsAt = true;
                 }
+
+                CrestedLeader.IsStartPointsAssigned = true;
 
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

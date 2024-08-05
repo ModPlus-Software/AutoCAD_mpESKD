@@ -63,16 +63,17 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                 {
                     CrestedLeader.LeaderStartPoints.Add(startPoint);
                     CrestedLeader.LeaderEndPoints.Add(NewPoint);
-
+                    /*
                     var vectorToShelfEndPoint = CrestedLeader.ShelfEndPoint - CrestedLeader.ShelfLedgePoint;
-                    var vectorToShelfLedgePoint = CrestedLeader.ShelfLedgePoint - CrestedLeader.ShelfStartPoint;
+                    var vectorToShelfLedgePoint = CrestedLeader.ShelfLedgePoint - CrestedLeader.ShelfStartPoint;*/
 
+                    // var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
+
+
+                    /*
                     // Список векторов от начал к концам выносок
                     List<Vector3d> vectorsToEndPoint = CrestedLeader.LeaderStartPoints
                         .Select((t, i) => CrestedLeader.LeaderEndPoints[i] - t).ToList();
-
-                    // var leaderStartPointsSort = CrestedLeader.LeaderStartPoints.OrderBy(p => p.X).ToList();
-                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                     // Список концов выносок, с учетом нового положения перемещаемой выноски
                     List<Point3d> leaderEndPointsSort = new();
@@ -89,23 +90,15 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                             }
                         }
                     }
+                    */
 
-                    if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
-                    {
-                        CrestedLeader.ShelfStartPoint = leaderStartPointsSort.Last();
-                        CrestedLeader.BaseLeaderEndPoint = leaderEndPointsSort.Last();
-                    }
-                    else
-                    {
-                        CrestedLeader.ShelfStartPoint = leaderStartPointsSort.First();
-                        CrestedLeader.BaseLeaderEndPoint = leaderEndPointsSort.First();
-                    }
-
+                    /*
                     CrestedLeader.ShelfLedgePoint = CrestedLeader.ShelfStartPoint + vectorToShelfLedgePoint;
-                    CrestedLeader.ShelfEndPoint = CrestedLeader.ShelfLedgePoint + vectorToShelfEndPoint;
+                    CrestedLeader.ShelfEndPoint = CrestedLeader.ShelfLedgePoint + vectorToShelfEndPoint;*/
 
-                    CrestedLeader.IsStartPointsAssigned = true;
-                    CrestedLeader.IsMoveGripPointsAt = true;
+                    //CrestedLeader.IsMoveGripPointsAt = true;
+
+                    var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
                     // Если требуется переместить точку вставки
                     if (!(CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.Last()) &&
@@ -114,7 +107,11 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                         (!CrestedLeader.InsertionPoint.Equals(leaderStartPointsSort.First()) &&
                          CrestedLeader.ShelfPosition == ShelfPosition.Left))
                     {
-                        CrestedLeader.ToLogAnyString("CrestedLeaderAddLeaderGrip: OnGripStatusChanged: Insert point move !");
+                        CrestedLeader.ShelfStartPoint = CrestedLeader.ShelfPosition == ShelfPosition.Right 
+                            ? leaderStartPointsSort.Last() 
+                            : leaderStartPointsSort.First();
+
+                        //CrestedLeader.ToLogAnyString("CrestedLeaderAddLeaderGrip: OnGripStatusChanged: Insert point move !");
 
                         // Сохранить начала выносок
                         List<Point3d> leaderStartPointsTmp = new();
@@ -124,9 +121,15 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                         List<Point3d> leaderEndPointsTmp = new();
                         leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-                        var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
+                        //var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
                         CrestedLeader.InsertionPoint = CrestedLeader.ShelfStartPoint;
+
+                        var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);
+                        CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(index);
+                        var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
+
+                        CrestedLeader.IsStartPointsAssigned = true;
 
                         CrestedLeader.UpdateEntities();
                         CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -153,7 +156,10 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                         CrestedLeader.LeaderEndPoints.AddRange(leaderEndPointsTmp);
 
                         CrestedLeader.BaseLeaderEndPoint = boundEndPointTmp;
+
                     }
+
+                        CrestedLeader.IsStartPointsAssigned = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -188,27 +194,29 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
         {
             var cursorPoint = pointMonitorEventArgs.Context.ComputedPoint;
 
-            var vectorToStartPoint = 
-                CrestedLeader.InsertionPoint.ToPoint2d() - CrestedLeader.BaseLeaderEndPoint.ToPoint2d();
+            var vectorToStartPoint = CrestedLeader.InsertionPoint- CrestedLeader.BaseLeaderEndPoint;
 
              _newLeaderStartPoint = Intersections.GetIntersectionBetweenVectors(
                 cursorPoint,
-                vectorToStartPoint,
+                vectorToStartPoint.ToVector2d(),
                 CrestedLeader.InsertionPoint,
-                Vector2d.XAxis);
+                //Vector2d.XAxis
+                CrestedLeader.BaseVectorNormal.ToVector2d()
+                );
 
             if (_newLeaderStartPoint is {} startPoint)
             {
                 var lineNewLeader = new Line(cursorPoint, startPoint);
 
                 var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
+                var leaderStartPointsOcsSort = CrestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
 
-                if (startPoint.X < leaderStartPointsSort.First().X)
+                if (startPoint.Point3dToPoint3dOcs(CrestedLeader).X < leaderStartPointsOcsSort.First().X)
                 {
                     var addedUnionLine = new Line(leaderStartPointsSort.First(), startPoint);
                     pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(addedUnionLine);
                 }
-                else if (startPoint.X > leaderStartPointsSort.Last().X)
+                else if (startPoint.Point3dToPoint3dOcs(CrestedLeader).X > leaderStartPointsOcsSort.Last().X)
                 {
                     var addedUnionLine = new Line(leaderStartPointsSort.Last(), startPoint);
                     pointMonitorEventArgs.Context.DrawContext.Geometry.Draw(addedUnionLine);
