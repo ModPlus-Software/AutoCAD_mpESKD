@@ -14,6 +14,10 @@ using System.Linq;
 /// </summary>
 public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
 {
+    // Временное значение точек выноски
+    private Point3d _leaderStartPointTmp;
+    private Point3d _leaderEndPointTmp;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderEndPointLeaderGrip"/> class.
     /// </summary>
@@ -53,6 +57,8 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
+            _leaderStartPointTmp = CrestedLeader.LeaderStartPoints[GripIndex];
+            _leaderEndPointTmp = CrestedLeader.LeaderEndPoints[GripIndex];
         }
 
         if (newStatus == Status.GripEnd)
@@ -126,6 +132,11 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
+            if (_leaderStartPointTmp != null && _leaderEndPointTmp != null)
+            {
+                CrestedLeader.LeaderStartPoints[GripIndex] = _leaderStartPointTmp;
+                CrestedLeader.LeaderEndPoints[GripIndex] = _leaderEndPointTmp;
+            }
         }
 
         base.OnGripStatusChanged(entityId, newStatus);

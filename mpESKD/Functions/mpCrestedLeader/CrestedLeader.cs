@@ -407,6 +407,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private void CreateEntitiesUni(double scale)
     {
         this.ToLogAnyString("[CreateEntitiesUni] START");
+        this.ToLogAnyString($"IsStartPointsAssigned: {IsStartPointsAssigned}");
 
         #region Обнуление примитивов
         _tempLeader = null;
@@ -425,6 +426,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         CreateLeaderLines();
         
         LeaderStartPoints.ToLog("LeaderStartPoints");
+        if (_leaders != null)
+        {
+            this.ToLogAnyString($"_leaders.Count: {_leaders.Count}");
+        }
         #endregion
 
         #region Создание текста
@@ -754,15 +759,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 for (int i = 0; i < LeaderEndPointsOCS.Count; i++)
                 {
                     var intersectPoint = Intersections.GetIntersectionBetweenVectors(
-                        InsertionPoint.ToPoint2d(),
+                        InsertionPoint,
                         BaseVectorNormal.ToVector2d(),
-                        LeaderEndPoints[i].ToPoint2d(),
+                        LeaderEndPoints[i],
                         newLeaderVector);
 
                     if (intersectPoint == null)
                         continue;
 
-                    LeaderStartPoints.Add(intersectPoint.Value.ToPoint3d());
+                    LeaderStartPoints.Add(intersectPoint.Value);
 
                     _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
                 }

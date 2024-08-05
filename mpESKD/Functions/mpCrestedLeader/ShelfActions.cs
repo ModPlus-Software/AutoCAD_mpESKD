@@ -23,7 +23,7 @@ internal static class ShelfActions
         // Точка проекции newPoint на центральную линию, приведенную в координаты блока
         //newPoint = newPoint.Point3dToPoint3dOcs(crestedLeader);
 
-        var setShelfPosition = crestedLeader.ShelfPosition;
+        //var setShelfPosition = crestedLeader.ShelfPosition;
 
         newPoint = newPoint.GetProjectPointToBaseLine(crestedLeader).Point3dToPoint3dOcs(crestedLeader);
 
