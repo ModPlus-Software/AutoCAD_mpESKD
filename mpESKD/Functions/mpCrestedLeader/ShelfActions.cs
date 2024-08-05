@@ -20,15 +20,33 @@ internal static class ShelfActions
         var rightStartPoint = leaderStartPointsSort.Last();
         */
 
-        var leftStartPoint = crestedLeader.LeaderStartPointsSorted.First();
-        var rightStartPoint = crestedLeader.LeaderStartPointsSorted.Last();
+        // Точка проекции newPoint на центральную линию, приведенную в координаты блока
+        //newPoint = newPoint.Point3dToPoint3dOcs(crestedLeader);
+
+        var setShelfPosition = crestedLeader.ShelfPosition;
+
+        newPoint = newPoint.GetProjectPointToBaseLine(crestedLeader).Point3dToPoint3dOcs(crestedLeader);
+
+        var leaderStartPointsOcsSort = crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X);
+
+        // Крайняя слева точка начала выносок в координатах блока
+        var leftStartPoint = leaderStartPointsOcsSort.First();
+            //crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X);
+            //.Point3dToPoint3dOcs(crestedLeader);
+
+        // Крайняя справа точка начала выносок в координатах блока
+        var rightStartPoint = leaderStartPointsOcsSort.Last();
+            //crestedLeader.LeaderStartPointsSorted.Last()
+            //.Point3dToPoint3dOcs(crestedLeader);
+
+        // Средняя точка начала выносок в координатах блока
+        var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
+            //.Point3dToPoint3dOcs(crestedLeader);
 
         var unionLineLenght = Math.Abs(leftStartPoint.X - rightStartPoint.X);
 
-        var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
-
         // Точка вставки справа
-        if (crestedLeader.InsertionPoint.Equals(rightStartPoint))
+        if (crestedLeader.InsertionPointOCS.Equals(rightStartPoint))
         {
             // Точка вставки справа + Полка справа
             if (crestedLeader.ShelfPosition == ShelfPosition.Right)
@@ -147,8 +165,9 @@ internal static class ShelfActions
             }
         }
         
-        if (newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPoint.Equals(leftStartPoint) ||
-            newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPoint.Equals(rightStartPoint))
+        
+        if (newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(leftStartPoint) ||
+            newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(rightStartPoint))
         {
             crestedLeader.IsChangeShelfPosition = true;
         }
@@ -156,5 +175,17 @@ internal static class ShelfActions
         {
             crestedLeader.IsChangeShelfPosition = false;
         }
+
+        /*
+        if (crestedLeader.ShelfPosition != setShelfPosition)
+        {
+            crestedLeader.IsChangeShelfPosition = true;
+        }
+        else
+        {
+            crestedLeader.IsChangeShelfPosition = false;
+        }*/
+
+        crestedLeader.ToLogAnyString($"IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition}");
     }
 }

@@ -483,7 +483,6 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         IsStartPointsAssigned = false;
         IsMoveGripPointsAt = false;
         IsBasePointMovedByOverrule = false;
-
         /*
         if (_bottomText == null)
         {

@@ -3,6 +3,7 @@ using System.Windows.Navigation;
 using Autodesk.AutoCAD.DatabaseServices;
 using ControlzEx.Standard;
 using DocumentFormat.OpenXml.Bibliography;
+using mpESKD.Base;
 using mpESKD.Base.Utils;
 
 namespace mpESKD.Functions.mpCrestedLeader;
@@ -194,5 +195,11 @@ internal static class Helper
         }
 
         return point; 
+    }
+
+
+    internal static Point3d Point3dToPoint3dOcs(this Point3d point3d, ISmartEntity smartEntity)
+    {
+        return point3d.TransformBy(smartEntity.BlockTransform.Inverse());
     }
 }
