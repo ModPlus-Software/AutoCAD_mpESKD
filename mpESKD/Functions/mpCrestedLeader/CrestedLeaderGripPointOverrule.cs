@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using mpESKD.Base.Overrules.Grips;
 
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -17,6 +18,7 @@ using Exception = Autodesk.AutoCAD.Runtime.Exception;
 using mpESKD.Functions.mpRevisionMark.Grips;
 using mpESKD.Functions.mpRevisionMark;
 using System.Reflection;
+using mpESKD.Functions.mpNodalLeader;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
@@ -154,6 +156,30 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         }
                     }
 
+                    // Ручка выравнивания текста
+
+                    if ((!string.IsNullOrEmpty(crestedLeader.TopText)) & (!string.IsNullOrEmpty(crestedLeader.BottomText)) &&
+                        (crestedLeader.TopText.Length != crestedLeader.BottomText.Length))
+                    {
+                        var alignGripPoint = crestedLeader.ShelfEndPoint +
+                                             (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize);
+
+                        if (crestedLeader.ShelfPosition == ShelfPosition.Right)
+                        {
+                            alignGripPoint += baseVector.GetNormal() * 20 * curViewUnitSize;
+                        }
+                        else
+                        {
+                            alignGripPoint -= baseVector.GetNormal() * 20 * curViewUnitSize;
+                        }
+
+                        grips.Add(new EntityTextAlignGrip(crestedLeader,
+                            () => crestedLeader.ValueHorizontalAlignment,
+                            (setAlignEntity) => crestedLeader.ValueHorizontalAlignment = setAlignEntity)
+                        {
+                            GripPoint = alignGripPoint
+                        });
+                    }
                 }
             }
         }

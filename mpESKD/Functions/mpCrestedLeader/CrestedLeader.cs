@@ -238,6 +238,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public double TextMaskOffset { get; set; }
 
+    /// <summary>
+    /// Выравнивание текста по горизонтали
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Content, 8, "p73", TextHorizontalAlignment.Left, descLocalKey: "d73")]
+    [SaveToXData]
+    public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
+
     #endregion
 
     /// <inheritdoc/>
@@ -246,6 +253,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         get
         {
             var entities = new List<Entity>();
+
+            if (_topTextMask != null)
+                entities.Add(_topTextMask);
+
+            if (_bottomTextMask != null) 
+                entities.Add(_bottomTextMask);
 
             if (_leaders != null)
                 entities.AddRange(_leaders);
@@ -459,17 +472,45 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         #region Указание положения текста и создание маскировки
         var textRegionCenterPoint = GeometryUtils.GetMiddlePoint3d(ShelfLedgePointOCS, ShelfEndPointOCS);
 
+
+
+
+        Vector3d movingTextPosition = new ();
+
+        if (_bottomText != null && _topText != null && !string.IsNullOrEmpty(TopText) && !string.IsNullOrEmpty(BottomText) &&
+            !_topText.ActualWidth.Equals(_bottomText.ActualWidth))
+
+        {
+            var distMove = Math.Abs(_topText.ActualWidth - _bottomText.ActualWidth);
+            var textHalfMovementHorV = Vector3d.XAxis * (distMove / 2);
+
+            movingTextPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, true, textHalfMovementHorV, ScaleFactorX);
+        }
+
+        //var diffX = Math.Abs(_topText.ActualWidth - _bottomText.ActualWidth);
+
         if (_topText != null)
         {
             var yVectorToCenterTopText = Vector3d.YAxis * ((TextVerticalOffset * scale) + (_topText.ActualHeight / 2));
 
             _topText.Location = textRegionCenterPoint + yVectorToCenterTopText;
+
+            if (_bottomText != null && _topText.ActualWidth < _bottomText.ActualWidth)
+            {
+                _topText.Location += movingTextPosition;
+            }
         }
 
         if (_bottomText != null)
         {
             var yVectorToCenterBottomText = Vector3d.YAxis * ((TextVerticalOffset * scale) + (_bottomText.ActualHeight / 2));
+           
             _bottomText.Location = textRegionCenterPoint - yVectorToCenterBottomText;
+
+            if (_topText != null && _bottomText.ActualWidth < _topText.ActualWidth)
+            {
+                _bottomText.Location += movingTextPosition;
+            }
         }
 
         if (HideTextBackground)

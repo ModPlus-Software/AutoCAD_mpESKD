@@ -142,6 +142,9 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     //CrestedLeader.IsChangeShelfPosition = true;
                 }
 
+                //CrestedLeader.ShelfLedge = 
+                CrestedLeader.IsChangeShelfPosition = false;
+
                 CrestedLeader.UpdateEntities();
                 CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
@@ -156,7 +159,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     tr.Commit();
                 }
 
-                CrestedLeader.IsChangeShelfPosition = false;
 
                 CrestedLeader.Dispose();
             }
