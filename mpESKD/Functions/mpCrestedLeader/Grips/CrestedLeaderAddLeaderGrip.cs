@@ -52,14 +52,14 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
         {
             CrestedLeader.LeaderStartPoints.ToLog("Status.GripStart: LeaderStartPoints");
 
-            // Сохранить списки точек выносок
+            // Сохранение списков точек выносок
             _leaderStartPointsTmp.Clear();
             _leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
-            //_leaderStartPointsTmp.ToLog("Status.GripStart: _leaderStartPointsTmp");
+
             _leaderEndPointsTmp.Clear();
             _leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
 
-            // добавить точки новой выноски
+            // Добавление точки новой выноски
             CrestedLeader.LeaderStartPoints.Add(GripPoint);
             CrestedLeader.LeaderEndPoints.Add(GripPoint);
         }
@@ -142,24 +142,15 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
 
         if (newStatus == Status.GripAbort)
         {
-            //CrestedLeader.LeaderStartPoints.RemoveAt(CrestedLeader.LeaderStartPoints.Count - 1);
-            //CrestedLeader.LeaderEndPoints.RemoveAt(CrestedLeader.LeaderEndPoints.Count - 1);
-
-
             if (_leaderStartPointsTmp != null && _leaderEndPointsTmp != null)
             {
-                //_leaderStartPointsTmp.ToLog("Status.GripStart: _leaderStartPointsTmp");
-
                 CrestedLeader.LeaderStartPoints.Clear();
                 CrestedLeader.LeaderStartPoints.AddRange(_leaderStartPointsTmp);
 
                 CrestedLeader.LeaderEndPoints.Clear();
                 CrestedLeader.LeaderEndPoints.AddRange(_leaderEndPointsTmp);
             }
-
-            //CrestedLeader.LeaderStartPoints.ToLog("Status.GripAbort: LeaderStartPoints");
         }
-
 
         base.OnGripStatusChanged(entityId, newStatus);
     }

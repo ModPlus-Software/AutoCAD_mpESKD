@@ -55,6 +55,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                 var crestedLeader = EntityReaderService.Instance.GetFromEntity<CrestedLeader>(entity);
                 if (crestedLeader != null)
                 {
+                    var baseVector = crestedLeader.BaseVectorNormal;
+
                     var insertGrip = new CrestedLeaderGrip(crestedLeader, 0)
                     {
                         GripPoint = crestedLeader.ShelfStartPoint
@@ -62,28 +64,36 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                     grips.Add(insertGrip);
 
+                    // Ручка перемещения полки
                     var shelfMoveGrip = new CrestedLeaderShelfMoveGrip(crestedLeader, 0)
                     {
                         GripPoint = crestedLeader.ShelfLedgePoint
                     };
-
                     grips.Add(shelfMoveGrip);
 
-                    // ручки переноса выносок - в конце выносок
-                    for (var i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
+                    // Ручка смены позиции полки
+                    //                    var shelfPositionGripPoint = crestedLeader.ShelfLedgePoint + (Vector3d.YAxis * 20 * curViewUnitSize);
+                    var shelfPositionGripPoint = crestedLeader.ShelfLedgePoint + (baseVector.GetPerpendicularVector() * 20 * curViewUnitSize);
+                    if (crestedLeader.ShelfPosition == ShelfPosition.Right)
                     {
-                        var leaderMoveGrip = new CrestedLeaderEndPointLeaderGrip(crestedLeader, i)
-                        {
-                            GripPoint = crestedLeader.LeaderEndPoints[i]
-                        };
-
-                        grips.Add(leaderMoveGrip);
+                        // shelfPositionGripPoint -= Vector3d.XAxis * 20 * curViewUnitSize;
+                        shelfPositionGripPoint -= baseVector * 20 * curViewUnitSize;
+                    }
+                    else
+                    {
+                        //                         shelfPositionGripPoint += Vector3d.XAxis * 20 * curViewUnitSize;
+                        shelfPositionGripPoint += baseVector * 20 * curViewUnitSize;
                     }
 
-                    // ручки переноса выносок - в начале выносок
+                    var shelfPositionGrip = new CrestedLeaderShelfPositionGrip(crestedLeader)
+                    {
+                        GripPoint = shelfPositionGripPoint //.GetRotatedPointByBlock(crestedLeader)
+                    };
+                    grips.Add(shelfPositionGrip);
+
+                    // Ручки переноса выносок - в начале выносок
                     for (var i = 0; i < crestedLeader.LeaderStartPoints.Count; i++)
                     {
-                        // Проверка, что начало выноски не совпадает с точкой вставки
                         if (!crestedLeader.InsertionPoint.Equals(crestedLeader.LeaderStartPoints[i]))
                         {
                             var leaderMoveGrip = new CrestedLeaderStartPointLeaderGrip(crestedLeader, i)
@@ -94,22 +104,48 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             grips.Add(leaderMoveGrip);
                         }
                     }
+                    // Ручки переноса выносок - в конце выносок
+                    for (var i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
+                    {
+                        var leaderMoveGrip = new CrestedLeaderEndPointLeaderGrip(crestedLeader, i)
+                        {
+                            GripPoint = crestedLeader.LeaderEndPoints[i]
+                        };
+
+                        grips.Add(leaderMoveGrip);
+                    }
+
+                    // Ручка добавления выносок 
+                    var addLeaderGripPoint = crestedLeader.ShelfLedgePoint - (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize);
+                    if (crestedLeader.ShelfPosition == ShelfPosition.Right)
+                    {
+                        //addLeaderGripPoint -= Vector3d.XAxis * 20 * curViewUnitSize;
+                        addLeaderGripPoint -= baseVector.GetNormal() * 20 * curViewUnitSize;
+                    }
+                    else
+                    {
+                        addLeaderGripPoint += baseVector.GetNormal() * 20 * curViewUnitSize;
+                    }
 
                     var addLeaderGrip = new CrestedLeaderAddLeaderGrip(crestedLeader)
                     {
                         
-                        GripPoint = crestedLeader.ShelfLedgePoint - (Vector3d.YAxis * 20 * curViewUnitSize)
+                        GripPoint = addLeaderGripPoint //.GetRotatedPointByBlock(crestedLeader)
                     };
 
                     grips.Add(addLeaderGrip);
 
-
+                    // Ручка удаления выносок 
                     if (crestedLeader.LeaderStartPoints.Count > 1)
                     {
                         for (int i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
                         {
-                            var removeLeaderGripPoint =
-                            crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+                            var removeLeaderGripPoint = crestedLeader.LeaderEndPointsOCS[i].Y > crestedLeader.ShelfStartPointOCS.Y
+                                    // crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
+                                    ? crestedLeader.LeaderStartPoints[i] -
+                                      (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize)
+                                    : crestedLeader.LeaderStartPoints[i] +
+                                      (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize);
 
                             grips.Add(new CrestedLeaderLeaderRemoveGrip(crestedLeader, i)
                             {
@@ -118,12 +154,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         }
                     }
 
-                    var shelfPositionGrip = new CrestedLeaderShelfPositionGrip(crestedLeader)
-                    {
-                        GripPoint = crestedLeader.ShelfLedgePoint + (Vector3d.YAxis * 20 * curViewUnitSize)
-                    };
-
-                    grips.Add(shelfPositionGrip);
                 }
             }
         }
@@ -410,7 +440,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         var newPointProject = newPoint.GetProjectPointToBaseLine(crestedLeader);
 
                         var leaderStartPoint = crestedLeader.LeaderStartPoints.Last();
-                        //var leaderEndPoint = crestedLeader.LeaderEndPoints.Last();
 
                         if (newPoint.DistanceTo(newPointProject) < crestedLeader.MinDistanceBetweenPoints)
                         {
