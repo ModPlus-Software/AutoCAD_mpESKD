@@ -1,15 +1,13 @@
-﻿
+﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+
+using System.Collections.Generic;
 using System.Linq;
-
-namespace mpESKD.Functions.mpCrestedLeader.Grips;
-
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Collections.Generic;
 
 /// <summary>
 /// Ручка перетаскивания выносок
@@ -21,7 +19,7 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
     private Point3d _leaderEndPointTmp;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="CrestedLeaderMoveLeaderGrip"/> class.
+    /// Initializes a new instance of the <see cref="CrestedLeaderStartPointLeaderGrip"/> class.
     /// </summary>
     /// <param name="crestedLeader">Экземпляр класса <see cref="mpCrestedLeader.CrestedLeader"/></param>
     /// <param name="gripIndex">Индекс ручки</param>

@@ -1,7 +1,7 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
+﻿#pragma warning disable SA1000
+namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
@@ -15,8 +15,8 @@ using System.Linq;
 /// </summary>
 public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
 {
-    private List<Point3d> _leaderStartPointsTmp = new ();
-    private List<Point3d> _leaderEndPointsTmp = new ();
+    private readonly List<Point3d> _leaderStartPointsTmp = new ();
+    private readonly List<Point3d> _leaderEndPointsTmp = new ();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderAddLeaderGrip"/> class.

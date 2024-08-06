@@ -1,5 +1,7 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
@@ -8,8 +10,6 @@ using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
 using ModPlusAPI.Windows;
-using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Ручка перетаскивания полки
@@ -89,18 +89,11 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                         CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
                     }
 
-
                     var baseLeaderStartPoint = CrestedLeader.LeaderStartPoints.First(p => p.Equals(CrestedLeader.InsertionPoint));
                     var baseIndex = CrestedLeader.LeaderStartPoints.IndexOf(baseLeaderStartPoint);
                     var baseLeaderEndPoint = CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(baseIndex);
 
-                    //CrestedLeader.ShelfLedgePoint = new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y,
-                    //    CrestedLeader.InsertionPoint.Z);
-
-                    //CrestedLeader.IsShelfPointMovedByGrip = true;
-                    //CrestedLeader.IsChangeShelfPosition = true;
-
-                   CrestedLeader.IsStartPointsAssigned = true;
+                    CrestedLeader.IsStartPointsAssigned = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -134,15 +127,8 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                         .DistanceTo(CrestedLeader.InsertionPoint);
 
                     CrestedLeader.IsStartPointsAssigned = true;
-
-                    //CrestedLeader.ShelfLedgePoint = 
-                    //    new Point3d(NewPoint.X, CrestedLeader.InsertionPoint.Y, CrestedLeader.InsertionPoint.Z);
-
-                    //CrestedLeader.IsShelfPointMovedByGrip = true;
-                    //CrestedLeader.IsChangeShelfPosition = true;
                 }
 
-                //CrestedLeader.ShelfLedge = 
                 CrestedLeader.IsChangeShelfPosition = false;
 
                 CrestedLeader.UpdateEntities();
@@ -158,7 +144,6 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
 
                     tr.Commit();
                 }
-
 
                 CrestedLeader.Dispose();
             }

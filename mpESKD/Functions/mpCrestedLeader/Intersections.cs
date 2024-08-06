@@ -5,6 +5,9 @@ using Autodesk.AutoCAD.Geometry;
 using Base.Utils;
 using System;
 
+/// <summary>
+/// Пересечения объектов
+/// </summary>
 internal class Intersections
 {
     /// <summary>
@@ -42,6 +45,9 @@ internal class Intersections
         return !double.IsNaN(x) || !double.IsNaN(y) ? new Point2d(x, y) : default;
     }
 
+    /// <summary>
+    /// Возвращает точку пересечения 2х 2D векторов
+    /// </summary>
     internal static Point3d? GetIntersectionBetweenVectors(Point3d point1, Vector2d vector1, Point3d point2,
         Vector2d vector2)
     {
@@ -55,6 +61,12 @@ internal class Intersections
         return new Point3d(point2d.Value.X, point2d.Value.Y, point1.Z);
     }
 
+    /// <summary>
+    /// Возвращает точку пересечения линии с окружностью
+    /// </summary>
+    /// <param name="line">Линия</param>
+    /// <param name="circle">Окружность</param>
+    /// <returns></returns>
     internal static Point3d? GetIntersectionBetweenCircleLine(Line line, Circle circle)
     {
         var x1 = line.EndPoint.X;

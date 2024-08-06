@@ -1,26 +1,24 @@
-﻿using System.Linq;
-using System.Windows.Navigation;
-using Autodesk.AutoCAD.DatabaseServices;
-using ControlzEx.Standard;
-using DocumentFormat.OpenXml.Bibliography;
-using mpESKD.Base;
-using mpESKD.Base.Utils;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
-namespace mpESKD.Functions.mpCrestedLeader;
-
-using Autodesk.AutoCAD.Geometry;
-using mpESKD.Base.Abstractions;
 using System.Collections.Generic;
+using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Base.Abstractions;
+using Base.Utils;
 
+/// <summary>
+/// Вспомогательные методы
+/// </summary>
 internal static class Helper
 {
     /// <summary>
-    ///  Функция возвращает проекцию точки на прямую, заданную двумя точками
+    ///  Функция возвращает перпендикулярную проекцию точки на прямую, заданную двумя точками
     /// </summary>
     /// <param name="pointProj">Проецирумая точка</param>
     /// <param name="linePoint1">Первая точка прямой</param>
     /// <param name="linePoint2">Вторая точка прямой</param>
-    /// <returns>Точка на прямой</returns>
+    /// <returns>Перпендикулярная проекция точки на прямую</returns>
     internal static Point3d GetProjectPoint(this Point3d pointProj, Point3d linePoint1, Point3d linePoint2)
     {
         using (var line = new Line3d(linePoint1, linePoint2))
@@ -35,51 +33,45 @@ internal static class Helper
     /// Возвращает перпендикулярную проекцию точки на центральную линию смарт объекта 
     /// </summary>
     /// <param name="point">Проецируемая точка в координатах модели</param>
-    /// <param name="crestedLeader">смарт объект</param>
-    /// <returns>Точка проекции в координатах модели</returns>
-    /// <remarks>Например, точки курсора</remarks>
+    /// <param name="crestedLeader">Экземпляр объекта <see cref="CrestedLeader"></see>т</param>
+    /// <returns>Перпендикулярная проекция точки на центральную линию смарт объекта в координатах модели</returns>
+    /// <remarks>Например, проекция точки курсора</remarks>
     internal static Point3d GetProjectPointToBaseLine(this Point3d point, CrestedLeader crestedLeader)
     {
         return GetProjectPoint(point, crestedLeader.InsertionPoint, crestedLeader.BaseSecondPoint);
     }
 
     /// <summary>
-    /// Пересчет точки из OCS в координаты модели
+    /// Возвращает точку, пересчитанную из относительных координат смарт объекта в координаты модели
     /// </summary>
-    /// <param name="point3dOcs">Точка в координатах смарт объекта</param>
-    /// <param name="smartEntity">Смарт объект</param>
+    /// <param name="pointOcs">Точка в координатах смарт объекта</param>
+    /// <param name="smartEntity">Экземпляр объекта, наследующий <see cref="ISmartEntity"></see></param>
     /// <returns>Точка в координатах модели</returns>
-    internal static Point3d Point3dOcsToPoint3d(this Point3d point3dOcs, ISmartEntity smartEntity)
+    internal static Point3d Point3dOcsToPoint3d(this Point3d pointOcs, ISmartEntity smartEntity)
     {
-        return smartEntity.InsertionPoint + (point3dOcs - smartEntity.InsertionPointOCS);
+        return smartEntity.InsertionPoint + (pointOcs - smartEntity.InsertionPointOCS);
     }
 
     /// <summary>
-    /// Пересчет точки из OCS в координаты модели
+    /// Возвращает точку, пересчитанную из координат модели в координаты смарт объекта
     /// </summary>
-    /// <param name="point2dOcs">Точка в координатах смарт объекта</param>
-    /// <param name="smartEntity">Смарт объект</param>
-    /// <returns>Точка в координатах модели.<br/>
-    /// Используется для обработки результата метода <see cref="Intersections"/>.GetIntersectionBetweenVectors</returns>
-    internal static Point3d Point3dOcsToPoint3d(this Point2d? point2dOcs, ISmartEntity smartEntity)
+    /// <param name="point">Точка в координатах модели</param>
+    /// <param name="smartEntity">Экземпляр объекта, наследующий <see cref="ISmartEntity"></see></param>
+    /// <returns></returns>
+    internal static Point3d Point3dToPoint3dOcs(this Point3d point, ISmartEntity smartEntity)
     {
-        if (point2dOcs is { } point2dResult)
-        {
-            return point2dResult.ToPoint3d().Point3dOcsToPoint3d(smartEntity);
-        }
-
-        return Point3d.Origin;
+        return point.TransformBy(smartEntity.BlockTransform.Inverse());
     }
 
     /// <summary>
-    /// Сортирует список точек по возрастанию X первого параметра по отсортированному списку второго параметра
+    /// Возвращает отсортированный (по центральной линии смарт объекта) список точек по шаблону, в координатах модели
     /// </summary>
-    /// <param name="points3d">Список точек для сортировки</param>
-    /// <param name="points3dOcs">Список точек как шаблон для сортировки </param>
-    /// <returns>Список точек</returns>
-    /// <remarks>Второй параметр содержит список точек с относительными координатами по блоку, этот список сортируется по X,
-    /// затем точки списка первого параметра переставляются в соответствии с отсортированным списком относительных точек.
-    /// Получаем точки первого параметра в координатах модели последовательно слева направо от первой выноски слева до крайней справа </remarks>
+    /// <param name="points3d">Список точек для сортировки, в координатах модели</param>
+    /// <param name="points3dOcs">Список точек как шаблон для сортировки, в координатах смарт объекта</param>
+    /// <returns>Список точек в координатах модели, отсортированный по центральной линии смарт объекта</returns>
+    /// <remarks>Второй параметр содержит список точек с относительными координатами по блоку, этот список сортируется по X,<br/>
+    /// затем точки списка первого параметра переставляются в соответствии с отсортированным списком относительных точек.<br/><br/>
+    /// Результат - список точек первого параметра в координатах модели, последовательно слева направо вдоль центральной линии смарт объекта</remarks>
     internal static List<Point3d> OrderByBaseLine(this List<Point3d> points3d, List<Point3d> points3dOcs)
     {
         if (points3d != null && points3d.Count > 0)
@@ -89,7 +81,7 @@ internal static class Helper
             List<Point3d> points3dSort = new();
             for (int i = 0; i < points3dOcsSort.Count; i++)
             {
-                var indexInPoints3dOcs = points3dOcs. IndexOf(points3dOcsSort[i]);
+                var indexInPoints3dOcs = points3dOcs.IndexOf(points3dOcsSort[i]);
                 points3dSort.Add(points3d.ElementAt(indexInPoints3dOcs));
             }
 
@@ -99,12 +91,19 @@ internal static class Helper
         return new List<Point3d>();
     }
 
-
+    /// <summary>
+    /// Возвращает список точек начал выносок, отсортированный по центральной линии смарт объекта, в координатах модели
+    /// </summary>
+    /// <param name="crestedLeader">Экземпляр объекта <see cref="CrestedLeader"></see></param>
     internal static List<Point3d> OrderLeaderStartPoints(this CrestedLeader crestedLeader)
     {
        return crestedLeader.LeaderStartPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
     }
 
+    /// <summary>
+    /// Возвращает список точек концов выносок, отсортированный по центральной линии смарт объекта, в координатах модели
+    /// </summary>
+    /// <param name="crestedLeader">Экземпляр объекта <see cref="CrestedLeader"></see></param>
     internal static List<Point3d> OrderLeaderEndPoints(this CrestedLeader crestedLeader)
     {
         return crestedLeader.LeaderEndPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
@@ -113,12 +112,9 @@ internal static class Helper
     /// <summary>
     /// Возвращает 2d вектор из 3d вектора
     /// </summary>
-    /// <param name="vector3d"></param>
-    /// <returns></returns>
+    /// <param name="vector3d"> 2d вектор</param>
     internal static Vector2d ToVector2d(this Vector3d vector3d)
     {
-        //return  vector3d.Convert2d(new Plane(Point3d.Origin, vector3d.GetNormal()));
-
         var ptEnd = Point3d.Origin + vector3d;
 
         var ptEnd2d = ptEnd.ToPoint2d();
@@ -128,46 +124,45 @@ internal static class Helper
         return vec2d;
     }
 
-    // Проверка на приближение курсора к концам выносок
-    internal static Point3d GetNormalizedPointByDistToPointSet(this Point3d checkPoint, List<Point3d> pointSet, double dist)
+    /// <summary>
+    /// Возвращает точку, проверенную на приближение к набору точек
+    /// </summary>
+    /// <param name="point">Проверяемая точка</param>
+    /// <param name="targetPoints">Список точек (набор) по которым выполняется проверка</param>
+    /// <param name="distance">Критическое расстояние от проверяемой точки</param>
+    /// <remarks>При приближении к одной из точек набора на расстояние меньше критического<br/>
+    /// возвращается точка пересечения окружности (с центром в точке из набора и радиусом <paramref name="distance"/>)<br/>
+    /// и вектора от центра окружности к проверяемой точке
+    /// </remarks>
+    internal static Point3d GetNormalizedPointByDistToPointSet(this Point3d point, List<Point3d> targetPoints, double distance)
     {
-        //if (pointSet.Any(p => checkPoint.ToPoint2d().GetDistanceTo(p.ToPoint2d()) < dist))
-        //{
+        var searchPoint = point.GetNearestPoint(targetPoints);
 
-        /*
-            var searchLeaderEndPoint = pointSet
-                .Select(leaderEndPoint => new
-                {
-                    Point = leaderEndPoint,
-                    Distance = leaderEndPoint.ToPoint2d().GetDistanceTo(checkPoint.ToPoint2d())
-                })
-                .OrderBy(p => p.Distance)
-                .First();
+        // Точка пересечения окружности с радиусом distance и отрезка к searchPoint
+        var lineStartPoint = searchPoint + ((point - searchPoint) * distance * 2);
 
-            var searchPoint = searchLeaderEndPoint.Point;
-        */
-         var searchPoint = checkPoint.GetNearestPoint(pointSet);
+        var line = new Line(lineStartPoint, searchPoint);
 
-       // Найдем точку пересечения окружности с радиусом dist и отрезка к searchPoint
-       var lineStartPoint = searchPoint + ((checkPoint - searchPoint) * dist * 2);
+        var circle = new Circle()
+        {
+            Center = searchPoint,
+            Radius = distance,
+        };
 
-            var line = new Line(lineStartPoint, searchPoint);
-            var circle = new Circle()
-            {
-                Center = searchPoint,
-                Radius = dist,
-            };
+        var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
+        if (intersectPoint != null)
+        {
+            return intersectPoint.Value;
+        }
 
-            var intersectPoint = Intersections.GetIntersectionBetweenCircleLine(line, circle);
-            if (intersectPoint != null)
-            {
-                return intersectPoint.Value;
-            }
-        //}
-
-        return checkPoint;
+        return point;
     }
 
+    /// <summary>
+    /// Возвращает точку из набора, ближайшую к проверяемой точке
+    /// </summary>
+    /// <param name="point">Проверяемая точка</param>
+    /// <param name="targetPoints">Список точек (набор) по которым выполняется проверка</param>
     internal static Point3d GetNearestPoint(this Point3d point, List<Point3d> targetPoints)
     {
         if (targetPoints != null && targetPoints.Count > 0)
@@ -177,16 +172,16 @@ internal static class Helper
                 return targetPoints[0];
             }
 
-            var minDist = point.DistanceTo(targetPoints[0]);
+            var minDistance = point.DistanceTo(targetPoints[0]);
             var indexSearch = 0;
 
             for (int i = 1; i <= targetPoints.Count - 1; i++)
             {
                 var iDist = point.DistanceTo(targetPoints[i]);
 
-                if (iDist < minDist)
+                if (iDist < minDistance)
                 {
-                    minDist = iDist;
+                    minDistance = iDist;
                     indexSearch = i;
                 }
             }
@@ -195,11 +190,5 @@ internal static class Helper
         }
 
         return point; 
-    }
-
-
-    internal static Point3d Point3dToPoint3dOcs(this Point3d point3d, ISmartEntity smartEntity)
-    {
-        return point3d.TransformBy(smartEntity.BlockTransform.Inverse());
     }
 }

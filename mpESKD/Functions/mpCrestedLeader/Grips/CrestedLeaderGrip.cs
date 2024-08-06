@@ -1,6 +1,5 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
-using ModPlusAPI.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
@@ -10,6 +9,7 @@ using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
+using ModPlusAPI.Windows;
 
 /// <summary>
 /// Ручка переноса выносок
@@ -68,9 +68,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                //if (!CrestedLeader.LeaderEndPointsOCS.Any(p => p.Y.Equals(CrestedLeader.InsertionPointOCS.Y)))
-                //{
-
                     List<Point3d> leaderStartPointsTmp = new();
                     leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
@@ -85,13 +82,13 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     var baseIndex = CrestedLeader.LeaderStartPoints.IndexOf(baseLeaderStartPoint);
                     var baseLeaderEndPoint = CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(baseIndex);
 
-
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
 
                     using (var tr = AcadUtils.Database.TransactionManager.StartOpenCloseTransaction())
                     {
                         var blkRef = tr.GetObject(CrestedLeader.BlockId, OpenMode.ForWrite, true, true);
+
                         // перемещение точки вставки в точку первой точки полки
                         ((BlockReference)blkRef).Position = CrestedLeader.InsertionPoint;
 
@@ -124,11 +121,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     }
 
                     CrestedLeader.Dispose();
-                //}
-                //else
-                //{
-                //    newStatus = Status.GripAbort;
-                //}
             }
 
             // При отмене перемещения возвращаем временные значения
@@ -151,5 +143,4 @@ public class CrestedLeaderGrip : SmartEntityGripData
                 ExceptionBox.Show(exception);
         }
     }
-
 }

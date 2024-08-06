@@ -1,8 +1,5 @@
-﻿// todo Добавить ручку выравнивания текста
-// todo Добавить  'Выбрать тип стрелки'
-
-using System.Linq;
-
+﻿#pragma warning disable SA1515
+#pragma warning disable SA1513
 namespace mpESKD.Functions.mpCrestedLeader;
 
 using Autodesk.AutoCAD.DatabaseServices;
@@ -17,6 +14,7 @@ using Base.Utils;
 using ModPlusAPI.Windows;
 using Base.Enums;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <inheritdoc />
 public class CrestedLeaderFunction : ISmartEntityFunction
@@ -133,11 +131,12 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                 if (entityJig.JigState == JigState.PromptInsertPoint)
                 {
                     entityJig.PreviousPoint = crestedLeader.InsertionPoint;
-                    // Задан текущий режим JIG как режим NextPoint
+
                     entityJig.JigState = JigState.PromptNextPoint;
                     
                     leaderEndPoints.Clear();
                     leaderEndPoints.Add(crestedLeader.InsertionPoint);
+
                     crestedLeader.LeaderEndPoints.Add(crestedLeader.InsertionPoint);
 
                     // Включение режима указания точек для смарт-объекта - указание точек выносок
@@ -160,11 +159,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                         leaderStartPoints.AddRange(crestedLeader.LeaderStartPoints);
 
                         // Включение режима указания точки отступа полки как текущего
-                        crestedLeader.CurrentJigState = 4; // 4
+                        crestedLeader.CurrentJigState = 4;
 
                     }
                     // Если текущий режим указания точек для смарт-объекта - указание точки отступа полки
-                    else if (currentJigStateOfCrestedLeader == 4) // currentJigState == 4
+                    else if (currentJigStateOfCrestedLeader == 4)
                     {
                         // Отключение режима указания точек 
                         crestedLeader.CurrentJigState = 0;
@@ -242,6 +241,4 @@ public class CrestedLeaderFunction : ISmartEntityFunction
             }
         }
     }
-
-
 }

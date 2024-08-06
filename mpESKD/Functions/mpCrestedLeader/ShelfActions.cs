@@ -1,47 +1,44 @@
-﻿using mpESKD.Base.Enums;
-using System;
-using System.Linq;
-using Autodesk.AutoCAD.DatabaseServices;
-using mpESKD.Base.Utils;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.Internal;
-
+﻿#pragma warning disable SA1515
 namespace mpESKD.Functions.mpCrestedLeader;
 
+using System;
+using System.Linq;
+using Base.Utils;
+using Base.Enums;
+using Autodesk.AutoCAD.Geometry;
+
+/// <summary>
+/// Изменение положения полки текста
+/// </summary>
 internal static class ShelfActions
 {
+    /// <summary>
+    /// Изменяет положение полки текста при перетаскивании ручки 
+    /// </summary>
+    /// <param name="crestedLeader">Экземпляр объекта <see cref="CrestedLeader"></see></param>
+    /// <param name="newPoint">Точка курсора</param>
     internal static void ShelfPositionMove(ref CrestedLeader crestedLeader, Point3d newPoint)
     {
-        // новое значение ShelfPosition(? , ShelfStartPoint, ShelfLedgePoint, ShelfEndPoint
-        /*
-        var leaderStartPointsSort = crestedLeader.LeaderStartPoints.OrderBy(p => p.X);
+        if (crestedLeader.LeaderStartPoints.Count == 0)
+        {
+            return;
+        }
 
-        var leftStartPoint = leaderStartPointsSort.First();
-        var rightStartPoint = leaderStartPointsSort.Last();
-        */
-
-        // Точка проекции newPoint на центральную линию, приведенную в координаты блока
-        //newPoint = newPoint.Point3dToPoint3dOcs(crestedLeader);
-
-        //var setShelfPosition = crestedLeader.ShelfPosition;
-
+        // Точка проекции newPoint на центральную линию, приведенная к координатам блока
         newPoint = newPoint.GetProjectPointToBaseLine(crestedLeader).Point3dToPoint3dOcs(crestedLeader);
 
         var leaderStartPointsOcsSort = crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X);
 
         // Крайняя слева точка начала выносок в координатах блока
+        // ReSharper disable once PossibleMultipleEnumeration
         var leftStartPoint = leaderStartPointsOcsSort.First();
-            //crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X);
-            //.Point3dToPoint3dOcs(crestedLeader);
 
         // Крайняя справа точка начала выносок в координатах блока
+        // ReSharper disable once PossibleMultipleEnumeration
         var rightStartPoint = leaderStartPointsOcsSort.Last();
-            //crestedLeader.LeaderStartPointsSorted.Last()
-            //.Point3dToPoint3dOcs(crestedLeader);
 
         // Средняя точка начала выносок в координатах блока
         var midUnionLinePoint = GeometryUtils.GetMiddlePoint3d(leftStartPoint, rightStartPoint);
-            //.Point3dToPoint3dOcs(crestedLeader);
 
         var unionLineLenght = Math.Abs(leftStartPoint.X - rightStartPoint.X);
 
@@ -54,9 +51,6 @@ internal static class ShelfActions
                 // Направо от правой точки
                 if (newPoint.X >= rightStartPoint.X)
                 {
-                    // ShelfLedge = [точка проекции newPoint на BaseLine].DistanceTo(rightStartPoint)
-                    // GetProjectPointToBaseLine
-
                     crestedLeader.ShelfLedge = Math.Abs(newPoint.X - rightStartPoint.X);
                 }
                 // Между средней точкой и правой точкой
@@ -165,7 +159,6 @@ internal static class ShelfActions
             }
         }
         
-        
         if (newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(leftStartPoint) ||
             newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(rightStartPoint))
         {
@@ -175,16 +168,6 @@ internal static class ShelfActions
         {
             crestedLeader.IsChangeShelfPosition = false;
         }
-
-        /*
-        if (crestedLeader.ShelfPosition != setShelfPosition)
-        {
-            crestedLeader.IsChangeShelfPosition = true;
-        }
-        else
-        {
-            crestedLeader.IsChangeShelfPosition = false;
-        }*/
 
         crestedLeader.ToLogAnyString($"IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition}");
     }
