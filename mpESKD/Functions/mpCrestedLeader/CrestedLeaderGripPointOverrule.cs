@@ -309,8 +309,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                                
                                crestedLeader.IsStartPointsAssigned = true;
 
-                               //crestedLeader.IsMoveGripPointsAt = true;
-
                                crestedLeader.UpdateEntities();
                                crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                            }
@@ -403,11 +401,55 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                    }
                    else if (gripData is CrestedLeaderAddLeaderGrip addLeaderGrip)
                    {
-                       addLeaderGrip.CrestedLeader.ToLogAnyString(
-                           "CrestedLeaderGripPointOverrule: MoveGripPointsAt: CrestedLeaderAddLeaderGrip");
+                        var crestedLeader = addLeaderGrip.CrestedLeader;
 
-                       addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
-                   }
+                        addLeaderGrip.NewPoint = addLeaderGrip.GripPoint + offset;
+                        var newPoint = addLeaderGrip.NewPoint;
+
+                        // Точка проекции newPoint на центральную линию
+                        var newPointProject = newPoint.GetProjectPointToBaseLine(crestedLeader);
+
+                        var leaderStartPoint = crestedLeader.LeaderStartPoints.Last();
+                        //var leaderEndPoint = crestedLeader.LeaderEndPoints.Last();
+
+                        if (newPoint.DistanceTo(newPointProject) < crestedLeader.MinDistanceBetweenPoints)
+                        {
+                            var vectorToNewPointNormal = (newPoint - newPointProject).GetNormal();
+                            var vectorToCorrectNewPoint = vectorToNewPointNormal * crestedLeader.MinDistanceBetweenPoints;
+
+                            newPoint = newPointProject + vectorToCorrectNewPoint;
+                        }
+
+                        var vectorLeader = crestedLeader.BaseLeaderEndPoint - crestedLeader.InsertionPoint;
+
+                        if (Intersections.GetIntersectionBetweenVectors(
+                                crestedLeader.InsertionPoint,
+                                crestedLeader.BaseVectorNormal.ToVector2d(),
+                                newPoint,
+                                vectorLeader.ToVector2d()) is { } tempLineStartPoint)
+                        {
+                            bool isValidPoint =
+                                  !(newPoint.Point3dToPoint3dOcs(crestedLeader).Y.Equals(leaderStartPoint.Point3dToPoint3dOcs(crestedLeader).Y) ||
+                                  crestedLeader.LeaderStartPoints.Any(p => p.Equals(newPoint)));
+
+                            if (isValidPoint)
+                            {
+                                crestedLeader.LeaderStartPoints[crestedLeader.LeaderStartPoints.Count - 1] = tempLineStartPoint;
+                                crestedLeader.LeaderEndPoints[crestedLeader.LeaderStartPoints.Count - 1] = newPoint;
+
+                                var leaderStartPointsSort = crestedLeader.LeaderStartPointsSorted;
+
+                                crestedLeader.ShelfStartPoint = crestedLeader.ShelfPosition == ShelfPosition.Right
+                                     ? leaderStartPointsSort.Last()
+                                     : leaderStartPointsSort.First();
+
+                                crestedLeader.IsStartPointsAssigned = true;
+
+                                crestedLeader.UpdateEntities();
+                                crestedLeader.BlockRecord.UpdateAnonymousBlocks();
+                            }
+                        }
+                    }
                    else
                    {
                        base.MoveGripPointsAt(entity, grips, offset, bitFlags);

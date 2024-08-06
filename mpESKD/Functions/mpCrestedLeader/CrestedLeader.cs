@@ -407,7 +407,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     private void CreateEntitiesUni(double scale)
     {
         this.ToLogAnyString("[CreateEntitiesUni] START");
-        this.ToLogAnyString($"IsStartPointsAssigned: {IsStartPointsAssigned}");
+        //this.ToLogAnyString($"IsStartPointsAssigned: {IsStartPointsAssigned}");
 
         #region Обнуление примитивов
         _tempLeader = null;
@@ -425,11 +425,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         #region Создание выносок
         CreateLeaderLines();
         
+        /*
         LeaderStartPoints.ToLog("LeaderStartPoints");
         if (_leaders != null)
         {
             this.ToLogAnyString($"_leaders.Count: {_leaders.Count}");
-        }
+        }*/
         #endregion
 
         #region Создание текста
