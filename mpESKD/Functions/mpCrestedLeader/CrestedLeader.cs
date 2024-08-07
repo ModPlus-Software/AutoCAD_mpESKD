@@ -1,4 +1,6 @@
-﻿#pragma warning disable SA1000
+﻿using DocumentFormat.OpenXml.Vml.Spreadsheet;
+
+#pragma warning disable SA1000
 #pragma warning disable SA1129
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -12,6 +14,7 @@ using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
+using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using ModPlusAPI;
 
 /// <summary>
@@ -23,10 +26,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 {
     #region Примитивы
 
-    private readonly List<Line> _leaders = new ();
+    private readonly List<Line> _leaderLines = new ();
 
-    // ReSharper disable once UnusedMember.Local
-    private readonly List<Line> _leaderArrows = new ();
+    //private readonly List<Line> _leaderArrows = new ();
 
     private Line _unionLine = new ();
     private Line _shelfLine = new ();
@@ -52,7 +54,10 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     private Wipeout _bottomTextMask = new ();
 
-    private Line _tempLeader = new ();
+    private Line _tempLeaderLine = new ();
+
+    private readonly List<Hatch> _hatches = new();
+    private readonly List<Polyline> _leaderEndLines = new();
 
     #endregion
 
@@ -169,7 +174,21 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// </summary>
     [SaveToXData]
     public ShelfPosition ShelfPosition { get; set; } = ShelfPosition.Right;
-    
+
+    /// <summary>
+    /// Размер стрелок
+    /// </summary>
+    [EntityProperty(PropertiesCategory.Geometry, 5, "p29", 5, 0.1, 10, nameSymbol: "d")]
+    [SaveToXData]
+    public double ArrowSize { get; set; } = 3;
+
+    /// <summary>
+    /// Тип стрелки
+    /// </summary> 
+    [EntityProperty(PropertiesCategory.Geometry, 6, "gp7", LeaderEndType.ClosedArrow)]
+    [SaveToXData]
+    public LeaderEndType ArrowType { get; set; } = LeaderEndType.ClosedArrow;
+
     #endregion
 
     #region Свойства - контент
@@ -240,8 +259,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             if (_bottomTextMask != null) 
                 entities.Add(_bottomTextMask);
 
-            if (_leaders != null)
-                entities.AddRange(_leaders);
+            if (_leaderLines != null)
+                entities.AddRange(_leaderLines);
 
             if (_unionLine != null)
                 entities.Add(_unionLine);
@@ -258,8 +277,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             if (_bottomText != null)
                 entities.Add(_bottomText);
 
-            if (_tempLeader != null)
-                entities.Add(_tempLeader);
+            if (_tempLeaderLine != null)
+                entities.Add(_tempLeaderLine);
+
+            if (_hatches != null) 
+                entities.AddRange(_hatches);
+
+            if (_leaderEndLines != null) 
+                entities.AddRange(_leaderEndLines);
 
             foreach (var e in entities)
                 SetImmutablePropertiesToNestedEntity(e);
@@ -330,17 +355,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
             if (CurrentJigState == (int)CrestedLeaderJigState.PromptInsertPoint)
             {
-                CreateTempCurrentLeader(InsertionPoint);
+                CreateTempCurrentLeader(InsertionPoint, scale);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptNextLeaderPoint)
             {
-                CreateTempCurrentLeader(EndPoint);
-                CreateTempLeaders();
+                CreateTempCurrentLeader(EndPoint, scale);
+                CreateTempLeaders(scale);
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfStartPoint)
             {
                 // В режиме указания точки полки рисуется набор выносок до точки пересечения с курсором
-                CreateTempLeaderLineMoved(); 
+                CreateTempLeaderLineMoved(scale); 
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.PromptShelfIndentPoint)
             {
@@ -396,6 +421,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             this.ToLogAnyString($"Entity: {en.GetRXClass().Name}");
         }
+        this.ToLogAnyString($"_leaderEndLines.Count: {_leaderEndLines.Count()}");
+        this.ToLogAnyString($"_hatches.Count: {_hatches.Count()}");
 
         this.ToLogAnyString("[UpdateEntities] END");
         this.ToLogAnyString(".");
@@ -408,8 +435,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         // Обнуление примитивов
         _topTextMask = null;
         _bottomTextMask = null;
-        _tempLeader = null;
-        _leaders.Clear();
+        _tempLeaderLine = null;
+        _leaderLines.Clear();
         _unionLine = null;
         _shelfLine = null;
         _shelf = null;
@@ -417,9 +444,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _bottomText = null;
 
         // Создание выносок
-        CreateLeaderLines();
+        CreateLeaderLines(scale);
         
-        if (_leaders.Count == 0)
+        if (_leaderLines.Count == 0)
         {
             return;
         }
@@ -503,7 +530,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         this.ToLogAnyString("[CreateEntities] END");
     }
 
-    private void CreateLeaderLines()
+    private void CreateLeaderLines(double scale)
     {
         /*
         InsertionPoint.ToLog("InsertionPoint");
@@ -514,7 +541,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         BaseLeaderEndPointOCS.ToLog("BaseLeaderEndPointOCS");
         LeaderEndPointsOCS.ToLog("LeaderEndPointsOCS");
 
-        _leaders.Clear();
+        _leaderLines.Clear();
         */
 
         // todo Предотвратить улет выносок в 0 и др. неприятности
@@ -523,12 +550,15 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             return;
         }
 
+        _leaderEndLines.Clear();
+        _hatches.Clear();
+
         // Если не нужно вычислять точки начал выносок.
         if (IsStartPointsAssigned)
         {
             for (var i = 0; i < LeaderEndPoints.Count; i++)
             {
-                _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+                _leaderLines.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
             }
         }
         else
@@ -545,7 +575,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                     var leaderStartPointOcs =
                         new Point3d(LeaderEndPointsOCS[i].X, InsertionPointOCS.Y, InsertionPointOCS.Z);
 
-                    _leaders.Add(new Line(leaderStartPointOcs, LeaderEndPointsOCS[i]));
+                    _leaderLines.Add(new Line(leaderStartPointOcs, LeaderEndPointsOCS[i]));
 
                     LeaderStartPoints.Add(leaderStartPointOcs.Point3dOcsToPoint3d(this));
                 }
@@ -567,9 +597,16 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
                     LeaderStartPoints.Add(intersectPoint.Value);
 
-                    _leaders.Add(new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]));
+                    var leaderLine = new Line(LeaderStartPointsOCS[i], LeaderEndPointsOCS[i]);
+                    _leaderLines.Add(leaderLine);
                 }
             }
+        }
+
+        foreach (var leaderLine in _leaderLines)
+        {
+            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
+            CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale * 0.02);
         }
     }
 
@@ -619,7 +656,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     /// Отрисовка выноски в режиме указания точек
     /// </summary>
     /// <param name="leaderEndPoint">Точка конца выноски</param>
-    private void CreateTempCurrentLeader(Point3d leaderEndPoint)
+    private void CreateTempCurrentLeader(Point3d leaderEndPoint, double scale)
     {
         _bottomTextMask = null;
         _topTextMask = null;
@@ -628,8 +665,14 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _shelf = null;
         _topText = null;
         _bottomText = null;
+        
+        _leaderEndLines.Clear();
+        _hatches.Clear();
 
-        _tempLeader = GetLeaderSimplyLine(leaderEndPoint);
+        _tempLeaderLine = GetLeaderSimplyLine(leaderEndPoint);
+
+        var arrowVector = (_tempLeaderLine.EndPoint - _tempLeaderLine.StartPoint).Negate();
+        CreateArrow(leaderEndPoint, arrowVector, ArrowSize, scale * 0.02);
     }
     
     private static Line GetLeaderSimplyLine(Point3d leaderEndPoint)
@@ -645,22 +688,32 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         return new Line(leaderStartPoint, leaderEndPoint);
     }
 
-    private void CreateTempLeaders()
+    private void CreateTempLeaders(double scale)
     {
-        _leaders.Clear();
+        _leaderLines.Clear();
 
-        foreach (var leaderPointOcs in LeaderEndPointsOCS)
+        _leaderEndLines.Clear();
+        _hatches.Clear();
+
+        foreach (var leaderEndPointOcs in LeaderEndPointsOCS)
         {
-            _leaders.Add(GetLeaderSimplyLine(leaderPointOcs));
+            var leaderLine = GetLeaderSimplyLine(leaderEndPointOcs);
+            _leaderLines.Add(leaderLine);
+
+            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
+            CreateArrow(leaderEndPointOcs, arrowVector, ArrowSize, scale * 0.02);
         }
     }
    
-    private void CreateTempLeaderLineMoved()
+    private void CreateTempLeaderLineMoved(double scale)
     {
         // EndPoint - точка курсора
 
-        _tempLeader = null;
-        _leaders.Clear();
+        _tempLeaderLine = null;
+        _leaderLines.Clear();
+
+        _leaderEndLines.Clear();
+        _hatches.Clear();
 
         // Проверка на приближение курсора к концам выносок
         if (LeaderEndPoints.Any(p => EndPoint.DistanceTo(p) < MinDistanceBetweenPoints))
@@ -688,12 +741,18 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
                 continue;
             }
 
-            _leaders.Add(new Line(intersectPoint.Value.ToPoint3d(), LeaderEndPoints[i]));
+            _leaderLines.Add(new Line(intersectPoint.Value.ToPoint3d(), LeaderEndPoints[i]));
         }
 
-        if (_leaders != null)
+        if (_leaderLines != null)
         {
-            LeaderStartPoints = _leaders.Select(l => l.StartPoint).ToList();
+            foreach (var leaderLine in _leaderLines)
+            {
+                var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
+                CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale * 0.02);
+            }
+
+            LeaderStartPoints = _leaderLines.Select(l => l.StartPoint).ToList();
 
             if (LeaderStartPoints.Count > 1)
             {
@@ -716,7 +775,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X);
 
-            _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
+            _unionLine = new Line(
+                // ReSharper disable once PossibleMultipleEnumeration
+                leaderStartPointsOcsSort.First(), 
+                // ReSharper disable once PossibleMultipleEnumeration
+                leaderStartPointsOcsSort.Last());
 
             var leaderStartPointsSort = LeaderStartPointsSorted;
 
@@ -831,4 +894,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     }
 
     #endregion
+
+    private void CreateArrow(Point3d point3d, Vector3d mainNormal, double arrowSize, double scale)
+    {
+        new ArrowBuilder(mainNormal, arrowSize, scale).BuildArrow(ArrowType, point3d, _hatches, _leaderEndLines);
+    }
 }
