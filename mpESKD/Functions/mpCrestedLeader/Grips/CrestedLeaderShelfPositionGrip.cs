@@ -51,19 +51,9 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
 
             Point3d shelfStartPoint;
 
-
-            //var leaderStartPointsOcsSorted = CrestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X);
-            /*
-            if (CrestedLeader.ScaleFactorX == -1)
-            {
-                leaderStartPointsOcsSorted.Reverse();
-            }*/
-
             if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
             {
                 CrestedLeader.ShelfPosition = ShelfPosition.Left;
-
-                // CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPointsSorted.First();
 
                 CrestedLeader.InsertionPoint = CrestedLeader.ScaleFactorX == -1
                     ? CrestedLeader.LeaderStartPointsSorted.Last()
@@ -75,7 +65,6 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
             {
                 CrestedLeader.ShelfPosition = ShelfPosition.Right;
 
-                // CrestedLeader.InsertionPoint = CrestedLeader.LeaderStartPointsSorted.Last(); 
                 CrestedLeader.InsertionPoint = CrestedLeader.ScaleFactorX == -1
                     ? CrestedLeader.LeaderStartPointsSorted.First()
                     : CrestedLeader.LeaderStartPointsSorted.Last();
@@ -88,7 +77,7 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
             var boundEndPointTmp = CrestedLeader.BaseLeaderEndPoint;
 
             CrestedLeader.IsStartPointsAssigned = true;
-            CrestedLeader.IsShelfPoritionByGrip = true;
+            CrestedLeader.IsShelfPositionByGrip = true;
 
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -119,7 +108,7 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
             CrestedLeader.BaseLeaderEndPoint = boundEndPointTmp;
 
             CrestedLeader.IsStartPointsAssigned = true;
-            CrestedLeader.IsShelfPoritionByGrip = true;
+            CrestedLeader.IsShelfPositionByGrip = true;
 
             CrestedLeader.UpdateEntities();
             CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

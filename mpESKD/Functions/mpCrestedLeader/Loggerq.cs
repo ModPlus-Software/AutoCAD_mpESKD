@@ -1,12 +1,11 @@
-using mpESKD.Base.Utils;
-
 namespace mpESKD;
 
+using System;
 using System.Collections.Generic;
+using System.IO;
 using Autodesk.AutoCAD.Geometry;
 using Base.Abstractions;
-using System;
-using System.IO;
+using Base.Utils;
 
 public static class Loggerq
 {
@@ -67,6 +66,7 @@ public static class LogData
 
                 Loggerq.WriteRecord($"  [{i}]: {x} , {y} , {z}");
             }
+
             Loggerq.WriteRecord("}\n");
         }
         else
@@ -84,11 +84,9 @@ public static class LogData
                             );
     }
 
-
     public static void ToLog(this Point3d point, string pointName)
     {
         var spLim = 25;
-        // Console.WriteLine("{0,-20} {1,5:N1}", names[counter], hours[counter]);
 
         var x = Math.Round(point.X, 3, MidpointRounding.AwayFromZero);
         var y = Math.Round(point.Y, 3, MidpointRounding.AwayFromZero);
@@ -96,15 +94,12 @@ public static class LogData
         var name = pointName + ":";
         var pt = $"{x} , {y}";
 
-        // var str = $"{name,-50} {pt,0}";
-
-        var sp = "";
+        var sp = string.Empty;
         var spCount = spLim - name.Length;
         if (spCount > 0)
         {
             sp = new string(' ', spCount);
         }
-
 
         var str = $"{name}{sp}{pt}";
         Loggerq.WriteRecord(str);
@@ -114,5 +109,4 @@ public static class LogData
     {
         point.ToPoint3d().ToLog(pointName);
     }
-
 }

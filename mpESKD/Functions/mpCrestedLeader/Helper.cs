@@ -1,6 +1,4 @@
-﻿using MirroringSample;
-
-namespace mpESKD.Functions.mpCrestedLeader;
+﻿namespace mpESKD.Functions.mpCrestedLeader;
 
 using System;
 using System.Collections.Generic;
@@ -9,8 +7,6 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Abstractions;
 using Base.Utils;
-using mpESKD.Base;
-using mpESKD.Functions.mpAxis;
 
 /// <summary>
 /// Вспомогательные методы
@@ -199,13 +195,16 @@ internal static class Helper
         return point; 
     }
     
+    /// <summary>
+    /// Выполняет зеркальное отражение  текста
+    /// </summary>
+    /// <param name="mtext">Текст</param>
+    /// <param name="direction">Вектор линии текста</param>
     internal static void MirrorMtext(this MText mtext, Vector3d direction)
     {
         if ((short)Autodesk.AutoCAD.ApplicationServices.Core.Application.GetSystemVariable("MIRRTEXT") == 0)
         {
             var axis = new Line3d(mtext.Location, mtext.Location + direction);
-
-            //var pts = mtext.GetMTextBoxCorners();
 
             var pointCollection = mtext.GetBoundingPoints();
             Point3d[] pointArray = new Point3d[pointCollection.Count];
