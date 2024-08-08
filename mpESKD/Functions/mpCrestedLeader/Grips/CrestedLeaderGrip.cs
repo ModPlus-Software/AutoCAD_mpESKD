@@ -73,6 +73,14 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
 
+                    
+                    if (CrestedLeader.ScaleFactorX == -1)
+                    {
+                        leaderStartPointsSort.Reverse();
+                    }
+
+                    leaderStartPointsSort.ToLog("leaderStartPointsSort");
+
                     if (CrestedLeader.ShelfPosition == ShelfPosition.Right)
                         CrestedLeader.InsertionPoint = leaderStartPointsSort.Last();
                     else
@@ -80,7 +88,10 @@ public class CrestedLeaderGrip : SmartEntityGripData
 
                     var baseLeaderStartPoint = CrestedLeader.LeaderStartPoints.First(p => p.Equals(CrestedLeader.InsertionPoint));
                     var baseIndex = CrestedLeader.LeaderStartPoints.IndexOf(baseLeaderStartPoint);
+
                     var baseLeaderEndPoint = CrestedLeader.BaseLeaderEndPoint = CrestedLeader.LeaderEndPoints.ElementAt(baseIndex);
+
+                    CrestedLeader.IsBasePointMovedByOverrule = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
@@ -104,7 +115,9 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
                     CrestedLeader.BaseLeaderEndPoint = baseLeaderEndPoint;
 
-                    CrestedLeader.IsBasePointMovedByGrip = true;
+                //CrestedLeader.IsBasePointMovedByGrip = true;
+
+                    CrestedLeader.IsBasePointMovedByOverrule = true;
 
                     CrestedLeader.UpdateEntities();
                     CrestedLeader.BlockRecord.UpdateAnonymousBlocks();

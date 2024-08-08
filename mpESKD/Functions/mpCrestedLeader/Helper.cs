@@ -1,11 +1,16 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using MirroringSample;
 
+namespace mpESKD.Functions.mpCrestedLeader;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Abstractions;
 using Base.Utils;
+using mpESKD.Base;
+using mpESKD.Functions.mpAxis;
 
 /// <summary>
 /// Вспомогательные методы
@@ -100,6 +105,7 @@ internal static class Helper
        return crestedLeader.LeaderStartPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
     }
 
+    /*
     /// <summary>
     /// Возвращает список точек концов выносок, отсортированный по центральной линии смарт объекта, в координатах модели
     /// </summary>
@@ -108,6 +114,7 @@ internal static class Helper
     {
         return crestedLeader.LeaderEndPoints.OrderByBaseLine(crestedLeader.LeaderStartPointsOCS);
     }
+    */
 
     /// <summary>
     /// Возвращает 2d вектор из 3d вектора
@@ -190,5 +197,32 @@ internal static class Helper
         }
 
         return point; 
+    }
+    
+    internal static void MirrorMtext(this MText mtext, Vector3d direction)
+    {
+        if ((short)Autodesk.AutoCAD.ApplicationServices.Core.Application.GetSystemVariable("MIRRTEXT") == 0)
+        {
+            var axis = new Line3d(mtext.Location, mtext.Location + direction);
+
+            //var pts = mtext.GetMTextBoxCorners();
+
+            var pointCollection = mtext.GetBoundingPoints();
+            Point3d[] pointArray = new Point3d[pointCollection.Count];
+
+            for (var i = 0; i < pointCollection.Count; i++)
+            {
+                pointArray[i] = pointCollection[i];
+            }
+
+            var rotAxis = Math.Abs(axis.Direction.X) < Math.Abs(axis.Direction.Y) 
+                ? pointArray[0].GetVectorTo(pointArray[3]) 
+                : pointArray[0].GetVectorTo(pointArray[1]);
+
+            mtext.TransformBy(Matrix3d.Rotation(Math.PI, rotAxis, mtext.Location));
+
+            var rotationMatrix = Matrix3d.Rotation(Math.PI, Vector3d.ZAxis, mtext.Location);
+            mtext.TransformBy(rotationMatrix);
+        }
     }
 }

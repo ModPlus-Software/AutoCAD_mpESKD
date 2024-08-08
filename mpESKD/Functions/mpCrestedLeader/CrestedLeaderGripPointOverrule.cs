@@ -12,6 +12,7 @@ using ModPlusAPI.Windows;
 using Base.Utils;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 using mpESKD.Base.Overrules.Grips;
+using DocumentFormat.OpenXml.Presentation;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
@@ -25,6 +26,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         Vector3d curViewDir,
         GetGripPointsFlags bitFlags)
     {
+        Loggerq.WriteRecord("[CrestedLeaderGripPointOverrule: GetGripPoints]");
+
         try
         {
             if (IsApplicable(entity))
@@ -67,22 +70,29 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     grips.Add(shelfMoveGrip);
 
                     // Ручка смены позиции полки
-                    //                    var shelfPositionGripPoint = crestedLeader.ShelfLedgePoint + (Vector3d.YAxis * 20 * curViewUnitSize);
                     var shelfPositionGripPoint = crestedLeader.ShelfLedgePoint + (baseVector.GetPerpendicularVector() * 20 * curViewUnitSize);
+
+                    var addVector = baseVector * 20 * curViewUnitSize;
+/*
+                    if (crestedLeader.ScaleFactorX == -1)
+                    {
+                        addVector.Negate();
+                    }*/
+
                     if (crestedLeader.ShelfPosition == ShelfPosition.Right)
                     {
-                        // shelfPositionGripPoint -= Vector3d.XAxis * 20 * curViewUnitSize;
-                        shelfPositionGripPoint -= baseVector * 20 * curViewUnitSize;
+                        shelfPositionGripPoint -= addVector;
                     }
                     else
                     {
-                        //                         shelfPositionGripPoint += Vector3d.XAxis * 20 * curViewUnitSize;
-                        shelfPositionGripPoint += baseVector * 20 * curViewUnitSize;
+                        shelfPositionGripPoint += addVector;
+
+
                     }
 
                     var shelfPositionGrip = new CrestedLeaderShelfPositionGrip(crestedLeader)
                     {
-                        GripPoint = shelfPositionGripPoint //.GetRotatedPointByBlock(crestedLeader)
+                        GripPoint = shelfPositionGripPoint 
                     };
                     grips.Add(shelfPositionGrip);
 
@@ -114,7 +124,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     var addLeaderGripPoint = crestedLeader.ShelfLedgePoint - (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize);
                     if (crestedLeader.ShelfPosition == ShelfPosition.Right)
                     {
-                        //addLeaderGripPoint -= Vector3d.XAxis * 20 * curViewUnitSize;
                         addLeaderGripPoint -= baseVector.GetNormal() * 20 * curViewUnitSize;
                     }
                     else
@@ -125,7 +134,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     var addLeaderGrip = new CrestedLeaderAddLeaderGrip(crestedLeader)
                     {
                         
-                        GripPoint = addLeaderGripPoint //.GetRotatedPointByBlock(crestedLeader)
+                        GripPoint = addLeaderGripPoint
                     };
 
                     grips.Add(addLeaderGrip);
@@ -136,7 +145,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         for (int i = 0; i < crestedLeader.LeaderEndPoints.Count; i++)
                         {
                             var removeLeaderGripPoint = crestedLeader.LeaderEndPointsOCS[i].Y > crestedLeader.ShelfStartPointOCS.Y
-                                    // crestedLeader.LeaderEndPoints[i] - (Vector3d.XAxis * 20 * curViewUnitSize);
                                     ? crestedLeader.LeaderStartPoints[i] -
                                       (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize)
                                     : crestedLeader.LeaderStartPoints[i] +
@@ -187,7 +195,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
-       try
+        Loggerq.WriteRecord("[CrestedLeaderGripPointOverrule: MoveGripPointsAt]");
+
+        try
        {
            if (IsApplicable(entity))
            {
@@ -204,8 +214,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            insertGrip.NewPoint = insertGrip.GripPoint + offset;
                            var newPoint = insertGrip.NewPoint;
 
-                           // Проверка на приближение курсора к концам выносок
-                           if (crestedLeader.LeaderEndPoints
+                            // Проверка на приближение курсора к концам выносок
+                            if (crestedLeader.LeaderEndPoints
                                .Any(p => newPoint.DistanceTo(p) < crestedLeader.MinDistanceBetweenPoints))
                            {
                                newPoint = newPoint.GetNormalizedPointByDistToPointSet(
@@ -275,16 +285,36 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                            {
                                crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex] = tempLineStartPoint;
                                crestedLeader.LeaderEndPoints[leaderEndGrip.GripIndex] = newPoint;
-
+                                
+                                
                                var leaderStartPointsSort = crestedLeader.LeaderStartPointsSorted;
 
                                crestedLeader.ShelfStartPoint = crestedLeader.ShelfPosition == ShelfPosition.Right 
                                     ? leaderStartPointsSort.Last() 
                                     : leaderStartPointsSort.First();
-                               
-                               crestedLeader.IsStartPointsAssigned = true;
 
-                               crestedLeader.UpdateEntities();
+                                /*
+                                var leaderStartPointsOcsSort = crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
+
+                                if (crestedLeader.ScaleFactorX == -1)
+                                {
+                                    leaderStartPointsOcsSort.Reverse();
+                                }
+
+                                if (crestedLeader.BaseSecondPointOCS.X < leaderStartPointsOcsSort.First().X)
+                                {
+                                    crestedLeader.ShelfPosition = ShelfPosition.Left;
+                                }
+                                else
+                                {
+                                    crestedLeader.ShelfPosition = ShelfPosition.Right;
+                                }*/
+
+                                crestedLeader.IsStartPointsAssigned = true;
+                                crestedLeader.IsBasePointMovedByOverrule = true;
+                                crestedLeader.IsShelfPoritionByGrip = true;
+
+                                crestedLeader.UpdateEntities();
                                crestedLeader.BlockRecord.UpdateAnonymousBlocks();
                            }
 

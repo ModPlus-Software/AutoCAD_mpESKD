@@ -75,6 +75,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void CreateCrestedLeader()
     {
+        Loggerq.WriteRecord("CrestedLeaderFunction: CreateCrestedLeader() * * *");
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
         try
@@ -107,6 +108,8 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
+        Loggerq.WriteRecord("CrestedLeaderFunction: InsertCrestedLeaderWithJig() * * *");
+
         List<Point3d> leaderStartPoints = new ();
         List<Point3d> leaderEndPoints = new ();
         Point3d shelfStartPoint = new ();

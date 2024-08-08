@@ -1,6 +1,4 @@
-﻿using DocumentFormat.OpenXml.Vml.Spreadsheet;
-
-#pragma warning disable SA1000
+﻿#pragma warning disable SA1000
 #pragma warning disable SA1129
 namespace mpESKD.Functions.mpCrestedLeader;
 
@@ -14,7 +12,6 @@ using Base.Abstractions;
 using Base.Attributes;
 using Base.Enums;
 using Base.Utils;
-using DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle;
 using ModPlusAPI;
 
 /// <summary>
@@ -127,7 +124,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     public bool IsStartPointsAssigned { get; set; } = false;
 
     [SaveToXData]
-    public bool IsBasePointMovedByGrip { get; set; } = false;
+    public bool IsShelfPoritionByGrip { get; set; } = false;
     
     [SaveToXData]
     public bool IsBasePointMovedByOverrule { get; set; } = false;
@@ -142,7 +139,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
     public Point3d BaseSecondPoint => (InsertionPoint + Vector3d.XAxis).GetRotatedPointByBlock(this);
 
+    public Point3d BaseSecondPointOCS => BaseSecondPoint.TransformBy(BlockTransform.Inverse());
+
     public Vector3d BaseVectorNormal => BaseSecondPoint - InsertionPoint;
+
+    [SaveToXData]
+    public bool IsMirrored { get; set; } = false;
 
     #endregion
 
@@ -316,38 +318,42 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     {
         this.ToLogAnyString(" ");
         this.ToLogAnyString("[UpdateEntities] START");
-        /*
-        this.ToLogAnyString($"  IsStartPointsAssigned: {IsStartPointsAssigned.ToString()}");
-        this.ToLogAnyString($"  IsMoveGripPointsAt: {IsMoveGripPointsAt.ToString()}");
-        
-        this.ToLogAnyString($"  Rotation: {Math.Round(Rotation, 3, MidpointRounding.AwayFromZero)} rad");
-        this.ToLogAnyString($"  Rotation: {Math.Round(Rotation.RadianToDegree(), 3, MidpointRounding.AwayFromZero)} degree");
-        */
+        /*  this.ToLogAnyString(" ");
+
+          this.ToLogAnyString($"ScaleFactorX: {ScaleFactorX}");
+          this.ToLogAnyString($"IsMirrored: {IsMirrored}");
+          this.ToLogAnyString($"CommandsWatcher.Mirroring: {CommandsWatcher.Mirroring}");
+          this.ToLogAnyString(" ");
+
+          InsertionPoint.ToLog("InsertionPoint");
+          //InsertionPointOCS.ToLog("InsertionPointOCS");
+          //this.ToLogAnyString(" ");
+
+          BaseSecondPoint.ToLog("BaseSecondPoint");
+          //BaseSecondPointOCS.ToLog("BaseSecondPointOCS");
+          //this.ToLogAnyString(" ");
+
+          BaseLeaderEndPoint.ToLog("BaseLeaderEndPoint");
+          //BaseLeaderEndPointOCS.ToLog("BaseLeaderEndPointOCS");
+          this.ToLogAnyString(" ");
+
+          this.ToLogAnyString($"ShelfPosition: {ShelfPosition.ToString()}");
+
+          ShelfStartPoint.ToLog("ShelfStartPoint");
+
+          ShelfLedgePoint.ToLog("ShelfLedgePoint"); */
+
+        InsertionPoint.ToLog("InsertionPoint");
+
+
+        this.ToLogAnyString($"ShelfPosition: {ShelfPosition.ToString()}");
+
+
+        this.ToLogAnyString(" ");
 
         /*
-        this.ToLogAnyStringFromPoint3d(InsertionPoint, "InsertionPoint");
-        this.ToLogAnyStringFromPoint3d(InsertionPointOCS, "InsertionPointOCS");
-        */
-
-        /*
-        BaseSecondPoint.ToLog("BaseSecondPoint");
-        BaseSecondPointOCS.ToLog("BaseSecondPointOCS");
-
         this.ToLogAnyString("\n");
         */
-
-        /*
-        this.ToLogAnyString("Преобразование из vector3d в vector2d");
-        var pt3dStart = new Point3d(100, 100, 0);
-        var pt3dEnd = new Point3d(200, 200, 0);
-        var vec3d = pt3dEnd - pt3dStart;
-        var vec2d = vec3d.ToVector2d();
-
-        var pt2dStart = new Point2d(pt3dStart.X, pt3dStart.Y);
-        var pt2dEnd = pt2dStart + vec2d;
-
-        this.ToLogAnyString($"Точка должна быть = (200, 200)");
-        pt2dEnd.ToLog("Конец вектора 2d:");*/
 
         try
         {
@@ -371,7 +377,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 CreateTempShelfLines(); 
                 CreateTextSimple(scale);
-                CreateTempShelf(); 
+                CreateTempShelf();
+                ScaleFactorX = 1;
             }
             else if (CurrentJigState == (int)CrestedLeaderJigState.None)
             {
@@ -411,18 +418,13 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             this.ToLogErr("CrestedLeader", "UpdateEntities", exception);
         }
 
+        this.ToLogAnyString(" ");
+        this.ToLogAnyString($"ScaleFactorX: {ScaleFactorX}");
         /*
-        LeaderStartPoints.ToLogAnyStringFromPoint3dList("LeaderStartPoints");
-        var leaderStartPointsSort1 = LeaderStartPoints.OrderByBaseLine(LeaderStartPointsOCS);
-        leaderStartPointsSort1.ToLogAnyStringFromPoint3dList("LeaderStartPoints sorted");*/
-
-        this.ToLogAnyString($"Entities.Count: {Entities.Count()}");
-        foreach (var en in Entities)
-        {
-            this.ToLogAnyString($"Entity: {en.GetRXClass().Name}");
-        }
-        this.ToLogAnyString($"_leaderEndLines.Count: {_leaderEndLines.Count()}");
-        this.ToLogAnyString($"_hatches.Count: {_hatches.Count()}");
+        this.ToLogAnyString($"IsMirrored: {IsMirrored}");
+        this.ToLogAnyString($"CommandsWatcher.Mirroring: {CommandsWatcher.Mirroring}");
+        */
+        this.ToLogAnyString($"ShelfPosition: {ShelfPosition.ToString()}");  
 
         this.ToLogAnyString("[UpdateEntities] END");
         this.ToLogAnyString(".");
@@ -443,33 +445,93 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         _topText = null;
         _bottomText = null;
 
+        /*
+        if (CommandsWatcher.Mirroring)
+        {
+            IsMirrored = true;
+        }
+        else if (IsMirrored && !CommandsWatcher.Mirroring)
+        {
+            ShelfPosition = ShelfPosition == ShelfPosition.Right
+                ? ShelfPosition.Left
+                : ShelfPosition.Right;
+
+            IsMirrored = false;
+        }*/
+        /*
+        if (CommandsWatcher.Mirroring)
+        {
+            ShelfPosition = ShelfPosition == ShelfPosition.Right
+                ? ShelfPosition.Left
+                : ShelfPosition.Right;
+        }*/
+
+        
+
+        bool isMirroringText = (ScaleFactorX <= 0 && !CommandsWatcher.Mirroring) ||
+                               (ScaleFactorX >= 0 && CommandsWatcher.Mirroring);
+
+        //if ((ScaleFactorX == -1 || ScaleFactorX == 1) && IsMirrored && !CommandsWatcher.Mirroring)
+
         // Создание выносок
         CreateLeaderLines(scale);
-        
+
         if (_leaderLines.Count == 0)
         {
             return;
         }
 
         // Создание текста
-
         var widthWidestText = CreateText(scale);
 
         // Создание доп. линий и полки
 
         var leaderStartPointsOcsSort = LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
         _unionLine = new Line(leaderStartPointsOcsSort.First(), leaderStartPointsOcsSort.Last());
-        
+
         // ShelfStartPoint задается через обработку ручек, кроме
         if (IsBasePointMovedByOverrule)
         {
+            //var leaderStartPointsOcsSort = LeaderEndPointsOCS.OrderBy(p => p.X).ToList();
+
+            //this.ToLogAnyString($"{leaderStartPointsOcsSort}");
+            if (!IsShelfPoritionByGrip)
+            {
+                if (ScaleFactorX == -1)
+                {
+                    leaderStartPointsOcsSort.Reverse();
+                    /*
+                    BaseSecondPointOCS.ToLog("BaseSecondPointOCS");
+                leaderStartPointsOcsSort.ToLog("leaderStartPointsOcsSort");*/
+
+                    if (BaseSecondPointOCS.X < leaderStartPointsOcsSort.First().X)
+                    {
+                        ShelfPosition = ShelfPosition.Left;
+                    }
+                    else 
+                    {
+                        ShelfPosition= ShelfPosition.Right;
+                    }
+                }
+            }
+
             ShelfStartPoint = this.GetShelfStartPoint();
+            //ShelfStartPoint.ToLog("ShelfStartPoint ");
+            //ShelfStartPointOCS.ToLog("ShelfStartPointOCS");
         }
 
+
         ShelfLedgePoint = this.GetShelfLedgePoint();
+        //ShelfLedgePoint.ToLog("ShelfLedgePoint ");
+        //ShelfLedgePointOCS.ToLog("ShelfLedgePointOCS");
+
+
         _shelfLine = new Line(ShelfStartPointOCS, ShelfLedgePointOCS);
 
         ShelfEndPoint = this.GetShelfEndPoint(widthWidestText);
+        //ShelfEndPoint.ToLog("ShelfEndPoint ");
+        //ShelfEndPointOCS.ToLog("ShelfEndPointOCS");
+
         _shelf = new Line(ShelfLedgePointOCS, ShelfEndPointOCS);
 
         // Указание положения текста и создание маскировки
@@ -487,6 +549,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             movingTextPosition = EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, true, textHalfMovementHorV, ScaleFactorX);
         }
 
+
         if (_topText != null)
         {
             var yVectorToCenterTopText = Vector3d.YAxis * ((TextVerticalOffset * scale) + (_topText.ActualHeight / 2));
@@ -497,7 +560,26 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 _topText.Location += movingTextPosition;
             }
+
+            if (isMirroringText)
+            {
+                _topText.MirrorMtext(Vector3d.XAxis);
+            }
         }
+
+        /*
+        if (CommandsWatcher.Mirroring)
+        {
+            this.ToLogAnyString($"Mirroring now !");
+        }
+
+        this.ToLogAnyString($"ScaleFactorX: {ScaleFactorX}");
+        this.ToLogAnyString($"Sysvar the MIRRTEXT: {Autodesk.AutoCAD.ApplicationServices.Core.Application.GetSystemVariable("MIRRTEXT")}");
+
+        if ((ScaleFactorX <= 0 && !CommandsWatcher.Mirroring) || (ScaleFactorX >= 0 && CommandsWatcher.Mirroring))
+        {
+            _topText.MirrorMtext(Vector3d.XAxis);
+        }*/
 
         if (_bottomText != null)
         {
@@ -509,6 +591,12 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             {
                 _bottomText.Location += movingTextPosition;
             }
+
+            if (isMirroringText)
+            {
+                _bottomText.MirrorMtext(Vector3d.XAxis);
+            }
+
         }
 
         if (HideTextBackground)
@@ -526,7 +614,9 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         IsStartPointsAssigned = false;
         IsBasePointMovedByOverrule = false;
-       
+        IsShelfPoritionByGrip = false;
+
+
         this.ToLogAnyString("[CreateEntities] END");
     }
 
@@ -605,8 +695,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         foreach (var leaderLine in _leaderLines)
         {
-            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
-            CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale * 0.02);
+            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate().GetNormal();
+            CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale);
         }
     }
 
@@ -671,8 +761,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         _tempLeaderLine = GetLeaderSimplyLine(leaderEndPoint);
 
-        var arrowVector = (_tempLeaderLine.EndPoint - _tempLeaderLine.StartPoint).Negate();
-        CreateArrow(leaderEndPoint, arrowVector, ArrowSize, scale * 0.02);
+        var arrowVector = (_tempLeaderLine.EndPoint - _tempLeaderLine.StartPoint).Negate().GetNormal();
+        CreateArrow(leaderEndPoint, arrowVector, ArrowSize, scale);
     }
     
     private static Line GetLeaderSimplyLine(Point3d leaderEndPoint)
@@ -700,8 +790,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
             var leaderLine = GetLeaderSimplyLine(leaderEndPointOcs);
             _leaderLines.Add(leaderLine);
 
-            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
-            CreateArrow(leaderEndPointOcs, arrowVector, ArrowSize, scale * 0.02);
+            var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate().GetNormal();
+            CreateArrow(leaderEndPointOcs, arrowVector, ArrowSize, scale);
         }
     }
    
@@ -748,8 +838,8 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         {
             foreach (var leaderLine in _leaderLines)
             {
-                var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate();
-                CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale * 0.02);
+                var arrowVector = (leaderLine.EndPoint - leaderLine.StartPoint).Negate().GetNormal();
+                CreateArrow(leaderLine.EndPoint, arrowVector, ArrowSize, scale);
             }
 
             LeaderStartPoints = _leaderLines.Select(l => l.StartPoint).ToList();
@@ -879,7 +969,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         var topTextHeight = _topText.ActualHeight;
 
         Point3d textRegionCenterPoint;
-        var vectorToCenterPoint = Vector3d.XAxis * (((ShelfLedge + TextIndent) * scale) + (topTextWidth / 2));
+        var vectorToCenterPoint = Vector3d.XAxis * (ShelfLedge + (TextIndent * scale) + (topTextWidth / 2));
 
         if (ShelfPosition == ShelfPosition.Right)
         {

@@ -1,4 +1,6 @@
-﻿namespace mpESKD.Functions.mpCrestedLeader;
+﻿using System;
+
+namespace mpESKD.Functions.mpCrestedLeader;
 
 using System.Linq;
 using Autodesk.AutoCAD.Geometry;
@@ -46,6 +48,13 @@ internal static class PointRotations
     {
         var leaderStartPointsOcsSort = crestedLeader.LeaderStartPointsOCS.OrderBy(p => p.X).ToList();
 
+        if (crestedLeader.ScaleFactorX == -1)
+        {
+            leaderStartPointsOcsSort.Reverse();
+        }
+
+        //leaderStartPointsOcsSort.ToLog("leaderStartPointsOcsSort");
+
         Point3d shelfStartPointOcs;
         if (crestedLeader.IsRotated)
         {
@@ -70,6 +79,14 @@ internal static class PointRotations
     internal static Point3d GetShelfLedgePoint(this CrestedLeader crestedLeader)
     {
         var vectorToShelfLedge = Vector3d.XAxis * crestedLeader.ShelfLedge;
+        /*
+        bool isMirroring = (crestedLeader.ScaleFactorX <= 0 && !CommandsWatcher.Mirroring) ||
+                           (crestedLeader.ScaleFactorX >= 0 && CommandsWatcher.Mirroring);
+        
+        if (isMirroring)
+        {
+            vectorToShelfLedge = -vectorToShelfLedge;
+        }*/
 
         Point3d shelfLedgePointOcs;
         if (crestedLeader.IsRotated)
@@ -96,9 +113,19 @@ internal static class PointRotations
     /// <param name="widthWidestText">Длина самого широкого текста</param>
     internal static Point3d GetShelfEndPoint(this CrestedLeader crestedLeader, double widthWidestText)
     {
-        var vectorToShelfEndpoint = Vector3d.XAxis * ((crestedLeader.TextIndent * crestedLeader.GetScale()) + widthWidestText);
+        // var vectorToShelfEndpoint = Vector3d.XAxis * ((crestedLeader.TextIndent * crestedLeader.GetScale()) + widthWidestText);
+        var vectorToShelfEndpoint = Vector3d.XAxis * 
+                                    (crestedLeader.ShelfLedge + (crestedLeader.TextIndent * crestedLeader.GetScale()) + widthWidestText);
+        /*
+        if (crestedLeader.ScaleFactorX == -1)
+        {
+        
+            vectorToShelfEndpoint = -vectorToShelfEndpoint;
+        }
+        */
 
         Point3d shelfEndPointOcs;
+        /*
         if (crestedLeader.IsRotated)
         {
             shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
@@ -111,6 +138,20 @@ internal static class PointRotations
                 ? crestedLeader.ShelfLedgePointOCS + vectorToShelfEndpoint
                 : crestedLeader.ShelfLedgePointOCS - vectorToShelfEndpoint;
         }
+        */
+        if (crestedLeader.IsRotated)
+        {
+            shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
+                ? (crestedLeader.ShelfStartPointOCS + vectorToShelfEndpoint).GetRotatedPointOcsByBlock(crestedLeader)
+                : (crestedLeader.ShelfStartPointOCS - vectorToShelfEndpoint).GetRotatedPointOcsByBlock(crestedLeader);
+        }
+        else
+        {
+            shelfEndPointOcs = crestedLeader.ShelfPosition == ShelfPosition.Right
+                ? crestedLeader.ShelfStartPointOCS + vectorToShelfEndpoint
+                : crestedLeader.ShelfStartPointOCS - vectorToShelfEndpoint;
+        }
+
 
         return shelfEndPointOcs.Point3dOcsToPoint3d(crestedLeader);
     }
