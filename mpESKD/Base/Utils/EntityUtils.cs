@@ -333,6 +333,7 @@ public static class EntityUtils
             var bottomRightPoint = new Point2d(center.X + halfWidth, center.Y - halfHeight);
 
             return [bottomLeftPoint, topLeftPoint, topRightPoint, bottomRightPoint];
+            
         }
 
         return null;

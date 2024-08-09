@@ -3,78 +3,96 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mps="https://modplus.org/winfx/xaml/controls">
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/ModPlusStyle;component/Styles/Controls.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="EntityExpander" TargetType="{x:Type Expander}" BasedOn="{StaticResource ModPlusExpander}">
-        <Setter Property="mps:ExpanderAssist.UpDownHeaderPadding" Value="5"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="EntityExpander"
+           BasedOn="{StaticResource ModPlusExpander}"
+           TargetType="{x:Type Expander}">
+        <Setter Property="mps:ExpanderAssist.UpDownHeaderPadding" Value="5" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="HeaderTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="Background" Value="{DynamicResource FlatButtonGrayBrush}"/>
-        <Setter Property="Margin" Value="5 5 5 0"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="HeaderTextBox"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="{DynamicResource FlatButtonGrayBrush}" />
+        <Setter Property="Margin" Value="5 5 5 0" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="PropertyNameTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Margin" Value="5 0 0 0"/>
-        <Setter Property="BorderThickness" Value="1 0 0 1"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyNameTextBox"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Margin" Value="5 0 0 0" />
+        <Setter Property="BorderThickness" Value="1 0 0 1" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="PropertyValueTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModPlusTextBox}">
-        <Setter Property="Margin" Value="0 0 5 0"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="mps:TextFieldAssist.SelectAllOnFocus" Value="True"/>
-        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="True"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueTextBox"
+           BasedOn="{StaticResource ModPlusTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="Margin" Value="0 0 5 0" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="mps:TextFieldAssist.SelectAllOnFocus" Value="True" />
+        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="True" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="PropertyValueReadOnlyTextBox" TargetType="{x:Type TextBox}" BasedOn="{StaticResource PropertyValueTextBox}">
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="False"/>
-        <Setter Property="Foreground" Value="#707070"/>
+    <Style x:Key="PropertyValueReadOnlyTextBox"
+           BasedOn="{StaticResource PropertyValueTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="False" />
+        <Setter Property="Foreground" Value="#707070" />
     </Style>
 
-    <Style x:Key="PropertyValueTextBoxClickable" TargetType="{x:Type TextBox}" BasedOn="{StaticResource PropertyValueTextBox}">
-        <Setter Property="mps:TextFieldAssist.SelectAllOnFocus" Value="False"/>
-        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="False"/>
-        <Setter Property="Cursor" Value="Hand"/>
+    <Style x:Key="PropertyValueTextBoxClickable"
+           BasedOn="{StaticResource PropertyValueTextBox}"
+           TargetType="{x:Type TextBox}">
+        <Setter Property="mps:TextFieldAssist.SelectAllOnFocus" Value="False" />
+        <Setter Property="mps:TextFieldAssist.ClearTextButton" Value="False" />
+        <Setter Property="Cursor" Value="Hand" />
     </Style>
 
-    <Style x:Key="PropertyValueComboBox" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ModPlusComboBox}">
-        <Setter Property="Margin" Value="0 0 5 0"/>
-        <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="IsEditable" Value="True"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueComboBox"
+           BasedOn="{StaticResource ModPlusComboBox}"
+           TargetType="{x:Type ComboBox}">
+        <Setter Property="Margin" Value="0 0 5 0" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="IsEditable" Value="True" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="PropertyValueNumericTextBox" TargetType="{x:Type mps:NumericBox}">
-        <Setter Property="Margin" Value="0 0 5 0"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Height" Value="24"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="PropertyValueNumericTextBox"
+           TargetType="{x:Type mps:NumericBox}">
+        <Setter Property="Margin" Value="0 0 5 0" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="BorderForValueCheckBox" TargetType="{x:Type Border}">
-        <Setter Property="Margin" Value="0 0 5 0"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BoxesBorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0 0 1 1"/>
-        <Setter Property="Background" Value="{DynamicResource WhiteBrush}"/>
-        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0"/>
+    <Style x:Key="BorderForValueCheckBox"
+           TargetType="{x:Type Border}">
+        <Setter Property="Margin" Value="0 0 5 0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BoxesBorderBrush}" />
+        <Setter Property="BorderThickness" Value="0 0 1 1" />
+        <Setter Property="Background" Value="{DynamicResource WhiteBrush}" />
+        <Setter Property="mps:ControlsAssist.CornerRadius" Value="0" />
     </Style>
 
-    <Style x:Key="PropertyValueCheckBox" TargetType="{x:Type CheckBox}" BasedOn="{StaticResource ModPlusCheckBox}">
-        <Setter Property="Margin" Value="6 0 0 0"/>
-        <Setter Property="IsThreeState" Value="True"/>
+    <Style x:Key="PropertyValueCheckBox"
+           BasedOn="{StaticResource ModPlusCheckBox}"
+           TargetType="{x:Type CheckBox}">
+        <Setter Property="Margin" Value="6 0 0 0" />
+        <Setter Property="IsThreeState" Value="True" />
     </Style>
 </ResourceDictionary>
