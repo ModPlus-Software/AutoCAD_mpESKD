@@ -50,7 +50,8 @@ internal static class Helper
     /// <returns>Точка в координатах модели</returns>
     internal static Point3d Point3dOcsToPoint3d(this Point3d pointOcs, ISmartEntity smartEntity)
     {
-        var point = smartEntity.InsertionPoint + (pointOcs - smartEntity.InsertionPointOCS);
+        var point = smartEntity.InsertionPoint + ((pointOcs - smartEntity.InsertionPointOCS)
+            * smartEntity.GetFullScale() / smartEntity.GetScale());
 
         if (smartEntity.IsRotated)
         {

@@ -78,7 +78,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
             // По этим данным я потом получаю экземпляр класса
             if (newStatus == Status.GripEnd)
             {
-                    List<Point3d> leaderStartPointsTmp = new();
+                List<Point3d> leaderStartPointsTmp = new();
                     leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
@@ -138,7 +138,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                         tr.Commit();
                     }
 
-                    CrestedLeader.Dispose();
+                CrestedLeader.Dispose();
             }
 
             // При отмене перемещения возвращаем временные значения

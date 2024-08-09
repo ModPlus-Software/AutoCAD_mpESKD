@@ -90,6 +90,9 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     {
                         CrestedLeader.InsertionPoint = leaderStartPointsSort.First();
                     }
+                    
+                    var shelfLedgeTmp = CrestedLeader.ShelfLedge = NewPoint.GetProjectPointToBaseLine(CrestedLeader)
+                        .DistanceTo(CrestedLeader.InsertionPoint) / CrestedLeader.GetFullScale();
 
                     var baseLeaderStartPoint = CrestedLeader.LeaderStartPoints.First(p => p.Equals(CrestedLeader.InsertionPoint));
                     var baseIndex = CrestedLeader.LeaderStartPoints.IndexOf(baseLeaderStartPoint);
@@ -125,8 +128,7 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
                     
                     CrestedLeader.ShelfStartPoint = CrestedLeader.InsertionPoint;
 
-                    CrestedLeader.ShelfLedge = NewPoint.GetProjectPointToBaseLine(CrestedLeader)
-                        .DistanceTo(CrestedLeader.InsertionPoint);
+                    CrestedLeader.ShelfLedge = shelfLedgeTmp;
 
                     CrestedLeader.IsStartPointsAssigned = true;
                 }
