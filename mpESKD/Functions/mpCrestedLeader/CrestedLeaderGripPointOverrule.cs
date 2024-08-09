@@ -1,17 +1,17 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader;
 
-using Base.Enums;
-using Autodesk.AutoCAD.DatabaseServices;
 using System.Linq;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using Base;
+using Base.Enums;
 using Base.Overrules;
+using Base.Utils;
 using Grips;
 using ModPlusAPI.Windows;
-using Base.Utils;
-using Exception = Autodesk.AutoCAD.Runtime.Exception;
 using mpESKD.Base.Overrules.Grips;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 /// <inheritdoc />
 public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<CrestedLeader>
@@ -25,8 +25,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
         Vector3d curViewDir,
         GetGripPointsFlags bitFlags)
     {
-        Loggerq.WriteRecord("[CrestedLeaderGripPointOverrule: GetGripPoints]");
-
         try
         {
             if (IsApplicable(entity))
@@ -126,7 +124,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                     var addLeaderGrip = new CrestedLeaderAddLeaderGrip(crestedLeader)
                     {
-                        
                         GripPoint = addLeaderGripPoint
                     };
 
@@ -172,6 +169,12 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             GripPoint = alignGripPoint
                         });
                     }
+
+                    // Ручка выбора типа стрелки
+                    grips.Add(new CrestedLeaderArrowTypeGrip(crestedLeader, 0)
+                    {
+                        GripPoint = crestedLeader.ShelfEndPoint
+                    });
                 }
             }
         }
@@ -186,8 +189,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
     public override void MoveGripPointsAt(
         Entity entity, GripDataCollection grips, Vector3d offset, MoveGripPointsFlags bitFlags)
     {
-        Loggerq.WriteRecord("[CrestedLeaderGripPointOverrule: MoveGripPointsAt]");
-
         try
         {
             if (IsApplicable(entity))
@@ -242,7 +243,10 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                         var newPointProject = newPoint.GetProjectPointToBaseLine(crestedLeader);
 
                         var leaderStartPoint = crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex];
+                        var leaderStartPointOcs = crestedLeader.LeaderStartPointsOCS[leaderEndGrip.GripIndex];
+
                         var leaderEndPoint = crestedLeader.LeaderEndPoints[leaderEndGrip.GripIndex];
+                        var leaderEndPointOcs = crestedLeader.LeaderEndPointsOCS[leaderEndGrip.GripIndex];
 
                         if (newPoint.DistanceTo(newPointProject) < crestedLeader.MinDistanceBetweenPoints)
                         {
@@ -252,12 +256,12 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             newPoint = newPointProject + vectorToCorrectNewPoint;
                         }
 
-                        var vectorLeader = leaderEndPoint.ToPoint2d() - leaderStartPoint.ToPoint2d();
+                        var vectorLeader = leaderEndPointOcs.ToPoint2d() - leaderStartPointOcs.ToPoint2d();
 
                         if (Intersections.GetIntersectionBetweenVectors(
-                                crestedLeader.InsertionPoint,
-                                crestedLeader.BaseVectorNormal.ToVector2d(),
-                                newPoint,
+                                crestedLeader.InsertionPointOCS,
+                                (crestedLeader.BaseSecondPointOCS - crestedLeader.InsertionPointOCS).ToVector2d(),
+                                newPoint.Point3dToPoint3dOcs(crestedLeader),
                                 vectorLeader) is { } tempLineStartPoint)
                         {
                             bool isValidPoint =
@@ -267,9 +271,8 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                             if (isValidPoint)
                             {
-                                crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex] = tempLineStartPoint;
+                                crestedLeader.LeaderStartPoints[leaderEndGrip.GripIndex] = tempLineStartPoint.Point3dOcsToPoint3d(crestedLeader);
                                 crestedLeader.LeaderEndPoints[leaderEndGrip.GripIndex] = newPoint;
-                                
                                 
                                 var leaderStartPointsSort = crestedLeader.LeaderStartPointsSorted;
 
@@ -289,8 +292,6 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     else if (gripData is CrestedLeaderStartPointLeaderGrip leaderStartGrip)
                     {
                         var crestedLeader = leaderStartGrip.CrestedLeader;
-
-                        crestedLeader.ToLogAnyString("CrestedLeaderGripPointOverrule: MoveGripPointsAt: CrestedLeaderStartPointLeaderGrip");
 
                         var leaderStartPoint = crestedLeader.LeaderStartPoints[leaderStartGrip.GripIndex];
                         var leaderEndPoint = crestedLeader.LeaderEndPoints[leaderStartGrip.GripIndex];
@@ -348,12 +349,12 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                             newPoint = newPointProject + vectorToCorrectNewPoint;
                         }
 
-                        var vectorLeader = crestedLeader.BaseLeaderEndPoint - crestedLeader.InsertionPoint;
+                        var vectorLeader = crestedLeader.BaseLeaderEndPointOCS - crestedLeader.InsertionPointOCS;
 
                         if (Intersections.GetIntersectionBetweenVectors(
-                                crestedLeader.InsertionPoint,
-                                crestedLeader.BaseVectorNormal.ToVector2d(),
-                                newPoint,
+                                crestedLeader.InsertionPointOCS,
+                                (crestedLeader.BaseSecondPointOCS - crestedLeader.InsertionPointOCS).ToVector2d(),
+                                newPoint.Point3dToPoint3dOcs(crestedLeader),
                                 vectorLeader.ToVector2d()) is { } tempLineStartPoint)
                         {
                             bool isValidPoint =
@@ -362,7 +363,9 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
 
                             if (isValidPoint)
                             {
-                                crestedLeader.LeaderStartPoints[crestedLeader.LeaderStartPoints.Count - 1] = tempLineStartPoint;
+                                crestedLeader.LeaderStartPoints[crestedLeader.LeaderStartPoints.Count - 1] = 
+                                    tempLineStartPoint.Point3dOcsToPoint3d(crestedLeader);
+
                                 crestedLeader.LeaderEndPoints[crestedLeader.LeaderStartPoints.Count - 1] = newPoint;
 
                                 var leaderStartPointsSort = crestedLeader.LeaderStartPointsSorted;

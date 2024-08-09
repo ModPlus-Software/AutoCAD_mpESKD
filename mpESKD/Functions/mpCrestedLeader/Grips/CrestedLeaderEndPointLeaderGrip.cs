@@ -1,22 +1,23 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Ручка перетаскивания выносок
 /// </summary>
 public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
 {
-    // Временное значение точек выноски
+    // Временное значение точек
     private Point3d _leaderStartPointTmp;
     private Point3d _leaderEndPointTmp;
+    private Point3d _shelfStartPointTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderEndPointLeaderGrip"/> class.
@@ -28,7 +29,6 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
         GripType = GripType.Point;
-        //RubberBandLineDisabled = true;
     }
 
     /// <summary>
@@ -59,6 +59,7 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
         {
             _leaderStartPointTmp = CrestedLeader.LeaderStartPoints[GripIndex];
             _leaderEndPointTmp = CrestedLeader.LeaderEndPoints[GripIndex];
+            _shelfStartPointTmp = CrestedLeader.ShelfStartPoint;
         }
 
         if (newStatus == Status.GripEnd)
@@ -138,6 +139,10 @@ public class CrestedLeaderEndPointLeaderGrip : SmartEntityGripData
             {
                 CrestedLeader.LeaderStartPoints[GripIndex] = _leaderStartPointTmp;
                 CrestedLeader.LeaderEndPoints[GripIndex] = _leaderEndPointTmp;
+                CrestedLeader.ShelfStartPoint = _shelfStartPointTmp;
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
             }
         }
 

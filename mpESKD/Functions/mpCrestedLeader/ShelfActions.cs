@@ -1,4 +1,5 @@
 ﻿#pragma warning disable SA1515
+#pragma warning disable SA1513
 namespace mpESKD.Functions.mpCrestedLeader;
 
 using System;
@@ -159,8 +160,8 @@ internal static class ShelfActions
             }
         }
         
-        if (newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(leftStartPoint) ||
-            newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(rightStartPoint))
+        if ((newPoint.X >= midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(leftStartPoint)) ||
+            (newPoint.X < midUnionLinePoint.X && crestedLeader.InsertionPointOCS.Equals(rightStartPoint)))
         {
             crestedLeader.IsChangeShelfPosition = true;
         }
@@ -168,7 +169,5 @@ internal static class ShelfActions
         {
             crestedLeader.IsChangeShelfPosition = false;
         }
-
-        crestedLeader.ToLogAnyString($"IsChangeShelfPosition: {crestedLeader.IsChangeShelfPosition}");
     }
 }

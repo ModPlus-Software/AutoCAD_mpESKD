@@ -16,8 +16,10 @@ using ModPlusAPI.Windows;
 /// </summary>
 public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
 {
-    // Временное значение ручки
-    private Point3d _gripTmp;
+    // Временное значение точек
+    private Point3d _shelfStartPoint;
+    private double _shelfLedge;
+    private ShelfPosition _shelfPosition;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderShelfMoveGrip"/> class.
@@ -55,15 +57,15 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
     /// <inheritdoc />
     public override void OnGripStatusChanged(ObjectId entityId, Status newStatus)
     {
-        CrestedLeader.ToLogAnyString("OnGripStatusChanged: CrestedLeaderShelfMoveGrip");
-
         try
         {
             // При начале перемещения запоминаем первоначальное положение ручки
             // Запоминаем начальные значения
             if (newStatus == Status.GripStart)
             {
-                _gripTmp = GripPoint;
+                _shelfStartPoint = CrestedLeader.ShelfStartPoint;
+                _shelfLedge = CrestedLeader.ShelfLedge;
+                _shelfPosition = CrestedLeader.ShelfPosition;
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -151,13 +153,16 @@ public class CrestedLeaderShelfMoveGrip : SmartEntityGripData
             // При отмене перемещения возвращаем временные значения
             if (newStatus == Status.GripAbort)
             {
-                if (_gripTmp != null)
+                if (_shelfStartPoint != null)
                 {
-                    if (GripIndex == 0)
-                    {
-                        CrestedLeader.EndPoint = _gripTmp;
-                    }
+                    CrestedLeader.ShelfStartPoint = _shelfStartPoint;
                 }
+
+                CrestedLeader.ShelfLedge = _shelfLedge;
+                CrestedLeader.ShelfPosition = _shelfPosition;
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
             }
 
             base.OnGripStatusChanged(entityId, newStatus);

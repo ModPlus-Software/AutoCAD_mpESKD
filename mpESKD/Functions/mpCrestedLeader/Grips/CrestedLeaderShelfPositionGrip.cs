@@ -69,7 +69,7 @@ public class CrestedLeaderShelfPositionGrip : SmartEntityGripData
                     ? CrestedLeader.LeaderStartPointsSorted.First()
                     : CrestedLeader.LeaderStartPointsSorted.Last();
 
-                 shelfStartPoint = CrestedLeader.InsertionPoint;
+                shelfStartPoint = CrestedLeader.InsertionPoint;
             }
 
             var index = CrestedLeader.LeaderStartPoints.IndexOf(CrestedLeader.InsertionPoint);

@@ -15,6 +15,7 @@ using ModPlusAPI.Windows;
 using Base.Enums;
 using System.Collections.Generic;
 using System.Linq;
+using ModPlusAPI;
 
 /// <inheritdoc />
 public class CrestedLeaderFunction : ISmartEntityFunction
@@ -25,9 +26,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new CrestedLeaderGripPointOverrule(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityOsnapOverrule<CrestedLeader>(), true);
         Overrule.AddOverrule(RXObject.GetClass(typeof(BlockReference)), new SmartEntityObjectOverrule<CrestedLeader>(), true);
-
-        // Loggerq.DeleteFile();
-        Loggerq.WriteRecord("CrestedLeaderFunction: Initialize() * * * * * * * * * * * * * * * * * * * * *");
     }
 
     /// <inheritdoc />
@@ -67,15 +65,11 @@ public class CrestedLeaderFunction : ISmartEntityFunction
     [CommandMethod("ModPlus", "mpCrestedLeader", CommandFlags.Modal)]
     public void CreateCrestedLeaderCommand()
     {
-        Loggerq.ClearFile();
-        Loggerq.WriteRecord("CrestedLeaderFunction: CreateCrestedLeaderCommand() * * * * * * * * * * * * *");
-
         CreateCrestedLeader();
     }
 
     private static void CreateCrestedLeader()
     {
-        Loggerq.WriteRecord("CrestedLeaderFunction: CreateCrestedLeader() * * *");
         SmartEntityUtils.SendStatistic<CrestedLeader>();
 
         try
@@ -108,8 +102,6 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
     private static void InsertCrestedLeaderWithJig(CrestedLeader crestedLeader, BlockReference blockReference)
     {
-        Loggerq.WriteRecord("CrestedLeaderFunction: InsertCrestedLeaderWithJig() * * *");
-
         List<Point3d> leaderStartPoints = new ();
         List<Point3d> leaderEndPoints = new ();
         Point3d shelfStartPoint = new ();
@@ -124,9 +116,19 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
         do
         {
-            var status = AcadUtils.Editor.Drag(entityJig).Status;
+            // Укажите точку выноски:
+            var leaderPointPrompt = Language.GetItem("msg18");
+            
+            // Укажите точку размещения текста
+            var shelfStartPointPrompt = Language.GetItem("msg19"); 
 
-            // Это именно режим указания точек для смарт-объекта - не путать с режимом самого JIG
+            // Укажите точку отступа текста
+            var shelfLedgePointPrompt = Language.GetItem("msg20");
+            entityJig.PromptForInsertionPoint = leaderPointPrompt;
+
+            var status = AcadUtils.Editor.Drag(entityJig).Status;
+            
+            // Это именно режим указания точек для смарт-объекта, а не режим самого JIG
             var currentJigStateOfCrestedLeader = crestedLeader.CurrentJigState;
 
             if (status == PromptStatus.OK)
@@ -144,6 +146,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
                     // Включение режима указания точек для смарт-объекта - указание точек выносок
                     crestedLeader.CurrentJigState = (int)CrestedLeaderJigState.PromptNextLeaderPoint;
+                    entityJig.PromptForNextPoint = leaderPointPrompt;
                 }
                 // Если режим JIG - это NextPoint
                 else if (entityJig.JigState == JigState.PromptNextPoint)
@@ -151,6 +154,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
                     // Если текущий режим указания точек для смарт-объекта - указание точек выносок
                     if (currentJigStateOfCrestedLeader == 2)
                     {
+
                         // сохранение точки выноски
                         leaderEndPoints.Add(crestedLeader.EndPoint);
                         crestedLeader.LeaderEndPoints.Add(crestedLeader.EndPoint);
@@ -163,6 +167,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
                         // Включение режима указания точки отступа полки как текущего
                         crestedLeader.CurrentJigState = 4;
+                        entityJig.PromptForNextPoint = shelfLedgePointPrompt;
 
                     }
                     // Если текущий режим указания точек для смарт-объекта - указание точки отступа полки
@@ -197,6 +202,7 @@ public class CrestedLeaderFunction : ISmartEntityFunction
 
                     // Включение режима указания первой точки полки как текущего
                     crestedLeader.CurrentJigState = 3;
+                    entityJig.PromptForNextPoint = shelfStartPointPrompt;
                 }
             }
             else

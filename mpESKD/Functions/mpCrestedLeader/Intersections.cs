@@ -1,9 +1,9 @@
 ﻿namespace mpESKD.Functions.mpCrestedLeader;
 
+using System;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Utils;
-using System;
 
 /// <summary>
 /// Пересечения объектов
@@ -13,6 +13,10 @@ internal class Intersections
     /// <summary>
     /// Возвращает точку пересечения 2х 2D векторов
     /// </summary>
+    /// <param name="point1">Точка для первого вектора</param>
+    /// <param name="vector1">Первый вектор</param>
+    /// <param name="point2">Точка для второго вектора</param>
+    /// <param name="vector2">Второй вектор</param>
     internal static Point2d? GetIntersectionBetweenVectors(Point2d point1, Vector2d vector1, Point2d point2, Vector2d vector2)
     {
         if (point1.Equals(point2))
@@ -48,8 +52,11 @@ internal class Intersections
     /// <summary>
     /// Возвращает точку пересечения 2х 2D векторов
     /// </summary>
-    internal static Point3d? GetIntersectionBetweenVectors(Point3d point1, Vector2d vector1, Point3d point2,
-        Vector2d vector2)
+    /// <param name="point1">Точка для первого вектора</param>
+    /// <param name="vector1">Первый вектор</param>
+    /// <param name="point2">Точка для второго вектора</param>
+    /// <param name="vector2">Второй вектор</param>
+    internal static Point3d? GetIntersectionBetweenVectors(Point3d point1, Vector2d vector1, Point3d point2, Vector2d vector2)
     {
         var point2d = GetIntersectionBetweenVectors(point1.ToPoint2d(), vector1, point2.ToPoint2d(), vector2);
 
@@ -94,7 +101,7 @@ internal class Intersections
 
         double a = (dx * dx) + (dy * dy);
         double b = 2 * ((dx * (x1 - xc)) + (dy * (y1 - yc)));
-        double c = (x1 - xc) * (x1 - xc) + (y1 - yc) * (y1 - yc) - (r * r);
+        double c = ((x1 - xc) * (x1 - xc)) + ((y1 - yc) * (y1 - yc)) - (r * r);
 
         // Дискриминант
         double d = (b * b) - (4 * a * c);

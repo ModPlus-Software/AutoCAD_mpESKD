@@ -1,14 +1,14 @@
 ﻿#pragma warning disable SA1000
 namespace mpESKD.Functions.mpCrestedLeader.Grips;
 
+using System.Collections.Generic;
+using System.Linq;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Base.Enums;
 using Base.Overrules;
 using Base.Utils;
 using ModPlusAPI;
-using System.Collections.Generic;
-using System.Linq;
 
 /// <summary>
 /// Ручка добавления выноски
@@ -17,6 +17,10 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
 {
     private readonly List<Point3d> _leaderStartPointsTmp = new ();
     private readonly List<Point3d> _leaderEndPointsTmp = new ();
+    private Point3d _shelfStartPoint;
+
+    private Point3d _shelfLedgePoint;
+    private double _shelfLedge;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderAddLeaderGrip"/> class.
@@ -50,14 +54,16 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
     {
         if (newStatus == Status.GripStart)
         {
-            CrestedLeader.LeaderStartPoints.ToLog("Status.GripStart: LeaderStartPoints");
-
             // Сохранение списков точек выносок
             _leaderStartPointsTmp.Clear();
             _leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
             _leaderEndPointsTmp.Clear();
             _leaderEndPointsTmp.AddRange(CrestedLeader.LeaderEndPoints);
+
+            _shelfStartPoint = CrestedLeader.ShelfStartPoint;
+            _shelfLedgePoint = CrestedLeader.ShelfLedgePoint;
+            _shelfLedge = CrestedLeader.ShelfLedge;
 
             // Добавление точки новой выноски
             CrestedLeader.LeaderStartPoints.Add(GripPoint);
@@ -137,19 +143,28 @@ public class CrestedLeaderAddLeaderGrip : SmartEntityGripData
                     tr.Commit();
                 }
             }
-
         }
 
         if (newStatus == Status.GripAbort)
         {
-            if (_leaderStartPointsTmp != null && _leaderEndPointsTmp != null)
+            if (_leaderStartPointsTmp != null &&
+                _leaderEndPointsTmp != null &&
+                _shelfLedgePoint != null &&
+                _shelfStartPoint != null)
             {
                 CrestedLeader.LeaderStartPoints.Clear();
                 CrestedLeader.LeaderStartPoints.AddRange(_leaderStartPointsTmp);
 
                 CrestedLeader.LeaderEndPoints.Clear();
                 CrestedLeader.LeaderEndPoints.AddRange(_leaderEndPointsTmp);
+
+                CrestedLeader.ShelfStartPoint = _shelfStartPoint;
+                CrestedLeader.ShelfLedgePoint = _shelfLedgePoint;
+                CrestedLeader.ShelfLedge = _shelfLedge;
             }
+
+            CrestedLeader.UpdateEntities();
+            CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
         }
 
         base.OnGripStatusChanged(entityId, newStatus);

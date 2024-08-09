@@ -14,9 +14,10 @@ using ModPlusAPI;
 /// </summary>
 public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
 {
-    // Временное значение точек выноски
+    // Временное значение точек
     private Point3d _leaderStartPointTmp;
     private Point3d _leaderEndPointTmp;
+    private Point3d _shelfStartPointTmp;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderStartPointLeaderGrip"/> class.
@@ -59,6 +60,7 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
         {
             _leaderStartPointTmp = CrestedLeader.LeaderStartPoints[GripIndex];
             _leaderEndPointTmp = CrestedLeader.LeaderEndPoints[GripIndex];
+            _shelfStartPointTmp = CrestedLeader.ShelfStartPoint;
         }
 
         if (newStatus == Status.GripEnd)
@@ -137,6 +139,11 @@ public class CrestedLeaderStartPointLeaderGrip : SmartEntityGripData
             {
                 CrestedLeader.LeaderStartPoints[GripIndex] = _leaderStartPointTmp;
                 CrestedLeader.LeaderEndPoints[GripIndex] = _leaderEndPointTmp;
+                CrestedLeader.ShelfStartPoint = _shelfStartPointTmp;
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
+
             }
         }
 

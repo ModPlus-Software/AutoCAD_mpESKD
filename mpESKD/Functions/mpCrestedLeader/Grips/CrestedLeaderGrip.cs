@@ -19,6 +19,10 @@ public class CrestedLeaderGrip : SmartEntityGripData
     // Временное значение ручки
     private Point3d _gripTmp;
 
+    // Временное значение точек
+    private readonly List<Point3d> _leaderStartPointsTmp = new ();
+    private Point3d _shelfStartPointTmp;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="CrestedLeaderGrip"/> class.
     /// </summary>
@@ -28,7 +32,8 @@ public class CrestedLeaderGrip : SmartEntityGripData
     {
         CrestedLeader = crestedLeader;
         GripIndex = gripIndex;
-        GripType = GripType.Point;
+        GripType = GripType.Point; 
+        RubberBandLineDisabled = true;
     }
 
     /// <summary>
@@ -62,6 +67,11 @@ public class CrestedLeaderGrip : SmartEntityGripData
             if (newStatus == Status.GripStart)
             {
                 _gripTmp = GripPoint;
+
+                _leaderStartPointsTmp.Clear();
+                _leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
+
+                _shelfStartPointTmp = CrestedLeader.ShelfStartPoint;
             }
 
             // При удачном перемещении ручки записываем новые значения в расширенные данные
@@ -72,7 +82,6 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     leaderStartPointsTmp.AddRange(CrestedLeader.LeaderStartPoints);
 
                     var leaderStartPointsSort = CrestedLeader.LeaderStartPointsSorted;
-
                     
                     if (CrestedLeader.ScaleFactorX == -1)
                     {
@@ -109,6 +118,7 @@ public class CrestedLeaderGrip : SmartEntityGripData
                     }
 
                     CrestedLeader.LeaderStartPoints.Clear();
+
                     CrestedLeader.LeaderStartPoints.AddRange(leaderStartPointsTmp);
                     CrestedLeader.BaseLeaderEndPoint = baseLeaderEndPoint;
 
@@ -141,6 +151,17 @@ public class CrestedLeaderGrip : SmartEntityGripData
                         CrestedLeader.InsertionPoint = _gripTmp;
                     }
                 }
+
+                if (_gripTmp != null && _shelfStartPointTmp != null)
+                {
+                    CrestedLeader.LeaderStartPoints.Clear();
+                    CrestedLeader.LeaderStartPoints.AddRange(_leaderStartPointsTmp);
+
+                    CrestedLeader.ShelfStartPoint = _shelfStartPointTmp;
+                }
+
+                CrestedLeader.UpdateEntities();
+                CrestedLeader.BlockRecord.UpdateAnonymousBlocks();
             }
 
             base.OnGripStatusChanged(entityId, newStatus);

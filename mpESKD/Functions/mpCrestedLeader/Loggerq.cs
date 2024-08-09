@@ -47,7 +47,6 @@ public static class LogData
 {
     public static void ToLogAnyString(this ISmartEntity smart, string str = "")
     {
-        //Loggerq.WriteRecord($"smart: {smart.GetType().Name}, mess: {str}");
         Loggerq.WriteRecord($"{str}");
     }
 
