@@ -146,9 +146,7 @@ public class CrestedLeaderGripPointOverrule : BaseSmartEntityGripOverrule<Creste
                     }
 
                     // Ручка выравнивания текста
-
-                    if ((!string.IsNullOrEmpty(crestedLeader.TopText)) & (!string.IsNullOrEmpty(crestedLeader.BottomText)) &&
-                        (crestedLeader.TopText.Length != crestedLeader.BottomText.Length))
+                    if (crestedLeader.ValueHorizontalAlignmentVisibilityDependency)
                     {
                         var alignGripPoint = crestedLeader.ShelfEndPoint +
                                              (baseVector.GetPerpendicularVector().GetNormal() * 20 * curViewUnitSize);

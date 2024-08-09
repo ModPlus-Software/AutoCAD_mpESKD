@@ -301,7 +301,7 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
     [SaveToXData]
     public TextHorizontalAlignment ValueHorizontalAlignment { get; set; } = TextHorizontalAlignment.Left;
 
-    [EntityProperty(PropertiesCategory.Geometry, 9, "", "", propertyScope: PropertyScope.Hidden)]
+    [EntityProperty(PropertiesCategory.Content, 9, "", "", propertyScope: PropertyScope.Hidden)]
     [PropertyVisibilityDependency(new[] { nameof(ValueHorizontalAlignment) })]
     [SaveToXData]
     public bool ValueHorizontalAlignmentVisibilityDependency { get; set; }
@@ -464,16 +464,17 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
 
         Vector3d movingTextPosition = new();
 
-        if (_bottomText != null && _topText != null && !string.IsNullOrEmpty(TopText) &&
-            !string.IsNullOrEmpty(BottomText) &&
-            !_topText.ActualWidth.Equals(_bottomText.ActualWidth))
+        if (_bottomText != null && _topText != null && !string.IsNullOrEmpty(TopText) && 
+            !string.IsNullOrEmpty(BottomText) && !_topText.ActualWidth.Equals(_bottomText.ActualWidth))
         {
             var distMove = Math.Abs(_topText.ActualWidth - _bottomText.ActualWidth);
             var textHalfMovementHorV = Vector3d.XAxis * (distMove / 2);
 
-            movingTextPosition =
-                EntityUtils.GetMovementPositionVector(ValueHorizontalAlignment, true, textHalfMovementHorV,
-                    ScaleFactorX);
+            movingTextPosition = EntityUtils.GetMovementPositionVector(
+                ValueHorizontalAlignment, 
+                true, 
+                textHalfMovementHorV,
+                ScaleFactorX);
         }
 
         if (_topText != null)
@@ -525,8 +526,11 @@ public class CrestedLeader : SmartEntity, ITextValueEntity, IWithDoubleClickEdit
         }
 
         if ((_topText == null || _bottomText == null) ||
-            ((_topText != null && _bottomText != null) && (TopText.Length != BottomText.Length))
-            )
+            ((_topText != null && _bottomText != null) && !_topText.ActualWidth.Equals(_bottomText.ActualWidth)))
+        {
+            ValueHorizontalAlignmentVisibilityDependency = true;
+        }
+        else
         {
             ValueHorizontalAlignmentVisibilityDependency = false;
         }
